@@ -105,56 +105,79 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     films = []
 
-    # Film titles are plain <h3> tags (no class, no child <a>).
-    # The list appears twice in the HTML (mobile + desktop), so deduplicate by title.
+    # Each film block: poster <a><img>, rating <img>, optional ESTRENO, <h3> title,
+    # <p> meta (country/year/genre/runtime), <p> director/cast, <p> synopsis.
+    # The list appears twice (mobile + desktop) so deduplicate by title.
     seen_titles = set()
+
     for h3 in soup.find_all("h3"):
         title = h3.get_text(strip=True)
         if not title or title in seen_titles:
             continue
         seen_titles.add(title)
 
-        # The film container is the h3's parent or grandparent div
-        container = h3.find_parent("div") or h3.parent
+        # Walk up to find the block that also contains a poster image
+        container = None
+        for parent in h3.parents:
+            if parent.find("img", src=re.compile(r"uploads")):
+                container = parent
+                break
+        if not container:
+            container = h3.parent
 
-        # Genre / metadata paragraph
-        meta_text = ""
-        meta_p = container.find("p") if container else None
-        if meta_p:
-            meta_text = meta_p.get_text(" ", strip=True)
+        raw_html = str(container)
 
-        # Detect VOSE — look for the label in surrounding text
-        raw_html = str(container) if container else ""
-        vose = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
+        # ── Poster: first img with a real uploads URL (skip SVG placeholders)
+        poster_url = ""
+        for img in container.find_all("img"):
+            src = img.get("src", "")
+            if "uploads" in src and not src.startswith("data:"):
+                poster_url = src
+                break
 
-        # Detect if it's a new release
-        is_new = bool(container and container.find(string=re.compile(r"ESTRENO", re.I))) if container else False
-
-        # Rating
+        # ── Rating: first calificacion img with a real URL
         rating = "?"
-        rating_img = container.find("img", src=re.compile(r"calificacion")) if container else None
-        if rating_img:
-            src = rating_img["src"]
-            if "ai.png"  in src: rating = "TP"
-            elif "7.png"  in src: rating = "7"
-            elif "12.png" in src: rating = "12"
-            elif "16.png" in src: rating = "16"
-            elif "18.png" in src: rating = "18"
+        for img in container.find_all("img"):
+            src = img.get("src", "")
+            if "calificacion" in src and not src.startswith("data:"):
+                if "ai.png"  in src: rating = "TP"
+                elif "18.png" in src: rating = "18"
+                elif "16.png" in src: rating = "16"
+                elif "12.png" in src: rating = "12"
+                elif "7.png"  in src: rating = "7"
+                break
 
-        # Poster image
-        poster_img = container.find("img", src=re.compile(r"uploads")) if container else None
-        poster_url = poster_img["src"] if poster_img else ""
+        # ── Meta and synopsis: <p> tags immediately after the h3
+        paragraphs = []
+        found_h3 = False
+        for tag in container.find_all(["h3", "p"]):
+            if tag is h3:
+                found_h3 = True
+                continue
+            if found_h3 and tag.name == "p":
+                text = tag.get_text(" ", strip=True)
+                if text and len(text) > 5:
+                    paragraphs.append(text)
+            elif found_h3 and tag.name == "h3":
+                break  # reached the next film
+
+        meta_text     = paragraphs[0] if len(paragraphs) > 0 else ""
+        synopsis_text = paragraphs[1] if len(paragraphs) > 1 else ""
+
+        # ── VOSE and new release flags
+        vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
+        is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
         films.append({
             "title":    title,
             "meta":     meta_text,
+            "synopsis": synopsis_text,
             "vose":     vose,
             "is_new":   is_new,
             "rating":   rating,
             "poster":   poster_url,
             "cinema_id": cinema_id,
         })
-
     log.info(f"  Found {len(films)} films at {cinema['name']}")
     return films
 
@@ -184,12 +207,13 @@ def fetch_all() -> dict:
             title = film["title"]
             if title not in by_film:
                 by_film[title] = {
-                    "title":   title,
-                    "meta":    film["meta"],
-                    "is_new":  film["is_new"],
-                    "rating":  film["rating"],
-                    "poster":  film["poster"],
-                    "cinemas": [],   # list of {id, name, website, vose, type}
+                    "title":    title,
+                    "meta":     film["meta"],
+                    "synopsis": film.get("synopsis", ""),
+                    "is_new":   film["is_new"],
+                    "rating":   film["rating"],
+                    "poster":   film["poster"],
+                    "cinemas":  [],
                     "any_vose": False,
                 }
             cinema_info = CINEMAS[cinema_id]
@@ -202,6 +226,8 @@ def fetch_all() -> dict:
             })
             if film["vose"]:
                 by_film[title]["any_vose"] = True
+            if film.get("synopsis") and not by_film[title].get("synopsis"):
+                by_film[title]["synopsis"] = film["synopsis"]
             # Prefer is_new=True and a poster if we have one
             if film["is_new"]:
                 by_film[title]["is_new"] = True
@@ -299,12 +325,14 @@ def t(el_type: str, es: str, en: str, cls: str = "") -> str:
 
 def film_card_html(film: dict) -> str:
     """Build a list-card for one film."""
-    title  = film["title"]
-    rating = film["rating"]
-    vose   = film["any_vose"]
-    poster = film["poster"]
-    cinemas = film["cinemas"]
-    is_new = film["is_new"]
+    title    = film["title"]
+    rating   = film["rating"]
+    vose     = film["any_vose"]
+    poster   = film["poster"]
+    cinemas  = film["cinemas"]
+    is_new   = film["is_new"]
+    synopsis = film.get("synopsis", "")
+    meta     = film.get("meta", "")
 
     poster_html = (
         f'<img src="{poster}" alt="{title}" onerror="this.style.display=\'none\'">'
@@ -332,7 +360,8 @@ def film_card_html(film: dict) -> str:
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}</div>
       <div class="list-title">{title}</div>
-      <div class="list-meta">{rating_dot}{film['meta'][:120]}</div>
+      <div class="list-meta">{rating_dot}{meta[:120]}</div>
+      {f'<div class="list-synopsis">{synopsis[:200]}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
         <div class="cinema-tags">{cinema_tags}</div>
@@ -502,7 +531,8 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) ->
         if len(film["cinemas"]) > 4:
             cinemas_str += f' +{len(film["cinemas"])-4} more'
 
-        meta_clean = film["meta"][:80].strip(". ")
+        synopsis   = film.get("synopsis", "")
+    meta_clean = film["meta"][:80].strip(". ")
 
         return f"""
         <tr>
@@ -514,6 +544,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) ->
                   <div style="margin-bottom:5px;">{badges}</div>
                   <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film["title"]}</div>
                   <div style="font-size:11px;color:#7a6d8a;margin-bottom:5px;">{meta_clean}</div>
+                  <div style="font-size:12px;color:#8c8090;margin-bottom:6px;line-height:1.4;">{synopsis[:160] if synopsis else ""}</div>
                   <div style="font-size:11px;color:#5a4e6a;">{cinemas_str}</div>
                 </td>
               </tr>
