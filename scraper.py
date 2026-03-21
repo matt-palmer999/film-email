@@ -47,21 +47,45 @@ CINEMAS = {
 }
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; Cartelera-Valencia-Bot/1.0)"
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/123.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Cache-Control": "max-age=0",
 }
+
+# Persistent session so cookies carry over between requests (more browser-like)
+_session = requests.Session()
+_session.headers.update(HEADERS)
 
 # ─── Scraping ─────────────────────────────────────────────────────────────────
 
 def fetch_cinema(cinema_id: str) -> list[dict]:
     """Scrape today's listings for a single cinema. Returns list of film dicts."""
+    import time, random
     cinema = CINEMAS[cinema_id]
     log.info(f"Fetching {cinema['name']} ...")
+
+    # Polite random delay between requests (2-5 seconds) — looks more human
+    time.sleep(random.uniform(2, 5))
+
     try:
-        resp = requests.get(cinema["url"], headers=HEADERS, timeout=15)
+        resp = _session.get(cinema["url"], timeout=20)
         resp.raise_for_status()
+        log.info(f"  HTTP {resp.status_code} — {len(resp.text)} bytes received")
     except requests.RequestException as e:
         log.warning(f"  Failed to fetch {cinema['name']}: {e}")
         return []
+
+    # Log a page snippet to help debug if films are still 0
+    snippet = resp.text[:400].replace("\n", " ")
+    log.info(f"  Page snippet: {snippet}")
 
     soup = BeautifulSoup(resp.text, "html.parser")
     films = []
@@ -115,6 +139,18 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
 
     log.info(f"  Found {len(films)} films at {cinema['name']}")
     return films
+
+
+def warm_up_session() -> None:
+    """Visit mabuse.es homepage first to get cookies, just like a real browser would."""
+    import time
+    log.info("Warming up session on mabuse.es ...")
+    try:
+        _session.get("https://mabuse.es/", timeout=15)
+        time.sleep(2)
+        log.info("  Session warmed up.")
+    except Exception as e:
+        log.warning(f"  Warm-up failed (non-fatal): {e}")
 
 
 def fetch_all() -> dict:
@@ -444,6 +480,7 @@ def main():
     anchor = anchor.replace(hour=0, minute=0, second=0, microsecond=0)
 
     log.info(f"Building newsletter for week starting {anchor.date()} ...")
+    warm_up_session()
     films = fetch_all()
     log.info(f"Total unique films found: {len(films)}")
 
