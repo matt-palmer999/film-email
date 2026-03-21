@@ -464,9 +464,159 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 
 # ─── Email sender ─────────────────────────────────────────────────────────────
 
+
+def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) -> str:
+    """Build a clean, simple teaser email that links to the full hosted page."""
+    date_en = week_range_en(anchor)
+
+    total_films   = len(films_by_title)
+    total_cinemas = len(CINEMAS)
+    vose_films    = [f for f in films_by_title.values() if f["any_vose"]]
+    new_films     = [f for f in films_by_title.values() if f["is_new"]]
+
+    # Pick up to 3 highlights: newest first, then VOSE, then anything
+    highlights = []
+    seen = set()
+    for f in sorted(films_by_title.values(), key=lambda x: (not x["is_new"], not x["any_vose"], x["title"])):
+        if f["title"] not in seen:
+            highlights.append(f)
+            seen.add(f["title"])
+        if len(highlights) == 3:
+            break
+
+    def highlight_card(film):
+        poster = film["poster"]
+        poster_html = (
+            f'<img src="{poster}" alt="{film["title"]}" width="60" height="87" "'
+            f'style="width:60px;height:87px;object-fit:cover;border-radius:6px;display:block;">' 
+            if poster else
+            '<div style="width:60px;height:87px;border-radius:6px;background:#2a1f3d;display:flex;align-items:center;justify-content:center;font-size:24px;">🎬</div>'
+        )
+        badges = ""
+        if film["is_new"]:
+            badges += '<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid #ffb43260;margin-right:4px;">NEW</span>'
+        if film["any_vose"]:
+            badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid #ffd84a50;">VOSE</span>'
+
+        cinemas_str = " · ".join(c["name"] for c in film["cinemas"][:4])
+        if len(film["cinemas"]) > 4:
+            cinemas_str += f' +{len(film["cinemas"])-4} more'
+
+        meta_clean = film["meta"][:80].strip(". ")
+
+        return f"""
+        <tr>
+          <td style="padding:12px 0;border-bottom:1px solid #1e1630;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="70" valign="top" style="padding-right:14px;">{poster_html}</td>
+                <td valign="top">
+                  <div style="margin-bottom:5px;">{badges}</div>
+                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film["title"]}</div>
+                  <div style="font-size:11px;color:#7a6d8a;margin-bottom:5px;">{meta_clean}</div>
+                  <div style="font-size:11px;color:#5a4e6a;">{cinemas_str}</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>"""
+
+    highlights_html = "".join(highlight_card(f) for f in highlights)
+
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Valencia Cinema – {date_en}</title>
+</head>
+<body style="margin:0;padding:0;background:#0f0c14;font-family:Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0c14;">
+  <tr>
+    <td align="center" style="padding:20px 10px;">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+        <!-- HEADER -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#1a0a2e,#0f0c14);border-bottom:1px solid #3a2a55;padding:36px 40px 28px;text-align:center;border-radius:12px 12px 0 0;">
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 Weekly Newsletter</div>
+            <div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">Cartelera<br>Valencia</div>
+            <div style="font-size:13px;color:#9b8faa;">Your weekly guide to cinema in Valencia</div>
+            <div style="display:inline-block;margin-top:16px;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_en}</div>
+          </td>
+        </tr>
+
+        <!-- STATS BAR -->
+        <tr>
+          <td style="background:#160f24;border-bottom:1px solid #2a1f3d;padding:14px 40px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="text-align:center;">
+                  <div style="font-size:22px;font-weight:700;color:#f0eae0;">{total_films}</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">Films showing</div>
+                </td>
+                <td style="text-align:center;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
+                  <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(vose_films)}</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">With VOSE</div>
+                </td>
+                <td style="text-align:center;">
+                  <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(new_films)}</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">New releases</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- HIGHLIGHTS -->
+        <tr>
+          <td style="background:#0f0c14;padding:20px 40px 10px;">
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">This week's highlights</div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              {highlights_html}
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA BUTTON -->
+        <tr>
+          <td style="background:#0f0c14;padding:24px 40px 32px;text-align:center;">
+            <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">See the full programme — all cinemas, all films, VOSE sessions highlighted</div>
+            <a href="{page_url}" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-weight:700;font-size:14px;letter-spacing:1px;text-decoration:none;border-radius:8px;text-transform:uppercase;">View Full Listings →</a>
+          </td>
+        </tr>
+
+        <!-- CINEMA LIST -->
+        <tr>
+          <td style="background:#0a0810;border-top:1px solid #1e1630;padding:18px 40px;text-align:center;">
+            <div style="font-size:11px;color:#4a3f5e;line-height:1.8;">
+              Kinépolis · Yelmo Campanar · Ocine Aqua · ABC El Saler · ABC Park · ABC Gran Turia<br>
+              Cines MN4 · Cines Lys · <strong style="color:#6a5e7a;">Cines Babel</strong> · <strong style="color:#6a5e7a;">Cinestudio D'Or</strong>
+            </div>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="background:#0a0810;padding:14px 40px 24px;text-align:center;border-radius:0 0 12px 12px;">
+            <div style="font-size:11px;color:#3a2e50;line-height:1.6;">
+              Showtimes may vary — always check the cinema's website before you go.<br>
+              © {anchor.year} Cartelera Valencia Weekly
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>"""
+
+
 def send_email(html: str, anchor: datetime) -> None:
     date_en = week_range_en(anchor)
-    subject = f"🎬 Valencia Cinema – Week of {date_en}"
+    subject = f"🎬 Valencia Cinema – {date_en}"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -503,24 +653,19 @@ def main():
     films = fetch_all()
     log.info(f"Total unique films found: {len(films)}")
 
-    html = build_html(films, anchor)
+    # Build the full bilingual listings page
+    full_html = build_html(films, anchor)
 
-    # Optionally save to disk (useful for debugging)
-    out_path = os.environ.get("OUTPUT_FILE", "")
-    if out_path:
-        with open(out_path, "w", encoding="utf-8") as f:
-            f.write(html)
-        log.info(f"HTML saved to {out_path}")
+    # Always save to docs/index.html for GitHub Pages
+    os.makedirs("docs", exist_ok=True)
+    with open("docs/index.html", "w", encoding="utf-8") as f:
+        f.write(full_html)
+    log.info("Full listings page saved to docs/index.html")
 
-    # Inline all CSS for email client compatibility
-    try:
-        import premailer
-        html = premailer.transform(html)
-        log.info("CSS inlined successfully.")
-    except Exception as e:
-        log.warning(f"CSS inlining failed (sending anyway): {e}")
-
-    send_email(html, anchor)
+    # Build and send the teaser email
+    page_url = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/valencia-cinema")
+    teaser = build_teaser_email(films, anchor, page_url)
+    send_email(teaser, anchor)
     close_browser()
 
 
