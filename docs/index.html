@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartelera Valencia – 27 March – 2 April 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
+.wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
+.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 24px;display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
+.lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
+.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn.active{background:#2e2040;color:#f0eae0}
+.header{background:linear-gradient(135deg,#1a0a2e 0%,#0f0c14 60%);border-bottom:1px solid #3a2a55;padding:40px 40px 32px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(220,80,120,.12) 0%,transparent 70%);border-radius:50%}
+.header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
+.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}
+.header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
+.header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
+.section-label{padding:28px 40px 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;font-weight:500}
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
+.cinema-group-header{margin:0 24px 14px;padding:12px 16px;background:#160f24;border:1px solid #2a1f3d;border-radius:10px;display:flex;align-items:center;gap:10px}
+.cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#c5b8d8}
+.cinema-group-desc{font-size:11px;color:#6a5e7a}
+.cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
+.list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start}
+.list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
+.list-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.list-body{flex:1}
+.list-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
+.list-meta{font-size:11px;color:#7a6d8a;margin-bottom:5px;line-height:1.5}
+.list-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.badges{margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.film-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
+.badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
+.vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
+.cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
+.vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
+.rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
+.footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
+.footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
+.footer a{color:#7a6a9a;text-decoration:none}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="lang-bar">
+    <span class="lang-label" data-es="Idioma" data-en="Language">Idioma</span>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-eyebrow" data-es="🎬 Newsletter Semanal" data-en="🎬 Weekly Newsletter">🎬 Newsletter Semanal</div>
+    <div class="header-title">Cartelera<br>Valencia</div>
+    <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
+    <div class="header-date" data-es="27 de marzo – 2 de abril 2026" data-en="27 March – 2 April 2026">27 de marzo – 2 de abril 2026</div>
+  </div>
+
+  <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys</div>
+      <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
+    </div>
+  </div>
+  
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Abuela tremenda</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Comedia Familiar . 88 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">After, amor infinito</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2022 . Drama , Romance . 119 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">After. Almas perdidas</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2021 . Drama , Romance . 90 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">After. Aquí acaba todo</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2023 . Drama , Romance . 95 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Akira</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 1988 . Animación . 124 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Altas Capacidades</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2026 . Comedia . 101 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Amarga Navidad</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2026 . Drama .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel</a>
+<a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Andrea Bocelli 30: The Celebration</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Italia. 2024 . Concierto , Documental , Música . 148 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Avatar. Fuego y ceniza</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Estados Unidos. 2025 . Animación , Aventura , Ciencia Ficción , Fantasía . 192 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Aída y vuelta</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2026 . Comedia . 100 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Balandrau, viento salvaje</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2026 . Aventura , Drama , Misterio , Thriller .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Batman Begins</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2005 . Acción , Crimen , Drama . 140 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Big Fish</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2003 . Drama . 125 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Bluey en cines: Colección ¡A jugar con los amigos!</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. Otros . 55 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Bts World Tour 'Arirang' In Goyang: Live Viewing</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Otros . 180 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Bts World Tour 'Arirang' In Japan: Live Viewing</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Otros . 180 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Calle Málaga</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Marruecos. 2026 . Drama . 116 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Centauros del desierto</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 1956 . Aventura , Drama , Western . 119 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Cleaner: Rescate vertical</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Acción , Drama , Thriller . 95 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Cumbres borrascosas</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Drama Romántico . 136 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Después De Kim</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Otros . 107 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Dhurandhar: The Revenge</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; India. 2026 . Acción , Crimen , Thriller . 210 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Drácula de Bram Stoker</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 1992 . Fantástica . 123 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El agente secreto</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Brasil. 2025 . Crimen , Drama , Suspense . 161 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El arquitecto</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Biopic , Drama , Historia . 105 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El caballero oscuro</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2008 . Acción , Crimen , Drama , Suspense . 152 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El caballero oscuro: La leyenda renace</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2012 . Acción , Crimen , Drama , Suspense . 164 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El cuento de la princesa Kaguya</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2013 . Animación . 137 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El diablo viste de Prada 2</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Estados Unidos. 2026 . Comedia , Drama .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El mago del Kremlin</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia, EEUU. 2025 . Drama , Historia , Thriller . 156 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El recuerdo de Marnie</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2014 . Animación . 103 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El testamento de Ann Lee</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2025 . Drama , Historia , Musical . 130 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El viaje de Chihiro</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 2001 . Animación , Familia , Fantasía . 125 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El viento se levanta</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2013 . Animación . 126 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">El último vikingo</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Dinamarca. 205 . Comedia , Crimen , Drama . 116 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Elegir mi vida</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Comedia , Drama , Musical . 94 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Fast & Furious 10</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2023 . Acción , Crimen , Suspense . 140 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Fast & Furious 9</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2020 . Acción , Aventura , Crimen , Suspense . 135 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Goat, como cabras</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Acción , Animación , Aventura , Comedia , Deporte , Familia . 100 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Greenland 2</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Acción , Aventura , Ciencia Ficción , Thriller . 97 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Hamnet</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2025 . Biopic , Drama , Romance . 125 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Hannah Montana, la película</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2009 . Comedia Dramatica . 102 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Heridos</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Documental . 76 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Hoppers</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Animación , Aventura , Ciencia Ficción , Comedia , Familia . 105 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Incontrolable (I swear)</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2025 . Biopic , Drama . 120 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Kill Bill: The Whole Bloody Affair</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2006 . Acción , Crimen , Thriller . 275 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La asistenta</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Estados Unidos. 2025 . Thriller . 130 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La cena</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Comedia , Drama , Historia . 106 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La hija pequeña</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Drama . 106 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La invasió dels bàrbars</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Drama . 117 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">La princesa Mononoke</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 1997 . Animación , Aventura , Fantasía . 136 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">La princesa prometida</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 1987 . Aventura , Comedia , Familia , Fantasía , Romance . 98 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">La sonrisa del mal</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Italia. 2025 . Drama , Terror . 123 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La tarta del presidente</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Irán. 2025 . Drama Histórico . 105 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">La última cena</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2021 . Comedia . 72 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Los domingos</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Drama . 115 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Los miserables. El origen</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Drama . 98 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Los pecadores</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Acción , Suspense , Terror . 138 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Línea de extinción</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2024 . Acción , Ciencia Ficción , Suspense . 91 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Marty Supreme</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Biopic , Deporte , Drama . 149 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Memories</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 1996 . Documental . 113 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">No te queda otra</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Comedia Romántica . 90 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Nos Veremos Esta Noche, Mi Amor</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Otros . 79 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Pillion</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2025 . Comedia Negra , Drama , Romance . 107 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Proyecto Salvación</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Aventura , Ciencia Ficción , Drama , Misterio , Thriller . 156 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Rental Family (Familia de alquiler)</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 2025 . Comedia Dramatica . 109 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Ruta de escape</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2026 . Crimen , Drama , Thriller . 135 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Scream 7</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Misterio , Terror . 114 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Shelter: El Protector</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Acción , Thriller . 107 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Super Mario Galaxy: la película</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU, Japón, Francia. 2026 . Acción , Animación , Aventura , Comedia , Familia , Fantasía . 98 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Tafiti y sus amigos</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Alemania. 2025 . Animación , Aventura , Comedia , Familia . 81 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel</a>
+<a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Te van a matar</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Acción , Comedia , Terror . 95 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Torrente presidente</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2026 . Comedia . 100 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Tres adioses</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Italia. 2025 . Drama Romántico . 120 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Una batalla tras otra</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Acción , Comedia Negra , Crimen , Drama , Thriller . 161 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Una hija en Tokio</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2024 . Drama . 99 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Valor sentimental</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Noruega. 2025 . Drama . 135 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Van Gogh. De los campos de trigo bajo cielos nublados</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; 2018 . Documental . 90 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Whistle. El silbido del mal</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Canadá. 2025 . Terror . 85 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis<span class="vose-mini">VOSE</span></a>
+<a href="https://www.ocine.es" class="cinema-tag">Ocine Aqua</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Your name</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Japón. 2016 . Animación , Drama , Romance . 106 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Zootrópolis 2</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Estados Unidos. 2025 . Animación , Aventura , Comedia , Crimen , Familia , Misterio . 108 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">¡La novia!</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2026 . Ciencia Ficción , Drama , Romance , Terror . 125 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag">Yelmo Campanar</a>
+<a href="https://www.kinepolis.es/valencia" class="cinema-tag">Kinépolis</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park<span class="vose-mini">VOSE</span></a>
+<a href="https://www.cinesmn4.com" class="cinema-tag">Cines MN4</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Gran Turia</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Águilas de El Cairo</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Suecia. 2025 . Acción , Drama , Thriller . 128 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+<a href="https://cineslys.com" class="cinema-tag">Cines Lys</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC El Saler</a>
+<a href="https://cinesabc.com" class="cinema-tag">ABC Park</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">Ópera - Turandot</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. Otros . 120 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag">Cines Lys<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="section-label" data-es="🎭 Cines Babel — Cine Independiente &amp; VOSE" data-en="🎭 Cines Babel — Independent &amp; VOSE Cinema">🎭 Cines Babel — Cine Independiente &amp; VOSE</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Cines Babel</div>
+      <div class="cinema-group-desc" data-es="C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE" data-en="C/ Vicent Sancho Tello, 10 · 5 screens · Independent &amp; VOSE specialists">C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE</div>
+    </div>
+    <a href="https://www.cinesalbatrosbabel.com" class="cinema-group-link">cinesalbatrosbabel.com →</a>
+  </div>
+  
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Balearic</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Fantástica . 74 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">El tesoro de Barracuda</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Animación , Aventura , Familia . 87 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="list-title">La grazia</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Italia. 2025 . Comedia , Drama . 133 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag">Cines Babel<span class="vose-mini">VOSE</span></a>
+</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin:0 24px 16px;padding:12px 16px;background:#130d20;border:1px solid #261d3a;border-radius:10px;">
+    <div class="cinema-links-label" data-es="También en Babel esta semana" data-en="Also at Babel this week" style="margin-bottom:8px;">También en Babel esta semana</div>
+    <div class="cinema-tags"><span class="cinema-tag" style="cursor:default;">Altas Capacidades</span><span class="cinema-tag" style="cursor:default;">Amarga Navidad</span><span class="cinema-tag" style="cursor:default;">Calle Málaga <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">El agente secreto <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">El arquitecto <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">El mago del Kremlin <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">El último vikingo <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Hamnet <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Tafiti y sus amigos <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Tres adioses <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Una hija en Tokio <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Your name <span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Águilas de El Cairo <span class="vose-mini">VOSE</span></span></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="section-label" data-es="🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor" data-en="🎞️ Cinestudio D'Or — Double Bills &amp; Art Cinema">🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Cinestudio D'Or</div>
+      <div class="cinema-group-desc" data-es="C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua" data-en="C/ Almirante Cadarso, 31 · Valencia's oldest cinema · Continuous double-bill screenings">C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua</div>
+    </div>
+    <a href="https://cinestudiodor.es" class="cinema-group-link">cinestudiodor.es →</a>
+  </div>
+  
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Ahora me ves 3</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Crimen , Thriller . 112 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">El sendero azul</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Brasil. 2025 . Ciencia Ficción , Drama . 86 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Father mother sister brother</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; EEUU. 2025 . Comedia , Drama . 110 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Nouvelle Vague</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Francia. 2025 . Biopic , Comedia , Drama , Historia . 105 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Todos los lados de la cama</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; España. 2025 . Comedia . 112 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-poster">🎬</div>
+    <div class="list-body">
+      <div class="badges"></div>
+      <div class="list-title">Urchin</div>
+      <div class="list-meta"><span class="rating rating-?"></span>+? &nbsp;·&nbsp; Reino Unido. 2025 . Drama . 99 min .</div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+        <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag">Cinestudio D'Or</a>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="footer">
+    <div class="footer-logo">Cartelera Valencia</div>
+    <p>
+      <span data-es="Fuentes:" data-en="Sources:">Fuentes:</span>
+      <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.ecartelera.com">eCartelera</a><br>
+      <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
+      <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
+      <span style="color:#3a2e50;">© 2026 · Cartelera Valencia Weekly</span>
+    </p>
+  </div>
+
+</div>
+<script>
+function setLang(lang) {
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('html-root').setAttribute('lang', lang);
+  document.querySelectorAll('[data-es][data-en]').forEach(el => {
+    el.textContent = el.getAttribute('data-' + lang);
+  });
+}
+</script>
+</body>
+</html>
