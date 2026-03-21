@@ -299,6 +299,19 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
 .rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
+.featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
+.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px}
+.film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
+.film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
+.grid-row{display:flex;gap:14px;margin:0 24px 14px}
+.grid-card{flex:1;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
+.grid-poster{width:100%;height:85px;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
+.grid-info{padding:12px 14px 14px}
+.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
+.grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
+.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
@@ -389,18 +402,100 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             if cid in cinema_ids:
                 arthouse_films.setdefault(cid, []).append(film)
 
-    multiplex_cards = "\n".join(film_card_html(f) for f in multiplex_films)
+    # ── Multiplex: featured card for top new release, grid pairs for the rest
+    def featured_card_html(film):
+        poster    = film["poster"]
+        synopsis  = film.get("synopsis", "")
+        meta      = film.get("meta", "")
+        vose      = film["any_vose"]
+        is_new    = film["is_new"]
+        cinemas   = film["cinemas"]
+        rating    = film["rating"]
 
+        poster_html = (
+            f'<img src="{poster}" alt="{film["title"]}" style="width:100%;height:100%;object-fit:cover;display:block;">' 
+            if poster else '<div style="font-size:42px;text-align:center;">🎬</div>'
+        )
+        new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
+        vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
+        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        cinema_tags = "".join(
+            f'<a href="{c["website"]}" class="cinema-tag">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            for c in cinemas
+        )
+        where_es, where_en = "Dónde verla", "Where to see it"
+        return f"""
+  <div class="featured-card">
+    <div class="featured-poster">{poster_html}</div>
+    <div class="featured-info">
+      <div>
+        <div class="badges">{new_badge}{vose_badge}</div>
+        <div class="film-title">{film["title"]}</div>
+        <div class="film-meta">{rating_dot}{meta[:100]}</div>
+        <div class="film-synopsis">{synopsis[:220]}</div>
+      </div>
+      <div class="cinema-links">
+        <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
+        <div class="cinema-tags">{cinema_tags}</div>
+      </div>
+    </div>
+  </div>"""
+
+    def grid_card_html(film):
+        poster   = film["poster"]
+        synopsis = film.get("synopsis", "")
+        meta     = film.get("meta", "")
+        vose     = film["any_vose"]
+        is_new   = film["is_new"]
+        cinemas  = film["cinemas"]
+        rating   = film["rating"]
+
+        poster_html = (
+            f'<img src="{poster}" alt="{film["title"]}" style="width:100%;height:100%;object-fit:cover;display:block;">' 
+            if poster else '<div style="font-size:34px;">🎬</div>'
+        )
+        new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span>' if is_new else ""
+        vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
+        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        cinema_tags = "".join(
+            f'<a href="{c["website"]}" class="cinema-tag">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            for c in cinemas
+        )
+        where_es, where_en = "Dónde verla", "Where to see it"
+        return f"""
+    <div class="grid-card">
+      <div class="grid-poster">{poster_html}</div>
+      <div class="grid-info">
+        <div class="badges">{new_badge}{vose_badge}</div>
+        <div class="grid-title">{film["title"]}</div>
+        <div class="grid-meta">{rating_dot}{meta[:80]}</div>
+        <div class="grid-synopsis">{synopsis[:140]}</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
+          <div class="cinema-tags">{cinema_tags}</div>
+        </div>
+      </div>
+    </div>"""
+
+    # Build multiplex section: first film gets featured card, rest go in grid pairs
+    multiplex_cards = ""
+    if multiplex_films:
+        multiplex_cards += featured_card_html(multiplex_films[0])
+        rest = multiplex_films[1:]
+        for i in range(0, len(rest), 2):
+            pair = rest[i:i+2]
+            inner = "".join(grid_card_html(f) for f in pair)
+            multiplex_cards += f'\n  <div class="grid-row">{inner}\n  </div>'
+
+    # Babel: compact list cards for babel-only films, tag strip for shared ones
     babel_cards = ""
     if "babel" in arthouse_films:
-        babel_only = [f for f in arthouse_films["babel"] if not any(c["type"]=="multiplex" for c in f["cinemas"])]
+        babel_only   = [f for f in arthouse_films["babel"] if not any(c["type"]=="multiplex" for c in f["cinemas"])]
         babel_shared = [f for f in arthouse_films["babel"] if any(c["type"]=="multiplex" for c in f["cinemas"])]
-        babel_cards = "\n".join(film_card_html(f) for f in babel_only)
+        babel_cards  = "\n".join(film_card_html(f) for f in babel_only)
         if babel_shared:
             shared_tags = "".join(
-                f'<span class="cinema-tag" style="cursor:default;">{f["title"]}'
-                + (' <span class="vose-mini">VOSE</span>' if f["any_vose"] else "")
-                + "</span>"
+                f'<span class="cinema-tag" style="cursor:default;">{f["title"]}{'<span class="vose-mini">VOSE</span>' if f["any_vose"] else ""}</span>'
                 for f in babel_shared
             )
             babel_cards += f"""
