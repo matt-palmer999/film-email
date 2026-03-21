@@ -708,13 +708,9 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) ->
         <tr>
           <td style="background:#0f0c14;padding:24px 40px 32px;text-align:center;">
             <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">See the full programme — all cinemas, all films, VOSE sessions highlighted</div>
-            <table border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-              <tr>
-                <td align="center" bgcolor="#ffb432" style="border-radius:8px;">
-                  <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;text-decoration:none;border-radius:8px;text-transform:uppercase;mso-padding-alt:0;-webkit-text-size-adjust:none;">View Full Listings →</a>
-                </td>
-              </tr>
-            </table>
+            <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">View Full Listings →</a>
+            <br><br>
+            <div style="font-size:11px;color:#5a4e6a;">Or copy this link: <a href="{page_url}" target="_blank" style="color:#7a6a9a;word-break:break-all;">{page_url}</a></div>
           </td>
         </tr>
 
