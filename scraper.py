@@ -14,6 +14,7 @@ from email.mime.text import MIMEText
 
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+import premailer
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -511,6 +512,13 @@ def main():
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(html)
         log.info(f"HTML saved to {out_path}")
+
+    # Inline all CSS for email client compatibility
+    try:
+        html = premailer.transform(html)
+        log.info("CSS inlined successfully.")
+    except Exception as e:
+        log.warning(f"CSS inlining failed (sending anyway): {e}")
 
     send_email(html, anchor)
     close_browser()

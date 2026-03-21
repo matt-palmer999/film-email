@@ -1,0 +1,57 @@
+name: Valencia Cinema Weekly Newsletter
+
+on:
+  schedule:
+    - cron: "0 17 * * 4"   # Every Thursday at 17:00 UTC (19:00 Valencia time)
+  workflow_dispatch:         # Allow manual trigger for testing
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies for Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2t64 \
+            libatk-bridge2.0-0 \
+            libatk1.0-0 \
+            libcups2 \
+            libdbus-1-3 \
+            libdrm2 \
+            libgbm1 \
+            libgtk-3-0 \
+            libnspr4 \
+            libnss3 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxkbcommon0 \
+            libxrandr2 \
+            xvfb
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright browser
+        run: playwright install chromium
+
+      - name: Run scraper and send email
+        env:
+          SMTP_HOST:     ${{ secrets.SMTP_HOST }}
+          SMTP_PORT:     ${{ secrets.SMTP_PORT }}
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          FROM_ADDRESS:  ${{ secrets.FROM_ADDRESS }}
+          FROM_NAME:     ${{ secrets.FROM_NAME }}
+          RECIPIENTS:    ${{ secrets.RECIPIENTS }}
+        run: python scraper.py
