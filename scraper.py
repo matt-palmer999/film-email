@@ -96,12 +96,7 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         html = page.content()
         log.info(f"  Page loaded — {len(html)} bytes")
 
-        # Diagnostic: log all h3 text content so we can see what's there
-        soup_diag = BeautifulSoup(html, "html.parser")
-        h3s = soup_diag.find_all("h3")
-        log.info(f"  Total h3 tags: {len(h3s)}")
-        for i, h in enumerate(h3s[:30]):
-            log.info(f"  h3[{i}] classes={h.get('class')} text={h.get_text(strip=True)[:80]}")
+
 
     except Exception as e:
         log.warning(f"  Failed to fetch {cinema['name']}: {e}")
@@ -110,14 +105,17 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     films = []
 
-    # Each film block is an <h3> inside a section following a poster image
-    for h3 in soup.select("h3 a"):
+    # Film titles are plain <h3> tags (no class, no child <a>).
+    # The list appears twice in the HTML (mobile + desktop), so deduplicate by title.
+    seen_titles = set()
+    for h3 in soup.find_all("h3"):
         title = h3.get_text(strip=True)
-        if not title:
+        if not title or title in seen_titles:
             continue
+        seen_titles.add(title)
 
-        # Walk up to the film container
-        container = h3.find_parent(class_=lambda c: c and "pelicula" in c) or h3.find_parent("article") or h3.parent.parent
+        # The film container is the h3's parent or grandparent div
+        container = h3.find_parent("div") or h3.parent
 
         # Genre / metadata paragraph
         meta_text = ""
