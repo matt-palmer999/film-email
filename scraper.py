@@ -96,14 +96,12 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         html = page.content()
         log.info(f"  Page loaded — {len(html)} bytes")
 
-        # Diagnostic: log all h3 tags found so we can see what selectors exist
-        h3_count = html.count("<h3")
-        log.info(f"  h3 tags found in page: {h3_count}")
-
-        # Log a mid-page snippet (skip the <head>) to see actual content
-        body_start = html.find("<body")
-        snippet = html[body_start:body_start+1000].replace("\n", " ") if body_start > 0 else html[500:1500]
-        log.info(f"  Body snippet: {snippet[:600]}")
+        # Diagnostic: log all h3 text content so we can see what's there
+        soup_diag = BeautifulSoup(html, "html.parser")
+        h3s = soup_diag.find_all("h3")
+        log.info(f"  Total h3 tags: {len(h3s)}")
+        for i, h in enumerate(h3s[:30]):
+            log.info(f"  h3[{i}] classes={h.get('class')} text={h.get_text(strip=True)[:80]}")
 
     except Exception as e:
         log.warning(f"  Failed to fetch {cinema['name']}: {e}")
