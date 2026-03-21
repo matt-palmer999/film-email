@@ -91,13 +91,20 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
     try:
         page = get_page()
         page.goto(cinema["url"], wait_until="networkidle", timeout=30000)
-        # Wait for film titles to appear in the DOM
-        page.wait_for_selector("h3 a", timeout=10000)
+        # Give JS a moment to render
+        page.wait_for_timeout(3000)
         html = page.content()
         log.info(f"  Page loaded — {len(html)} bytes")
-    except PlaywrightTimeout:
-        log.warning(f"  Timeout waiting for content at {cinema['name']} — skipping")
-        return []
+
+        # Diagnostic: log all h3 tags found so we can see what selectors exist
+        h3_count = html.count("<h3")
+        log.info(f"  h3 tags found in page: {h3_count}")
+
+        # Log a mid-page snippet (skip the <head>) to see actual content
+        body_start = html.find("<body")
+        snippet = html[body_start:body_start+1000].replace("\n", " ") if body_start > 0 else html[500:1500]
+        log.info(f"  Body snippet: {snippet[:600]}")
+
     except Exception as e:
         log.warning(f"  Failed to fetch {cinema['name']}: {e}")
         return []
