@@ -532,7 +532,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) ->
             cinemas_str += f' +{len(film["cinemas"])-4} more'
 
         synopsis   = film.get("synopsis", "")
-    meta_clean = film["meta"][:80].strip(". ")
+        meta_clean = film["meta"][:80].strip(". ")
 
         return f"""
         <tr>
