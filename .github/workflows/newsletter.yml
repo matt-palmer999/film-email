@@ -1,13 +1,9 @@
 name: Valencia Cinema Weekly Newsletter
 
 on:
-  # Every Thursday at 19:00 Valencia time (18:00 UTC in winter, 17:00 UTC in summer)
-  # Using 17:00 UTC which covers BST/CEST — adjust if needed
   schedule:
-    - cron: "0 17 * * 4"   # 4 = Thursday
-
-  # Allow manual trigger from GitHub Actions UI (useful for testing)
-  workflow_dispatch:
+    - cron: "0 17 * * 4"   # Every Thursday at 17:00 UTC (19:00 Valencia time)
+  workflow_dispatch:         # Allow manual trigger for testing
 
 jobs:
   send-newsletter:
@@ -22,8 +18,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
 
       - name: Run scraper and send email
         env:
