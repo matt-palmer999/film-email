@@ -12,8 +12,8 @@ from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -46,48 +46,63 @@ CINEMAS = {
     "gran_turia": {"name": "ABC Gran Turia",     "url": "https://mabuse.es/cine/abc-gran-turia/",     "website": "https://cinesabc.com",              "type": "multiplex"},
 }
 
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/123.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1",
-    "Cache-Control": "max-age=0",
-}
+# Playwright browser instance — shared across all cinema fetches
+_playwright = None
+_browser    = None
+_page       = None
 
-# Persistent session so cookies carry over between requests (more browser-like)
-_session = requests.Session()
-_session.headers.update(HEADERS)
+def get_page():
+    """Return a shared Playwright page, launching the browser on first call."""
+    global _playwright, _browser, _page
+    if _page is None:
+        log.info("Launching headless Chromium ...")
+        _playwright = sync_playwright().start()
+        _browser = _playwright.chromium.launch(headless=True)
+        context = _browser.new_context(
+            locale="es-ES",
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/123.0.0.0 Safari/537.36"
+            ),
+        )
+        _page = context.new_page()
+    return _page
+
+def close_browser():
+    global _playwright, _browser, _page
+    if _browser:
+        _browser.close()
+    if _playwright:
+        _playwright.stop()
+    _page = _browser = _playwright = None
 
 # ─── Scraping ─────────────────────────────────────────────────────────────────
 
 def fetch_cinema(cinema_id: str) -> list[dict]:
     """Scrape today's listings for a single cinema. Returns list of film dicts."""
-    import time, random
     cinema = CINEMAS[cinema_id]
     log.info(f"Fetching {cinema['name']} ...")
 
-    # Polite random delay between requests (2-5 seconds) — looks more human
-    time.sleep(random.uniform(2, 5))
+    import time, random
+    # Polite random delay between requests (1-3 seconds)
+    time.sleep(random.uniform(1, 3))
 
     try:
-        resp = _session.get(cinema["url"], timeout=20)
-        resp.raise_for_status()
-        log.info(f"  HTTP {resp.status_code} — {len(resp.text)} bytes received")
-    except requests.RequestException as e:
+        page = get_page()
+        page.goto(cinema["url"], wait_until="networkidle", timeout=30000)
+        # Wait for film titles to appear in the DOM
+        page.wait_for_selector("h3 a", timeout=10000)
+        html = page.content()
+        log.info(f"  Page loaded — {len(html)} bytes")
+    except PlaywrightTimeout:
+        log.warning(f"  Timeout waiting for content at {cinema['name']} — skipping")
+        return []
+    except Exception as e:
         log.warning(f"  Failed to fetch {cinema['name']}: {e}")
         return []
 
-    # Log a page snippet to help debug if films are still 0
-    snippet = resp.text[:400].replace("\n", " ")
-    log.info(f"  Page snippet: {snippet}")
-
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
     films = []
 
     # Each film block is an <h3> inside a section following a poster image
@@ -142,11 +157,12 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
 
 
 def warm_up_session() -> None:
-    """Visit mabuse.es homepage first to get cookies, just like a real browser would."""
+    """Visit mabuse.es homepage first to warm up cookies and JS state."""
     import time
     log.info("Warming up session on mabuse.es ...")
     try:
-        _session.get("https://mabuse.es/", timeout=15)
+        page = get_page()
+        page.goto("https://mabuse.es/", wait_until="networkidle", timeout=30000)
         time.sleep(2)
         log.info("  Session warmed up.")
     except Exception as e:
@@ -494,6 +510,7 @@ def main():
         log.info(f"HTML saved to {out_path}")
 
     send_email(html, anchor)
+    close_browser()
 
 
 if __name__ == "__main__":
