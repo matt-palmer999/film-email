@@ -784,14 +784,14 @@ def main():
     # Build the full bilingual listings page
     full_html = build_html(films, anchor)
 
-    # Always save to docs/index.html for GitHub Pages
-    os.makedirs("docs", exist_ok=True)
-    with open("docs/index.html", "w", encoding="utf-8") as f:
+    # Save listings to docs/listings/index.html for GitHub Pages
+    os.makedirs("docs/listings", exist_ok=True)
+    with open("docs/listings/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
-    log.info("Full listings page saved to docs/index.html")
+    log.info("Full listings page saved to docs/listings/index.html")
 
     # Build and send the teaser email
-    page_url = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/valencia-cinema")
+    page_url = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
     teaser = build_teaser_email(films, anchor, page_url)
     send_email(teaser, anchor)
     close_browser()
