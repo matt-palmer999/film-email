@@ -206,10 +206,12 @@ def tmdb_lookup(title: str) -> dict:
     Returns dict with: title_en, title_original, synopsis_en, poster_url, year
     Returns empty dict if not found or API key missing.
     """
+    import requests as req
+    import time
+
     if not TMDB_API_KEY:
         return {}
 
-    import time
     time.sleep(0.25)  # polite rate limiting
 
     try:
@@ -221,11 +223,11 @@ def tmdb_lookup(title: str) -> dict:
         # Search in Spanish first to match the scraped title
         search_url = (
             f"{TMDB_BASE}/search/movie"
-            f"?query={requests.utils.quote(title)}"
+            f"?query={req.utils.quote(title)}"
             f"&language=es-ES"
             f"&region=ES"
         )
-        res = requests.get(search_url, headers=headers, timeout=10)
+        res = req.get(search_url, headers=headers, timeout=10)
         res.raise_for_status()
         results = res.json().get("results", [])
 
@@ -233,10 +235,10 @@ def tmdb_lookup(title: str) -> dict:
             # Try English search as fallback
             search_url_en = (
                 f"{TMDB_BASE}/search/movie"
-                f"?query={requests.utils.quote(title)}"
+                f"?query={req.utils.quote(title)}"
                 f"&language=en-US"
             )
-            res = requests.get(search_url_en, headers=headers, timeout=10)
+            res = req.get(search_url_en, headers=headers, timeout=10)
             res.raise_for_status()
             results = res.json().get("results", [])
 
@@ -249,7 +251,7 @@ def tmdb_lookup(title: str) -> dict:
 
         # Fetch full details in English for synopsis
         detail_url = f"{TMDB_BASE}/movie/{movie_id}?language=en-US"
-        detail_res = requests.get(detail_url, headers=headers, timeout=10)
+        detail_res = req.get(detail_url, headers=headers, timeout=10)
         detail_res.raise_for_status()
         detail = detail_res.json()
 
