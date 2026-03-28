@@ -462,6 +462,11 @@ window.addEventListener('DOMContentLoaded', () => { applyVisibility(); });
 """
 
 
+def esc(s: str) -> str:
+    """Escape a string for safe use inside an HTML attribute value."""
+    return (s or "").replace("&", "&amp;").replace('"', "&quot;").replace("'", "&#39;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def t(el_type: str, es: str, en: str, cls: str = "") -> str:
     """Render a bilingual element."""
     c = f' class="{cls}"' if cls else ""
@@ -510,9 +515,9 @@ def film_card_html(film: dict) -> str:
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}</div>
-      <div class="list-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
+      <div class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
       <div class="list-meta">{rating_dot}{meta[:120]}</div>
-      {f'<div class="list-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>' if synopsis else ""}
+      {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
         <div class="cinema-tags">{cinema_tags}</div>
@@ -580,10 +585,10 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="featured-info">
       <div>
         <div class="badges">{new_badge}{vose_badge}</div>
-        <div class="film-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
+        <div class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
         {orig_label}
         <div class="film-meta">{rating_dot}{meta[:100]}</div>
-        <div class="film-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>
+        <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
       </div>
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -624,9 +629,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}</div>
-        <div class="grid-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
+        <div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
         <div class="grid-meta">{rating_dot}{meta[:80]}</div>
-        <div class="grid-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>
+        <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
           <div class="cinema-tags">{cinema_tags}</div>
@@ -943,6 +948,7 @@ def main():
     log.info(f"Total unique films found: {len(films)}")
 
     # Enrich each film with TMDB data
+    log.info(f"TMDB_API_KEY present: {bool(TMDB_API_KEY)}")
     if TMDB_API_KEY:
         log.info("Enriching films with TMDB data ...")
         for title, film in films.items():
