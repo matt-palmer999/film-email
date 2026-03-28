@@ -31,6 +31,10 @@ FROM_NAME     = os.environ.get("FROM_NAME", "Cartelera Valencia")
 # Comma-separated list of recipient emails stored as a single secret
 RECIPIENTS = [r.strip() for r in os.environ["RECIPIENTS"].split(",") if r.strip()]
 
+# TMDB API key for English titles and synopses
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY", "")
+TMDB_BASE    = "https://api.themoviedb.org/3"
+
 # ─── Cinema definitions ───────────────────────────────────────────────────────
 
 CINEMAS = {
@@ -194,6 +198,77 @@ def warm_up_session() -> None:
     except Exception as e:
         log.warning(f"  Warm-up failed (non-fatal): {e}")
 
+
+
+def tmdb_lookup(title: str) -> dict:
+    """
+    Search TMDB for a film by its Spanish title.
+    Returns dict with: title_en, title_original, synopsis_en, poster_url, year
+    Returns empty dict if not found or API key missing.
+    """
+    if not TMDB_API_KEY:
+        return {}
+
+    import time
+    time.sleep(0.25)  # polite rate limiting
+
+    try:
+        # Search in Spanish first to match the scraped title
+        search_url = (
+            f"{TMDB_BASE}/search/movie"
+            f"?api_key={TMDB_API_KEY}"
+            f"&query={requests.utils.quote(title)}"
+            f"&language=es-ES"
+            f"&region=ES"
+        )
+        res = requests.get(search_url, timeout=10)
+        res.raise_for_status()
+        results = res.json().get("results", [])
+
+        if not results:
+            # Try English search as fallback
+            search_url_en = (
+                f"{TMDB_BASE}/search/movie"
+                f"?api_key={TMDB_API_KEY}"
+                f"&query={requests.utils.quote(title)}"
+                f"&language=en-US"
+            )
+            res = requests.get(search_url_en, timeout=10)
+            res.raise_for_status()
+            results = res.json().get("results", [])
+
+        if not results:
+            log.info(f"  TMDB: no results for '{title}'")
+            return {}
+
+        movie = results[0]
+        movie_id = movie["id"]
+
+        # Fetch full details in English for synopsis
+        detail_url = (
+            f"{TMDB_BASE}/movie/{movie_id}"
+            f"?api_key={TMDB_API_KEY}"
+            f"&language=en-US"
+        )
+        detail_res = requests.get(detail_url, timeout=10)
+        detail_res.raise_for_status()
+        detail = detail_res.json()
+
+        poster_path = detail.get("poster_path") or movie.get("poster_path")
+        poster_url  = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
+
+        return {
+            "title_en":       detail.get("title", ""),
+            "title_original": detail.get("original_title", ""),
+            "synopsis_en":    detail.get("overview", ""),
+            "poster_url":     poster_url,
+            "year":           (detail.get("release_date") or "")[:4],
+            "tmdb_id":        movie_id,
+        }
+
+    except Exception as e:
+        log.warning(f"  TMDB lookup failed for '{title}': {e}")
+        return {}
 
 def fetch_all() -> dict:
     """
@@ -425,14 +500,19 @@ def film_card_html(film: dict) -> str:
     where_en = "Where to see it"
 
     cinema_ids = ",".join(c["id"] for c in cinemas)
+    title_es = title
+    title_en = film.get("title_en", title)
+    syn_es   = synopsis[:200]
+    syn_en   = film.get("synopsis_en", synopsis)[:200]
+
     return f"""
   <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}</div>
-      <div class="list-title">{title}</div>
+      <div class="list-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
       <div class="list-meta">{rating_dot}{meta[:120]}</div>
-      {f'<div class="list-synopsis">{synopsis[:200]}</div>' if synopsis else ""}
+      {f'<div class="list-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
         <div class="cinema-tags">{cinema_tags}</div>
@@ -483,15 +563,27 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         )
         where_es, where_en = "Dónde verla", "Where to see it"
         cinema_ids = ",".join(c["id"] for c in cinemas)
+        title_es  = film["title"]
+        title_en  = film.get("title_en", film["title"])
+        title_orig= film.get("title_original", film["title"])
+        syn_es    = synopsis[:220]
+        syn_en    = film.get("synopsis_en", synopsis)[:220]
+
+        # Show original title if different from Spanish
+        orig_label = ""
+        if title_orig and title_orig != title_es and title_orig != title_en:
+            orig_label = f'<div style="font-size:11px;color:var(--faint);margin-top:2px;" translate="no">{title_orig}</div>'
+
         return f"""
   <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
         <div class="badges">{new_badge}{vose_badge}</div>
-        <div class="film-title">{film["title"]}</div>
+        <div class="film-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
+        {orig_label}
         <div class="film-meta">{rating_dot}{meta[:100]}</div>
-        <div class="film-synopsis">{synopsis[:220]}</div>
+        <div class="film-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>
       </div>
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -522,14 +614,19 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         )
         where_es, where_en = "Dónde verla", "Where to see it"
         cinema_ids = ",".join(c["id"] for c in cinemas)
+        title_es = film["title"]
+        title_en = film.get("title_en", film["title"])
+        syn_es   = synopsis[:140]
+        syn_en   = film.get("synopsis_en", synopsis)[:140]
+
         return f"""
     <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}</div>
-        <div class="grid-title">{film["title"]}</div>
+        <div class="grid-title" data-es="{title_es}" data-en="{title_en}">{title_es}</div>
         <div class="grid-meta">{rating_dot}{meta[:80]}</div>
-        <div class="grid-synopsis">{synopsis[:140]}</div>
+        <div class="grid-synopsis" data-es="{syn_es}" data-en="{syn_en}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
           <div class="cinema-tags">{cinema_tags}</div>
@@ -844,6 +941,28 @@ def main():
     warm_up_session()
     films = fetch_all()
     log.info(f"Total unique films found: {len(films)}")
+
+    # Enrich each film with TMDB data
+    if TMDB_API_KEY:
+        log.info("Enriching films with TMDB data ...")
+        for title, film in films.items():
+            tmdb = tmdb_lookup(title)
+            if tmdb:
+                if tmdb.get("poster_url"):
+                    film["poster"] = tmdb["poster_url"]
+                film["title_en"]       = tmdb.get("title_en", title)
+                film["title_original"] = tmdb.get("title_original", title)
+                film["synopsis_en"]    = tmdb.get("synopsis_en", "")
+                log.info(f"  ✓ {title} → {tmdb.get('title_en','?')} / {tmdb.get('title_original','?')}")
+            else:
+                film["title_en"]       = title
+                film["title_original"] = title
+                film["synopsis_en"]    = film.get("synopsis", "")
+    else:
+        for film in films.values():
+            film["title_en"]       = film["title"]
+            film["title_original"] = film["title"]
+            film["synopsis_en"]    = film.get("synopsis", "")
 
     # Build the full bilingual listings page
     full_html = build_html(films, anchor)
