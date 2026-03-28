@@ -589,7 +589,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 # ─── Email sender ─────────────────────────────────────────────────────────────
 
 
-def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) -> str:
+def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "") -> str:
     """Build a clean, simple teaser email that links to the full hosted page."""
     date_en = week_range_en(anchor)
 
@@ -729,6 +729,9 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str) ->
           <td style="background:#0a0810;padding:14px 40px 24px;text-align:center;border-radius:0 0 12px 12px;">
             <div style="font-size:11px;color:#3a2e50;line-height:1.6;">
               Showtimes may vary — always check the cinema's website before you go.<br>
+              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">⚙️ Manage preferences</a>
+              &nbsp;·&nbsp;
+              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">Unsubscribe</a><br>
               © {anchor.year} Cartelera Valencia Weekly
             </div>
           </td>
@@ -791,8 +794,9 @@ def main():
     log.info("Full listings page saved to docs/listings/index.html")
 
     # Build and send the teaser email
-    page_url = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
-    teaser = build_teaser_email(films, anchor, page_url)
+    page_url  = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
+    prefs_url = page_url.replace("/listings", "/preferences")
+    teaser = build_teaser_email(films, anchor, page_url, prefs_url)
     send_email(teaser, anchor)
     close_browser()
 
