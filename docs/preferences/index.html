@@ -543,7 +543,7 @@
       <!-- CINEMAS -->
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Cines a incluir" data-en="Cinemas to include">Cines a incluir</div>
-        <div class="cinema-grid" id="cinema-grid">
+        <div class="cinema-grid" id="cinema-grid" translate="no">
           <!-- populated by JS -->
         </div>
       </div>
@@ -602,20 +602,20 @@
 
   <script>
     // !! Replace with your Supabase credentials !!
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     const CINEMAS = [
-      { id: 'kinepolis',  name: 'Kinépolis',       arthouse: false },
-      { id: 'yelmo',      name: 'Yelmo Campanar',   arthouse: false },
-      { id: 'ocine',      name: 'Ocine Aqua',       arthouse: false },
-      { id: 'lys',        name: 'Cines Lys',        arthouse: false },
-      { id: 'abc_saler',  name: 'ABC El Saler',     arthouse: false },
-      { id: 'abc_park',   name: 'ABC Park',         arthouse: false },
-      { id: 'gran_turia', name: 'ABC Gran Turia',   arthouse: false },
-      { id: 'mn4',        name: 'Cines MN4',        arthouse: false },
-      { id: 'babel',      name: '🎭 Cines Babel',   arthouse: true  },
-      { id: 'dor',        name: "🎞️ Cinestudio D'Or", arthouse: true },
+      { id: 'kinepolis',  name: 'Kinépolis',          arthouse: false },
+      { id: 'yelmo',      name: 'Yelmo Campanar',      arthouse: false },
+      { id: 'ocine',      name: 'Ocine Aqua',          arthouse: false },
+      { id: 'lys',        name: 'Cines Lys',           arthouse: false },
+      { id: 'abc_saler',  name: 'ABC El Saler',        arthouse: false },
+      { id: 'abc_park',   name: 'ABC Park',            arthouse: false },
+      { id: 'gran_turia', name: 'ABC Gran Turia',      arthouse: false },
+      { id: 'mn4',        name: 'Cines MN4',           arthouse: false },
+      { id: 'babel',      name: '🎭 Cines Babel',      arthouse: true  },
+      { id: 'dor',        name: "🎞️ Cinestudio D'Or",  arthouse: true  },
     ];
 
     // Current state
@@ -784,7 +784,7 @@
         <div class="cinema-pill ${c.arthouse ? 'arthouse' : ''} ${prefs.cinemas.includes(c.id) ? 'selected' : ''}"
              onclick="toggleCinema('${c.id}')">
           <div class="cinema-check">${prefs.cinemas.includes(c.id) ? '✓' : ''}</div>
-          <div class="cinema-name">${c.name}</div>
+          <div class="cinema-name" translate="no">${c.name}</div>
         </div>
       `).join('');
 
