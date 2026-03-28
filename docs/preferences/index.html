@@ -673,8 +673,8 @@
       const token = crypto.randomUUID();
 
       try {
-        // Store token in Supabase
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/preference_tokens`, {
+        // 1. Store token in Supabase
+        const tokenRes = await fetch(`${SUPABASE_URL}/rest/v1/preference_tokens`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -685,19 +685,29 @@
           body: JSON.stringify({ email, token })
         });
 
-        if (!res.ok) throw new Error(`Status ${res.status}`);
+        if (!tokenRes.ok) throw new Error(`Token store failed: ${tokenRes.status}`);
 
-        // For now — show the magic link directly (until we have email sending set up)
-        // In production this would send an email via the scraper/a Supabase function
-        const prefUrl = `${window.location.origin}${window.location.pathname}?token=${token}`;
+        // 2. Call Edge Function to send the magic link email
+        const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-magic-link`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+          },
+          body: JSON.stringify({ email, token, lang })
+        });
+
+        if (!emailRes.ok) {
+          const err = await emailRes.json();
+          throw new Error(`Email send failed: ${JSON.stringify(err)}`);
+        }
 
         document.getElementById('request-form').style.display = 'none';
         showAlert(alertEl, 'success',
           lang === 'es'
-            ? `✅ ¡Enlace enviado! Revisa tu bandeja de entrada.\n\nMientras configuramos el envío de emails, aquí tienes tu enlace directo:\n${prefUrl}`
-            : `✅ Link sent! Check your inbox.\n\nWhile we set up email sending, here's your direct link:\n${prefUrl}`
+            ? '✅ ¡Enlace enviado! Revisa tu bandeja de entrada.'
+            : '✅ Link sent! Check your inbox.'
         );
-        alertEl.style.whiteSpace = 'pre-wrap';
 
       } catch (err) {
         showAlert(alertEl, 'error',
