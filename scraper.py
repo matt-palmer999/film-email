@@ -525,6 +525,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
       <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
     </div>
+    <a href="../preferences/" style="margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px;white-space:nowrap;" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</a>
   </div>
 
   <div class="header">
