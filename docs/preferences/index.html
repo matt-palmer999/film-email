@@ -862,10 +862,20 @@
           }
         );
 
+        // Build personalised listings URL from saved preferences
+        const listingsBase = '../listings/';
+        const p = new URLSearchParams();
+        if (prefs.vose_only) p.set('vose', 'true');
+        if (prefs.new_only)  p.set('new',  'true');
+        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
+        const missing = allCinemas.filter(c => !prefs.cinemas.includes(c));
+        if (missing.length > 0) p.set('cinemas', prefs.cinemas.join(','));
+        const listingsUrl = listingsBase + (p.toString() ? '?' + p.toString() : '');
+
         alertEl.className = 'alert alert-success';
-        alertEl.textContent = lang === 'es'
-          ? '✅ Preferencias guardadas correctamente.'
-          : '✅ Preferences saved successfully.';
+        alertEl.innerHTML = (lang === 'es'
+          ? '✅ Preferencias guardadas. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">Ver cartelera personalizada →</a>'
+          : '✅ Preferences saved. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">View your personalised listings →</a>');
         alertEl.style.display = 'block';
         alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
