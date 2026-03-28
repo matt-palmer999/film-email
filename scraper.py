@@ -327,6 +327,63 @@ function setLang(lang) {
     el.textContent = el.getAttribute('data-' + lang);
   });
 }
+
+function setFilter(filter) {
+  const url = new URL(window.location);
+  if (filter === 'all') url.searchParams.delete('filter');
+  else url.searchParams.set('filter', filter);
+  window.history.replaceState({}, '', url);
+  applyVisibility();
+}
+
+function applyVisibility() {
+  const params   = new URLSearchParams(window.location.search);
+  const filter   = params.get('filter')  || 'all';
+  const voseOnly = params.get('vose')    === 'true';
+  const newOnly  = params.get('new')     === 'true';
+  const cinemas  = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+
+  // Sync filter buttons
+  const allBtn  = document.getElementById('filter-all');
+  const voseBtn = document.getElementById('filter-vose');
+  if (allBtn)  allBtn.classList.toggle('active',  !voseOnly && filter === 'all');
+  if (voseBtn) voseBtn.classList.toggle('active', voseOnly  || filter === 'vose');
+
+  let visible = 0;
+  document.querySelectorAll('[data-vose]').forEach(card => {
+    let show = true;
+
+    // VOSE filter
+    if (voseOnly || filter === 'vose') {
+      if (card.dataset.vose !== 'true') show = false;
+    }
+
+    // New releases filter
+    if (newOnly && card.dataset.isnew !== 'true') show = false;
+
+    // Cinema filter
+    if (cinemas && cinemas.length > 0) {
+      const cardCinemas = (card.dataset.cinemas || '').split(',');
+      if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
+    }
+
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  // Collapse empty grid rows
+  document.querySelectorAll('.grid-row').forEach(row => {
+    const anyVisible = Array.from(row.children).some(c => c.style.display !== 'none');
+    row.style.display = anyVisible ? '' : 'none';
+  });
+
+  // Empty state message
+  const empty = document.getElementById('filter-empty');
+  if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+}
+
+// On load — apply filters from URL params
+window.addEventListener('DOMContentLoaded', () => { applyVisibility(); });
 """
 
 
@@ -367,8 +424,9 @@ def film_card_html(film: dict) -> str:
     where_es = "Dónde verla"
     where_en = "Where to see it"
 
+    cinema_ids = ",".join(c["id"] for c in cinemas)
     return f"""
-  <div class="list-card">
+  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}</div>
@@ -424,8 +482,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
+        cinema_ids = ",".join(c["id"] for c in cinemas)
         return f"""
-  <div class="featured-card">
+  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
@@ -462,8 +521,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
+        cinema_ids = ",".join(c["id"] for c in cinemas)
         return f"""
-    <div class="grid-card">
+    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}</div>
