@@ -213,15 +213,19 @@ def tmdb_lookup(title: str) -> dict:
     time.sleep(0.25)  # polite rate limiting
 
     try:
+        headers = {
+            "Authorization": f"Bearer {TMDB_API_KEY}",
+            "accept": "application/json"
+        }
+
         # Search in Spanish first to match the scraped title
         search_url = (
             f"{TMDB_BASE}/search/movie"
-            f"?api_key={TMDB_API_KEY}"
-            f"&query={requests.utils.quote(title)}"
+            f"?query={requests.utils.quote(title)}"
             f"&language=es-ES"
             f"&region=ES"
         )
-        res = requests.get(search_url, timeout=10)
+        res = requests.get(search_url, headers=headers, timeout=10)
         res.raise_for_status()
         results = res.json().get("results", [])
 
@@ -229,11 +233,10 @@ def tmdb_lookup(title: str) -> dict:
             # Try English search as fallback
             search_url_en = (
                 f"{TMDB_BASE}/search/movie"
-                f"?api_key={TMDB_API_KEY}"
-                f"&query={requests.utils.quote(title)}"
+                f"?query={requests.utils.quote(title)}"
                 f"&language=en-US"
             )
-            res = requests.get(search_url_en, timeout=10)
+            res = requests.get(search_url_en, headers=headers, timeout=10)
             res.raise_for_status()
             results = res.json().get("results", [])
 
@@ -245,12 +248,8 @@ def tmdb_lookup(title: str) -> dict:
         movie_id = movie["id"]
 
         # Fetch full details in English for synopsis
-        detail_url = (
-            f"{TMDB_BASE}/movie/{movie_id}"
-            f"?api_key={TMDB_API_KEY}"
-            f"&language=en-US"
-        )
-        detail_res = requests.get(detail_url, timeout=10)
+        detail_url = f"{TMDB_BASE}/movie/{movie_id}?language=en-US"
+        detail_res = requests.get(detail_url, headers=headers, timeout=10)
         detail_res.raise_for_status()
         detail = detail_res.json()
 
@@ -948,7 +947,7 @@ def main():
     log.info(f"Total unique films found: {len(films)}")
 
     # Enrich each film with TMDB data
-    log.info(f"TMDB_API_KEY present: {bool(TMDB_API_KEY)}")
+    log.info(f"TMDB_API_KEY present: {bool(TMDB_API_KEY)}, length: {len(TMDB_API_KEY)}, value_start: {TMDB_API_KEY[:4] if TMDB_API_KEY else 'empty'}")
     if TMDB_API_KEY:
         log.info("Enriching films with TMDB data ...")
         for title, film in films.items():
