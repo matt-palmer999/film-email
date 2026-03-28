@@ -44,7 +44,7 @@ jobs:
           FROM_NAME:     ${{ secrets.FROM_NAME }}
           RECIPIENTS:    ${{ secrets.RECIPIENTS }}
           LISTINGS_URL:  ${{ secrets.LISTINGS_URL }}
-          TMDB_API_KEY:  ${{ secrets.TMDB_API_KEY }}
+          TMDB_API_KEY:  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyOWJjMjNkZGI2MmRhMzUyZDRhMDI1NTM4MmQzMGEyMCIsIm5iZiI6MTc3NDcxNjEyNy44NjQsInN1YiI6IjY5YzgwNGRmZTEyNTA5YzJmNjA3NDdhYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OtsZ58Eigy7j46zGsty-A3HWk8tsBiw4F1oG3IQgVAs"
         run: python scraper.py
 
       - name: Publish listings page to GitHub Pages
