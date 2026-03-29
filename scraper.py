@@ -32,7 +32,11 @@ FROM_NAME     = os.environ.get("FROM_NAME", "Cartelera Valencia")
 RECIPIENTS = [r.strip() for r in os.environ["RECIPIENTS"].split(",") if r.strip()]
 
 # TMDB API key for English titles and synopses
-TMDB_API_KEY = os.environ.get("TMDB_API_KEY", "")
+TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
+
+# Supabase credentials — injected into generated HTML pages
+SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON = os.environ.get("SUPABASE_ANON", "")
 TMDB_BASE    = "https://api.themoviedb.org/3"
 
 # ─── Cinema definitions ───────────────────────────────────────────────────────
@@ -979,6 +983,20 @@ def main():
     with open("docs/listings/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
+
+    # Inject Supabase credentials into landing page and preferences page
+    if SUPABASE_URL and SUPABASE_ANON:
+        for page_path in ["docs/index.html", "docs/preferences/index.html"]:
+            if os.path.exists(page_path):
+                with open(page_path, "r", encoding="utf-8") as f:
+                    page = f.read()
+                page = page.replace("YOUR_SUPABASE_URL", SUPABASE_URL)
+                page = page.replace("YOUR_SUPABASE_ANON_KEY", SUPABASE_ANON)
+                with open(page_path, "w", encoding="utf-8") as f:
+                    f.write(page)
+                log.info(f"Supabase credentials injected into {page_path}")
+    else:
+        log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
 
     # Build and send the teaser email
     page_url  = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
