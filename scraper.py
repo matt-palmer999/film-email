@@ -406,6 +406,79 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.textContent = el.getAttribute('data-' + lang);
   });
+  localStorage.setItem('cv_lang', lang);
+}
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function applyPreferencesFromURL() {
+  const params  = new URLSearchParams(window.location.search);
+  const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+
+  // Hide cinema tags for excluded cinemas
+  if (cinemas) {
+    document.querySelectorAll('.cinema-tag').forEach(tag => {
+      const cid = tag.dataset.cinema;
+      if (cid && !cinemas.includes(cid)) {
+        tag.style.display = 'none';
+      }
+    });
+  }
+}
+
+async function loadUserPreferences() {
+  // Check URL params first (pre-filtered link)
+  const params = new URLSearchParams(window.location.search);
+  const hasParams = params.has('vose') || params.has('cinemas') || params.has('new');
+
+  // Apply language from localStorage or cookie
+  const savedLang = localStorage.getItem('cv_lang');
+  if (savedLang) setLang(savedLang);
+
+  // If we have URL params, apply cinema tag visibility
+  if (hasParams) {
+    applyPreferencesFromURL();
+    return;
+  }
+
+  // Otherwise try to load from Supabase via cookie
+  const email = getCookie('cv_email');
+  if (!email || !window.SUPABASE_URL || !window.SUPABASE_ANON) return;
+
+  try {
+    const res = await fetch(
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=lang,cinemas,vose_only,new_only',
+      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON } }
+    );
+    const rows = await res.json();
+    if (!rows.length) return;
+
+    const prefs = rows[0];
+
+    // Apply language
+    if (prefs.lang) setLang(prefs.lang);
+
+    // Build URL params from preferences and reload if needed
+    const newParams = new URLSearchParams();
+    if (prefs.vose_only) newParams.set('vose', 'true');
+    if (prefs.new_only)  newParams.set('new',  'true');
+    const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
+    if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
+      newParams.set('cinemas', prefs.cinemas.join(','));
+    }
+
+    if (newParams.toString()) {
+      window.history.replaceState({}, '', '?' + newParams.toString());
+      applyVisibility();
+      applyPreferencesFromURL();
+    }
+
+  } catch(e) {
+    console.warn('Could not load preferences:', e);
+  }
 }
 
 function setFilter(filter) {
@@ -462,8 +535,6 @@ function applyVisibility() {
   if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
 }
 
-// On load — apply filters from URL params
-window.addEventListener('DOMContentLoaded', () => { applyVisibility(); });
 """
 
 
@@ -504,7 +575,7 @@ def film_card_html(film: dict) -> str:
     cinema_tags = ""
     for c in cinemas:
         vm = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
-        cinema_tags += f'<a href="{c["website"]}" class="cinema-tag">{c["name"]}{vm}</a>\n'
+        cinema_tags += f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{vm}</a>\n'
 
     where_es = "Dónde verla"
     where_en = "Where to see it"
@@ -568,7 +639,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
@@ -619,7 +690,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
@@ -749,7 +820,15 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
 
 </div>
-<script>{JS}</script>
+<script>
+window.SUPABASE_URL  = "{SUPABASE_URL}";
+window.SUPABASE_ANON = "{SUPABASE_ANON}";
+{JS}
+window.addEventListener('DOMContentLoaded', () => {{
+  applyVisibility();
+  loadUserPreferences();
+}});
+</script>
 </body>
 </html>"""
 
