@@ -345,7 +345,7 @@ CSS = """
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
 .wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
-.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 24px;display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
 .lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
 .lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
 .lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
@@ -399,6 +399,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
 .footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+@media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
 
 JS = """
@@ -767,13 +768,14 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <div class="wrapper">
 
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;text-decoration:none;margin-right:auto;">whatson<span style="color:#ffb432;">.movie</span></a>
-    {t('span','Idioma','Language','lang-label')}
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
-      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
     </div>
-    <a href="../preferences/" style="margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px;white-space:nowrap;" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</a>
   </div>
 
   <div class="header">
