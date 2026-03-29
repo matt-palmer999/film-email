@@ -20,7 +20,7 @@
       --text:      #f0eae0;
       --text2:     #c5b8d8;
       --muted:     #9b8faa;
-      --faint:     #5a4e6a;
+      --faint:     #8a7e9a;
       --vose:      #ffd84a;
       --vose-bg:   rgba(255,220,80,0.12);
       --vose-edge: rgba(255,220,80,0.35);
@@ -246,7 +246,7 @@
     .signup-btn:disabled { opacity: 0.5; cursor: default; }
 
     .signup-note {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--faint);
       margin-top: 10px;
       text-align: center;
@@ -998,8 +998,8 @@
     if (savedLang !== 'es') setLang(savedLang);
 
     /* ── SIGNUP ── */
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     async function submitSignup(source) {
       const emailEl   = document.getElementById(source + '-email');
