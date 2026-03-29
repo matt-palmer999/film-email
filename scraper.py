@@ -758,6 +758,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <div class="wrapper">
 
   <div class="lang-bar">
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;text-decoration:none;margin-right:auto;">whatson<span style="color:#ffb432;">.movie</span></a>
     {t('span','Idioma','Language','lang-label')}
     <div class="lang-toggle">
       <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
