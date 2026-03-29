@@ -478,7 +478,7 @@
     <div class="panel active" id="panel-request">
       <p class="page-eyebrow" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</p>
       <h1 class="page-title" data-es="Personaliza tu newsletter" data-en="Personalise your newsletter">Personaliza tu newsletter</h1>
-      <p class="page-desc" data-es="Introduce tu email y te enviamos un enlace para gestionar tus preferencias — qué cines quieres ver, si prefieres solo VOSE, y mucho más." data-en="Enter your email and we'll send you a link to manage your preferences — which cinemas to include, VOSE only, and more.">Introduce tu email y te enviamos un enlace para gestionar tus preferencias — qué cines quieres ver, si prefieres solo VOSE, y mucho más.</p>
+      <p class="page-desc" data-es="Introduce el email con el que te suscribiste para acceder a tus preferencias. Si estás en el mismo dispositivo donde te suscribiste, accederás directamente." data-en="Enter the email you subscribed with to access your preferences. If you're on the same device you signed up on, you'll be taken straight through.">Introduce el email con el que te suscribiste para acceder a tus preferencias. Si estás en el mismo dispositivo donde te suscribiste, accederás directamente.</p>
 
       <div id="request-alert" class="alert alert-success" style="display:none;"></div>
 
@@ -718,6 +718,46 @@
       }
     }
 
+    // ── LOAD PREFERENCES FROM COOKIE EMAIL (no token needed) ──
+    async function loadFromEmail(email) {
+      const lang = document.getElementById('html-root').getAttribute('lang');
+      try {
+        const subRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}&select=*`,
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+        );
+        const subs = await subRes.json();
+
+        if (!subs.length) {
+          // Email not in database — show request form with helpful message
+          showPanel('panel-request');
+          const alertEl = document.getElementById('request-alert');
+          showAlert(alertEl, 'info',
+            lang === 'es'
+              ? 'No encontramos tu email. ¿Lo introdujiste correctamente al suscribirte?'
+              : 'We couldn't find your email. Did you use the same address when you subscribed?'
+          );
+          return;
+        }
+
+        const sub = subs[0];
+        currentEmail = email;
+        prefs.vose_only = sub.vose_only || false;
+        prefs.new_only  = sub.new_only  || false;
+        prefs.classics  = sub.classics  || false;
+        prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
+        prefs.lang      = sub.lang      || 'es';
+
+        renderPreferences();
+        document.getElementById('prefs-email-display').textContent = currentEmail;
+        showPanel('panel-prefs');
+
+      } catch (err) {
+        console.error(err);
+        showPanel('panel-request');
+      }
+    }
+
     // ── LOAD PREFERENCES FROM TOKEN ──
     async function loadFromToken(token) {
       const lang = document.getElementById('html-root').getAttribute('lang');
@@ -857,20 +897,25 @@
 
         if (!res.ok) throw new Error(`Status ${res.status}`);
 
-        // Mark token as used
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${currentToken}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_ANON,
-              'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({ used: true })
-          }
-        );
+        // Refresh cookie on save
+        setCookie('cv_email', currentEmail);
+
+        // Mark token as used if we have one
+        if (currentToken) {
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${currentToken}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON,
+                'Authorization': `Bearer ${SUPABASE_ANON}`,
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({ used: true })
+            }
+          );
+        }
 
         // Build personalised listings URL from saved preferences
         const listingsBase = '../listings/';
@@ -943,11 +988,27 @@
       el.style.display = 'block';
     }
 
-    // ── INIT: check for token in URL ──
+    // ── COOKIE HELPERS ──
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function setCookie(name, value) {
+      const expires = new Date();
+      expires.setFullYear(expires.getFullYear() + 1);
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+    }
+
+    // ── INIT: check cookie first, then URL token ──
     const urlParams = new URLSearchParams(window.location.search);
     const urlToken  = urlParams.get('token');
+    const cookieEmail = getCookie('cv_email');
+
     if (urlToken) {
       loadFromToken(urlToken);
+    } else if (cookieEmail) {
+      loadFromEmail(cookieEmail);
     }
   </script>
 
