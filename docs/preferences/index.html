@@ -474,30 +474,13 @@
 
   <div class="container">
 
-    <!-- ── PANEL 1: REQUEST MAGIC LINK ── -->
+    <!-- ── PANEL 1: NOT RECOGNISED ── -->
     <div class="panel active" id="panel-request">
-      <p class="page-eyebrow" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</p>
-      <h1 class="page-title" data-es="Personaliza tu newsletter" data-en="Personalise your newsletter">Personaliza tu newsletter</h1>
-      <p class="page-desc" data-es="Introduce el email con el que te suscribiste para acceder a tus preferencias. Si estás en el mismo dispositivo donde te suscribiste, accederás directamente." data-en="Enter the email you subscribed with to access your preferences. If you're on the same device you signed up on, you'll be taken straight through.">Introduce el email con el que te suscribiste para acceder a tus preferencias. Si estás en el mismo dispositivo donde te suscribiste, accederás directamente.</p>
-
-      <div id="request-alert" class="alert alert-success" style="display:none;"></div>
-
-      <div id="request-form">
-        <div class="form-group">
-          <label class="form-label" data-es="Tu email" data-en="Your email">Tu email</label>
-          <input
-            type="email"
-            class="form-input"
-            id="request-email"
-            data-placeholder-es="tu@email.com"
-            data-placeholder-en="your@email.com"
-            placeholder="tu@email.com"
-          >
-        </div>
-        <button class="btn-primary" id="request-btn" onclick="requestLink()">
-          <span data-es="Enviarme el enlace" data-en="Send me the link">Enviarme el enlace</span>
-        </button>
-      </div>
+      <p class="page-eyebrow">⚙️</p>
+      <h1 class="page-title" data-es="Cargando preferencias..." data-en="Loading preferences...">Cargando preferencias...</h1>
+      <p class="page-desc" data-es="Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder." data-en="If you see this for more than a few seconds, you may be on a different device to the one you subscribed on. Go back to the homepage and sign up again to get access.">Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder.</p>
+      <div id="request-alert" style="display:none;"></div>
+      <a href="../" style="color:var(--gold);font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
     </div>
 
     <!-- ── PANEL 2: PREFERENCES ── -->
@@ -602,8 +585,8 @@
 
   <script>
     // !! Replace with your Supabase credentials !!
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     const CINEMAS = [
       { id: 'kinepolis',  name: 'Kinépolis',          arthouse: false },
@@ -997,7 +980,7 @@
     function setCookie(name, value) {
       const expires = new Date();
       expires.setFullYear(expires.getFullYear() + 1);
-      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/film-email/;SameSite=Lax`;
     }
 
     // ── INIT: check cookie first, then URL token ──
