@@ -985,9 +985,11 @@
 
     // ── INIT: check cookie first, then URL token ──
     window.addEventListener('DOMContentLoaded', () => {
+      console.log('All cookies:', document.cookie);
       const urlParams   = new URLSearchParams(window.location.search);
       const urlToken    = urlParams.get('token');
       const cookieEmail = getCookie('cv_email');
+      console.log('cv_email cookie:', cookieEmail);
 
       if (urlToken) {
         loadFromToken(urlToken);
