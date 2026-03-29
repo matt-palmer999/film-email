@@ -771,8 +771,9 @@
       </div>
       <div class="signup-success" id="hero-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
-        <div style="margin-top:14px;">
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
           <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="hero-error"></div>
@@ -953,8 +954,9 @@
       </div>
       <div class="signup-success" id="cta-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
-        <div style="margin-top:14px;">
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
           <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="cta-error"></div>
@@ -1040,15 +1042,18 @@
           })
         });
 
-        if (res.ok || res.status === 201) {
-          formWrap.style.display = 'none';
-          successEl.style.display = 'block';
-        } else if (res.status === 409) {
-          // Already subscribed
+        // 201 = created, 200 = ok, 409 = already exists (treat as success)
+        if (res.ok || res.status === 201 || res.status === 409) {
+          // Set a cookie so the preferences page knows who this is
+          const expires = new Date();
+          expires.setFullYear(expires.getFullYear() + 1);
+          document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
           formWrap.style.display = 'none';
           successEl.style.display = 'block';
         } else {
-          throw new Error(`Status ${res.status}`);
+          const body = await res.text();
+          console.error('Signup failed:', res.status, body);
+          throw new Error(`Status ${res.status}: ${body}`);
         }
       } catch (err) {
         btn.disabled = false;
