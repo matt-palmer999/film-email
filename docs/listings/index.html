@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
 .wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
-.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 24px;display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
 .lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
 .lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
 .lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
@@ -63,19 +63,21 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
 .footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+@media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 </style>
 </head>
 <body>
 <div class="wrapper">
 
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;text-decoration:none;margin-right:auto;">whatson<span style="color:#ffb432;">.movie</span></a>
-    <span class="lang-label" data-es="Idioma" data-en="Language">Idioma</span>
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
-      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
     </div>
-    <a href="../preferences/" style="margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px;white-space:nowrap;" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</a>
   </div>
 
   <div class="header">
@@ -340,7 +342,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
         <div class="grid-title" data-es="Un altre home (Otro hombre)" data-en="Un altre home (Otro hombre)">Un altre home (Otro hombre)</div>
         <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;2025 . Drama . 100 min .</div>
-        <div class="grid-synopsis" data-es="De David Moragas . Con Lluís Marquès , David Teixidó , Bruna Cusí ." data-en="De David Moragas . Con Lluís Marquès , David Teixidó , Bruna Cusí .">De David Moragas . Con Lluís Marquès , David Teixidó , Bruna Cusí .</div>
+        <div class="grid-synopsis" data-es="De David Moragas . Con Bruna Cusí , Ramón Pujol , Quim Àvila ." data-en="De David Moragas . Con Bruna Cusí , Ramón Pujol , Quim Àvila .">De David Moragas . Con Bruna Cusí , Ramón Pujol , Quim Àvila .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
@@ -381,7 +383,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span></div>
         <div class="grid-title" data-es="Ópera - Turandot" data-en="Royal Opera House: Turandot">Ópera - Turandot</div>
         <div class="grid-meta">España. Otros . 120 min .</div>
-        <div class="grid-synopsis" data-es="De Rafael Payare . Con Sondra Radvanovsky , Seokjong Baek , Gemma Summerfield ." data-en="2013 revival of Andrei Serban&#39;s 1984 production. Recorded live at the Royal Opera House, September 2013.  Andrei Serban&#39;s spectacular and th">De Rafael Payare . Con Sondra Radvanovsky , Seokjong Baek , Gemma Summerfield .</div>
+        <div class="grid-synopsis" data-es="De Rafael Payare . Con Seokjong Baek , Gemma Summerfield , Adam Palka ." data-en="2013 revival of Andrei Serban&#39;s 1984 production. Recorded live at the Royal Opera House, September 2013.  Andrei Serban&#39;s spectacular and th">De Rafael Payare . Con Seokjong Baek , Gemma Summerfield , Adam Palka .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a></div>
@@ -620,7 +622,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.1</span></div>
         <div class="grid-title" data-es="El cuento de la princesa Kaguya" data-en="The Tale of The Princess Kaguya">El cuento de la princesa Kaguya</div>
         <div class="grid-meta">2013 . Animación . 137 min .</div>
-        <div class="grid-synopsis" data-es="De Isao Takahata . Con 高良健吾 , Atsuko Takahata , Aki Asakura ." data-en="Found inside a shining stalk of bamboo by an old bamboo cutter and his wife, a tiny girl grows rapidly into an exquisite young lady. The mys">De Isao Takahata . Con 高良健吾 , Atsuko Takahata , Aki Asakura .</div>
+        <div class="grid-synopsis" data-es="De Isao Takahata . Con Aki Asakura , Takeo Chii , 宮本信子 ." data-en="Found inside a shining stalk of bamboo by an old bamboo cutter and his wife, a tiny girl grows rapidly into an exquisite young lady. The mys">De Isao Takahata . Con Aki Asakura , Takeo Chii , 宮本信子 .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
@@ -648,7 +650,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.9</span></div>
         <div class="grid-title" data-es="El recuerdo de Marnie" data-en="When Marnie Was There">El recuerdo de Marnie</div>
         <div class="grid-meta">2014 . Animación . 103 min .</div>
-        <div class="grid-synopsis" data-es="De Hiromasa Yonebayashi . Con 寺島進 , Toshie Negishi , 高月彩良 ." data-en="Upon being sent to live with relatives in the countryside due to an illness, an emotionally distant adolescent girl becomes obsessed with an">De Hiromasa Yonebayashi . Con 寺島進 , Toshie Negishi , 高月彩良 .</div>
+        <div class="grid-synopsis" data-es="De Hiromasa Yonebayashi . Con 高月彩良 , 有村架純 , 松嶋菜々子 ." data-en="Upon being sent to live with relatives in the countryside due to an illness, an emotionally distant adolescent girl becomes obsessed with an">De Hiromasa Yonebayashi . Con 高月彩良 , 有村架純 , 松嶋菜々子 .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
@@ -661,7 +663,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.5</span></div>
         <div class="grid-title" data-es="El viaje de Chihiro" data-en="Spirited Away">El viaje de Chihiro</div>
         <div class="grid-meta">Japón. 2001 . Animación , Familia , Fantasía . 125 min .</div>
-        <div class="grid-synopsis" data-es="De Hayao Miyazaki . Con Yasuko Sawaguchi , Rumi Hiiragi , Miyu Irino ." data-en="A young girl, Chihiro, becomes trapped in a strange new world of spirits. When her parents undergo a mysterious transformation, she must cal">De Hayao Miyazaki . Con Yasuko Sawaguchi , Rumi Hiiragi , Miyu Irino .</div>
+        <div class="grid-synopsis" data-es="De Hayao Miyazaki . Con Rumi Hiiragi , Miyu Irino , Mari Natsuki ." data-en="A young girl, Chihiro, becomes trapped in a strange new world of spirits. When her parents undergo a mysterious transformation, she must cal">De Hayao Miyazaki . Con Rumi Hiiragi , Miyu Irino , Mari Natsuki .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
@@ -676,7 +678,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.8</span></div>
         <div class="grid-title" data-es="El viento se levanta" data-en="The Wind Rises">El viento se levanta</div>
         <div class="grid-meta">2013 . Animación . 126 min .</div>
-        <div class="grid-synopsis" data-es="De Hayao Miyazaki . Con 二世野村萬斎 , Hidetoshi Nishijima , Masahiko Nishimura ." data-en="A lifelong love of flight inspires Japanese aviation engineer Jiro Horikoshi, whose storied career includes the creation of the A-6M World W">De Hayao Miyazaki . Con 二世野村萬斎 , Hidetoshi Nishijima , Masahiko Nishimura .</div>
+        <div class="grid-synopsis" data-es="De Hayao Miyazaki . Con Hidetoshi Nishijima , Masahiko Nishimura , 瀧本美織 ." data-en="A lifelong love of flight inspires Japanese aviation engineer Jiro Horikoshi, whose storied career includes the creation of the A-6M World W">De Hayao Miyazaki . Con Hidetoshi Nishijima , Masahiko Nishimura , 瀧本美織 .</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
