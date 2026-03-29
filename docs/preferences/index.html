@@ -562,7 +562,7 @@
     <div class="panel" id="panel-unsub">
       <p class="page-eyebrow">👋</p>
       <h1 class="page-title" data-es="¿Seguro que quieres darte de baja?" data-en="Are you sure you want to unsubscribe?">¿Seguro que quieres darte de baja?</h1>
-      <p class="page-desc" data-es="No recibirás más emails. Puedes volver a suscribirte en cualquier momento." data-en="You won't receive any more emails. You can resubscribe at any time.">No recibirás más emails. Puedes volver a suscribirte en cualquier momento.</p>
+      <p class="page-desc" data-es="No recibirás más emails. Puedes volver a suscribirte en cualquier momento." data-en="You will not receive any more emails. You can resubscribe at any time.">No recibirás más emails. Puedes volver a suscribirte en cualquier momento.</p>
       <div style="display:flex;gap:12px;margin-top:8px;">
         <button class="btn-primary" style="background:var(--red);" onclick="confirmUnsub()">
           <span data-es="Sí, darme de baja" data-en="Yes, unsubscribe">Sí, darme de baja</span>
@@ -718,7 +718,7 @@
           showAlert(alertEl, 'info',
             lang === 'es'
               ? 'No encontramos tu email. ¿Lo introdujiste correctamente al suscribirte?'
-              : 'We couldn't find your email. Did you use the same address when you subscribed?'
+              : 'We could not find your email. Did you use the same address when you subscribed?'
           );
           return;
         }
