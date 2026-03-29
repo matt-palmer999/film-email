@@ -602,8 +602,8 @@
 
   <script>
     // !! Replace with your Supabase credentials !!
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     const CINEMAS = [
       { id: 'kinepolis',  name: 'Kinépolis',          arthouse: false },
@@ -1001,15 +1001,17 @@
     }
 
     // ── INIT: check cookie first, then URL token ──
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken  = urlParams.get('token');
-    const cookieEmail = getCookie('cv_email');
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams   = new URLSearchParams(window.location.search);
+      const urlToken    = urlParams.get('token');
+      const cookieEmail = getCookie('cv_email');
 
-    if (urlToken) {
-      loadFromToken(urlToken);
-    } else if (cookieEmail) {
-      loadFromEmail(cookieEmail);
-    }
+      if (urlToken) {
+        loadFromToken(urlToken);
+      } else if (cookieEmail) {
+        loadFromEmail(cookieEmail);
+      }
+    });
   </script>
 
 </body>
