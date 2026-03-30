@@ -76,8 +76,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     </div>
   </div>
 
-  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
+  <div class="section-title" data-es="🎭 CINES" data-en="🎭 CINEMAS">🎭 CINES</div>
+  <div class="day-tabs" id="cinema-tabs"><button class="day-tab active" id="cinema-all" data-cinema="all" onclick="filterCinema('all')"><span data-es="Todos" data-en="All">Todos</span></button><button class="day-tab" data-cinema="kinepolis" onclick="filterCinema('kinepolis')" translate="no">Kinépolis</button><button class="day-tab" data-cinema="mn4" onclick="filterCinema('mn4')" translate="no">Cines MN4</button></div>
 
+  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
   <div class="day-tabs"><button class="day-tab active" data-day="2026-03-30" data-es="Hoy 30" data-en="Today 30" onclick="showDay('2026-03-30')">Hoy 30</button><button class="day-tab " data-day="2026-03-31" data-es="Mañana 31" data-en="Tomorrow 31" onclick="showDay('2026-03-31')">Mañana 31</button><button class="day-tab " data-day="2026-04-01" data-es="Miércoles 1" data-en="Wednesday 1" onclick="showDay('2026-04-01')">Miércoles 1</button><button class="day-tab " data-day="2026-04-02" data-es="Jueves 2" data-en="Thursday 2" onclick="showDay('2026-04-02')">Jueves 2</button><button class="day-tab " data-day="2026-04-03" data-es="Viernes 3" data-en="Friday 3" onclick="showDay('2026-04-03')">Viernes 3</button><button class="day-tab " data-day="2026-04-04" data-es="Sábado 4" data-en="Saturday 4" onclick="showDay('2026-04-04')">Sábado 4</button><button class="day-tab " data-day="2026-04-05" data-es="Domingo 5" data-en="Sunday 5" onclick="showDay('2026-04-05')">Domingo 5</button></div>
 
   <div id="day-panels"><div class="day-panel active" id="day-2026-03-30"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-03-31"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-04-01"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-04-02"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-04-03"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-04-04"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div><div class="day-panel " id="day-2026-04-05"><div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div></div></div>
@@ -96,6 +98,14 @@ function setLang(lang) {
   });
   document.title = (lang === 'en' ? 'Lapönia' : 'Lapönia') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
+}
+function filterCinema(cid) {
+  document.querySelectorAll('#cinema-tabs .day-tab').forEach(t => t.classList.remove('active'));
+  const btn = document.querySelector(`#cinema-tabs [data-cinema="${cid}"]`);
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.showtime-row').forEach(row => {
+    row.style.display = (cid === 'all' || row.dataset.cinemaId === cid) ? '' : 'none';
+  });
 }
 function showDay(key) {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
