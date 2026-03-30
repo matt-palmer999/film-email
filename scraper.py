@@ -176,43 +176,38 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
         is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
-        # ── Showtimes: scan container for HH:MM patterns grouped by day
+        # ── Showtimes: mabuse.es uses ul.ficha_sesiones > li > a[data-fecha]
+        # Each <a> has data-fecha="YYYY/MM/DD" and text like "16:30"
         showtimes = {}
         try:
-            from datetime import date as _date, timedelta as _td
-            today_d = _date.today()
-            DAYS_ES = {"lunes":0,"martes":1,"miércoles":2,"jueves":3,"viernes":4,"sábado":5,"domingo":6}
+            sesiones_ul = container.find("ul", class_=re.compile(r"ficha_sesiones|sesiones", re.I))
+            if not sesiones_ul:
+                # Try finding any ul that contains data-fecha links
+                for ul in container.find_all("ul"):
+                    if ul.find("a", attrs={"data-fecha": True}):
+                        sesiones_ul = ul
+                        break
 
-            # Find day headings and group times underneath them
-            all_tags = container.find_all(['div','span','li','a','button','p'])
-            current_date_key = None
-
-            for tag in all_tags:
-                text = tag.get_text(strip=True).lower()
-                # Check if this tag is a day heading (short text containing a day name + number)
-                day_m = re.search(r'(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)[^\d]*(\d{1,2})', text)
-                if day_m and len(text) < 40:
-                    day_name = day_m.group(1).replace('é','e').replace('á','a')
-                    day_num  = int(day_m.group(2))
-                    offset   = (DAYS_ES.get(day_name, 0) - today_d.weekday()) % 7
-                    show_d   = today_d + _td(days=offset)
-                    if show_d.day != day_num:
-                        show_d = show_d + _td(days=7)
-                    current_date_key = show_d.strftime("%Y-%m-%d")
-                    continue
-
-                # Check if this tag looks like a showtime button (short, has HH:MM)
-                times_found = re.findall(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", text)
-                if times_found and len(text) < 20:
-                    dk = current_date_key or today_d.strftime("%Y-%m-%d")
-                    for t in times_found:
-                        showtimes.setdefault(dk, [])
-                        if t not in showtimes[dk]:
-                            showtimes[dk].append(t)
+            if sesiones_ul:
+                for a in sesiones_ul.find_all("a", attrs={"data-fecha": True}):
+                    fecha = a.get("data-fecha", "")  # format: YYYY/MM/DD
+                    time_text = a.get_text(strip=True)
+                    # Normalise date key to YYYY-MM-DD
+                    date_key = fecha.replace("/", "-")
+                    # Extract HH:MM from text
+                    t_match = re.search(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", time_text)
+                    if t_match and date_key:
+                        t = t_match.group(0)
+                        showtimes.setdefault(date_key, [])
+                        if t not in showtimes[date_key]:
+                            showtimes[date_key].append(t)
 
             # Sort times within each day
             for dk in showtimes:
                 showtimes[dk] = sorted(showtimes[dk])
+
+            if showtimes:
+                log.debug(f"  Showtimes for {title}: {showtimes}")
 
         except Exception as _e:
             log.debug(f"  Showtime extraction failed for {title}: {_e}")
@@ -431,16 +426,23 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             "label_es": ("Hoy" if i==0 else "Mañana" if i==1 else DAYS_ES[d.weekday()]) + f" {d.day}",
         })
 
+    # Build cinema filter tabs — "All" first then one per cinema
+    cinema_tabs = '<button class="day-tab active" id="cinema-all" data-cinema="all" onclick="filterCinema(\'all\')"><span data-es="Todos" data-en="All">Todos</span></button>'
+    for c in film["cinemas"]:
+        cid   = c["id"]
+        cname = c["name"]
+        cinema_tabs += f'<button class="day-tab" data-cinema="{cid}" onclick="filterCinema(\'{cid}\')" translate="no">{cname}</button>'
+
     # Build showtime grid HTML
     def showtime_tabs():
-        tab_btns = ""
+        tab_btns  = ""
         tab_panels = ""
         for i, day in enumerate(days):
             active = "active" if i == 0 else ""
             dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
             tab_btns += f'<button class="day-tab {active}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
-            # Cinema rows for this day
+            # Cinema rows — each gets data-cinema-id for JS filtering
             cinema_rows = ""
             for c in film["cinemas"]:
                 times = c.get("showtimes", {}).get(day["key"], [])
@@ -451,11 +453,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     f'<a href="{c["website"]}" target="_blank" class="time-btn">{t}</a>'
                     for t in times
                 )
-                cinema_rows += f"""
-            <div class="showtime-row">
-              <div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div>
-              <div class="showtime-times">{time_btns}</div>
-            </div>"""
+                cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
 
             if not cinema_rows:
                 cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
@@ -551,8 +549,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     </div>
   </div>
 
-  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
+  <div class="section-title" data-es="🎭 CINES" data-en="🎭 CINEMAS">🎭 CINES</div>
+  <div class="day-tabs" id="cinema-tabs">{cinema_tabs}</div>
 
+  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
   <div class="day-tabs">{tab_btns}</div>
 
   <div id="day-panels">{tab_panels}</div>
@@ -571,6 +571,14 @@ function setLang(lang) {{
   }});
   document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
+}}
+function filterCinema(cid) {{
+  document.querySelectorAll('#cinema-tabs .day-tab').forEach(t => t.classList.remove('active'));
+  const btn = document.querySelector(`#cinema-tabs [data-cinema="${{cid}}"]`);
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.showtime-row').forEach(row => {{
+    row.style.display = (cid === 'all' || row.dataset.cinemaId === cid) ? '' : 'none';
+  }});
 }}
 function showDay(key) {{
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
