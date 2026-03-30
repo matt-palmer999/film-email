@@ -190,14 +190,16 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
 
             if sesiones_ul:
                 for a in sesiones_ul.find_all("a", attrs={"data-fecha": True}):
-                    fecha = a.get("data-fecha", "")  # format: YYYY/MM/DD
-                    time_text = a.get_text(strip=True)
-                    # Normalise date key to YYYY-MM-DD
-                    date_key = fecha.replace("/", "-")
-                    # Extract HH:MM from text
-                    t_match = re.search(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", time_text)
-                    if t_match and date_key:
-                        t = t_match.group(0)
+                    fecha     = a.get("data-fecha", "")
+                    data_hora = a.get("data-hora", "")
+                    date_key  = fecha.replace("/", "-")
+                    if data_hora:
+                        t = data_hora[:5]
+                    else:
+                        raw = a.get_text(strip=True)
+                        m = re.search(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", raw)
+                        t = m.group(0) if m else ""
+                    if t and date_key:
                         showtimes.setdefault(date_key, [])
                         if t not in showtimes[date_key]:
                             showtimes[date_key].append(t)
@@ -591,6 +593,26 @@ function showDay(key) {{
 window.addEventListener('DOMContentLoaded', () => {{
   const lang = localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
+
+  // Apply cinema filter from URL params (set by preferences)
+  const params  = new URLSearchParams(window.location.search);
+  const cinemas = params.get('cinemas');
+  if (cinemas) {{
+    const allowed = cinemas.split(',');
+    // Hide cinema tabs not in preferences
+    document.querySelectorAll('#cinema-tabs .day-tab[data-cinema]').forEach(btn => {{
+      const cid = btn.dataset.cinema;
+      if (cid !== 'all' && !allowed.includes(cid)) {{
+        btn.style.display = 'none';
+      }}
+    }});
+    // Hide showtime rows not in preferences
+    document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
+      if (!allowed.includes(row.dataset.cinemaId)) {{
+        row.style.display = 'none';
+      }}
+    }});
+  }}
 }});
 </script>
 </body>
@@ -1101,6 +1123,14 @@ window.SUPABASE_ANON = "{SUPABASE_ANON}";
 window.addEventListener('DOMContentLoaded', () => {{
   applyVisibility();
   loadUserPreferences();
+
+  // Make film title links pass through URL params (preferences) to detail pages
+  document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
+    const params = window.location.search;
+    if (params) {{
+      a.href = a.getAttribute('href') + params;
+    }}
+  }});
 }});
 </script>
 </body>
