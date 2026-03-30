@@ -118,6 +118,26 @@ function showDay(key) {
 window.addEventListener('DOMContentLoaded', () => {
   const lang = localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
+
+  // Apply cinema filter from URL params (set by preferences)
+  const params  = new URLSearchParams(window.location.search);
+  const cinemas = params.get('cinemas');
+  if (cinemas) {
+    const allowed = cinemas.split(',');
+    // Hide cinema tabs not in preferences
+    document.querySelectorAll('#cinema-tabs .day-tab[data-cinema]').forEach(btn => {
+      const cid = btn.dataset.cinema;
+      if (cid !== 'all' && !allowed.includes(cid)) {
+        btn.style.display = 'none';
+      }
+    });
+    // Hide showtime rows not in preferences
+    document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
+      if (!allowed.includes(row.dataset.cinemaId)) {
+        row.style.display = 'none';
+      }
+    });
+  }
 });
 </script>
 </body>
