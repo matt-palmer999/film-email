@@ -176,15 +176,58 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
         is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
+        # ── Showtimes: scan container for HH:MM patterns grouped by day
+        showtimes = {}
+        try:
+            from datetime import date as _date, timedelta as _td
+            today_d = _date.today()
+            DAYS_ES = {"lunes":0,"martes":1,"miércoles":2,"jueves":3,"viernes":4,"sábado":5,"domingo":6}
+
+            # Find day headings and group times underneath them
+            all_tags = container.find_all(['div','span','li','a','button','p'])
+            current_date_key = None
+
+            for tag in all_tags:
+                text = tag.get_text(strip=True).lower()
+                # Check if this tag is a day heading (short text containing a day name + number)
+                day_m = re.search(r'(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)[^\d]*(\d{1,2})', text)
+                if day_m and len(text) < 40:
+                    day_name = day_m.group(1).replace('é','e').replace('á','a')
+                    day_num  = int(day_m.group(2))
+                    offset   = (DAYS_ES.get(day_name, 0) - today_d.weekday()) % 7
+                    show_d   = today_d + _td(days=offset)
+                    if show_d.day != day_num:
+                        show_d = show_d + _td(days=7)
+                    current_date_key = show_d.strftime("%Y-%m-%d")
+                    continue
+
+                # Check if this tag looks like a showtime button (short, has HH:MM)
+                times_found = re.findall(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", text)
+                if times_found and len(text) < 20:
+                    dk = current_date_key or today_d.strftime("%Y-%m-%d")
+                    for t in times_found:
+                        showtimes.setdefault(dk, [])
+                        if t not in showtimes[dk]:
+                            showtimes[dk].append(t)
+
+            # Sort times within each day
+            for dk in showtimes:
+                showtimes[dk] = sorted(showtimes[dk])
+
+        except Exception as _e:
+            log.debug(f"  Showtime extraction failed for {title}: {_e}")
+            showtimes = {}
+
         films.append({
-            "title":    title,
-            "meta":     meta_text,
-            "synopsis": synopsis_text,
-            "vose":     vose,
-            "is_new":   is_new,
-            "rating":   rating,
-            "poster":   poster_url,
+            "title":     title,
+            "meta":      meta_text,
+            "synopsis":  synopsis_text,
+            "vose":      vose,
+            "is_new":    is_new,
+            "rating":    rating,
+            "poster":    poster_url,
             "cinema_id": cinema_id,
+            "showtimes": showtimes,
         })
     log.info(f"  Found {len(films)} films at {cinema['name']}")
     return films
@@ -309,11 +352,12 @@ def fetch_all() -> dict:
                 }
             cinema_info = CINEMAS[cinema_id]
             by_film[title]["cinemas"].append({
-                "id":      cinema_id,
-                "name":    cinema_info["name"],
-                "website": cinema_info["website"],
-                "type":    cinema_info["type"],
-                "vose":    film["vose"],
+                "id":        cinema_id,
+                "name":      cinema_info["name"],
+                "website":   cinema_info["website"],
+                "type":      cinema_info["type"],
+                "vose":      film["vose"],
+                "showtimes": film.get("showtimes", {}),
             })
             if film["vose"]:
                 by_film[title]["any_vose"] = True
@@ -345,6 +389,204 @@ def week_range_en(anchor: datetime) -> str:
     if anchor.month == end.month:
         return f"{anchor.day} – {end.day} {anchor.strftime('%B')} {anchor.year}"
     return f"{anchor.day} {anchor.strftime('%B')} – {end.day} {end.strftime('%B')} {anchor.year}"
+
+
+# ─── Film detail page builder ────────────────────────────────────────────────
+
+def slugify(title: str) -> str:
+    """Convert a film title to a URL-safe slug."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", title.lower())
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "film"
+
+
+def build_film_detail_page(film: dict, anchor: datetime) -> str:
+    """Build a standalone HTML page for a single film with showtimes by day."""
+    from datetime import date as _date, timedelta as _td
+
+    title_es   = film["title"]
+    title_en   = film.get("title_en", title_es)
+    title_orig = film.get("title_original", title_es)
+    syn_es     = (film.get("synopsis_es") or film.get("synopsis", ""))[:400]
+    syn_en     = (film.get("synopsis_en") or film.get("synopsis", ""))[:400]
+    poster     = film.get("poster", "")
+    meta       = film.get("meta", "")
+    score      = film.get("rating_score")
+    vose       = film.get("any_vose", False)
+    is_new     = film.get("is_new", False)
+
+    # Build day tabs for today + 6 days
+    today = _date.today()
+    DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
+
+    days = []
+    for i in range(7):
+        d = today + _td(days=i)
+        days.append({
+            "key":    d.strftime("%Y-%m-%d"),
+            "label_en": ("Today" if i==0 else "Tomorrow" if i==1 else DAYS_EN[d.weekday()]) + f" {d.day}",
+            "label_es": ("Hoy" if i==0 else "Mañana" if i==1 else DAYS_ES[d.weekday()]) + f" {d.day}",
+        })
+
+    # Build showtime grid HTML
+    def showtime_tabs():
+        tab_btns = ""
+        tab_panels = ""
+        for i, day in enumerate(days):
+            active = "active" if i == 0 else ""
+            dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
+            tab_btns += f'<button class="day-tab {active}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
+
+            # Cinema rows for this day
+            cinema_rows = ""
+            for c in film["cinemas"]:
+                times = c.get("showtimes", {}).get(day["key"], [])
+                if not times:
+                    continue
+                vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
+                time_btns  = "".join(
+                    f'<a href="{c["website"]}" target="_blank" class="time-btn">{t}</a>'
+                    for t in times
+                )
+                cinema_rows += f"""
+            <div class="showtime-row">
+              <div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div>
+              <div class="showtime-times">{time_btns}</div>
+            </div>"""
+
+            if not cinema_rows:
+                cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
+
+            panel_active = "active" if i == 0 else ""
+            tab_panels += f'<div class="day-panel {panel_active}" id="day-{day["key"]}">{cinema_rows}</div>'
+
+        return tab_btns, tab_panels
+
+    tab_btns, tab_panels = showtime_tabs()
+
+    new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
+    vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
+    score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
+    poster_html = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:100%;object-fit:cover;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
+    orig_label = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
+
+    return f"""<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}}
+.wrapper{{max-width:640px;margin:0 auto;background:#0f0c14}}
+.lang-bar{{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
+.lang-bar a{{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap}}
+.lang-bar a span{{color:#ffb432}}
+.lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
+.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;transition:all .2s}}
+.lang-btn.active{{background:#160f24;color:#f0eae0}}
+.back-bar{{padding:12px 20px;background:#0a0810;border-bottom:1px solid #1e1630}}
+.back-link{{font-size:12px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px}}
+.back-link:hover{{color:#c5b8d8}}
+.film-hero{{display:flex;gap:16px;padding:20px;background:#160f24;border-bottom:1px solid #2e2040}}
+.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#2a1f3d}}
+.hero-info{{flex:1;display:flex;flex-direction:column;justify-content:center}}
+.badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}}
+.film-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px}}
+.badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
+.vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
+.score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
+.hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
+.orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
+.hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
+.hero-synopsis{{font-size:12px;color:#9d909e;line-height:1.6}}
+.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a3f5e;padding:20px 20px 10px}}
+.day-tabs{{display:flex;gap:0;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none}}
+.day-tabs::-webkit-scrollbar{{display:none}}
+.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;margin-right:6px;flex-shrink:0}}
+.day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
+.day-panel{{display:none;padding:0 20px 20px}}
+.day-panel.active{{display:block}}
+.showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
+.showtime-row:last-child{{border-bottom:none}}
+.showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
+.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
+.showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
+.time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
+.time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
+.no-times{{font-size:13px;color:#4a3f5e;padding:20px 0;text-align:center}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
+@media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="lang-bar">
+    <a href="../../">whatson<span>.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-bar">
+    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+  </div>
+
+  <div class="film-hero">
+    <div class="hero-poster">{poster_html}</div>
+    <div class="hero-info">
+      <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+      <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+      {orig_label}
+      <div class="hero-meta">{meta}</div>
+      <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
+    </div>
+  </div>
+
+  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
+
+  <div class="day-tabs">{tab_btns}</div>
+
+  <div id="day-panels">{tab_panels}</div>
+
+  <div class="footer">
+    <span data-es="Horarios sujetos a cambios — verifica siempre en la web del cine." data-en="Showtimes subject to change — always verify on the cinema's website.">Horarios sujetos a cambios — verifica siempre en la web del cine.</span>
+  </div>
+</div>
+<script>
+function setLang(lang) {{
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('html-root').setAttribute('lang', lang);
+  document.querySelectorAll('[data-es][data-en]').forEach(el => {{
+    el.textContent = el.getAttribute('data-' + lang);
+  }});
+  document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
+  localStorage.setItem('cv_lang', lang);
+}}
+function showDay(key) {{
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  const tab = document.querySelector(`.day-tab[data-day="${{key}}"]`);
+  const panel = document.getElementById('day-' + key);
+  if (tab) tab.classList.add('active');
+  if (panel) panel.classList.add('active');
+}}
+window.addEventListener('DOMContentLoaded', () => {{
+  const lang = localStorage.getItem('cv_lang') || 'es';
+  if (lang !== 'es') setLang(lang);
+}});
+</script>
+</body>
+</html>"""
 
 
 # ─── HTML builder ─────────────────────────────────────────────────────────────
@@ -394,14 +636,14 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
 .featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px}
+.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:flex;gap:14px;margin:0 24px 14px}
 .grid-card{flex:1;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
 .grid-poster{width:100%;height:85px;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
-.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
+.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
 .grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
 .grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
@@ -606,7 +848,8 @@ def film_card_html(film: dict) -> str:
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-      <div class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+      <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
+         class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
       <div class="list-meta">{rating_dot}{meta[:120]}</div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
@@ -678,7 +921,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="featured-info">
       <div>
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-        <div class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+        <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
+           class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
         {orig_label}
         <div class="film-meta">{rating_dot}{meta[:100]}</div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
@@ -724,7 +968,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-        <div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+        <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
+           class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
         <div class="grid-meta">{rating_dot}{meta[:80]}</div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
@@ -1090,6 +1335,19 @@ def main():
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
 
+    # Generate individual film detail pages
+    log.info("Generating film detail pages ...")
+    for title, film in films.items():
+        slug = slugify(film.get("title_en", title) or title)
+        film_dir = f"docs/listings/{slug}"
+        os.makedirs(film_dir, exist_ok=True)
+        detail_html = build_film_detail_page(film, anchor)
+        with open(f"{film_dir}/index.html", "w", encoding="utf-8") as f:
+            f.write(detail_html)
+        # Store slug in film for linking from cards
+        film["slug"] = slug
+    log.info(f"Generated {len(films)} film detail pages")
+
     # Inject Supabase credentials into landing page and preferences page
     if SUPABASE_URL and SUPABASE_ANON:
         for page_path in ["docs/index.html", "docs/preferences/index.html"]:
@@ -1107,8 +1365,18 @@ def main():
     # Build and send the teaser email
     page_url  = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
     prefs_url = page_url.replace("/listings", "/preferences")
-    teaser = build_teaser_email(films, anchor, page_url, prefs_url)
-    send_email(teaser, anchor)
+
+    # Only send email on Thursdays (scraper now runs daily)
+    is_thursday = anchor.weekday() == 3
+    force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
+
+    if is_thursday or force_email:
+        teaser = build_teaser_email(films, anchor, page_url, prefs_url)
+    else:
+        log.info(f"Not Thursday (weekday={anchor.weekday()}) — skipping email send")
+        teaser = None
+    if teaser:
+        send_email(teaser, anchor)
     close_browser()
 
 
