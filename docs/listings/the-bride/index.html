@@ -76,9 +76,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     </div>
   </div>
 
-  <div class="section-title" data-es="🎭 CINES" data-en="🎭 CINEMAS">🎭 CINES</div>
-  <div class="day-tabs" id="cinema-tabs"><button class="day-tab active" id="cinema-all" data-cinema="all" onclick="filterCinema('all')"><span data-es="Todos" data-en="All">Todos</span></button><button class="day-tab" data-cinema="gran_turia" onclick="filterCinema('gran_turia')" translate="no">ABC Gran Turia</button></div>
-
   <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
   <div class="day-tabs"><button class="day-tab active" data-day="2026-03-30" data-es="Hoy 30" data-en="Today 30" onclick="showDay('2026-03-30')">Hoy 30</button><button class="day-tab " data-day="2026-03-31" data-es="Mañana 31" data-en="Tomorrow 31" onclick="showDay('2026-03-31')">Mañana 31</button><button class="day-tab " data-day="2026-04-01" data-es="Miércoles 1" data-en="Wednesday 1" onclick="showDay('2026-04-01')">Miércoles 1</button><button class="day-tab " data-day="2026-04-02" data-es="Jueves 2" data-en="Thursday 2" onclick="showDay('2026-04-02')">Jueves 2</button><button class="day-tab " data-day="2026-04-03" data-es="Viernes 3" data-en="Friday 3" onclick="showDay('2026-04-03')">Viernes 3</button><button class="day-tab " data-day="2026-04-04" data-es="Sábado 4" data-en="Saturday 4" onclick="showDay('2026-04-04')">Sábado 4</button><button class="day-tab " data-day="2026-04-05" data-es="Domingo 5" data-en="Sunday 5" onclick="showDay('2026-04-05')">Domingo 5</button></div>
 
@@ -99,14 +96,6 @@ function setLang(lang) {
   document.title = (lang === 'en' ? 'The Bride!' : '¡La novia!') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
-function filterCinema(cid) {
-  document.querySelectorAll('#cinema-tabs .day-tab').forEach(t => t.classList.remove('active'));
-  const btn = document.querySelector(`#cinema-tabs [data-cinema="${cid}"]`);
-  if (btn) btn.classList.add('active');
-  document.querySelectorAll('.showtime-row').forEach(row => {
-    row.style.display = (cid === 'all' || row.dataset.cinemaId === cid) ? '' : 'none';
-  });
-}
 function showDay(key) {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
@@ -124,16 +113,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const cinemas = params.get('cinemas');
   if (cinemas) {
     const allowed = cinemas.split(',');
-    // Hide cinema tabs not in preferences
-    document.querySelectorAll('#cinema-tabs .day-tab[data-cinema]').forEach(btn => {
-      const cid = btn.dataset.cinema;
-      if (cid !== 'all' && !allowed.includes(cid)) {
-        btn.style.display = 'none';
-      }
-    });
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
-      if (!allowed.includes(row.dataset.cinemaId)) {
+      const cid = row.getAttribute('data-cinema-id');
+      if (!allowed.includes(cid)) {
         row.style.display = 'none';
       }
     });
