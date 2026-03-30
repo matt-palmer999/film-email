@@ -428,13 +428,6 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             "label_es": ("Hoy" if i==0 else "Mañana" if i==1 else DAYS_ES[d.weekday()]) + f" {d.day}",
         })
 
-    # Build cinema filter tabs — "All" first then one per cinema
-    cinema_tabs = '<button class="day-tab active" id="cinema-all" data-cinema="all" onclick="filterCinema(\'all\')"><span data-es="Todos" data-en="All">Todos</span></button>'
-    for c in film["cinemas"]:
-        cid   = c["id"]
-        cname = c["name"]
-        cinema_tabs += f'<button class="day-tab" data-cinema="{cid}" onclick="filterCinema(\'{cid}\')" translate="no">{cname}</button>'
-
     # Build showtime grid HTML
     def showtime_tabs():
         tab_btns  = ""
@@ -551,9 +544,6 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     </div>
   </div>
 
-  <div class="section-title" data-es="🎭 CINES" data-en="🎭 CINEMAS">🎭 CINES</div>
-  <div class="day-tabs" id="cinema-tabs">{cinema_tabs}</div>
-
   <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
   <div class="day-tabs">{tab_btns}</div>
 
@@ -574,14 +564,6 @@ function setLang(lang) {{
   document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }}
-function filterCinema(cid) {{
-  document.querySelectorAll('#cinema-tabs .day-tab').forEach(t => t.classList.remove('active'));
-  const btn = document.querySelector(`#cinema-tabs [data-cinema="${{cid}}"]`);
-  if (btn) btn.classList.add('active');
-  document.querySelectorAll('.showtime-row').forEach(row => {{
-    row.style.display = (cid === 'all' || row.dataset.cinemaId === cid) ? '' : 'none';
-  }});
-}}
 function showDay(key) {{
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
@@ -599,16 +581,10 @@ window.addEventListener('DOMContentLoaded', () => {{
   const cinemas = params.get('cinemas');
   if (cinemas) {{
     const allowed = cinemas.split(',');
-    // Hide cinema tabs not in preferences
-    document.querySelectorAll('#cinema-tabs .day-tab[data-cinema]').forEach(btn => {{
-      const cid = btn.dataset.cinema;
-      if (cid !== 'all' && !allowed.includes(cid)) {{
-        btn.style.display = 'none';
-      }}
-    }});
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
-      if (!allowed.includes(row.dataset.cinemaId)) {{
+      const cid = row.getAttribute('data-cinema-id');
+      if (!allowed.includes(cid)) {{
         row.style.display = 'none';
       }}
     }});
