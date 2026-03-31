@@ -47,14 +47,14 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
 .rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
 .featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
-.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
 .film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:flex;gap:14px;margin:0 24px 14px}
 .grid-card{flex:1;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
-.grid-poster{width:100%;height:85px;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
+.grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
 .grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
@@ -117,7 +117,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   
   <div class="featured-card" data-vose="false" data-isnew="true" data-cinemas="babel,yelmo,lys,abc_saler,abc_park,mn4">
-    <div class="featured-poster"><img src="https://image.tmdb.org/t/p/w500/dfvG1uRRd6TROYEt2iEbQKVBAPU.jpg" alt="Altas capacidades" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+    <div class="featured-poster"><img src="https://image.tmdb.org/t/p/w500/dfvG1uRRd6TROYEt2iEbQKVBAPU.jpg" alt="Altas capacidades" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="featured-info">
       <div>
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span></div>
@@ -134,7 +134,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="babel,yelmo,abc_saler">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/fWagBXNDk44UaupYtwQOAvDwGiT.jpg" alt="Calle Málaga" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/fWagBXNDk44UaupYtwQOAvDwGiT.jpg" alt="Calle Málaga" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="score-badge">⭐ 7.1</span></div>
         <a href="./calle-malaga/" class="grid-title" data-es="Calle Málaga" data-en="Calle Malaga">Calle Málaga</a>
@@ -147,7 +147,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/k2jGfmN4T8Q5EMDpsUUgSwyhnSX.jpg" alt="Dos fiscales" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/k2jGfmN4T8Q5EMDpsUUgSwyhnSX.jpg" alt="Dos fiscales" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.7</span></div>
         <a href="./two-prosecutors/" class="grid-title" data-es="Dos fiscales" data-en="Two Prosecutors">Dos fiscales</a>
@@ -162,7 +162,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,kinepolis,abc_saler,abc_park,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/u5RgunQiA4hvDfTeWO9pS0lm4K4.jpg" alt="La grazia" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/u5RgunQiA4hvDfTeWO9pS0lm4K4.jpg" alt="La grazia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
         <a href="./la-grazia/" class="grid-title" data-es="La grazia" data-en="La Grazia">La grazia</a>
@@ -175,7 +175,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="yelmo,kinepolis,abc_saler,abc_park,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/1iDPjqlfRb9f8yl89bc2zvoMnVV.jpg" alt="Lapönia" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/1iDPjqlfRb9f8yl89bc2zvoMnVV.jpg" alt="Lapönia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
         <a href="./laponia/" class="grid-title" data-es="Lapönia" data-en="Lapönia">Lapönia</a>
@@ -190,7 +190,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="abc_saler,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/siGwXsTqwSBC9VcbDM4tdhb1qLo.jpg" alt="Maigret y la muerte del embajador" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/siGwXsTqwSBC9VcbDM4tdhb1qLo.jpg" alt="Maigret y la muerte del embajador" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.1</span></div>
         <a href="./maigret-and-the-dead-lover/" class="grid-title" data-es="Maigret y la muerte del embajador" data-en="Maigret and the Dead Lover">Maigret y la muerte del embajador</a>
@@ -203,7 +203,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,abc_saler,abc_park,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jRf89HVEtBZiSnOXXWDhZOfuTwW.jpg" alt="Noche de bodas 2" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jRf89HVEtBZiSnOXXWDhZOfuTwW.jpg" alt="Noche de bodas 2" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.5</span></div>
         <a href="./ready-or-not-here-i-come/" class="grid-title" data-es="Noche de bodas 2" data-en="Ready or Not: Here I Come">Noche de bodas 2</a>
@@ -218,7 +218,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg" alt="Proyecto Salvación" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg" alt="Proyecto Salvación" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.2</span></div>
         <a href="./project-hail-mary/" class="grid-title" data-es="Proyecto Salvación" data-en="Project Hail Mary">Proyecto Salvación</a>
@@ -231,7 +231,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/buPFnHZ3xQy6vZEHxbHgL1Pc6CR.jpg" alt="Shelter: El Protector" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/buPFnHZ3xQy6vZEHxbHgL1Pc6CR.jpg" alt="Shelter: El Protector" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.7</span></div>
         <a href="./shelter/" class="grid-title" data-es="Shelter: El Protector" data-en="Shelter">Shelter: El Protector</a>
@@ -246,7 +246,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg" alt="Super Mario Galaxy: la película" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg" alt="Super Mario Galaxy: la película" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span></div>
         <a href="./the-super-mario-galaxy-movie/" class="grid-title" data-es="Super Mario Galaxy: la película" data-en="The Super Mario Galaxy Movie">Super Mario Galaxy: la película</a>
@@ -259,7 +259,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg" alt="Te van a matar" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg" alt="Te van a matar" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.6</span></div>
         <a href="./they-will-kill-you/" class="grid-title" data-es="Te van a matar" data-en="They Will Kill You">Te van a matar</a>
@@ -274,7 +274,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/03/un-altre-home-otro-hombre-275x400.jpg" alt="Un altre home (Otro hombre)" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/03/un-altre-home-otro-hombre-275x400.jpg" alt="Un altre home (Otro hombre)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
         <a href="./un-altre-home-otro-hombre/" class="grid-title" data-es="Un altre home (Otro hombre)" data-en="Un altre home (Otro hombre)">Un altre home (Otro hombre)</a>
@@ -287,7 +287,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,lys">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/aBYQhsh65AZqEfPiDy3Z7AGbsw.jpg" alt="Yo te creo" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/aBYQhsh65AZqEfPiDy3Z7AGbsw.jpg" alt="Yo te creo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.8</span></div>
         <a href="./we-believe-you/" class="grid-title" data-es="Yo te creo" data-en="We Believe You">Yo te creo</a>
@@ -302,7 +302,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/q030Fi4tubXBJKg3D9otPDgGP2o.jpg" alt="Amarga Navidad" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/q030Fi4tubXBJKg3D9otPDgGP2o.jpg" alt="Amarga Navidad" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.7</span></div>
         <a href="./bitter-christmas/" class="grid-title" data-es="Amarga Navidad" data-en="Bitter Christmas">Amarga Navidad</a>
@@ -315,7 +315,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="kinepolis,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg" alt="Avatar. Fuego y ceniza" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg" alt="Avatar. Fuego y ceniza" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.3</span></div>
         <a href="./avatar-fire-and-ash/" class="grid-title" data-es="Avatar. Fuego y ceniza" data-en="Avatar: Fire and Ash">Avatar. Fuego y ceniza</a>
@@ -330,7 +330,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/3k4FKVgaxUZo1CITvj2nFDyNNKy.jpg" alt="Aída y vuelta" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/3k4FKVgaxUZo1CITvj2nFDyNNKy.jpg" alt="Aída y vuelta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
         <a href="./aida-y-vuelta/" class="grid-title" data-es="Aída y vuelta" data-en="Aída y vuelta">Aída y vuelta</a>
@@ -343,7 +343,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo">
-      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/02/bluey-en-cines-coleccion-.jpg" alt="Bluey en cines: Colección ¡A jugar con los amigos!" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/02/bluey-en-cines-coleccion-.jpg" alt="Bluey en cines: Colección ¡A jugar con los amigos!" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
         <a href="./bluey-en-cines-coleccion-a-jugar-con-los-amigos/" class="grid-title" data-es="Bluey en cines: Colección ¡A jugar con los amigos!" data-en="Bluey en cines: Colección ¡A jugar con los amigos!">Bluey en cines: Colección ¡A jugar con los amigos!</a>
@@ -358,7 +358,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lGlJ2cTDwMacj5nuANd38UjVGNQ.jpg" alt="Cumbres borrascosas" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lGlJ2cTDwMacj5nuANd38UjVGNQ.jpg" alt="Cumbres borrascosas" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.4</span></div>
         <a href="./wuthering-heights/" class="grid-title" data-es="Cumbres borrascosas" data-en="&quot;Wuthering Heights&quot;">Cumbres borrascosas</a>
@@ -371,7 +371,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/ov8vrRLZGoXHpYjSY9Vpv1tHJX7.jpg" alt="Dhurandhar: The Revenge" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/ov8vrRLZGoXHpYjSY9Vpv1tHJX7.jpg" alt="Dhurandhar: The Revenge" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
         <a href="./dhurandhar-the-revenge/" class="grid-title" data-es="Dhurandhar: The Revenge" data-en="Dhurandhar: The Revenge">Dhurandhar: The Revenge</a>
@@ -386,7 +386,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
-      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/01/El-arquitecto-1-279x400.jpg" alt="El arquitecto" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/01/El-arquitecto-1-279x400.jpg" alt="El arquitecto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span></div>
         <a href="./pacha-el-arquitecto-de-la-noche/" class="grid-title" data-es="El arquitecto" data-en="Pachá: El arquitecto de la noche">El arquitecto</a>
@@ -399,7 +399,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/l8eEJ6iQPGLala7Oo43LTYb31fM.jpg" alt="El mago del Kremlin" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/l8eEJ6iQPGLala7Oo43LTYb31fM.jpg" alt="El mago del Kremlin" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.4</span></div>
         <a href="./the-wizard-of-the-kremlin/" class="grid-title" data-es="El mago del Kremlin" data-en="The Wizard of the Kremlin">El mago del Kremlin</a>
@@ -414,7 +414,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jfwSexzlIzaOgxP9A8bTA6t8YYb.jpg" alt="El viento se levanta" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jfwSexzlIzaOgxP9A8bTA6t8YYb.jpg" alt="El viento se levanta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.8</span></div>
         <a href="./the-wind-rises/" class="grid-title" data-es="El viento se levanta" data-en="The Wind Rises">El viento se levanta</a>
@@ -427,7 +427,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/92ztdPsf98i0tLcONIX92yuh3MQ.jpg" alt="El último vikingo" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/92ztdPsf98i0tLcONIX92yuh3MQ.jpg" alt="El último vikingo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span></div>
         <a href="./the-last-viking/" class="grid-title" data-es="El último vikingo" data-en="The Last Viking">El último vikingo</a>
@@ -442,7 +442,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="lys">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/txzzgq2Rviv2Ljxnbh9Fy6gfDId.jpg" alt="Elegir mi vida" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/txzzgq2Rviv2Ljxnbh9Fy6gfDId.jpg" alt="Elegir mi vida" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.2</span></div>
         <a href="./leave-one-day/" class="grid-title" data-es="Elegir mi vida" data-en="Leave One Day">Elegir mi vida</a>
@@ -455,7 +455,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,abc_saler,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wfuqMlaExcoYiUEvKfVpUTt1v4u.jpg" alt="Goat, como cabras" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wfuqMlaExcoYiUEvKfVpUTt1v4u.jpg" alt="Goat, como cabras" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.8</span></div>
         <a href="./goat/" class="grid-title" data-es="Goat, como cabras" data-en="GOAT">Goat, como cabras</a>
@@ -470,7 +470,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,abc_saler,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/z2tqCJLsw6uEJ8nJV8BsQXGa3dr.jpg" alt="Greenland 2" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/z2tqCJLsw6uEJ8nJV8BsQXGa3dr.jpg" alt="Greenland 2" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
         <a href="./greenland-2-migration/" class="grid-title" data-es="Greenland 2" data-en="Greenland 2: Migration">Greenland 2</a>
@@ -483,7 +483,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_saler,abc_park,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vbeyOZm2bvBXcbgPD3v6o94epPX.jpg" alt="Hamnet" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vbeyOZm2bvBXcbgPD3v6o94epPX.jpg" alt="Hamnet" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.7</span></div>
         <a href="./hamnet/" class="grid-title" data-es="Hamnet" data-en="Hamnet">Hamnet</a>
@@ -498,7 +498,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/xjtWQ2CL1mpmMNwuU5HeS4Iuwuu.jpg" alt="Hoppers" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/xjtWQ2CL1mpmMNwuU5HeS4Iuwuu.jpg" alt="Hoppers" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.6</span></div>
         <a href="./hoppers/" class="grid-title" data-es="Hoppers" data-en="Hoppers">Hoppers</a>
@@ -511,7 +511,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/46KzwfJBSQfByBZfELzrZi9LJf2.jpg" alt="La Pasión en el arte" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/46KzwfJBSQfByBZfELzrZi9LJf2.jpg" alt="La Pasión en el arte" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
         <a href="./easter-in-art/" class="grid-title" data-es="La Pasión en el arte" data-en="Easter in Art">La Pasión en el arte</a>
@@ -526,7 +526,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,abc_saler,abc_park,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/cWsBscZzwu5brg9YjNkGewRUvJX.jpg" alt="La asistenta" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/cWsBscZzwu5brg9YjNkGewRUvJX.jpg" alt="La asistenta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.2</span></div>
         <a href="./the-housemaid/" class="grid-title" data-es="La asistenta" data-en="The Housemaid">La asistenta</a>
@@ -539,7 +539,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/a3mzC5xB7ipXx3jEgrGPFHs3Ynv.jpg" alt="La invasió dels bàrbars" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/a3mzC5xB7ipXx3jEgrGPFHs3Ynv.jpg" alt="La invasió dels bàrbars" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
         <a href="./the-invasion-of-the-barbarians/" class="grid-title" data-es="La invasió dels bàrbars" data-en="The Invasion of the Barbarians">La invasió dels bàrbars</a>
@@ -554,7 +554,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="lys,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/oTMs4dHlhcSeYQAUlnuGLotAi3a.jpg" alt="Los domingos" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/oTMs4dHlhcSeYQAUlnuGLotAi3a.jpg" alt="Los domingos" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.1</span></div>
         <a href="./sundays/" class="grid-title" data-es="Los domingos" data-en="Sundays">Los domingos</a>
@@ -567,7 +567,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/705nQHqe4JGdEisrQmVYmXyjs1U.jpg" alt="Los pecadores" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/705nQHqe4JGdEisrQmVYmXyjs1U.jpg" alt="Los pecadores" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.5</span></div>
         <a href="./sinners/" class="grid-title" data-es="Los pecadores" data-en="Sinners">Los pecadores</a>
@@ -582,7 +582,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/tnfc0NJ3BzhJrGJhkkEd6MHBdq5.jpg" alt="Línea de extinción" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/tnfc0NJ3BzhJrGJhkkEd6MHBdq5.jpg" alt="Línea de extinción" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.4</span></div>
         <a href="./elevation/" class="grid-title" data-es="Línea de extinción" data-en="Elevation">Línea de extinción</a>
@@ -595,7 +595,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/qWmJyzqXVSLzsq4XKXr4lIDlLBg.jpg" alt="Maigret" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/qWmJyzqXVSLzsq4XKXr4lIDlLBg.jpg" alt="Maigret" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 5.8</span></div>
         <a href="./maigret/" class="grid-title" data-es="Maigret" data-en="Maigret">Maigret</a>
@@ -610,7 +610,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="lys">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lYWEXbQgRTR4ZQleSXAgRbxAjvq.jpg" alt="Marty Supreme" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lYWEXbQgRTR4ZQleSXAgRbxAjvq.jpg" alt="Marty Supreme" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
         <a href="./marty-supreme/" class="grid-title" data-es="Marty Supreme" data-en="Marty Supreme">Marty Supreme</a>
@@ -623,7 +623,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/gBT1mJ2E7K8QqOM0HVtStlBElvV.jpg" alt="No te queda otra" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/gBT1mJ2E7K8QqOM0HVtStlBElvV.jpg" alt="No te queda otra" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 5.5</span></div>
         <a href="./it-takes-two-to-tango/" class="grid-title" data-es="No te queda otra" data-en="It Takes Two To Tango">No te queda otra</a>
@@ -638,7 +638,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_saler,abc_park,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wdEKJx4xiqTQlx2u9naqFSWYQqL.jpg" alt="Noise (Ruidos)" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wdEKJx4xiqTQlx2u9naqFSWYQqL.jpg" alt="Noise (Ruidos)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.0</span></div>
         <a href="./noise/" class="grid-title" data-es="Noise (Ruidos)" data-en="Noise">Noise (Ruidos)</a>
@@ -651,7 +651,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="lys">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7Pd6ChSQjSXy4snJiorSdzg2cG3.jpg" alt="Pillion" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7Pd6ChSQjSXy4snJiorSdzg2cG3.jpg" alt="Pillion" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.3</span></div>
         <a href="./pillion/" class="grid-title" data-es="Pillion" data-en="Pillion">Pillion</a>
@@ -666,7 +666,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/A5lswNlytTUrnMWsuD0NFfhZlf3.jpg" alt="Rental Family (Familia de alquiler)" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/A5lswNlytTUrnMWsuD0NFfhZlf3.jpg" alt="Rental Family (Familia de alquiler)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.8</span></div>
         <a href="./rental-family/" class="grid-title" data-es="Rental Family (Familia de alquiler)" data-en="Rental Family">Rental Family (Familia de alquiler)</a>
@@ -679,7 +679,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jjyuk0edLiW8vOSnlfwWCCLpbh5.jpg" alt="Scream 7" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jjyuk0edLiW8vOSnlfwWCCLpbh5.jpg" alt="Scream 7" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 5.8</span></div>
         <a href="./scream-7/" class="grid-title" data-es="Scream 7" data-en="Scream 7">Scream 7</a>
@@ -694,7 +694,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/02/Tafiti-y-sus-amigos-280x400.jpg" alt="Tafiti y sus amigos" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/02/Tafiti-y-sus-amigos-280x400.jpg" alt="Tafiti y sus amigos" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
         <a href="./tafiti-y-sus-amigos/" class="grid-title" data-es="Tafiti y sus amigos" data-en="Tafiti y sus amigos">Tafiti y sus amigos</a>
@@ -707,7 +707,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yrDKwAdZRJjoQ9RZwzRGPpMC7U1.jpg" alt="Torrente presidente" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yrDKwAdZRJjoQ9RZwzRGPpMC7U1.jpg" alt="Torrente presidente" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.3</span></div>
         <a href="./torrente-for-president/" class="grid-title" data-es="Torrente presidente" data-en="Torrente for President">Torrente presidente</a>
@@ -722,7 +722,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/2ciJmoQ2OY9IJvEFSqr2xc5sWn0.jpg" alt="Tres adioses" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/2ciJmoQ2OY9IJvEFSqr2xc5sWn0.jpg" alt="Tres adioses" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.1</span></div>
         <a href="./three-goodbyes/" class="grid-title" data-es="Tres adioses" data-en="Three Goodbyes">Tres adioses</a>
@@ -735,7 +735,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,lys">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lbBWwxBht4JFP5PsuJ5onpMqugW.jpg" alt="Una batalla tras otra" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lbBWwxBht4JFP5PsuJ5onpMqugW.jpg" alt="Una batalla tras otra" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
         <a href="./one-battle-after-another/" class="grid-title" data-es="Una batalla tras otra" data-en="One Battle After Another">Una batalla tras otra</a>
@@ -750,7 +750,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6FL2kWvfxMLaqN2ppZuOsfgHJBz.jpg" alt="Una hija en Tokio" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6FL2kWvfxMLaqN2ppZuOsfgHJBz.jpg" alt="Una hija en Tokio" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.5</span></div>
         <a href="./a-missing-part/" class="grid-title" data-es="Una hija en Tokio" data-en="A Missing Part">Una hija en Tokio</a>
@@ -763,7 +763,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park,dor">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/pz9NCWxxOk3o0W3v1Zkhawrwb4i.jpg" alt="Valor sentimental" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/pz9NCWxxOk3o0W3v1Zkhawrwb4i.jpg" alt="Valor sentimental" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
         <a href="./sentimental-value/" class="grid-title" data-es="Valor sentimental" data-en="Sentimental Value">Valor sentimental</a>
@@ -778,7 +778,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,ocine,abc_saler,abc_park,mn4,gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eGxPyseSnEZBMJaopGfRUO9HSYx.jpg" alt="Whistle. El silbido del mal" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eGxPyseSnEZBMJaopGfRUO9HSYx.jpg" alt="Whistle. El silbido del mal" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
         <a href="./whistle/" class="grid-title" data-es="Whistle. El silbido del mal" data-en="Whistle">Whistle. El silbido del mal</a>
@@ -791,7 +791,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,kinepolis,lys,abc_park,mn4">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg" alt="Your name" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/q719jXXEzOoYaps6babgKnONONX.jpg" alt="Your name" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.5</span></div>
         <a href="./your-name/" class="grid-title" data-es="Your name" data-en="Your Name.">Your name</a>
@@ -806,7 +806,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div class="grid-row">
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="gran_turia">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lV8YHwGkYZsm6EfIqnhaSz2avKt.jpg" alt="¡La novia!" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lV8YHwGkYZsm6EfIqnhaSz2avKt.jpg" alt="¡La novia!" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.3</span></div>
         <a href="./the-bride/" class="grid-title" data-es="¡La novia!" data-en="The Bride!">¡La novia!</a>
@@ -819,7 +819,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
     <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
-      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/f9MzpMfbBL4PknhKqoQpIUdskTl.jpg" alt="Águilas de El Cairo" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/f9MzpMfbBL4PknhKqoQpIUdskTl.jpg" alt="Águilas de El Cairo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.8</span></div>
         <a href="./eagles-of-the-republic/" class="grid-title" data-es="Águilas de El Cairo" data-en="Eagles of the Republic">Águilas de El Cairo</a>
