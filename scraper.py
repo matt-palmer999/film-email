@@ -843,11 +843,39 @@ function applyVisibility() {
     if (show) visible++;
   });
 
-  // Collapse empty grid rows
-  document.querySelectorAll('.grid-row').forEach(row => {
-    const anyVisible = Array.from(row.children).some(c => c.style.display !== 'none');
-    row.style.display = anyVisible ? '' : 'none';
-  });
+  // Re-pair visible grid cards so there are never gaps
+  // First collect all visible cards across all rows
+  const allGridCards = Array.from(document.querySelectorAll('.grid-row .grid-card'));
+  const visibleCards = allGridCards.filter(c => c.style.display !== 'none');
+
+  // Hide all grid rows first
+  document.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
+
+  // Create a temporary container to re-pair visible cards
+  // We reuse existing rows — fill them with visible cards in order
+  const rows = document.querySelectorAll('.grid-row');
+  let rowIndex = 0;
+  let cardIndex = 0;
+
+  while (cardIndex < visibleCards.length) {
+    if (rowIndex >= rows.length) break;
+    const row = rows[rowIndex];
+    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
+
+    // Place up to 2 visible cards in this row
+    rowCards.forEach(c => c.style.display = 'none'); // hide all first
+    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
+    batch.forEach((card, i) => {
+      if (rowCards[i]) {
+        // Move card to this slot by reordering in DOM
+        row.appendChild(card);
+        card.style.display = '';
+      }
+    });
+    row.style.display = batch.length > 0 ? '' : 'none';
+    cardIndex += 2;
+    rowIndex++;
+  }
 
   // Empty state message
   const empty = document.getElementById('filter-empty');
