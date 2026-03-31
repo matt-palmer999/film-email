@@ -311,7 +311,7 @@
     /* ── SCROLL INDICATOR ── */
     .scroll-hint {
       position: absolute;
-      bottom: 32px;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -334,6 +334,10 @@
       height: 40px;
       background: linear-gradient(to bottom, var(--border), transparent);
       animation: scrollPulse 2s ease infinite;
+    }
+
+    @media (max-height: 700px) {
+      .scroll-hint { display: none; }
     }
 
     /* ── HOW IT WORKS ── */
@@ -713,7 +717,7 @@
     }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       nav { padding: 14px 20px; }
       .nav-cta { display: none; }
       .scroll-hint { display: none; }
@@ -999,8 +1003,8 @@
     if (savedLang !== 'es') setLang(savedLang);
 
     /* ── SIGNUP ── */
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     async function submitSignup(source) {
       const emailEl   = document.getElementById(source + '-email');
