@@ -1101,9 +1101,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
 
   <!-- ANONYMOUS BANNER — shown to non-subscribers -->
-  <div id="anon-banner" style="background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span style="font-size:12px;color:#9b8faa;" data-es="🔒 Suscríbete gratis para filtrar por VOSE, elegir tus cines y recibir el email semanal" data-en="🔒 Subscribe free to filter by VOSE, choose your cinemas and get the weekly email">🔒 Suscríbete gratis para filtrar por VOSE, elegir tus cines y recibir el email semanal</span>
-    <a href="../" style="font-size:12px;font-weight:600;padding:6px 16px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+  <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="🎬 Más de 30 películas. 10 cines. Cada semana." data-en="🎬 30+ films. 10 cinemas. Every week.">🎬 Más de 30 películas. 10 cines. Cada semana.</span>
+      <span style="font-size:12px;color:#9b8faa;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
+    </div>
+    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
   <!-- FILTER BAR — only shown to subscribers -->
@@ -1115,7 +1118,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="filter-empty" id="filter-empty" data-es="No hay películas que coincidan con el filtro." data-en="No films match this filter.">No hay películas que coincidan con el filtro.</div>
 
   <div class="header">
-    <div class="header-eyebrow" data-es="🎬 Newsletter Semanal" data-en="🎬 Weekly Newsletter">🎬 Newsletter Semanal</div>
     <div class="header-title">Cartelera<br>Valencia</div>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
     <div class="header-date" data-es="{date_es}" data-en="{date_en}">{date_es}</div>
