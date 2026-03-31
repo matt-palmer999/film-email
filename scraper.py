@@ -104,6 +104,10 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         html = page.content()
         log.info(f"  Page loaded — {len(html)} bytes")
 
+        # mabuse.es puts ALL dates in the page HTML as divs with class "listafechas fecha_YYYYMMDD"
+        # No need to interact with the dropdown — just parse them all from the HTML
+        all_day_html = {}  # not used anymore — we parse soup directly per date div
+
 
 
     except Exception as e:
@@ -176,40 +180,57 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
         is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
-        # ── Showtimes: mabuse.es uses ul.ficha_sesiones > li > a[data-fecha]
-        # Each <a> has data-fecha="YYYY/MM/DD" and text like "16:30"
+        # ── Showtimes: all dates are in page HTML as div.listafechas.fecha_YYYYMMDD
+        # Each date div contains the film list for that day — find our film and extract times
         showtimes = {}
         try:
-            sesiones_ul = container.find("ul", class_=re.compile(r"ficha_sesiones|sesiones", re.I))
-            if not sesiones_ul:
-                # Try finding any ul that contains data-fecha links
-                for ul in container.find_all("ul"):
-                    if ul.find("a", attrs={"data-fecha": True}):
-                        sesiones_ul = ul
-                        break
+            # Find all date divs — class is like "listafechas fecha_20260331"
+            date_divs = soup.find_all("div", class_=re.compile(r"fecha_(\d{8})"))
+            log.debug(f"  Found {len(date_divs)} date divs")
 
-            if sesiones_ul:
-                for a in sesiones_ul.find_all("a", attrs={"data-fecha": True}):
-                    fecha     = a.get("data-fecha", "")
-                    data_hora = a.get("data-hora", "")
-                    date_key  = fecha.replace("/", "-")
-                    if data_hora:
-                        t = data_hora[:5]
-                    else:
-                        raw = a.get_text(strip=True)
-                        m = re.search(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", raw)
-                        t = m.group(0) if m else ""
-                    if t and date_key:
-                        showtimes.setdefault(date_key, [])
-                        if t not in showtimes[date_key]:
-                            showtimes[date_key].append(t)
+            for date_div in date_divs:
+                # Extract date from class name: fecha_20260331 -> 2026-03-31
+                classes    = date_div.get("class", [])
+                date_class = next((c for c in classes if re.match(r"fecha_\d{8}", c)), None)
+                if not date_class:
+                    continue
+                raw_date = date_class.replace("fecha_", "")  # "20260331"
+                date_key = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:8]}"  # "2026-03-31"
+
+                # Find our film's title within this date div
+                for h3 in date_div.find_all("h3"):
+                    if h3.get_text(strip=True) != title:
+                        continue
+                    # Found our film — find the sesiones ul nearby
+                    for parent in h3.parents:
+                        ul = parent.find("ul", class_=re.compile(r"ficha_sesiones|sesiones", re.I))
+                        if not ul:
+                            for u in parent.find_all("ul"):
+                                if u.find("a", attrs={"data-fecha": True}):
+                                    ul = u
+                                    break
+                        if ul:
+                            for a in ul.find_all("a", attrs={"data-fecha": True}):
+                                hora = a.get("data-hora", "")
+                                t    = hora[:5] if hora else ""
+                                if not t:
+                                    raw = a.get_text(strip=True)
+                                    m   = re.search(r"([01]?[0-9]|2[0-3]):[0-5][0-9]", raw)
+                                    t   = m.group(0) if m else ""
+                                if t:
+                                    showtimes.setdefault(date_key, [])
+                                    if t not in showtimes[date_key]:
+                                        showtimes[date_key].append(t)
+                            break
+                        if date_key in showtimes:
+                            break
 
             # Sort times within each day
             for dk in showtimes:
                 showtimes[dk] = sorted(showtimes[dk])
 
             if showtimes:
-                log.debug(f"  Showtimes for {title}: {showtimes}")
+                log.info(f"  Showtimes {title}: { {k: len(v) for k, v in showtimes.items()} } days")
 
         except Exception as _e:
             log.debug(f"  Showtime extraction failed for {title}: {_e}")
