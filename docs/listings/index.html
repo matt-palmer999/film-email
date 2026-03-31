@@ -1383,6 +1383,15 @@ async function loadUserPreferences() {
       applyPreferencesFromURL();
     }
 
+    // Update all film links to carry preferences params through to detail pages
+    const finalParams = window.location.search;
+    if (finalParams) {
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + finalParams;
+      });
+    }
+
   } catch(e) {
     console.warn('Could not load preferences:', e);
   }
@@ -1447,13 +1456,17 @@ window.addEventListener('DOMContentLoaded', () => {
   applyVisibility();
   loadUserPreferences();
 
-  // Make film title links pass through URL params (preferences) to detail pages
-  document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+  // After preferences load, update film links to pass params through
+  // We do this after a short delay to allow loadUserPreferences() to update the URL
+  setTimeout(() => {
     const params = window.location.search;
     if (params) {
-      a.href = a.getAttribute('href') + params;
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + params;
+      });
     }
-  });
+  }, 1500);
 });
 </script>
 </body>
