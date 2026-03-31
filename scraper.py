@@ -1430,13 +1430,21 @@ def main():
             film["rating_score"]   = None
 
     # Build the full bilingual listings page
-    # Pre-assign slugs so build_html can render clickable titles
+    # Remove films with no future showtimes and assign slugs to the rest
+    from datetime import date as _date
+    today_str = _date.today().strftime("%Y-%m-%d")
+
+    stale = [title for title, film in films.items()
+             if not any(
+                 any(dk >= today_str for dk in c.get("showtimes", {}).keys())
+                 for c in film.get("cinemas", [])
+             )]
+    for title in stale:
+        log.info(f"  Removing '{title}' — no future showtimes")
+        del films[title]
+
     for title, film in films.items():
-        has_showtimes = any(c.get("showtimes") for c in film.get("cinemas", []))
-        if has_showtimes:
-            film["slug"] = slugify(film.get("title_en", title) or title)
-        else:
-            film["slug"] = None
+        film["slug"] = slugify(film.get("title_en", title) or title)
 
     full_html = build_html(films, anchor)
 
