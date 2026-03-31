@@ -441,7 +441,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
     days = []
-    for i in range(7):
+    for i in range(10):  # show 10 days to cover weekly programme
         d = today + _td(days=i)
         days.append({
             "key":    d.strftime("%Y-%m-%d"),
@@ -1453,6 +1453,17 @@ def main():
     with open("docs/listings/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
+
+    # Clean up stale film detail pages from previous runs
+    import shutil
+    if os.path.exists("docs/listings"):
+        for entry in os.scandir("docs/listings"):
+            if entry.is_dir():
+                # Keep only dirs that match a current film slug
+                current_slugs = {film["slug"] for film in films.values() if film.get("slug")}
+                if entry.name not in current_slugs:
+                    shutil.rmtree(entry.path)
+                    log.info(f"  Deleted stale detail page: {entry.name}")
 
     # Generate individual film detail pages (only for films with showtimes)
     log.info("Generating film detail pages ...")
