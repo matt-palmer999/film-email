@@ -711,24 +711,46 @@ function applyPreferencesFromURL() {
   }
 }
 
-async function loadUserPreferences() {
-  // Check URL params first (pre-filtered link)
-  const params = new URLSearchParams(window.location.search);
-  const hasParams = params.has('vose') || params.has('cinemas') || params.has('new');
+function setSubscriberUI(isSubscriber) {
+  // Nav — show preferences link for subscribers, subscribe button for anon
+  const navPrefs     = document.getElementById('nav-prefs');
+  const navSubscribe = document.getElementById('nav-subscribe');
+  if (navPrefs)     navPrefs.style.display     = isSubscriber ? '' : 'none';
+  if (navSubscribe) navSubscribe.style.display  = isSubscriber ? 'none' : '';
 
+  // Banners
+  const subBanner  = document.getElementById('subscriber-banner');
+  const anonBanner = document.getElementById('anon-banner');
+  if (subBanner)  subBanner.style.display  = isSubscriber ? 'flex' : 'none';
+  if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
+
+  // Filter bar — only for subscribers
+  const filterBar = document.getElementById('filter-bar');
+  if (filterBar) filterBar.style.display = isSubscriber ? 'flex' : 'none';
+}
+
+async function loadUserPreferences() {
   // Apply language from localStorage or cookie
   const savedLang = localStorage.getItem('cv_lang');
   if (savedLang) setLang(savedLang);
 
-  // If we have URL params, apply cinema tag visibility
+  // Check URL params first (pre-filtered link from email or preferences page)
+  const params = new URLSearchParams(window.location.search);
+  const hasParams = params.has('vose') || params.has('cinemas') || params.has('new');
+
+  // If we have URL params, treat as subscriber (they came via a personalised link)
   if (hasParams) {
+    setSubscriberUI(true);
     applyPreferencesFromURL();
     return;
   }
 
   // Otherwise try to load from Supabase via cookie
   const email = getCookie('cv_email');
-  if (!email || !window.SUPABASE_URL || !window.SUPABASE_ANON) return;
+  if (!email || !window.SUPABASE_URL || !window.SUPABASE_ANON) {
+    setSubscriberUI(false);
+    return;
+  }
 
   try {
     const res = await fetch(
@@ -739,6 +761,9 @@ async function loadUserPreferences() {
     if (!rows.length) return;
 
     const prefs = rows[0];
+
+    // Mark as subscriber — show filter bar, hide subscribe button
+    setSubscriberUI(true);
 
     // Apply language
     if (prefs.lang) setLang(prefs.lang);
@@ -1064,9 +1089,30 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
+      <a href="../preferences/" id="nav-prefs" style="display:none;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
+      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
   </div>
+
+  <!-- SUBSCRIBER BANNER — shown to subscribers only -->
+  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:#c5a84a;" data-es="🎬 Estás viendo tu cartelera personalizada" data-en="🎬 You're viewing your personalised listings">🎬 Estás viendo tu cartelera personalizada</span>
+    <a href="../preferences/" style="font-size:11px;color:#ffb432;text-decoration:none;" data-es="⚙️ Cambiar preferencias →" data-en="⚙️ Change preferences →">⚙️ Cambiar preferencias →</a>
+  </div>
+
+  <!-- ANONYMOUS BANNER — shown to non-subscribers -->
+  <div id="anon-banner" style="background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:#9b8faa;" data-es="🔒 Suscríbete gratis para filtrar por VOSE, elegir tus cines y recibir el email semanal" data-en="🔒 Subscribe free to filter by VOSE, choose your cinemas and get the weekly email">🔒 Suscríbete gratis para filtrar por VOSE, elegir tus cines y recibir el email semanal</span>
+    <a href="../" style="font-size:12px;font-weight:600;padding:6px 16px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+  </div>
+
+  <!-- FILTER BAR — only shown to subscribers -->
+  <div class="filter-bar" id="filter-bar" style="display:none;">
+    <span class="filter-label" data-es="Filtrar" data-en="Filter">Filtrar</span>
+    <button class="filter-btn active" id="filter-all" onclick="setFilter('all')" data-es="Todas" data-en="All films">Todas</button>
+    <button class="filter-btn" id="filter-vose" onclick="setFilter('vose')" data-es="Solo VOSE" data-en="VOSE only">Solo VOSE</button>
+  </div>
+  <div class="filter-empty" id="filter-empty" data-es="No hay películas que coincidan con el filtro." data-en="No films match this filter.">No hay películas que coincidan con el filtro.</div>
 
   <div class="header">
     <div class="header-eyebrow" data-es="🎬 Newsletter Semanal" data-en="🎬 Weekly Newsletter">🎬 Newsletter Semanal</div>
