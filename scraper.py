@@ -1203,8 +1203,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="footer-logo">Cartelera Valencia</div>
     <p>
       <span data-es="Fuentes:" data-en="Sources:">Fuentes:</span>
-      <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.ecartelera.com">eCartelera</a><br>
+      <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.themoviedb.org">TMDB</a><br>
       <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
+      <em style="color:#7a6a9a;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
       <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
       <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span>
     </p>
