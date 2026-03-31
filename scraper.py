@@ -904,6 +904,11 @@ def film_card_html(film: dict) -> str:
     cinema_ids = ",".join(c["id"] for c in cinemas)
     title_es = title
     title_en = film.get("title_en", title)
+    slug     = film.get("slug")
+    if slug:
+        title_html_list = f'<a href="./{slug}/" class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+    else:
+        title_html_list = f'<div class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
     syn_es   = (film.get("synopsis_es") or synopsis)[:200]
     syn_en   = (film.get("synopsis_en") or synopsis)[:200]
 
@@ -912,8 +917,7 @@ def film_card_html(film: dict) -> str:
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-      <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
-         class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
+      {title_html_list}
       <div class="list-meta">{rating_dot}{meta[:120]}</div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
@@ -970,6 +974,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         cinema_ids = ",".join(c["id"] for c in cinemas)
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
+        slug      = film.get("slug")
+        if slug:
+            title_html_feat = f'<a href="./{slug}/" class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+        else:
+            title_html_feat = f'<div class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         title_orig= film.get("title_original", film["title"])
         syn_es    = (film.get("synopsis_es") or synopsis)[:220]
         syn_en    = (film.get("synopsis_en") or synopsis)[:220]
@@ -985,8 +994,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="featured-info">
       <div>
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-        <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
-           class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
+        {title_html_feat}
         {orig_label}
         <div class="film-meta">{rating_dot}{meta[:100]}</div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
@@ -1024,6 +1032,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         cinema_ids = ",".join(c["id"] for c in cinemas)
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
+        slug     = film.get("slug")
+        if slug:
+            title_html_grid = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+        else:
+            title_html_grid = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         syn_es   = (film.get("synopsis_es") or synopsis)[:140]
         syn_en   = (film.get("synopsis_en") or synopsis)[:140]
 
@@ -1032,8 +1045,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
-        <a href="./{film.get('slug', slugify(film.get('title_en', title_es)))}/"
-           class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>
+        {title_html_grid}
         <div class="grid-meta">{rating_dot}{meta[:80]}</div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
@@ -1426,18 +1438,31 @@ def main():
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
 
-    # Generate individual film detail pages
+    # Generate individual film detail pages (only for films with showtimes)
     log.info("Generating film detail pages ...")
+    generated = 0
     for title, film in films.items():
+        # Check if film has any showtimes across all cinemas
+        has_showtimes = any(
+            c.get("showtimes")
+            for c in film.get("cinemas", [])
+        )
         slug = slugify(film.get("title_en", title) or title)
-        film_dir = f"docs/listings/{slug}"
-        os.makedirs(film_dir, exist_ok=True)
-        detail_html = build_film_detail_page(film, anchor)
-        with open(f"{film_dir}/index.html", "w", encoding="utf-8") as f:
-            f.write(detail_html)
-        # Store slug in film for linking from cards
-        film["slug"] = slug
-    log.info(f"Generated {len(films)} film detail pages")
+
+        if has_showtimes:
+            film_dir = f"docs/listings/{slug}"
+            os.makedirs(film_dir, exist_ok=True)
+            detail_html = build_film_detail_page(film, anchor)
+            with open(f"{film_dir}/index.html", "w", encoding="utf-8") as f:
+                f.write(detail_html)
+            film["slug"] = slug
+            generated += 1
+        else:
+            # No showtimes — don't generate detail page, don't make title clickable
+            film["slug"] = None
+            log.info(f"  Skipping detail page for '{title}' — no showtimes found")
+
+    log.info(f"Generated {generated} film detail pages ({len(films)-generated} skipped — no showtimes)")
 
     # Inject Supabase credentials into landing page and preferences page
     if SUPABASE_URL and SUPABASE_ANON:
