@@ -484,7 +484,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
     vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
-    poster_html = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:100%;object-fit:cover;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
+    poster_html = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
     return f"""<!DOCTYPE html>
@@ -661,7 +661,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
 .rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
 .featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
-.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;overflow:hidden;display:flex;align-items:flex-start;justify-content:center}
+.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
 .film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
