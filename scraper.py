@@ -1055,13 +1055,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       </div>
     </div>"""
 
-    # Build multiplex section: first film gets featured card, rest go in grid pairs
+    # Build multiplex section: all films in grid pairs (no featured card)
     multiplex_cards = ""
     if multiplex_films:
-        multiplex_cards += featured_card_html(multiplex_films[0])
-        rest = multiplex_films[1:]
-        for i in range(0, len(rest), 2):
-            pair = rest[i:i+2]
+        for i in range(0, len(multiplex_films), 2):
+            pair = multiplex_films[i:i+2]
             inner = "".join(grid_card_html(f) for f in pair)
             multiplex_cards += f'\n  <div class="grid-row">{inner}\n  </div>'
 
