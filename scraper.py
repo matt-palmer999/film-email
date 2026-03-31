@@ -677,6 +677,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
 .footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+.filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
+.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a3f5e;font-weight:500}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
+.filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
+.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
 
@@ -724,9 +730,6 @@ function setSubscriberUI(isSubscriber) {
   if (subBanner)  subBanner.style.display  = isSubscriber ? 'flex' : 'none';
   if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
 
-  // Filter bar — only for subscribers
-  const filterBar = document.getElementById('filter-bar');
-  if (filterBar) filterBar.style.display = isSubscriber ? 'flex' : 'none';
 }
 
 async function loadUserPreferences() {
@@ -1108,14 +1111,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     </div>
     <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
-
-  <!-- FILTER BAR — only shown to subscribers -->
-  <div class="filter-bar" id="filter-bar" style="display:none;">
-    <span class="filter-label" data-es="Filtrar" data-en="Filter">Filtrar</span>
-    <button class="filter-btn active" id="filter-all" onclick="setFilter('all')" data-es="Todas" data-en="All films">Todas</button>
-    <button class="filter-btn" id="filter-vose" onclick="setFilter('vose')" data-es="Solo VOSE" data-en="VOSE only">Solo VOSE</button>
-  </div>
-  <div class="filter-empty" id="filter-empty" data-es="No hay películas que coincidan con el filtro." data-en="No films match this filter.">No hay películas que coincidan con el filtro.</div>
 
   <div class="header">
     <div class="header-title">Cartelera<br>Valencia</div>
