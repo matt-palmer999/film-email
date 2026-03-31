@@ -667,7 +667,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:flex;gap:14px;margin:0 24px 14px}
-.grid-card{flex:1;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
+.grid-card{flex:1;max-width:calc(50% - 7px);background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
 .grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
@@ -936,7 +936,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     multiplex_films = []
     arthouse_films  = {}  # keyed by cinema_id
 
-    for title, film in sorted(films_by_title.items(), key=lambda x: (-x[1]["is_new"], x[0])):
+    for title, film in sorted(films_by_title.items(), key=lambda x: (-x[1]["is_new"], -(x[1].get("rating_score") or 0), x[0])):
         cinema_types = {c["type"] for c in film["cinemas"]}
         cinema_ids   = {c["id"]   for c in film["cinemas"]}
 
