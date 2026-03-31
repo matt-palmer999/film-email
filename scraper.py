@@ -441,7 +441,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
     days = []
-    for i in range(10):  # show 10 days to cover weekly programme
+    for i in range(7):
         d = today + _td(days=i)
         days.append({
             "key":    d.strftime("%Y-%m-%d"),
@@ -565,7 +565,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     </div>
   </div>
 
-  <div class="section-title" data-es="🕖 HORARIOS" data-en="🕖 SHOWTIMES">🕖 HORARIOS</div>
+  <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
   <div class="day-tabs">{tab_btns}</div>
 
   <div id="day-panels">{tab_panels}</div>
@@ -1434,9 +1434,11 @@ def main():
     from datetime import date as _date
     today_str = _date.today().strftime("%Y-%m-%d")
 
+    from datetime import timedelta as _td2
+    week_ahead = (_date.today() + _td2(days=7)).strftime("%Y-%m-%d")
     stale = [title for title, film in films.items()
              if not any(
-                 any(dk >= today_str for dk in c.get("showtimes", {}).keys())
+                 any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
                  for c in film.get("cinemas", [])
              )]
     for title in stale:
