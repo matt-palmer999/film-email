@@ -1430,6 +1430,14 @@ def main():
             film["rating_score"]   = None
 
     # Build the full bilingual listings page
+    # Pre-assign slugs so build_html can render clickable titles
+    for title, film in films.items():
+        has_showtimes = any(c.get("showtimes") for c in film.get("cinemas", []))
+        if has_showtimes:
+            film["slug"] = slugify(film.get("title_en", title) or title)
+        else:
+            film["slug"] = None
+
     full_html = build_html(films, anchor)
 
     # Save listings to docs/listings/index.html for GitHub Pages
@@ -1442,24 +1450,16 @@ def main():
     log.info("Generating film detail pages ...")
     generated = 0
     for title, film in films.items():
-        # Check if film has any showtimes across all cinemas
-        has_showtimes = any(
-            c.get("showtimes")
-            for c in film.get("cinemas", [])
-        )
-        slug = slugify(film.get("title_en", title) or title)
+        slug = film.get("slug")
 
-        if has_showtimes:
+        if slug:
             film_dir = f"docs/listings/{slug}"
             os.makedirs(film_dir, exist_ok=True)
             detail_html = build_film_detail_page(film, anchor)
             with open(f"{film_dir}/index.html", "w", encoding="utf-8") as f:
                 f.write(detail_html)
-            film["slug"] = slug
             generated += 1
         else:
-            # No showtimes — don't generate detail page, don't make title clickable
-            film["slug"] = None
             log.info(f"  Skipping detail page for '{title}' — no showtimes found")
 
     log.info(f"Generated {generated} film detail pages ({len(films)-generated} skipped — no showtimes)")
