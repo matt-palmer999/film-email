@@ -1068,7 +1068,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     if "babel" in arthouse_films:
         babel_only   = [f for f in arthouse_films["babel"] if not any(c["type"]=="multiplex" for c in f["cinemas"])]
         babel_shared = [f for f in arthouse_films["babel"] if any(c["type"]=="multiplex" for c in f["cinemas"])]
-        babel_cards  = "\n".join(film_card_html(f) for f in babel_only)
+        babel_grid = ""
+        for i in range(0, len(babel_only), 2):
+            pair = babel_only[i:i+2]
+            inner = "".join(grid_card_html(f) for f in pair)
+            babel_grid += f'\n  <div class="grid-row">{inner}\n  </div>'
+        babel_cards = babel_grid
         if babel_shared:
             shared_tags = "".join(
                 f'<span class="cinema-tag" style="cursor:default;">{f["title"]}{'<span class="vose-mini">VOSE</span>' if f["any_vose"] else ""}</span>'
@@ -1082,7 +1087,10 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 
     dor_cards = ""
     if "dor" in arthouse_films:
-        dor_cards = "\n".join(film_card_html(f) for f in arthouse_films["dor"])
+        for i in range(0, len(arthouse_films["dor"]), 2):
+            pair = arthouse_films["dor"][i:i+2]
+            inner = "".join(grid_card_html(f) for f in pair)
+            dor_cards += f'\n  <div class="grid-row">{inner}\n  </div>'
 
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
