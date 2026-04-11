@@ -1,0 +1,41 @@
+{
+  "name": "whatson.movie — Cartelera Valencia",
+  "short_name": "whatson.movie",
+  "description": "Your weekly bilingual guide to cinema in Valencia",
+  "start_url": "/listings/",
+  "display": "standalone",
+  "background_color": "#0f0c14",
+  "theme_color": "#0a0810",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["entertainment", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "This week's listings",
+      "short_name": "Listings",
+      "url": "/listings/",
+      "description": "See what's on this week"
+    },
+    {
+      "name": "My preferences",
+      "short_name": "Preferences",
+      "url": "/preferences/",
+      "description": "Update your cinema preferences"
+    }
+  ]
+}
