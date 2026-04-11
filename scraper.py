@@ -492,6 +492,13 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="whatson.movie">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
@@ -1125,6 +1132,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="whatson.movie">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>Cartelera Valencia – {date_en}</title>
 <style>{CSS}</style>
 </head>
@@ -1232,6 +1246,14 @@ window.addEventListener('DOMContentLoaded', () => {{
     }}
   }}, 1500);
 }});
+</script>
+<script>
+if ('serviceWorker' in navigator) {{
+  window.addEventListener('load', () => {{
+    navigator.serviceWorker.register('/sw.js')
+      .catch(err => console.log('SW registration failed:', err));
+  }});
+}}
 </script>
 </body>
 </html>"""
