@@ -585,6 +585,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 </div>
 <script>
 function setLang(lang) {{
+  document.getElementById('html-root').lang = lang;
+  setTimeout(updateHeaderDate, 10);
   document.getElementById('btn-es').classList.toggle('active', lang === 'es');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
@@ -809,6 +811,37 @@ async function loadUserPreferences() {
   }
 }
 
+function updateHeaderDate() {
+  const today = new Date();
+  const end   = new Date(today);
+  end.setDate(today.getDate() + 6);
+
+  const monthsEs = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const lang = document.getElementById('html-root').lang || 'es';
+
+  let label;
+  if (lang === 'en') {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' ' + monthsEn[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' ' + monthsEn[today.getMonth()] + ' – ' + end.getDate() + ' ' + monthsEn[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  } else {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' de ' + monthsEs[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' de ' + monthsEs[today.getMonth()] + ' – ' + end.getDate() + ' de ' + monthsEs[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  }
+
+  const el = document.getElementById('header-date');
+  if (el) el.textContent = label;
+}
+
+// Update date on load and when language changes
+updateHeaderDate();
 function setFilter(filter) {
   const url = new URL(window.location);
   if (filter === 'all') url.searchParams.delete('filter');
@@ -1179,7 +1212,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="header">
     <div class="header-title">Cartelera<br>Valencia</div>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
-    <div class="header-date" data-es="{date_es}" data-en="{date_en}">{date_es}</div>
+    <div class="header-date" id="header-date"></div>
   </div>
 
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
@@ -1450,11 +1483,7 @@ def send_email(html: str, anchor: datetime) -> None:
 def main():
     # The newsletter covers Friday → Thursday; anchor on this coming Friday
     today  = datetime.now()
-    days_until_friday = (4 - today.weekday()) % 7  # 4 = Friday
-    if days_until_friday == 0:
-        days_until_friday = 7  # if today IS Friday, show next week
-    anchor = today + timedelta(days=days_until_friday)
-    anchor = anchor.replace(hour=0, minute=0, second=0, microsecond=0)
+    anchor = today.replace(hour=0, minute=0, second=0, microsecond=0)
 
     log.info(f"Building newsletter for week starting {anchor.date()} ...")
     warm_up_session()
