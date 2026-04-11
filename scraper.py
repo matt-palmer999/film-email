@@ -929,19 +929,19 @@ function applyVisibility() {
     ['section-babel',     'divider-dor'],
     ['section-dor',       null]
   ];
-  sectionMap.forEach(function(pair) {{
+  sectionMap.forEach(function(pair) {
     var sectionId = pair[0], dividerId = pair[1];
     var section = document.getElementById(sectionId);
     if (!section) return;
     var sCards = section.querySelectorAll('[data-vose]');
-    var anyVisible = Array.from(sCards).some(function(c) {{ return c.style.display !== 'none'; }});
+    var anyVisible = Array.from(sCards).some(function(c) { return c.style.display !== 'none'; });
     section.style.display = anyVisible ? '' : 'none';
-    if (dividerId) {{
+    if (dividerId) {
       var divider = document.getElementById(dividerId);
       if (divider) divider.style.display = anyVisible ? '' : 'none';
-    }}
-  }});
-}}
+    }
+  });
+}
 
 """
 
