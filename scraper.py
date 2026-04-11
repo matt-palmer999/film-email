@@ -922,7 +922,24 @@ function applyVisibility() {
   // Empty state message
   const empty = document.getElementById('filter-empty');
   if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
-}
+
+  // Hide entire sections (label + header + cards) if all their cards are hidden
+  [
+    ['section-multiplex', 'divider-babel'],
+    ['section-babel',     'divider-dor'],
+    ['section-dor',       null]
+  ].forEach(([sectionId, dividerId]) => {{
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const cards = section.querySelectorAll('[data-vose]');
+    const anyVisible = Array.from(cards).some(c => c.style.display !== 'none');
+    section.style.display = anyVisible ? '' : 'none';
+    if (dividerId) {{
+      const divider = document.getElementById(dividerId);
+      if (divider) divider.style.display = anyVisible ? '' : 'none';
+    }}
+  }});
+}}
 
 """
 
@@ -1215,6 +1232,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="header-date" id="header-date"></div>
   </div>
 
+  <div id="section-multiplex">
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
   <div class="cinema-group-header">
     <div>
@@ -1223,9 +1241,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     </div>
   </div>
   {multiplex_cards}
+  </div>
 
-  <div class="section-divider"></div>
+  <div class="section-divider" id="divider-babel"></div>
 
+  <div id="section-babel">
   <div class="section-label" data-es="🎭 Cines Babel — Cine Independiente &amp; VOSE" data-en="🎭 Cines Babel — Independent &amp; VOSE Cinema">🎭 Cines Babel — Cine Independiente &amp; VOSE</div>
   <div class="cinema-group-header">
     <div>
@@ -1235,9 +1255,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <a href="https://www.cinesalbatrosbabel.com" class="cinema-group-link">cinesalbatrosbabel.com →</a>
   </div>
   {babel_cards}
+  </div>
 
-  <div class="section-divider"></div>
+  <div class="section-divider" id="divider-dor"></div>
 
+  <div id="section-dor">
   <div class="section-label" data-es="🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor" data-en="🎞️ Cinestudio D'Or — Double Bills &amp; Art Cinema">🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor</div>
   <div class="cinema-group-header">
     <div>
@@ -1247,6 +1269,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <a href="https://cinestudiodor.es" class="cinema-group-link">cinestudiodor.es →</a>
   </div>
   {dor_cards}
+  </div>
 
   <div class="section-divider"></div>
 
