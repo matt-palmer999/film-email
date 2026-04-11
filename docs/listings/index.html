@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title>Cartelera Valencia – 17 – 23 April 2026</title>
+<title>Cartelera Valencia – 11 – 17 April 2026</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -114,7 +114,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="header">
     <div class="header-title">Cartelera<br>Valencia</div>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
-    <div class="header-date" data-es="17 – 23 de abril 2026" data-en="17 – 23 April 2026">17 – 23 de abril 2026</div>
+    <div class="header-date" id="header-date"></div>
   </div>
 
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
@@ -1042,6 +1042,37 @@ async function loadUserPreferences() {
   }
 }
 
+function updateHeaderDate() {
+  const today = new Date();
+  const end   = new Date(today);
+  end.setDate(today.getDate() + 6);
+
+  const monthsEs = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const lang = document.getElementById('html-root').lang || 'es';
+
+  let label;
+  if (lang === 'en') {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' ' + monthsEn[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' ' + monthsEn[today.getMonth()] + ' – ' + end.getDate() + ' ' + monthsEn[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  } else {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' de ' + monthsEs[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' de ' + monthsEs[today.getMonth()] + ' – ' + end.getDate() + ' de ' + monthsEs[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  }
+
+  const el = document.getElementById('header-date');
+  if (el) el.textContent = label;
+}
+
+// Update date on load and when language changes
+updateHeaderDate();
 function setFilter(filter) {
   const url = new URL(window.location);
   if (filter === 'all') url.searchParams.delete('filter');

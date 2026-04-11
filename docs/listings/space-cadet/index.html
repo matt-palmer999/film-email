@@ -96,6 +96,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 </div>
 <script>
 function setLang(lang) {
+  document.getElementById('html-root').lang = lang;
+  setTimeout(updateHeaderDate, 10);
   document.getElementById('btn-es').classList.toggle('active', lang === 'es');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
