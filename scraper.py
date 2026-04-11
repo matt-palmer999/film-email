@@ -492,6 +492,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0a0810">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1132,6 +1134,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0a0810">
 <meta name="mobile-web-app-capable" content="yes">
