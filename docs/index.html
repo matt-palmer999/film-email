@@ -989,6 +989,15 @@
   </footer>
 
   <script>
+    /* ── REDIRECT EXISTING SUBSCRIBERS ── */
+    (function() {
+      const match = document.cookie.match(/(^| )cv_email=([^;]+)/);
+      if (match) {
+        // Already subscribed — redirect to personalised listings
+        window.location.replace('/listings/');
+      }
+    })();
+
     /* ── LANGUAGE TOGGLE ── */
     function setLang(lang) {
       document.getElementById('btn-es').classList.toggle('active', lang === 'es');
@@ -1012,8 +1021,8 @@
     if (savedLang !== 'es') setLang(savedLang);
 
     /* ── SIGNUP ── */
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     async function submitSignup(source) {
       const emailEl   = document.getElementById(source + '-email');
