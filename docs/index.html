@@ -743,6 +743,14 @@
       footer { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
+  <script>
+    // Redirect subscribers before page renders — avoids flash of subscribe page
+    (function() {
+      if (document.cookie.match(/(^| )cv_email=([^;]+)/)) {
+        window.location.replace('/listings/');
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -990,13 +998,7 @@
 
   <script>
     /* ── REDIRECT EXISTING SUBSCRIBERS ── */
-    (function() {
-      const match = document.cookie.match(/(^| )cv_email=([^;]+)/);
-      if (match) {
-        // Already subscribed — redirect to personalised listings
-        window.location.replace('/listings/');
-      }
-    })();
+    /* This is a no-op here — redirect handled in <head> */
 
     /* ── LANGUAGE TOGGLE ── */
     function setLang(lang) {
