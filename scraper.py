@@ -1535,7 +1535,7 @@ def main():
         log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
 
     # Build and send the teaser email
-    page_url  = os.environ.get("LISTINGS_URL", "https://matt-palmer999.github.io/film-email/listings")
+    page_url  = os.environ.get("LISTINGS_URL", "https://whatson.movie/listings")
     prefs_url = page_url.replace("/listings", "/preferences")
 
     # Only send email on Thursdays (scraper now runs daily)
