@@ -46,7 +46,7 @@ jobs:
           LISTINGS_URL:  ${{ secrets.LISTINGS_URL }}
           SUPABASE_URL:  ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON: ${{ secrets.SUPABASE_ANON }}
-          TMDB_API_KEY:  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyOWJjMjNkZGI2MmRhMzUyZDRhMDI1NTM4MmQzMGEyMCIsIm5iZiI6MTc3NDcxNjEyNy44NjQsInN1YiI6IjY5YzgwNGRmZTEyNTA5YzJmNjA3NDdhYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OtsZ58Eigy7j46zGsty-A3HWk8tsBiw4F1oG3IQgVAs"
+          TMDB_API_KEY:  ${{ secrets.TMDB_API_KEY }}
         run: python scraper.py
 
       - name: Publish listings page to GitHub Pages
