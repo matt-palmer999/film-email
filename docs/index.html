@@ -170,7 +170,7 @@
     }
 
     .hero-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: clamp(52px, 10vw, 100px);
       font-weight: 700;
       line-height: 0.95;
@@ -182,13 +182,8 @@
 
     .hero-title-sub {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(28px, 5vw, 52px);
-      font-weight: 600;
       font-style: italic;
       color: var(--gold);
-      margin-bottom: 28px;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.5s forwards;
     }
 
     .hero-desc {
@@ -773,8 +768,7 @@
 
     <p class="hero-eyebrow" data-es="🎬 Valencia" data-en="🎬 Valencia">🎬 Valencia</p>
 
-    <h1 class="hero-title">whatson</h1>
-    <p class="hero-title-sub">.movie</p>
+    <h1 class="hero-title">whatson<span class="hero-title-sub">.movie</span></h1>
 
     <p class="hero-desc" data-es="La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche." data-en="The weekly guide to cinema in Valencia. Every cinema, every film, VOSE sessions highlighted. Free, every Thursday evening.">La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche.</p>
 
@@ -1023,8 +1017,8 @@
     if (savedLang !== 'es') setLang(savedLang);
 
     /* ── SIGNUP ── */
-    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
 
     async function submitSignup(source) {
       const emailEl   = document.getElementById(source + '-email');
