@@ -1161,18 +1161,20 @@ function applyVisibility() {
   if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
 
   // Hide entire sections (label + header + cards) if all their cards are hidden
-  [
+  var sectionMap = [
     ['section-multiplex', 'divider-babel'],
     ['section-babel',     'divider-dor'],
     ['section-dor',       null]
-  ].forEach(([sectionId, dividerId]) => {{
-    const section = document.getElementById(sectionId);
+  ];
+  sectionMap.forEach(function(pair) {{
+    var sectionId = pair[0], dividerId = pair[1];
+    var section = document.getElementById(sectionId);
     if (!section) return;
-    const cards = section.querySelectorAll('[data-vose]');
-    const anyVisible = Array.from(cards).some(c => c.style.display !== 'none');
+    var sCards = section.querySelectorAll('[data-vose]');
+    var anyVisible = Array.from(sCards).some(function(c) {{ return c.style.display !== 'none'; }});
     section.style.display = anyVisible ? '' : 'none';
     if (dividerId) {{
-      const divider = document.getElementById(dividerId);
+      var divider = document.getElementById(dividerId);
       if (divider) divider.style.display = anyVisible ? '' : 'none';
     }}
   }});
