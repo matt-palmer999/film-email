@@ -62,7 +62,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
-.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
+.grid-card{display:block;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,transform .15s}}.grid-card:hover{{border-color:#5a3a7a;transform:translateY(-2px)}}
 .grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
@@ -127,7 +127,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,abc_saler,abc_park">
+    <a class="grid-card" href="./lee-cronin-s-the-mummy/" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,abc_saler,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lTQoEczVEnkuxHFEGgWYfJB98tL.jpg" alt="La momia de Lee Cronin" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.7</span></div>
@@ -138,9 +138,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,lys,abc_park,mn4">
+    </a>
+    <a class="grid-card" href="./i-swear/" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,lys,abc_park,mn4">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vUwyhNWBKkSwK8ELvEeBRwV724h.jpg" alt="Incontrolable (I swear)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.3</span></div>
@@ -151,11 +152,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,ocine,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./kill-bill-the-whole-bloody-affair/" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,ocine,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/nSOJfWJCdVFZQwXQA7RXn7FIIiY.jpg" alt="Kill Bill: The Whole Bloody Affair" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.1</span></div>
@@ -166,9 +168,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./a-poet/" data-vose="false" data-isnew="true" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/o0MRVa3XMUUIxiSCZYaJ1jGXdk.jpg" alt="Un poeta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="score-badge">⭐ 7.5</span></div>
@@ -179,11 +182,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./reminders-of-him/" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7L6rceYgzQ0NeHD7PRDNrRoQ291.jpg" alt="No te olvidaré" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.1</span></div>
@@ -194,9 +198,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./good-luck-have-fun-don-t-die/" data-vose="true" data-isnew="true" data-cinemas="yelmo,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/rWcfOdY7TU6lTdazWj0ebDZnAfO.jpg" alt="Buena suerte, pásalo bien, no mueras" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.9</span></div>
@@ -207,11 +212,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./dust-bunny/" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/qa5aZpO8tQqhlDaE0flalS1TuIS.jpg" alt="Atrapando a un monstruo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.6</span></div>
@@ -222,9 +228,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,abc_saler,abc_park,gran_turia">
+    </a>
+    <a class="grid-card" href="./space-cadet/" data-vose="true" data-isnew="true" data-cinemas="babel,abc_saler,abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eTxfcOXIZs8mSaL7dqdmpnVmB5l.jpg" alt="Mi robot favorito" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 5.5</span></div>
@@ -235,11 +242,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./boulevard/" data-vose="false" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/o5M5mjnfRO50t3Wha1QPD04oHfT.jpg" alt="Boulevard" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="score-badge">⭐ 3.0</span></div>
@@ -250,9 +258,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="kinepolis,lys,abc_saler,abc_park,mn4">
+    </a>
+    <a class="grid-card" href="./an-island-away-from-you/" data-vose="false" data-isnew="true" data-cinemas="kinepolis,lys,abc_saler,abc_park,mn4">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/ddYZksoDokxjNHm2E0u1GeWVBsE.jpg" alt="A una isla de ti" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
@@ -263,11 +272,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./auri/" data-vose="false" data-isnew="true" data-cinemas="abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dDt7E6pdoJAE6JvQtorCBvFhHtW.jpg" alt="Auri" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
@@ -278,9 +288,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./en-busca-del-mesias/" data-vose="false" data-isnew="true" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jAZpwZ6yAh9pExq9GRINSIWForG.jpg" alt="En busca del mesías" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
@@ -291,11 +302,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,abc_park">
+    <a class="grid-card" href="./the-designer-is-dead/" data-vose="true" data-isnew="true" data-cinemas="babel,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lzewyd5b6GK3ONMdEFlY3sS8qMA.jpg" alt="The Designer Is Dead" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span></div>
@@ -306,9 +318,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./ramon-y-cajal-drawings-on-the-retina/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/tRqcXP5afNdY56qRxVboKV5aBcF.jpg" alt="Ramón y Cajal: Dibujos en la retina" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 9.0</span></div>
@@ -319,11 +332,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+    <a class="grid-card" href="./leon-the-professional/" data-vose="true" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bxB2q91nKYp8JNzqE7t7TWBVupB.jpg" alt="El profesional (León)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.3</span></div>
@@ -334,9 +348,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./project-hail-mary/" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg" alt="Proyecto Salvación" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.2</span></div>
@@ -347,11 +362,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    <a class="grid-card" href="./pacha-el-arquitecto-de-la-noche/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/01/El-arquitecto-1-279x400.jpg" alt="El arquitecto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 8.0</span></div>
@@ -362,9 +378,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="lys">
+    </a>
+    <a class="grid-card" href="./kill-bill-vol-1/" data-vose="true" data-isnew="false" data-cinemas="lys">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/v7TaX8kXMXs5yFFGR41guUDNcnB.jpg" alt="Kill Bill: Volumen 1" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span></div>
@@ -375,11 +392,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+    <a class="grid-card" href="./when-marnie-was-there/" data-vose="true" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vug1dvDI1tSa60Z8qjCuUE7ntkO.jpg" alt="El recuerdo de Marnie" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.9</span></div>
@@ -390,9 +408,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+    </a>
+    <a class="grid-card" href="./goat/" data-vose="false" data-isnew="false" data-cinemas="mn4">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wfuqMlaExcoYiUEvKfVpUTt1v4u.jpg" alt="Goat, como cabras" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.9</span></div>
@@ -403,11 +422,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./hoppers/" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/xjtWQ2CL1mpmMNwuU5HeS4Iuwuu.jpg" alt="Hoppers" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.6</span></div>
@@ -418,9 +438,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./bitter-christmas/" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/kiPGcHX0YT49nrab76G0bqw3gHW.jpg" alt="Amarga Navidad" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
@@ -431,11 +452,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="kinepolis">
+    <a class="grid-card" href="./avatar-fire-and-ash/" data-vose="false" data-isnew="false" data-cinemas="kinepolis">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg" alt="Avatar. Fuego y ceniza" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.4</span></div>
@@ -446,9 +468,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,lys,abc_park">
+    </a>
+    <a class="grid-card" href="./la-grazia/" data-vose="true" data-isnew="false" data-cinemas="babel,lys,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/u5RgunQiA4hvDfTeWO9pS0lm4K4.jpg" alt="La grazia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
@@ -459,11 +482,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,gran_turia">
+    <a class="grid-card" href="./calle-malaga/" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/fWagBXNDk44UaupYtwQOAvDwGiT.jpg" alt="Calle Málaga" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.2</span></div>
@@ -474,9 +498,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
+    </a>
+    <a class="grid-card" href="./the-last-viking/" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/92ztdPsf98i0tLcONIX92yuh3MQ.jpg" alt="El último vikingo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span></div>
@@ -487,11 +512,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_saler,abc_park,gran_turia">
+    <a class="grid-card" href="./the-housemaid/" data-vose="false" data-isnew="false" data-cinemas="abc_saler,abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/cWsBscZzwu5brg9YjNkGewRUvJX.jpg" alt="La asistenta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.2</span></div>
@@ -502,9 +528,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./ready-or-not-here-i-come/" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jRf89HVEtBZiSnOXXWDhZOfuTwW.jpg" alt="Noche de bodas 2" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.1</span></div>
@@ -515,11 +542,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./the-super-mario-galaxy-movie/" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg" alt="Super Mario Galaxy: la película" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.9</span></div>
@@ -530,9 +558,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./shelter/" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/buPFnHZ3xQy6vZEHxbHgL1Pc6CR.jpg" alt="Shelter: El Protector" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.8</span></div>
@@ -543,11 +572,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    <a class="grid-card" href="./eagles-of-the-republic/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/f9MzpMfbBL4PknhKqoQpIUdskTl.jpg" alt="Águilas de El Cairo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.8</span></div>
@@ -558,9 +588,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./two-prosecutors/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dU46ROG7HoP7biPtntaMTjkGbU6.jpg" alt="Dos fiscales" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.7</span></div>
@@ -571,11 +602,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park,gran_turia">
+    <a class="grid-card" href="./noise/" data-vose="true" data-isnew="false" data-cinemas="abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/uU3NXe7QqjJNxVpYPdz8dscFWlj.jpg" alt="Noise (Ruidos)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.7</span></div>
@@ -586,9 +618,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="ocine,lys,abc_saler,abc_park,gran_turia">
+    </a>
+    <a class="grid-card" href="./wuthering-heights/" data-vose="true" data-isnew="false" data-cinemas="ocine,lys,abc_saler,abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/3YBce6dTh1D5oCMITXk2S5QhPt.jpg" alt="Cumbres borrascosas" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.5</span></div>
@@ -599,11 +632,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+    <a class="grid-card" href="./they-will-kill-you/" data-vose="false" data-isnew="false" data-cinemas="mn4">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg" alt="Te van a matar" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
@@ -614,9 +648,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+    </a>
+    <a class="grid-card" href="./torrente-for-president/" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yrDKwAdZRJjoQ9RZwzRGPpMC7U1.jpg" alt="Torrente presidente" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
@@ -627,11 +662,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    <a class="grid-card" href="./a-missing-part/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6FL2kWvfxMLaqN2ppZuOsfgHJBz.jpg" alt="Una hija en Tokio" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
@@ -642,9 +678,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./maigret-and-the-dead-lover/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/siGwXsTqwSBC9VcbDM4tdhb1qLo.jpg" alt="Maigret y la muerte del embajador" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.1</span></div>
@@ -655,11 +692,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_saler,abc_park">
+    <a class="grid-card" href="./better-class/" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_saler,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dfvG1uRRd6TROYEt2iEbQKVBAPU.jpg" alt="Altas capacidades" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
@@ -670,9 +708,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,abc_saler,gran_turia">
+    </a>
+    <a class="grid-card" href="./scream-7/" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,abc_saler,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jjyuk0edLiW8vOSnlfwWCCLpbh5.jpg" alt="Scream 7" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
@@ -683,11 +722,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+    <a class="grid-card" href="./whistle/" data-vose="false" data-isnew="false" data-cinemas="mn4">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eGxPyseSnEZBMJaopGfRUO9HSYx.jpg" alt="Whistle. El silbido del mal" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
@@ -698,9 +738,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./encadenados/" data-vose="true" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/MAgsjx2W2SjCCDhrBsTwF6hMxT.jpg" alt="Encadenados" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 3.3</span></div>
@@ -711,11 +752,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,ocine,abc_saler,abc_park,gran_turia">
+    <a class="grid-card" href="./bts-world-tour-arirang-in-japan-live-viewing/" data-vose="false" data-isnew="false" data-cinemas="yelmo,ocine,abc_saler,abc_park,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/iNBzpdLRX7OfajlnwNdJNlW0bCB.jpg" alt="Bts World Tour 'Arirang' In Japan: Live Viewing" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
@@ -726,9 +768,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,lys">
+    </a>
+    <a class="grid-card" href="./la-mujer-mas-rica-del-mundo-proyecto-viridiana-pelicula-coloquio-online/" data-vose="true" data-isnew="false" data-cinemas="babel,lys">
       <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/04/la-mujer-mas-rica-del-mun-271x400.jpg" alt="La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span></div>
@@ -739,11 +782,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_park">
+    <a class="grid-card" href="./the-good-daughter/" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/8NI00eKWTGKTpBjQEMJRzOWGA4h.jpg" alt="La buena hija" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
@@ -754,9 +798,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+    </a>
+    <a class="grid-card" href="./the-invasion-of-the-barbarians/" data-vose="false" data-isnew="false" data-cinemas="abc_park">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/a3mzC5xB7ipXx3jEgrGPFHs3Ynv.jpg" alt="La invasió dels bàrbars" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
@@ -767,11 +812,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,lys,abc_saler,abc_park,mn4,gran_turia">
+    <a class="grid-card" href="./laponia/" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,lys,abc_saler,abc_park,mn4,gran_turia">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/1iDPjqlfRb9f8yl89bc2zvoMnVV.jpg" alt="Lapönia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"></div>
@@ -782,8 +828,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   </div>
 
@@ -800,7 +847,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel">
+    <a class="grid-card" href="./hamnet/" data-vose="true" data-isnew="false" data-cinemas="babel">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vbeyOZm2bvBXcbgPD3v6o94epPX.jpg" alt="Hamnet" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.7</span></div>
@@ -811,9 +858,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel">
+    </a>
+    <a class="grid-card" href="./three-goodbyes/" data-vose="true" data-isnew="false" data-cinemas="babel">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/2ciJmoQ2OY9IJvEFSqr2xc5sWn0.jpg" alt="Tres adioses" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span></div>
@@ -824,8 +872,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div style="margin:0 24px 16px;padding:12px 16px;background:#130d20;border:1px solid #261d3a;border-radius:10px;">
     <div class="cinema-links-label" data-es="También en Babel esta semana" data-en="Also at Babel this week" style="margin-bottom:8px;">También en Babel esta semana</div>
@@ -846,7 +895,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+    <a class="grid-card" href="./sentimental-value/" data-vose="false" data-isnew="false" data-cinemas="dor">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/pz9NCWxxOk3o0W3v1Zkhawrwb4i.jpg" alt="Valor sentimental" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
@@ -857,9 +906,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+    </a>
+    <a class="grid-card" href="./nuremberg/" data-vose="false" data-isnew="false" data-cinemas="dor">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7cWTGH2svfNHWVRjsfKIBob9pDj.jpg" alt="Núremberg" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 7.4</span></div>
@@ -870,11 +920,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+    <a class="grid-card" href="./if-i-had-legs-i-d-kick-you/" data-vose="false" data-isnew="false" data-cinemas="dor">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/va0TQ9WprMXRqQAzY56vyqY0Yd5.jpg" alt="Si pudiera, te daría una patada" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.3</span></div>
@@ -885,9 +936,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
-    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+    </a>
+    <a class="grid-card" href="./munter-kandinsky/" data-vose="false" data-isnew="false" data-cinemas="dor">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/kSt46DqnIPLuQB4ou7UToqMjIgi.jpg" alt="Münter Y El Amor De Kandinsky" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
@@ -898,8 +950,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
         </div>
+        <div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>
       </div>
-    </div>
+    </a>
   </div>
   </div>
 
