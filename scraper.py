@@ -586,7 +586,6 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 <script>
 function setLang(lang) {{
   document.getElementById('html-root').lang = lang;
-  setTimeout(updateHeaderDate, 10);
   document.getElementById('btn-es').classList.toggle('active', lang === 'es');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
@@ -605,7 +604,9 @@ function showDay(key) {{
   if (panel) panel.classList.add('active');
 }}
 window.addEventListener('DOMContentLoaded', () => {{
-  const lang = localStorage.getItem('cv_lang') || 'es';
+  // Read lang from URL param (passed from listings) or localStorage fallback
+  const urlParams = new URLSearchParams(window.location.search);
+  const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
 
   // Apply cinema filter from URL params (set by preferences)
@@ -706,6 +707,10 @@ function setLang(lang) {
     el.textContent = el.getAttribute('data-' + lang);
   });
   localStorage.setItem('cv_lang', lang);
+  // Update URL with lang param so detail pages pick it up
+  const url = new URL(window.location);
+  url.searchParams.set('lang', lang);
+  window.history.replaceState({}, '', url);
 }
 
 function getCookie(name) {
