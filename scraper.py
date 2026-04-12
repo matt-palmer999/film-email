@@ -1043,7 +1043,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
@@ -1101,7 +1101,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
