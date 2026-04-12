@@ -524,6 +524,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
 .vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
 .score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
+.showtimes-btn{{display:inline-block;margin-top:10px;padding:5px 14px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.35);border-radius:20px;font-size:11px;font-weight:600;color:#ffb432;letter-spacing:0.5px}}
 .hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
 .orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
 .hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
@@ -679,7 +680,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
-.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
+.grid-card{display:block;background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,transform .15s}}.grid-card:hover{{border-color:#5a3a7a;transform:translateY(-2px)}}
 .grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
@@ -1129,13 +1130,19 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         slug     = film.get("slug")
         if slug:
             title_html_grid = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            card_tag_open  = f'<a class="grid-card" href="./{slug}/"'
+            card_tag_close = '</a>'
+            showtimes_btn  = f'<div class="showtimes-btn" data-es="Ver horarios →" data-en="Showtimes →">Showtimes →</div>'
         else:
             title_html_grid = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
+            card_tag_open  = '<div class="grid-card"'
+            card_tag_close = '</div>'
+            showtimes_btn  = ''
         syn_es   = (film.get("synopsis_es") or synopsis)[:140]
         syn_en   = (film.get("synopsis_en") or synopsis)[:140]
 
         return f"""
-    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+    {card_tag_open} data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
@@ -1146,8 +1153,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
           <div class="cinema-tags">{cinema_tags}</div>
         </div>
+        {showtimes_btn}
       </div>
-    </div>"""
+    {card_tag_close}"""
 
     # Build multiplex section: all films in grid pairs (no featured card)
     multiplex_cards = ""
