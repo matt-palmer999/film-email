@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="whatson.movie">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<title>Cartelera Valencia – 12 – 18 April 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
+.wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
+.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
+.lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
+.lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
+.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn.active{background:#2e2040;color:#f0eae0}
+.header{background:linear-gradient(135deg,#1a0a2e 0%,#0f0c14 60%);border-bottom:1px solid #3a2a55;padding:40px 40px 32px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(220,80,120,.12) 0%,transparent 70%);border-radius:50%}
+.header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
+.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}
+.header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
+.header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
+.section-label{padding:28px 40px 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;font-weight:500}
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
+.cinema-group-header{margin:0 24px 14px;padding:12px 16px;background:#160f24;border:1px solid #2a1f3d;border-radius:10px;display:flex;align-items:center;gap:10px}
+.cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#c5b8d8}
+.cinema-group-desc{font-size:11px;color:#6a5e7a}
+.cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
+.list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start}
+.list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
+.list-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.list-body{flex:1}
+.list-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
+.list-meta{font-size:11px;color:#7a6d8a;margin-bottom:5px;line-height:1.5}
+.list-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.badges{margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.film-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
+.badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
+.vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
+.cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
+.cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
+.vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
+.rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
+.featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
+.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
+.featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
+.film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
+.film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
+.grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
+.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
+.grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
+.grid-info{padding:12px 14px 14px}
+.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
+.grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
+.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
+.footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
+.footer a{color:#7a6a9a;text-decoration:none}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+.filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
+.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a3f5e;font-weight:500}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
+.filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
+.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
+@media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="lang-bar">
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="../preferences/" id="nav-prefs" style="display:none;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
+      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+    </div>
+  </div>
+
+  <!-- SUBSCRIBER BANNER — shown to subscribers only -->
+  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:#c5a84a;" data-es="🎬 Estás viendo tu cartelera personalizada" data-en="🎬 You're viewing your personalised listings">🎬 Estás viendo tu cartelera personalizada</span>
+    <a href="../preferences/" style="font-size:11px;color:#ffb432;text-decoration:none;" data-es="⚙️ Cambiar preferencias →" data-en="⚙️ Change preferences →">⚙️ Cambiar preferencias →</a>
+  </div>
+
+  <!-- ANONYMOUS BANNER — shown to non-subscribers -->
+  <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="🎬 Más de 30 películas. 10 cines. Cada semana." data-en="🎬 30+ films. 10 cinemas. Every week.">🎬 Más de 30 películas. 10 cines. Cada semana.</span>
+      <span style="font-size:12px;color:#9b8faa;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
+    </div>
+    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+  </div>
+
+  <div class="header">
+    <div class="header-title">Cartelera<br>Valencia</div>
+    <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
+    <div class="header-date" id="header-date"></div>
+  </div>
+
+  <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys</div>
+      <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
+    </div>
+  </div>
+  
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,abc_saler,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lTQoEczVEnkuxHFEGgWYfJB98tL.jpg" alt="La momia de Lee Cronin" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.7</span></div>
+        <a href="./lee-cronin-s-the-mummy/" class="grid-title" data-es="La momia de Lee Cronin" data-en="Lee Cronin&#39;s The Mummy">La momia de Lee Cronin</a>
+        <div class="grid-meta">EEUU, Irlanda. 2026 . Terror . 120 min .</div>
+        <div class="grid-synopsis" data-es="La joven hija de un periodista desaparece en el desierto sin dejar rastro—ocho años más tarde, la familia rota se conmociona cuando ella es " data-en="The young daughter of a journalist disappears into the desert without a trace—eight years later, the broken family is shocked when she is re">La joven hija de un periodista desaparece en el desierto sin dejar rastro—ocho años más tarde, la familia rota se conmociona cuando ella es </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,lys,abc_park,mn4">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vUwyhNWBKkSwK8ELvEeBRwV724h.jpg" alt="Incontrolable (I swear)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.3</span></div>
+        <a href="./i-swear/" class="grid-title" data-es="Incontrolable (I swear)" data-en="I Swear">Incontrolable (I swear)</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Reino Unido. 2025 . Biopic , Drama . 120 min .</div>
+        <div class="grid-synopsis" data-es="La historia real de John Davidson. Diagnosticado con Tourette a los 15 años, señalado como loco por sus compañeros, luchó con una condición " data-en="Diagnosed with Tourette Syndrome at 15, John Davidson navigates his way against the odds through troubled teenage years and into adulthood, ">La historia real de John Davidson. Diagnosticado con Tourette a los 15 años, señalado como loco por sus compañeros, luchó con una condición </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,ocine,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/nSOJfWJCdVFZQwXQA7RXn7FIIiY.jpg" alt="Kill Bill: The Whole Bloody Affair" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.1</span></div>
+        <a href="./kill-bill-the-whole-bloody-affair/" class="grid-title" data-es="Kill Bill: The Whole Bloody Affair" data-en="Kill Bill: The Whole Bloody Affair">Kill Bill: The Whole Bloody Affair</a>
+        <div class="grid-meta">EEUU. 2006 . Acción , Crimen , Thriller . 275 min .</div>
+        <div class="grid-synopsis" data-es="Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti" data-en="Quentin Tarantino&#39;s complete cut combining Kill Bill: Vol. 1 and Vol. 2 follows The Bride, a former assassin who awakens from a four-year co">Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/o0MRVa3XMUUIxiSCZYaJ1jGXdk.jpg" alt="Un poeta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="score-badge">⭐ 7.5</span></div>
+        <a href="./a-poet/" class="grid-title" data-es="Un poeta" data-en="A Poet">Un poeta</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Colombia. 2025 . Comedia Dramatica . 123 min .</div>
+        <div class="grid-synopsis" data-es="La obsesión de Óscar Restrepo por la poesía no le ha reportado ninguna gloria. Envejecido y errático, ha sucumbido al tópico del poeta en la" data-en="An aging poet finds purpose mentoring Yurlady, a talented teen, though exposing her to the poetry scene might be unwise. His own poetic purs">La obsesión de Óscar Restrepo por la poesía no le ha reportado ninguna gloria. Envejecido y errático, ha sucumbido al tópico del poeta en la</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7L6rceYgzQ0NeHD7PRDNrRoQ291.jpg" alt="No te olvidaré" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.1</span></div>
+        <a href="./reminders-of-him/" class="grid-title" data-es="No te olvidaré" data-en="Reminders of Him">No te olvidaré</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;EEUU. 2026 . Drama , Romance . 115 min .</div>
+        <div class="grid-synopsis" data-es="Cuando los abuelos y tutores de Diem se niegan categóricamente a permitir que la vea, Kenna descubre una compasión inesperada seguida de un " data-en="When Diem&#39;s custodial grandparents adamantly refuse Kenna&#39;s attempts to see her daughter, Kenna discovers unexpected compassion, and then so">Cuando los abuelos y tutores de Diem se niegan categóricamente a permitir que la vea, Kenna descubre una compasión inesperada seguida de un </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="yelmo,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/rWcfOdY7TU6lTdazWj0ebDZnAfO.jpg" alt="Buena suerte, pásalo bien, no mueras" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.9</span></div>
+        <a href="./good-luck-have-fun-don-t-die/" class="grid-title" data-es="Buena suerte, pásalo bien, no mueras" data-en="Good Luck, Have Fun, Don&#39;t Die">Buena suerte, pásalo bien, no mueras</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;EEUU. 2025 . Acción , Aventura , Ciencia Ficción , Comedia . 134 min .</div>
+        <div class="grid-synopsis" data-es="Un hombre que afirma venir del futuro llega a un pequeño restaurante en Los Ángeles. Su misión: reclutar a los humanos descontentos para que" data-en="A &#39;Man from the Future&#39; arrives at an LA diner where he must recruit the precise combination of disgruntled patrons to join him on a one-nig">Un hombre que afirma venir del futuro llega a un pequeño restaurante en Los Ángeles. Su misión: reclutar a los humanos descontentos para que</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/qa5aZpO8tQqhlDaE0flalS1TuIS.jpg" alt="Atrapando a un monstruo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.6</span></div>
+        <a href="./dust-bunny/" class="grid-title" data-es="Atrapando a un monstruo" data-en="Dust Bunny">Atrapando a un monstruo</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;EEUU. 2025 . Drama , Terror , Thriller . 105 min .</div>
+        <div class="grid-synopsis" data-es="Una niña de ocho años le pide ayuda a su insidiosa vecina en su misión para matar al monstruo que vive debajo de su cama, el cual, según ell" data-en="Ten-year-old Aurora asks her hitman neighbor to kill the monster under her bed that she claims ate her family. To protect her, he must battl">Una niña de ocho años le pide ayuda a su insidiosa vecina en su misión para matar al monstruo que vive debajo de su cama, el cual, según ell</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,abc_saler,abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eTxfcOXIZs8mSaL7dqdmpnVmB5l.jpg" alt="Mi robot favorito" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 5.5</span></div>
+        <a href="./space-cadet/" class="grid-title" data-es="Mi robot favorito" data-en="Space Cadet">Mi robot favorito</a>
+        <div class="grid-meta">Canadá. 2025 . Animación , Ciencia Ficción , Fantasía , Música . 83 min .</div>
+        <div class="grid-synopsis" data-es="A young astronaut and her guardian robot which explores grief, loss and love across generations." data-en="A young astronaut and her guardian robot which explores grief, loss and love across generations.">A young astronaut and her guardian robot which explores grief, loss and love across generations.</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/o5M5mjnfRO50t3Wha1QPD04oHfT.jpg" alt="Boulevard" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="score-badge">⭐ 3.0</span></div>
+        <a href="./boulevard/" class="grid-title" data-es="Boulevard" data-en="Boulevard">Boulevard</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;España. 2026 . Drama Romántico . 115 min .</div>
+        <div class="grid-synopsis" data-es="Cuando Hasley (Eve Ryan) se muda a una nueva ciudad con su madre, lo último que espera es cruzarse con Luke (Mikel Niso), un joven envuelto " data-en="Hasley, a girl with a list of unfulfilled dreams, and Luke, a complex and vulnerable boy marked by a tragic past, find refuge on the bouleva">Cuando Hasley (Eve Ryan) se muda a una nueva ciudad con su madre, lo último que espera es cruzarse con Luke (Mikel Niso), un joven envuelto </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="kinepolis,lys,abc_saler,abc_park,mn4">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/ddYZksoDokxjNHm2E0u1GeWVBsE.jpg" alt="A una isla de ti" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
+        <a href="./an-island-away-from-you/" class="grid-title" data-es="A una isla de ti" data-en="An island away from you">A una isla de ti</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;España. 2026 . Comedia . 102 min .</div>
+        <div class="grid-synopsis" data-es="Un cocinero con el corazón partido va de vacaciones a Gran Canaria con su amigo, enamorándose de la isla, su cultura y cocina-e inesperadame" data-en="A romantic comedy set in the breathtaking Canary Islands. After being left at the altar, uptight chef Harry is convinced by his best friend ">Un cocinero con el corazón partido va de vacaciones a Gran Canaria con su amigo, enamorándose de la isla, su cultura y cocina-e inesperadame</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dDt7E6pdoJAE6JvQtorCBvFhHtW.jpg" alt="Auri" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
+        <a href="./auri/" class="grid-title" data-es="Auri" data-en="Auri">Auri</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;España. 206 . Comedia Dramatica . 96 min .</div>
+        <div class="grid-synopsis" data-es="Auri es una ama de casa que se aventura a descubrir sus deseos y lograr independencia gracias a la llegada inesperada de su primer dinero «p" data-en="Auri&#39;s life takes a sudden turn when she receives her first earnings and, for the first time, experiences a new kind of freedom.">Auri es una ama de casa que se aventura a descubrir sus deseos y lograr independencia gracias a la llegada inesperada de su primer dinero «p</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="true" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jAZpwZ6yAh9pExq9GRINSIWForG.jpg" alt="En busca del mesías" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span></div>
+        <a href="./en-busca-del-mesias/" class="grid-title" data-es="En busca del mesías" data-en="En Busca del Mesías">En busca del mesías</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;España. 2026 . Documental . 95 min .</div>
+        <div class="grid-synopsis" data-es="Por primera vez una película reúne a judíos destacados de diversos países, que revelan sus extraordinarias experiencias con Jesús. Estos tes" data-en="De Andrés Garrigó .">Por primera vez una película reúne a judíos destacados de diversos países, que revelan sus extraordinarias experiencias con Jesús. Estos tes</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/lzewyd5b6GK3ONMdEFlY3sS8qMA.jpg" alt="The Designer Is Dead" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span></div>
+        <a href="./the-designer-is-dead/" class="grid-title" data-es="The Designer Is Dead" data-en="The Designer is Dead">The Designer Is Dead</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;2025 . Documental .</div>
+        <div class="grid-synopsis" data-es="The Designer Is Dead follows Miguel Adrover, the groundbreaking New York designer who reshaped fashion with bold statements on multicultural" data-en="The Designer Is Dead follows Miguel Adrover, the groundbreaking New York designer who reshaped fashion with bold statements on multicultural">The Designer Is Dead follows Miguel Adrover, the groundbreaking New York designer who reshaped fashion with bold statements on multicultural</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/tRqcXP5afNdY56qRxVboKV5aBcF.jpg" alt="Ramón y Cajal: Dibujos en la retina" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 9.0</span></div>
+        <a href="./ramon-y-cajal-drawings-on-the-retina/" class="grid-title" data-es="Ramón y Cajal: Dibujos en la retina" data-en="Ramón y Cajal: drawings on the retina">Ramón y Cajal: Dibujos en la retina</a>
+        <div class="grid-meta">España. Otros . 97 min .</div>
+        <div class="grid-synopsis" data-es="“Ramón y Cajal: drawings on the retina” is a documentary about the Nobel Prize winner that explores, from a contemporary perspective, his fa" data-en="“Ramón y Cajal: drawings on the retina” is a documentary about the Nobel Prize winner that explores, from a contemporary perspective, his fa">“Ramón y Cajal: drawings on the retina” is a documentary about the Nobel Prize winner that explores, from a contemporary perspective, his fa</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bxB2q91nKYp8JNzqE7t7TWBVupB.jpg" alt="El profesional (León)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.3</span></div>
+        <a href="./leon-the-professional/" class="grid-title" data-es="El profesional (León)" data-en="Léon: The Professional">El profesional (León)</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;1994 . Acción . 110 min .</div>
+        <div class="grid-synopsis" data-es="Stan es un corrupto agente de la DEA cuya codicia le lleva a cometer asesinatos en las calles de Nueva York. El mortal juego del gato y el r" data-en="Léon, the top hit man in New York, has earned a rep as an effective &quot;cleaner&quot;. But when his next-door neighbors are wiped out by a loose-can">Stan es un corrupto agente de la DEA cuya codicia le lleva a cometer asesinatos en las calles de Nueva York. El mortal juego del gato y el r</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg" alt="Proyecto Salvación" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.2</span></div>
+        <a href="./project-hail-mary/" class="grid-title" data-es="Proyecto Salvación" data-en="Project Hail Mary">Proyecto Salvación</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;EEUU. 2026 . Aventura , Ciencia Ficción , Drama , Misterio , Thriller . 156 min </div>
+        <div class="grid-synopsis" data-es="El profesor de ciencias Ryland Grace se despierta en una nave espacial a años luz de casa sin recordar quién es ni cómo ha llegado hasta all" data-en="Science teacher Ryland Grace wakes up on a spaceship light years from home with no recollection of who he is or how he got there. As his mem">El profesor de ciencias Ryland Grace se despierta en una nave espacial a años luz de casa sin recordar quién es ni cómo ha llegado hasta all</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/01/El-arquitecto-1-279x400.jpg" alt="El arquitecto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 8.0</span></div>
+        <a href="./pacha-el-arquitecto-de-la-noche/" class="grid-title" data-es="El arquitecto" data-en="Pachá: El arquitecto de la noche">El arquitecto</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Francia. 2025 . Biopic , Drama , Historia . 105 min .</div>
+        <div class="grid-synopsis" data-es="Miguel Bardem firma este documental que invita a conocer al fundador del imperio PACHA, Ricardo Urgell, que ha dedicado toda su vida a crear" data-en="De Stéphane Demoustier . Con Claes Bang , Sidse Babett Knudsen , Xavier Dolan .">Miguel Bardem firma este documental que invita a conocer al fundador del imperio PACHA, Ricardo Urgell, que ha dedicado toda su vida a crear</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="lys">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/v7TaX8kXMXs5yFFGR41guUDNcnB.jpg" alt="Kill Bill: Volumen 1" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span></div>
+        <a href="./kill-bill-vol-1/" class="grid-title" data-es="Kill Bill: Volumen 1" data-en="Kill Bill: Vol. 1">Kill Bill: Volumen 1</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;2003 . Acción , Crimen . 111 min .</div>
+        <div class="grid-synopsis" data-es="Uma Thurman es una asesina que, el día de su boda, es atacada por los miembros de la banda de su jefe, Bill (David Carradine). Logra sobrevi" data-en="An assassin is shot by her ruthless employer, Bill, and other members of their assassination circle – but she lives to plot her vengeance.">Uma Thurman es una asesina que, el día de su boda, es atacada por los miembros de la banda de su jefe, Bill (David Carradine). Logra sobrevi</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vug1dvDI1tSa60Z8qjCuUE7ntkO.jpg" alt="El recuerdo de Marnie" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.9</span></div>
+        <a href="./when-marnie-was-there/" class="grid-title" data-es="El recuerdo de Marnie" data-en="When Marnie Was There">El recuerdo de Marnie</a>
+        <div class="grid-meta">2014 . Animación . 103 min .</div>
+        <div class="grid-synopsis" data-es="Anna es una chica solitaria, sin amigos, que vive con sus padres adoptivos. Un día es enviada con el señor y la señora Pegg. Allí, donde se " data-en="Upon being sent to live with relatives in the countryside due to an illness, an emotionally distant adolescent girl becomes obsessed with an">Anna es una chica solitaria, sin amigos, que vive con sus padres adoptivos. Un día es enviada con el señor y la señora Pegg. Allí, donde se </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/wfuqMlaExcoYiUEvKfVpUTt1v4u.jpg" alt="Goat, como cabras" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.9</span></div>
+        <a href="./goat/" class="grid-title" data-es="Goat, como cabras" data-en="GOAT">Goat, como cabras</a>
+        <div class="grid-meta">EEUU. 2026 . Acción , Animación , Aventura , Comedia , Deporte , Familia . 100 m</div>
+        <div class="grid-synopsis" data-es="Will es una pequeña cabra con grandes sueños que recibe una oportunidad única en la vida para unirse a los profesionales y jugar al rugebol," data-en="A small goat with big dreams gets a once-in-a-lifetime shot to join the pros and play roarball, a high-intensity, co-ed, full-contact sport ">Will es una pequeña cabra con grandes sueños que recibe una oportunidad única en la vida para unirse a los profesionales y jugar al rugebol,</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/xjtWQ2CL1mpmMNwuU5HeS4Iuwuu.jpg" alt="Hoppers" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.6</span></div>
+        <a href="./hoppers/" class="grid-title" data-es="Hoppers" data-en="Hoppers">Hoppers</a>
+        <div class="grid-meta">EEUU. 2026 . Animación , Aventura , Ciencia Ficción , Comedia , Familia . 105 mi</div>
+        <div class="grid-synopsis" data-es="Una amante de los animales aprovecha la oportunidad de utilizar una tecnología que coloca su conciencia en un castor robótico, descubriendo " data-en="Scientists have discovered how to &#39;hop&#39; human consciousness into lifelike robotic animals, allowing people to communicate with animals as an">Una amante de los animales aprovecha la oportunidad de utilizar una tecnología que coloca su conciencia en un castor robótico, descubriendo </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/kiPGcHX0YT49nrab76G0bqw3gHW.jpg" alt="Amarga Navidad" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
+        <a href="./bitter-christmas/" class="grid-title" data-es="Amarga Navidad" data-en="Bitter Christmas">Amarga Navidad</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;España. 2026 . Drama .</div>
+        <div class="grid-synopsis" data-es="Tras el fallecimiento de su madre en diciembre, Elsa, directora de publicidad, se sumerge en el trabajo para afrontar la situación. Cuando u" data-en="After her mother dies in December, advertising director Elsa immerses herself in work to cope. When a panic attack forces her to take a brea">Tras el fallecimiento de su madre en diciembre, Elsa, directora de publicidad, se sumerge en el trabajo para afrontar la situación. Cuando u</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="kinepolis">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg" alt="Avatar. Fuego y ceniza" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.4</span></div>
+        <a href="./avatar-fire-and-ash/" class="grid-title" data-es="Avatar. Fuego y ceniza" data-en="Avatar: Fire and Ash">Avatar. Fuego y ceniza</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Estados Unidos. 2025 . Animación , Aventura , Ciencia Ficción , Fantasía . 192 m</div>
+        <div class="grid-synopsis" data-es="Jake Sully y Neytiri enfrentan una nueva amenaza en Pandora: los Ash People, una tribu Na&#39;vi violenta y sedienta de poder, liderada por la i" data-en="In the wake of the devastating war against the RDA and the loss of their eldest son, Jake Sully and Neytiri face a new threat on Pandora: th">Jake Sully y Neytiri enfrentan una nueva amenaza en Pandora: los Ash People, una tribu Na'vi violenta y sedienta de poder, liderada por la i</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,lys,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/u5RgunQiA4hvDfTeWO9pS0lm4K4.jpg" alt="La grazia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.4</span></div>
+        <a href="./la-grazia/" class="grid-title" data-es="La grazia" data-en="La Grazia">La grazia</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Italia. 2025 . Comedia , Drama . 133 min .</div>
+        <div class="grid-synopsis" data-es="Mariano De Santis, presidente (ficiticio) de la República italiana, es un veterano político demócrata, humanista y católico, que de repente " data-en="As his tenure as President of Italy nears its end, Mariano De Santis faces wrenching decisions-both political and deeply personal. Amid thes">Mariano De Santis, presidente (ficiticio) de la República italiana, es un veterano político demócrata, humanista y católico, que de repente </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,yelmo,lys,abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/fWagBXNDk44UaupYtwQOAvDwGiT.jpg" alt="Calle Málaga" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.2</span></div>
+        <a href="./calle-malaga/" class="grid-title" data-es="Calle Málaga" data-en="Calle Malaga">Calle Málaga</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Marruecos. 2026 . Drama . 116 min .</div>
+        <div class="grid-synopsis" data-es="María Ángeles, una mujer de 79 años, vive sola en Tánger disfrutando de su rutina y la ciudad que la vio crecer. Cuando su hija llega desde " data-en="Maria Angeles, a 79-year-old Spanish woman, lives alone in Tangier, Morocco, and enjoys her daily routine. However, her life is turned upsid">María Ángeles, una mujer de 79 años, vive sola en Tánger disfrutando de su rutina y la ciudad que la vio crecer. Cuando su hija llega desde </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/92ztdPsf98i0tLcONIX92yuh3MQ.jpg" alt="El último vikingo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span></div>
+        <a href="./the-last-viking/" class="grid-title" data-es="El último vikingo" data-en="The Last Viking">El último vikingo</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Dinamarca. 205 . Comedia , Crimen , Drama . 116 min .</div>
+        <div class="grid-synopsis" data-es="Anker sale de prisión tras cumplir una condena de quince años por robo. El dinero del atraco fue enterrado por su hermano Manfred. Solo él s" data-en="After serving fourteen years for robbery, Anker is released from prison and reunites with his mentally ill brother Manfred, who alone knows ">Anker sale de prisión tras cumplir una condena de quince años por robo. El dinero del atraco fue enterrado por su hermano Manfred. Solo él s</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_saler,abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/cWsBscZzwu5brg9YjNkGewRUvJX.jpg" alt="La asistenta" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.2</span></div>
+        <a href="./the-housemaid/" class="grid-title" data-es="La asistenta" data-en="The Housemaid">La asistenta</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Estados Unidos. 2025 . Thriller . 130 min .</div>
+        <div class="grid-synopsis" data-es="Una joven (Sydney Sweeney), con un pasado complicado comienza a trabajar como asistenta en la lujosa casa de los Winchester. A medida que se" data-en="Trying to escape her past, Millie Calloway accepts a job as a live-in housemaid for the wealthy Nina and Andrew Winchester. But what begins ">Una joven (Sydney Sweeney), con un pasado complicado comienza a trabajar como asistenta en la lujosa casa de los Winchester. A medida que se</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jRf89HVEtBZiSnOXXWDhZOfuTwW.jpg" alt="Noche de bodas 2" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.1</span></div>
+        <a href="./ready-or-not-here-i-come/" class="grid-title" data-es="Noche de bodas 2" data-en="Ready or Not: Here I Come">Noche de bodas 2</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;Estados Unidos. 2026 . Comedia , Terror , Thriller . 108 min .</div>
+        <div class="grid-synopsis" data-es="Momentos después de sobrevivir a un ataque de la familia Le Domas, Grace descubre que ha alcanzado el siguiente nivel del juego, y esta vez " data-en="Moments after surviving an all-out attack from the Le Domas family, Grace discovers she’s reached the next level of the nightmarish game — a">Momentos después de sobrevivir a un ataque de la familia Le Domas, Grace descubre que ha alcanzado el siguiente nivel del juego, y esta vez </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg" alt="Super Mario Galaxy: la película" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.9</span></div>
+        <a href="./the-super-mario-galaxy-movie/" class="grid-title" data-es="Super Mario Galaxy: la película" data-en="The Super Mario Galaxy Movie">Super Mario Galaxy: la película</a>
+        <div class="grid-meta">EEUU, Japón, Francia. 2026 . Acción , Animación , Aventura , Comedia , Familia ,</div>
+        <div class="grid-synopsis" data-es="Secuela de &#39;Super Mario Bros: La película&#39;, basada en la saga &#39;Mario Galaxy&#39;. Los hermanos Mario y Luigi y la princesa Peach emprenden una a" data-en="Having thwarted Bowser&#39;s previous plot to marry Princess Peach, Mario and Luigi now face a fresh threat in Bowser Jr., who is determined to ">Secuela de 'Super Mario Bros: La película', basada en la saga 'Mario Galaxy'. Los hermanos Mario y Luigi y la princesa Peach emprenden una a</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/buPFnHZ3xQy6vZEHxbHgL1Pc6CR.jpg" alt="Shelter: El Protector" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.8</span></div>
+        <a href="./shelter/" class="grid-title" data-es="Shelter: El Protector" data-en="Shelter">Shelter: El Protector</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;EEUU. 2026 . Acción , Thriller . 107 min .</div>
+        <div class="grid-synopsis" data-es="Un recluso en una remota isla escocesa rescata a una niña del mar, desencadenando una peligrosa secuencia de acontecimientos." data-en="A man living in self-imposed exile on a remote island rescues a young girl from a violent storm, setting off a chain of events that forces h">Un recluso en una remota isla escocesa rescata a una niña del mar, desencadenando una peligrosa secuencia de acontecimientos.</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/f9MzpMfbBL4PknhKqoQpIUdskTl.jpg" alt="Águilas de El Cairo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.8</span></div>
+        <a href="./eagles-of-the-republic/" class="grid-title" data-es="Águilas de El Cairo" data-en="Eagles of the Republic">Águilas de El Cairo</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Suecia. 2025 . Acción , Drama , Thriller . 128 min .</div>
+        <div class="grid-synopsis" data-es="George Fahmy, Egypt&#39;s most adored actor, is pressured to star in a film commissioned by the highest authorities. He reluctantly accepts and " data-en="George Fahmy, Egypt&#39;s most adored actor, is pressured to star in a film commissioned by the highest authorities. He reluctantly accepts and ">George Fahmy, Egypt's most adored actor, is pressured to star in a film commissioned by the highest authorities. He reluctantly accepts and </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dU46ROG7HoP7biPtntaMTjkGbU6.jpg" alt="Dos fiscales" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.7</span></div>
+        <a href="./two-prosecutors/" class="grid-title" data-es="Dos fiscales" data-en="Two Prosecutors">Dos fiscales</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Ucrania. 2025 . Drama Histórico , Misterio , Thriller . 118 min .</div>
+        <div class="grid-synopsis" data-es="In 1937, amidst Stalin&#39;s Great Terror, a newly appointed prosecutor for the USSR is made aware of alleged corruption in the Secret Police, a" data-en="In 1937, amidst Stalin&#39;s Great Terror, a newly appointed prosecutor for the USSR is made aware of alleged corruption in the Secret Police, a">In 1937, amidst Stalin's Great Terror, a newly appointed prosecutor for the USSR is made aware of alleged corruption in the Secret Police, a</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/uU3NXe7QqjJNxVpYPdz8dscFWlj.jpg" alt="Noise (Ruidos)" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.7</span></div>
+        <a href="./noise/" class="grid-title" data-es="Noise (Ruidos)" data-en="Noise">Noise (Ruidos)</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Corea Del Sur. 2024 . Terror . 95 min .</div>
+        <div class="grid-synopsis" data-es="Una mujer con un impedimento auditivo que se ve perseguida por sonidos relacionados con la desaparición de su hermana y la presencia de un e" data-en="Ju-young is a young woman with a hearing impediment who decides to investigate her sister&#39;s inexplicable disappearance, last seen in her apa">Una mujer con un impedimento auditivo que se ve perseguida por sonidos relacionados con la desaparición de su hermana y la presencia de un e</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="ocine,lys,abc_saler,abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/3YBce6dTh1D5oCMITXk2S5QhPt.jpg" alt="Cumbres borrascosas" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.5</span></div>
+        <a href="./wuthering-heights/" class="grid-title" data-es="Cumbres borrascosas" data-en="&quot;Wuthering Heights&quot;">Cumbres borrascosas</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;EEUU. 2025 . Drama Romántico . 136 min .</div>
+        <div class="grid-synopsis" data-es="Una audaz y original reinterpretación de una de una de las historias de amor más grandes de todos los tiempos, &#39;Cumbres Borrascosas&#39; de Emer" data-en="Tragedy strikes when Heathcliff falls in love with Catherine Earnshaw, a woman from a wealthy family in 18th-century England.">Una audaz y original reinterpretación de una de una de las historias de amor más grandes de todos los tiempos, 'Cumbres Borrascosas' de Emer</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg" alt="Te van a matar" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
+        <a href="./they-will-kill-you/" class="grid-title" data-es="Te van a matar" data-en="They Will Kill You">Te van a matar</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;EEUU. 2026 . Acción , Comedia , Terror . 95 min .</div>
+        <div class="grid-synopsis" data-es="Una mujer acepta un trabajo como ama de llaves en un rascacielos de Nueva York, sin conocer el historial de desapariciones del edificio. Pro" data-en="A woman answers a help wanted ad to be a housekeeper in a mysterious New York City high-rise, unaware that she is entering a community that ">Una mujer acepta un trabajo como ama de llaves en un rascacielos de Nueva York, sin conocer el historial de desapariciones del edificio. Pro</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,ocine,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yrDKwAdZRJjoQ9RZwzRGPpMC7U1.jpg" alt="Torrente presidente" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
+        <a href="./torrente-for-president/" class="grid-title" data-es="Torrente presidente" data-en="Torrente for President">Torrente presidente</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;España. 2026 . Comedia . 100 min .</div>
+        <div class="grid-synopsis" data-es="José Luis Torrente vuelve metido de lleno en la política española, arrastrando su habitual mezcla de vulgaridad, oportunismo e ineptitud. La" data-en="Years have passed since his last adventure, but José Luis Torrente, the most politically incorrect former cop in Spain, still sees himself a">José Luis Torrente vuelve metido de lleno en la política española, arrastrando su habitual mezcla de vulgaridad, oportunismo e ineptitud. La</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/6FL2kWvfxMLaqN2ppZuOsfgHJBz.jpg" alt="Una hija en Tokio" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
+        <a href="./a-missing-part/" class="grid-title" data-es="Una hija en Tokio" data-en="A Missing Part">Una hija en Tokio</a>
+        <div class="grid-meta"><span class="rating rating-7"></span>+7&nbsp;·&nbsp;Francia. 2024 . Drama . 99 min .</div>
+        <div class="grid-synopsis" data-es="Every day, Jay travels the length and breadth of Tokyo in his taxi, looking for his daughter Lily. In the 9 years since he has separated fro" data-en="Every day, Jay travels the length and breadth of Tokyo in his taxi, looking for his daughter Lily. In the 9 years since he has separated fro">Every day, Jay travels the length and breadth of Tokyo in his taxi, looking for his daughter Lily. In the 9 years since he has separated fro</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/siGwXsTqwSBC9VcbDM4tdhb1qLo.jpg" alt="Maigret y la muerte del embajador" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.1</span></div>
+        <a href="./maigret-and-the-dead-lover/" class="grid-title" data-es="Maigret y la muerte del embajador" data-en="Maigret and the Dead Lover">Maigret y la muerte del embajador</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Francia. 2026 . Crimen , Drama , Misterio , Policiaca . 80 min .</div>
+        <div class="grid-synopsis" data-es="Commissioner Maigret rushes to the Quai d’Orsay with Lieutenant Janvier. There, they find Mademoiselle Larrieu in a state of shock. That ver" data-en="Commissioner Maigret rushes to the Quai d’Orsay with Lieutenant Janvier. There, they find Mademoiselle Larrieu in a state of shock. That ver">Commissioner Maigret rushes to the Quai d’Orsay with Lieutenant Janvier. There, they find Mademoiselle Larrieu in a state of shock. That ver</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_saler,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/dfvG1uRRd6TROYEt2iEbQKVBAPU.jpg" alt="Altas capacidades" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
+        <a href="./better-class/" class="grid-title" data-es="Altas capacidades" data-en="Better Class">Altas capacidades</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;España. 2026 . Comedia . 101 min .</div>
+        <div class="grid-synopsis" data-es="Alicia y Gonzalo, una pareja de clase media, se encuentran con la oportunidad de matricular a su hijo Fer en un colegio laico de élite. Las " data-en="Alicia and Gonzalo, a middle-class couple, have the chance to enroll their son Fer in an elite secular school. For the parents, it means a g">Alicia y Gonzalo, una pareja de clase media, se encuentran con la oportunidad de matricular a su hijo Fer en un colegio laico de élite. Las </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,abc_saler,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/jjyuk0edLiW8vOSnlfwWCCLpbh5.jpg" alt="Scream 7" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
+        <a href="./scream-7/" class="grid-title" data-es="Scream 7" data-en="Scream 7">Scream 7</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;EEUU. 2026 . Misterio , Terror . 114 min .</div>
+        <div class="grid-synopsis" data-es="Cuando un nuevo asesino Ghostface aparece en el tranquilo pueblo donde Sidney Prescott ha construido una nueva vida, sus peores miedos se ha" data-en="When a new Ghostface killer emerges in the quiet town where Sidney Prescott has built a new life, her darkest fears are realized as her daug">Cuando un nuevo asesino Ghostface aparece en el tranquilo pueblo donde Sidney Prescott ha construido una nueva vida, sus peores miedos se ha</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="mn4">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/eGxPyseSnEZBMJaopGfRUO9HSYx.jpg" alt="Whistle. El silbido del mal" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
+        <a href="./whistle/" class="grid-title" data-es="Whistle. El silbido del mal" data-en="Whistle">Whistle. El silbido del mal</a>
+        <div class="grid-meta"><span class="rating rating-18"></span>+18&nbsp;·&nbsp;Canadá. 2025 . Terror . 85 min .</div>
+        <div class="grid-synopsis" data-es="Un grupo de estudiantes inadaptados encuentra por accidente un objeto maldito: un antiguo silbato de la muerte azteca. Al soplarlo, descubre" data-en="A misfit group of unwitting high school students stumble upon a cursed object, an ancient Aztec Death Whistle. They discover that blowing th">Un grupo de estudiantes inadaptados encuentra por accidente un objeto maldito: un antiguo silbato de la muerte azteca. Al soplarlo, descubre</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/MAgsjx2W2SjCCDhrBsTwF6hMxT.jpg" alt="Encadenados" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 3.3</span></div>
+        <a href="./encadenados/" class="grid-title" data-es="Encadenados" data-en="Encadenados">Encadenados</a>
+        <div class="grid-meta"><span class="rating rating-7"></span>+7&nbsp;·&nbsp;1946 . Suspense . 101 min .</div>
+        <div class="grid-synopsis" data-es="De Alfred Hitchcock . Con Cary Grant , Ingrid Bergman , Claude Rains ." data-en="De Alfred Hitchcock . Con Cary Grant , Ingrid Bergman , Claude Rains .">De Alfred Hitchcock . Con Cary Grant , Ingrid Bergman , Claude Rains .</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,ocine,abc_saler,abc_park,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/iNBzpdLRX7OfajlnwNdJNlW0bCB.jpg" alt="Bts World Tour 'Arirang' In Japan: Live Viewing" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"></div>
+        <a href="./bts-world-tour-arirang-in-japan-live-viewing/" class="grid-title" data-es="Bts World Tour &#39;Arirang&#39; In Japan: Live Viewing" data-en="BTS World Tour &#39;Arirang&#39; in Japan: Live Viewing">Bts World Tour 'Arirang' In Japan: Live Viewing</a>
+        <div class="grid-meta">Otros . 180 min .</div>
+        <div class="grid-synopsis" data-es="Pop Royalty BTS returns to the global stage with their highly anticipated world tour, marking their first large-scale tour in approximately " data-en="Pop Royalty BTS returns to the global stage with their highly anticipated world tour, marking their first large-scale tour in approximately ">Pop Royalty BTS returns to the global stage with their highly anticipated world tour, marking their first large-scale tour in approximately </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel,lys">
+      <div class="grid-poster"><img src="https://mabuse.es/wp-content/uploads/2026/04/la-mujer-mas-rica-del-mun-271x400.jpg" alt="La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span></div>
+        <a href="./la-mujer-mas-rica-del-mundo-proyecto-viridiana-pelicula-coloquio-online/" class="grid-title" data-es="La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online" data-en="La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online">La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Otros . 122 min .</div>
+        <div class="grid-synopsis" data-es="La donación millonaria de una nonagenaria a un joven artista desata un escándalo que lleva a su hija a destapar una presunta corrupción polí" data-en="La donación millonaria de una nonagenaria a un joven artista desata un escándalo que lleva a su hija a destapar una presunta corrupción polí">La donación millonaria de una nonagenaria a un joven artista desata un escándalo que lleva a su hija a destapar una presunta corrupción polí</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="babel,lys,abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/8NI00eKWTGKTpBjQEMJRzOWGA4h.jpg" alt="La buena hija" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"></div>
+        <a href="./the-good-daughter/" class="grid-title" data-es="La buena hija" data-en="The Good Daughter">La buena hija</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;España. 2025 . Drama . 103 min .</div>
+        <div class="grid-synopsis" data-es="After her parents’ separation, Carmela and her mother move into her grandmother’s home. As Carmela struggles to adjust to her new reality, s" data-en="After her parents’ separation, Carmela and her mother move into her grandmother’s home. As Carmela struggles to adjust to her new reality, s">After her parents’ separation, Carmela and her mother move into her grandmother’s home. As Carmela struggles to adjust to her new reality, s</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="abc_park">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/a3mzC5xB7ipXx3jEgrGPFHs3Ynv.jpg" alt="La invasió dels bàrbars" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"></div>
+        <a href="./the-invasion-of-the-barbarians/" class="grid-title" data-es="La invasió dels bàrbars" data-en="The Invasion of the Barbarians">La invasió dels bàrbars</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;España. 2025 . Drama . 117 min .</div>
+        <div class="grid-synopsis" data-es="1939. A young art conservator from the Prado Museum is interrogated about a missing painting sought by a colonel. 80 years later, her grandd" data-en="1939. A young art conservator from the Prado Museum is interrogated about a missing painting sought by a colonel. 80 years later, her grandd">1939. A young art conservator from the Prado Museum is interrogated about a missing painting sought by a colonel. 80 years later, her grandd</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="yelmo,kinepolis,lys,abc_saler,abc_park,mn4,gran_turia">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/1iDPjqlfRb9f8yl89bc2zvoMnVV.jpg" alt="Lapönia" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"></div>
+        <a href="./laponia/" class="grid-title" data-es="Lapönia" data-en="Lapönia">Lapönia</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;España. 2026 . Comedia , Familia . 89 min .</div>
+        <div class="grid-synopsis" data-es="Después de varios años sin celebrar juntas las fiestas de Navidad, una familia asentada en Laponia invita a la familia de la hermana de la m" data-en="Two sisters reunite in Lapland for Christmas, but chaos erupts when one niece tells her cousin Santa isn&#39;t real. The revelation triggers a f">Después de varios años sin celebrar juntas las fiestas de Navidad, una familia asentada en Laponia invita a la familia de la hermana de la m</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar</a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis</a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park</a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <div class="section-label" data-es="🎭 Cines Babel — Cine Independiente &amp; VOSE" data-en="🎭 Cines Babel — Independent &amp; VOSE Cinema">🎭 Cines Babel — Cine Independiente &amp; VOSE</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Cines Babel</div>
+      <div class="cinema-group-desc" data-es="C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE" data-en="C/ Vicent Sancho Tello, 10 · 5 screens · Independent &amp; VOSE specialists">C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE</div>
+    </div>
+    <a href="https://www.cinesalbatrosbabel.com" class="cinema-group-link">cinesalbatrosbabel.com →</a>
+  </div>
+  
+  <div class="grid-row">
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/vbeyOZm2bvBXcbgPD3v6o94epPX.jpg" alt="Hamnet" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.7</span></div>
+        <a href="./hamnet/" class="grid-title" data-es="Hamnet" data-en="Hamnet">Hamnet</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Reino Unido. 2025 . Biopic , Drama , Romance . 125 min .</div>
+        <div class="grid-synopsis" data-es="Descubre la poderosa historia de amor que inspiró la creación de Hamlet, la intemporal obra maestra de Shakespeare.  La historia de Agnes, l" data-en="The powerful story of love and loss that inspired the creation of Shakespeare&#39;s timeless masterpiece, Hamlet.">Descubre la poderosa historia de amor que inspiró la creación de Hamlet, la intemporal obra maestra de Shakespeare.  La historia de Agnes, l</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="true" data-isnew="false" data-cinemas="babel">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/2ciJmoQ2OY9IJvEFSqr2xc5sWn0.jpg" alt="Tres adioses" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span></div>
+        <a href="./three-goodbyes/" class="grid-title" data-es="Tres adioses" data-en="Three Goodbyes">Tres adioses</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Italia. 2025 . Drama Romántico . 120 min .</div>
+        <div class="grid-synopsis" data-es="Marta y Antonio son una pareja que se separa tras lo que parece una discusión trivial. Marta (Alba Rohrwacher) reacciona a la ruptura encerr" data-en="Follows a couple, Marta and Antonio, who split up after what seems like an trivial argument.">Marta y Antonio son una pareja que se separa tras lo que parece una discusión trivial. Marta (Alba Rohrwacher) reacciona a la ruptura encerr</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://www.cinesalbatrosbabel.com" class="cinema-tag" data-cinema="babel">Cines Babel<span class="vose-mini">VOSE</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin:0 24px 16px;padding:12px 16px;background:#130d20;border:1px solid #261d3a;border-radius:10px;">
+    <div class="cinema-links-label" data-es="También en Babel esta semana" data-en="Also at Babel this week" style="margin-bottom:8px;">También en Babel esta semana</div>
+    <div class="cinema-tags"><span class="cinema-tag" style="cursor:default;">Incontrolable (I swear)<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Kill Bill: The Whole Bloody Affair<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Atrapando a un monstruo<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Mi robot favorito<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">The Designer Is Dead<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Amarga Navidad</span><span class="cinema-tag" style="cursor:default;">La grazia<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Calle Málaga</span><span class="cinema-tag" style="cursor:default;">El último vikingo<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">Altas capacidades</span><span class="cinema-tag" style="cursor:default;">La Mujer Más Rica Del Mundo -Proyecto Viridiana-Película +Coloquio Online<span class="vose-mini">VOSE</span></span><span class="cinema-tag" style="cursor:default;">La buena hija</span></div>
+  </div>
+
+  <div class="section-divider"></div>
+  <div class="section-label" data-es="🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor" data-en="🎞️ Cinestudio D'Or — Double Bills &amp; Art Cinema">🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor</div>
+  <div class="cinema-group-header">
+    <div>
+      <div class="cinema-group-name">Cinestudio D'Or</div>
+      <div class="cinema-group-desc" data-es="C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua" data-en="C/ Almirante Cadarso, 31 · Valencia's oldest cinema · Continuous double-bill screenings">C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua</div>
+    </div>
+    <a href="https://cinestudiodor.es" class="cinema-group-link">cinestudiodor.es →</a>
+  </div>
+  
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/pz9NCWxxOk3o0W3v1Zkhawrwb4i.jpg" alt="Valor sentimental" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
+        <a href="./sentimental-value/" class="grid-title" data-es="Valor sentimental" data-en="Sentimental Value">Valor sentimental</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Noruega. 2025 . Drama . 135 min .</div>
+        <div class="grid-synopsis" data-es="Una exploración íntima y conmovedora de la familia, los recuerdos y el poder reconciliador del arte." data-en="Sisters Nora and Agnes reunite with their estranged father, the charismatic Gustav, a once-renowned director who offers stage actress Nora a">Una exploración íntima y conmovedora de la familia, los recuerdos y el poder reconciliador del arte.</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/7cWTGH2svfNHWVRjsfKIBob9pDj.jpg" alt="Núremberg" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 7.4</span></div>
+        <a href="./nuremberg/" class="grid-title" data-es="Núremberg" data-en="Nuremberg">Núremberg</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;Estados Unidos. 2025 . Drama , Historia , Suspense . 148 min .</div>
+        <div class="grid-synopsis" data-es="Tras el fin de la II Guerra Mundial, con ocasión de los cruciales e inminentes juicios de Nuremberg contra el derrotado régimen Nazi, el psi" data-en="In postwar Germany, an American psychiatrist must determine whether Nazi prisoners are fit to go on trial for war crimes, and finds himself ">Tras el fin de la II Guerra Mundial, con ocasión de los cruciales e inminentes juicios de Nuremberg contra el derrotado régimen Nazi, el psi</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-row">
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/va0TQ9WprMXRqQAzY56vyqY0Yd5.jpg" alt="Si pudiera, te daría una patada" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.3</span></div>
+        <a href="./if-i-had-legs-i-d-kick-you/" class="grid-title" data-es="Si pudiera, te daría una patada" data-en="If I Had Legs I&#39;d Kick You">Si pudiera, te daría una patada</a>
+        <div class="grid-meta"><span class="rating rating-16"></span>+16&nbsp;·&nbsp;EEUU. 2025 . Comedia Negra , Drama , Thriller . 113 min .</div>
+        <div class="grid-synopsis" data-es="Con su vida literalmente derrumbándose a su alrededor, Linda intenta lidiar con la misteriosa enfermedad de su hija, su marido ausente, una " data-en="With her life crashing down around her, Linda attempts to navigate her child&#39;s mysterious illness, her absent husband, a missing person, and">Con su vida literalmente derrumbándose a su alrededor, Linda intenta lidiar con la misteriosa enfermedad de su hija, su marido ausente, una </div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-card" data-vose="false" data-isnew="false" data-cinemas="dor">
+      <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/kSt46DqnIPLuQB4ou7UToqMjIgi.jpg" alt="Münter Y El Amor De Kandinsky" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+      <div class="grid-info">
+        <div class="badges"><span class="score-badge">⭐ 6.0</span></div>
+        <a href="./munter-kandinsky/" class="grid-title" data-es="Münter Y El Amor De Kandinsky" data-en="Münter &amp; Kandinsky">Münter Y El Amor De Kandinsky</a>
+        <div class="grid-meta"><span class="rating rating-12"></span>+12&nbsp;·&nbsp;Alemania. 2024 . Drama , Romance . 125 min .</div>
+        <div class="grid-synopsis" data-es="Gabriele Münter conoció a Wassily Kandinsky cuando aún soñaba con abrirse camino en el arte. Entre pinceles, viajes y el carácter inquieto d" data-en="A gifted pair of lovers: Gabriele Münter and Wassily Kandinsky, co-founder of the German modern-art movement &quot;Blauer Reiter.&quot; While he was g">Gabriele Münter conoció a Wassily Kandinsky cuando aún soñaba con abrirse camino en el arte. Entre pinceles, viajes y el carácter inquieto d</div>
+        <div class="cinema-links">
+          <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
+          <div class="cinema-tags"><a href="https://cinestudiodor.es" class="cinema-tag" data-cinema="dor">Cinestudio D'Or</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="footer">
+    <div class="footer-logo">Cartelera Valencia</div>
+    <p>
+      <span data-es="Fuentes:" data-en="Sources:">Fuentes:</span>
+      <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.themoviedb.org">TMDB</a><br>
+      <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
+      <em style="color:#7a6a9a;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
+      <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
+      <span style="color:#3a2e50;">© 2026 · Cartelera Valencia Weekly</span>
+    </p>
+  </div>
+
+</div>
+<script>
+window.SUPABASE_URL  = "https://xhvbvggbrmlloefsgofy.supabase.co";
+window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc";
+
+function setLang(lang) {
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('html-root').setAttribute('lang', lang);
+  document.querySelectorAll('[data-es][data-en]').forEach(el => {
+    el.textContent = el.getAttribute('data-' + lang);
+  });
+  localStorage.setItem('cv_lang', lang);
+  // Update URL with lang param so detail pages pick it up
+  const url = new URL(window.location);
+  url.searchParams.set('lang', lang);
+  window.history.replaceState({}, '', url);
+}
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function applyPreferencesFromURL() {
+  const params  = new URLSearchParams(window.location.search);
+  const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+
+  // Hide cinema tags for excluded cinemas
+  if (cinemas) {
+    document.querySelectorAll('.cinema-tag').forEach(tag => {
+      const cid = tag.dataset.cinema;
+      if (cid && !cinemas.includes(cid)) {
+        tag.style.display = 'none';
+      }
+    });
+  }
+}
+
+function setSubscriberUI(isSubscriber) {
+  // Nav — show preferences link for subscribers, subscribe button for anon
+  const navPrefs     = document.getElementById('nav-prefs');
+  const navSubscribe = document.getElementById('nav-subscribe');
+  if (navPrefs)     navPrefs.style.display     = isSubscriber ? '' : 'none';
+  if (navSubscribe) navSubscribe.style.display  = isSubscriber ? 'none' : '';
+
+  // Banners
+  const subBanner  = document.getElementById('subscriber-banner');
+  const anonBanner = document.getElementById('anon-banner');
+  if (subBanner)  subBanner.style.display  = isSubscriber ? 'flex' : 'none';
+  if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
+
+}
+
+async function loadUserPreferences() {
+  // Apply language from localStorage or cookie
+  const savedLang = localStorage.getItem('cv_lang');
+  if (savedLang) setLang(savedLang);
+
+  // Check URL params first (pre-filtered link from email or preferences page)
+  const params = new URLSearchParams(window.location.search);
+  const hasParams = params.has('vose') || params.has('cinemas') || params.has('new');
+
+  // If we have URL params, treat as subscriber (they came via a personalised link)
+  if (hasParams) {
+    setSubscriberUI(true);
+    applyPreferencesFromURL();
+    return;
+  }
+
+  // Otherwise try to load from Supabase via cookie
+  const email = getCookie('cv_email');
+  if (!email || !window.SUPABASE_URL || !window.SUPABASE_ANON) {
+    setSubscriberUI(false);
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=lang,cinemas,vose_only,new_only',
+      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON } }
+    );
+    const rows = await res.json();
+    if (!rows.length) return;
+
+    const prefs = rows[0];
+
+    // Mark as subscriber — show filter bar, hide subscribe button
+    setSubscriberUI(true);
+
+    // Apply language
+    if (prefs.lang) setLang(prefs.lang);
+
+    // Build URL params from preferences and reload if needed
+    const newParams = new URLSearchParams();
+    if (prefs.vose_only) newParams.set('vose', 'true');
+    if (prefs.new_only)  newParams.set('new',  'true');
+    const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
+    if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
+      newParams.set('cinemas', prefs.cinemas.join(','));
+    }
+
+    if (newParams.toString()) {
+      window.history.replaceState({}, '', '?' + newParams.toString());
+      applyVisibility();
+      applyPreferencesFromURL();
+    }
+
+    // Update all film links to carry preferences params through to detail pages
+    const finalParams = window.location.search;
+    if (finalParams) {
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + finalParams;
+      });
+    }
+
+  } catch(e) {
+    console.warn('Could not load preferences:', e);
+  }
+}
+
+function updateHeaderDate() {
+  const today = new Date();
+  const end   = new Date(today);
+  end.setDate(today.getDate() + 6);
+
+  const monthsEs = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const lang = document.getElementById('html-root').lang || 'es';
+
+  let label;
+  if (lang === 'en') {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' ' + monthsEn[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' ' + monthsEn[today.getMonth()] + ' – ' + end.getDate() + ' ' + monthsEn[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  } else {
+    if (today.getMonth() === end.getMonth()) {
+      label = today.getDate() + ' – ' + end.getDate() + ' de ' + monthsEs[today.getMonth()] + ' ' + today.getFullYear();
+    } else {
+      label = today.getDate() + ' de ' + monthsEs[today.getMonth()] + ' – ' + end.getDate() + ' de ' + monthsEs[end.getMonth()] + ' ' + today.getFullYear();
+    }
+  }
+
+  const el = document.getElementById('header-date');
+  if (el) el.textContent = label;
+}
+
+// Update date on load and when language changes
+updateHeaderDate();
+function setFilter(filter) {
+  const url = new URL(window.location);
+  if (filter === 'all') url.searchParams.delete('filter');
+  else url.searchParams.set('filter', filter);
+  window.history.replaceState({}, '', url);
+  applyVisibility();
+}
+
+function applyVisibility() {
+  const params   = new URLSearchParams(window.location.search);
+  const filter   = params.get('filter')  || 'all';
+  const voseOnly = params.get('vose')    === 'true';
+  const newOnly  = params.get('new')     === 'true';
+  const cinemas  = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+
+  // Sync filter buttons
+  const allBtn  = document.getElementById('filter-all');
+  const voseBtn = document.getElementById('filter-vose');
+  if (allBtn)  allBtn.classList.toggle('active',  !voseOnly && filter === 'all');
+  if (voseBtn) voseBtn.classList.toggle('active', voseOnly  || filter === 'vose');
+
+  let visible = 0;
+  document.querySelectorAll('[data-vose]').forEach(card => {
+    let show = true;
+
+    // VOSE filter
+    if (voseOnly || filter === 'vose') {
+      if (card.dataset.vose !== 'true') show = false;
+    }
+
+    // New releases filter
+    if (newOnly && card.dataset.isnew !== 'true') show = false;
+
+    // Cinema filter
+    if (cinemas && cinemas.length > 0) {
+      const cardCinemas = (card.dataset.cinemas || '').split(',');
+      if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
+    }
+
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  // Re-pair visible grid cards so there are never gaps
+  // First collect all visible cards across all rows
+  const allGridCards = Array.from(document.querySelectorAll('.grid-row .grid-card'));
+  const visibleCards = allGridCards.filter(c => c.style.display !== 'none');
+
+  // Hide all grid rows first
+  document.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
+
+  // Create a temporary container to re-pair visible cards
+  // We reuse existing rows — fill them with visible cards in order
+  const rows = document.querySelectorAll('.grid-row');
+  let rowIndex = 0;
+  let cardIndex = 0;
+
+  while (cardIndex < visibleCards.length) {
+    if (rowIndex >= rows.length) break;
+    const row = rows[rowIndex];
+    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
+
+    // Place up to 2 visible cards in this row
+    rowCards.forEach(c => c.style.display = 'none'); // hide all first
+    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
+    batch.forEach((card, i) => {
+      if (rowCards[i]) {
+        // Move card to this slot by reordering in DOM
+        row.appendChild(card);
+        card.style.display = '';
+      }
+    });
+    row.style.display = batch.length > 0 ? '' : 'none';
+    cardIndex += 2;
+    rowIndex++;
+  }
+
+  // Empty state message
+  const empty = document.getElementById('filter-empty');
+  if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  applyVisibility();
+  loadUserPreferences();
+
+  // After preferences load, update film links to pass params through
+  // We do this after a short delay to allow loadUserPreferences() to update the URL
+  setTimeout(() => {
+    const params = window.location.search;
+    if (params) {
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + params;
+      });
+    }
+  }, 1500);
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
