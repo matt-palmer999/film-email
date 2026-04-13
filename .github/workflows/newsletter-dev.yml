@@ -4,14 +4,6 @@ on:
   push:
     branches: [ dev ]
   workflow_dispatch:
-    inputs:
-      FORCE_EMAIL:
-        description: 'Force email send (true/false)'
-        required: false
-        default: 'false'
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -26,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -42,17 +34,18 @@ jobs:
           FROM_ADDRESS:   ${{ secrets.FROM_ADDRESS }}
           FROM_NAME:      ${{ secrets.FROM_NAME }}
           RECIPIENTS:     ${{ secrets.RECIPIENTS }}
-          LISTINGS_URL:   "https://matt-palmer999.github.io/film-email/listings"
+          LISTINGS_URL:   "https://whatson-dev.netlify.app/listings"
           TMDB_API_KEY:   ${{ secrets.TMDB_API_KEY }}
           SUPABASE_URL:   ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON:  ${{ secrets.SUPABASE_ANON }}
-          FORCE_EMAIL:    ${{ github.event.inputs.FORCE_EMAIL || 'false' }}
+          FORCE_EMAIL:    "false"
         run: python scraper.py
 
-      - name: Deploy dev build to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
-          publish_branch: gh-pages-dev
-          destination_dir: .
+          publish-dir: ./docs
+          production-deploy: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}
