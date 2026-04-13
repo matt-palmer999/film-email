@@ -1221,28 +1221,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   {multiplex_cards}
 
   <div class="section-divider"></div>
-  <div class="section-label" data-es="🎭 Cines Babel — Cine Independiente &amp; VOSE" data-en="🎭 Cines Babel — Independent &amp; VOSE Cinema">🎭 Cines Babel — Cine Independiente &amp; VOSE</div>
-  <div class="cinema-group-header">
-    <div>
-      <div class="cinema-group-name">Cines Babel</div>
-      <div class="cinema-group-desc" data-es="C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE" data-en="C/ Vicent Sancho Tello, 10 · 5 screens · Independent &amp; VOSE specialists">C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE</div>
-    </div>
-    <a href="https://www.cinesalbatrosbabel.com" class="cinema-group-link">cinesalbatrosbabel.com →</a>
-  </div>
-  {babel_cards}
-
-  <div class="section-divider"></div>
-  <div class="section-label" data-es="🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor" data-en="🎞️ Cinestudio D'Or — Double Bills &amp; Art Cinema">🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor</div>
-  <div class="cinema-group-header">
-    <div>
-      <div class="cinema-group-name">Cinestudio D'Or</div>
-      <div class="cinema-group-desc" data-es="C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua" data-en="C/ Almirante Cadarso, 31 · Valencia's oldest cinema · Continuous double-bill screenings">C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua</div>
-    </div>
-    <a href="https://cinestudiodor.es" class="cinema-group-link">cinestudiodor.es →</a>
-  </div>
-  {dor_cards}
-
-  <div class="section-divider"></div>
 
   <div class="footer">
     <div class="footer-logo">Cartelera Valencia</div>
