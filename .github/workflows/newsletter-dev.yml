@@ -1,0 +1,51 @@
+name: Valencia Cinema Dev Build
+
+on:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v3
+        with:
+          ref: dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests beautifulsoup4
+          playwright install chromium
+
+      - name: Run scraper
+        env:
+          SMTP_HOST:      ${{ secrets.SMTP_HOST }}
+          SMTP_PORT:      ${{ secrets.SMTP_PORT }}
+          SMTP_USER:      ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD:  ${{ secrets.SMTP_PASSWORD }}
+          FROM_ADDRESS:   ${{ secrets.FROM_ADDRESS }}
+          FROM_NAME:      ${{ secrets.FROM_NAME }}
+          RECIPIENTS:     ${{ secrets.RECIPIENTS }}
+          LISTINGS_URL:   "https://whatson-dev.netlify.app/listings"
+          TMDB_API_KEY:   ${{ secrets.TMDB_API_KEY }}
+          SUPABASE_URL:   ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON:  ${{ secrets.SUPABASE_ANON }}
+          FORCE_EMAIL:    "false"
+        run: python scraper.py
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: ./docs
+          production-deploy: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}

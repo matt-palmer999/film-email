@@ -1043,7 +1043,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
@@ -1101,7 +1101,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
         rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
         cinema_tags = "".join(
-            f'<a href="{c["website"]}" class="cinema-tag" data-cinema="{c["id"]}">{c["name"]}{'<span class="vose-mini">VOSE</span>' if c["vose"] else ""}</a>'
+            '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
@@ -1152,7 +1152,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         babel_cards = babel_grid
         if babel_shared:
             shared_tags = "".join(
-                f'<span class="cinema-tag" style="cursor:default;">{f["title"]}{'<span class="vose-mini">VOSE</span>' if f["any_vose"] else ""}</span>'
+                '<span class="cinema-tag" style="cursor:default;">' + f["title"] + ('<span class="vose-mini">VOSE</span>' if f["any_vose"] else "") + '</span>'
                 for f in babel_shared
             )
             babel_cards += f"""
@@ -1262,7 +1262,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
       <em style="color:#7a6a9a;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
       <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
-      <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span>
+      <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
