@@ -1150,16 +1150,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             inner = "".join(grid_card_html(f) for f in pair)
             babel_grid += f'\n  <div class="grid-row">{inner}\n  </div>'
         babel_cards = babel_grid
-        if babel_shared:
-            shared_tags = "".join(
-                '<span class="cinema-tag" style="cursor:default;">' + f["title"] + ('<span class="vose-mini">VOSE</span>' if f["any_vose"] else "") + '</span>'
-                for f in babel_shared
-            )
-            babel_cards += f"""
-  <div style="margin:0 24px 16px;padding:12px 16px;background:#130d20;border:1px solid #261d3a;border-radius:10px;">
-    <div class="cinema-links-label" data-es="También en Babel esta semana" data-en="Also at Babel this week" style="margin-bottom:8px;">También en Babel esta semana</div>
-    <div class="cinema-tags">{shared_tags}</div>
-  </div>"""
 
     dor_cards = ""
     if "dor" in arthouse_films:
