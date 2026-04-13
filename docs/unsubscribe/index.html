@@ -391,15 +391,14 @@
       btn.disabled = true;
       try {
         await doUnsubscribe(currentEmail);
-        showPanel('panel-done');
-        setTimeout(() => { window.location.href = '/'; }, 3000);
       } catch (err) {
-        btn.disabled = false;
-        errorEl.textContent = lang === 'es'
-          ? 'Algo ha fallado. Inténtalo de nuevo o escríbenos a hola@whatson.movie'
-          : 'Something went wrong. Try again or email us at hola@whatson.movie';
-        errorEl.style.display = 'block';
+        // Log but continue — cookie deletion and redirect should still happen
+        console.warn('Supabase error:', err);
       }
+      // Always delete cookie and redirect, regardless of Supabase result
+      deleteCookie('cv_email');
+      showPanel('panel-done');
+      setTimeout(() => { window.location.href = '/?unsubscribed=1'; }, 3000);
     }
 
     async function submitManualEmail() {
