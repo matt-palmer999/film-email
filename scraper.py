@@ -1016,7 +1016,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         cinema_types = {c["type"] for c in film["cinemas"]}
         cinema_ids   = {c["id"]   for c in film["cinemas"]}
 
-        if "multiplex" in cinema_types:
+        if "multiplex" in cinema_types or cinema_ids.issubset({"babel", "dor"}):
             multiplex_films.append(film)
 
         for cid in ["babel", "dor"]:
