@@ -314,7 +314,7 @@
       <div class="panel" id="panel-done">
         <span class="success-icon">✅</span>
         <h1 data-es="Hasta pronto" data-en="See you around">Hasta pronto</h1>
-        <p class="card-desc" data-es="Te has dado de baja correctamente. No recibirás más emails." data-en="You have been successfully unsubscribed. You will not receive any more emails.">Te has dado de baja correctamente. No recibirás más emails.</p>
+        <p class="card-desc" data-es="Te has dado de baja correctamente. No recibirás más emails. Redirigiendo al inicio..." data-en="You have been successfully unsubscribed. You will not receive any more emails. Redirecting to home...">Te has dado de baja correctamente. No recibirás más emails. Redirigiendo al inicio...</p>
         <br>
         <a href="/" class="btn-secondary" data-es="Volver al inicio" data-en="Back to home">Volver al inicio</a>
       </div>
@@ -386,6 +386,7 @@
       try {
         await doUnsubscribe(currentEmail);
         showPanel('panel-done');
+        setTimeout(() => { window.location.href = '/'; }, 3000);
       } catch (err) {
         btn.disabled = false;
         errorEl.textContent = lang === 'es'
