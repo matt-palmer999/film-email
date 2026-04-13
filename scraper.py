@@ -1303,7 +1303,7 @@ if ('serviceWorker' in navigator) {{
 # ─── Email sender ─────────────────────────────────────────────────────────────
 
 
-def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "") -> str:
+def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "") -> str:
     """Build a clean, simple teaser email that links to the full hosted page."""
     date_en = week_range_en(anchor)
 
@@ -1445,7 +1445,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
               Showtimes may vary — always check the cinema's website before you go.<br>
               <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">⚙️ Manage preferences</a>
               &nbsp;·&nbsp;
-              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">Unsubscribe</a><br>
+              <a href="{unsub_url}" style="color:#5a4e6a;text-decoration:none;">Unsubscribe</a><br>
               © {anchor.year} Cartelera Valencia Weekly
             </div>
           </td>
@@ -1594,15 +1594,16 @@ def main():
         log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
 
     # Build and send the teaser email
-    page_url  = os.environ.get("LISTINGS_URL", "https://whatson.movie/listings")
-    prefs_url = page_url.replace("/listings", "/preferences")
+    page_url   = os.environ.get("LISTINGS_URL", "https://whatson.movie/listings")
+    prefs_url  = page_url.replace("/listings", "/preferences")
+    unsub_url  = page_url.replace("/listings", "/unsubscribe")
 
     # Only send email on Thursdays (scraper now runs daily)
     is_thursday = anchor.weekday() == 3
     force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
 
     if is_thursday or force_email:
-        teaser = build_teaser_email(films, anchor, page_url, prefs_url)
+        teaser = build_teaser_email(films, anchor, page_url, prefs_url, unsub_url)
     else:
         log.info(f"Not Thursday (weekday={anchor.weekday()}) — skipping email send")
         teaser = None
