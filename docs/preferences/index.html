@@ -961,16 +961,22 @@
             body: JSON.stringify({ active: false })
           }
         );
-
-        document.getElementById('done-title').textContent = lang === 'es' ? 'Hasta pronto 👋' : 'See you around 👋';
-        document.getElementById('done-desc').textContent = lang === 'es'
-          ? 'Te has dado de baja correctamente. Puedes volver a suscribirte en cualquier momento.'
-          : 'You have been successfully unsubscribed. You can resubscribe at any time.';
-        showPanel('panel-done');
-
       } catch (err) {
         console.error(err);
       }
+      // Always delete cookie and redirect regardless of Supabase result
+      const past = 'Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = `cv_email=;expires=${past};path=/;SameSite=Lax`;
+      document.cookie = `cv_email=;expires=${past};path=/`;
+      document.cookie = `cv_email=;expires=${past};path=/;domain=${location.hostname}`;
+      document.cookie = `cv_email=;expires=${past};path=/;domain=.${location.hostname}`;
+      document.cookie = `cv_email=;max-age=0;path=/`;
+      setTimeout(() => { window.location.href = '/'; }, 2000);
+      document.getElementById('done-title').textContent = lang === 'es' ? 'Hasta pronto 👋' : 'See you around 👋';
+      document.getElementById('done-desc').textContent = lang === 'es'
+        ? 'Te has dado de baja correctamente. Redirigiendo al inicio...'
+        : 'You have been successfully unsubscribed. Redirecting to home...';
+      showPanel('panel-done');
     }
 
     // ── ALERT HELPER ──
