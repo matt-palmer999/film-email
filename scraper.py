@@ -147,17 +147,8 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
                 poster_url = src
                 break
 
-        # ── Rating: first calificacion img with a real URL
+        # ── Rating: will be enriched from TMDB, default to ?
         rating = "?"
-        for img in container.find_all("img"):
-            src = img.get("src", "")
-            if "calificacion" in src and not src.startswith("data:"):
-                if "ai.png"  in src: rating = "TP"
-                elif "18.png" in src: rating = "18"
-                elif "16.png" in src: rating = "16"
-                elif "12.png" in src: rating = "12"
-                elif "7.png"  in src: rating = "7"
-                break
 
         # ── Meta and synopsis: <p> tags immediately after the h3
         paragraphs = []
@@ -325,6 +316,22 @@ def tmdb_lookup(title: str) -> dict:
         detail_es_res.raise_for_status()
         detail_es = detail_es_res.json()
 
+        # Fetch ES certification from release_dates
+        cert_es = "?"
+        try:
+            rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
+            rel_res.raise_for_status()
+            for entry in rel_res.json().get("results", []):
+                if entry.get("iso_3166_1") == "ES":
+                    for rd in entry.get("release_dates", []):
+                        cert = rd.get("certification", "").strip()
+                        if cert:
+                            cert_es = cert
+                            break
+                    break
+        except Exception:
+            pass
+
         # Use Spanish overview if available, fall back to English
         synopsis_es = detail_es.get("overview") or detail.get("overview", "")
 
@@ -344,6 +351,7 @@ def tmdb_lookup(title: str) -> dict:
             "genres_en":      [g["name"] for g in detail.get("genres", [])],
             "runtime":        detail.get("runtime"),
             "origin_country": detail.get("origin_country", []),
+            "cert_es":        cert_es,
         }
 
     except Exception as e:
@@ -1487,6 +1495,11 @@ def main():
                 film["synopsis_en"]    = tmdb.get("synopsis_en", "")
                 film["synopsis_es"]    = tmdb.get("synopsis_es") or film.get("synopsis", "")
                 film["rating_score"]   = tmdb.get("rating_score")
+                if tmdb.get("cert_es") and tmdb["cert_es"] != "?":
+                    cert = tmdb["cert_es"]
+                    # Normalise TMDB ES cert to Spanish display format
+                    if cert in ("A", "APTA", "TP"): cert = "TP"
+                    film["rating"] = cert
                 # Build English meta from TMDB data
                 genres_en = tmdb.get("genres_en", [])
                 runtime   = tmdb.get("runtime")
