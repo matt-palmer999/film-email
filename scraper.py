@@ -435,6 +435,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     poster     = film.get("poster", "")
     meta       = film.get("meta", "")
     score      = film.get("rating_score")
+    rating     = film.get("rating", "?")
     vose       = film.get("any_vose", False)
     is_new     = film.get("is_new", False)
 
