@@ -997,7 +997,7 @@ def film_card_html(film: dict) -> str:
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
       {title_html_list}
-      <div class="list-meta" data-es="{rating_dot}{meta[:120]}" data-en="{rating_dot}{film.get('meta_en', meta)[:120]}">{rating_dot}{meta[:120]}</div>
+      <div class="list-meta">{rating_dot}<span data-es="{meta[:120]}" data-en="{film.get('meta_en', meta)[:120]}">{meta[:120]}</span></div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1075,7 +1075,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
         {title_html_feat}
         {orig_label}
-        <div class="film-meta" data-es="{rating_dot}{meta[:100]}" data-en="{rating_dot}{film.get('meta_en', meta)[:100]}">{rating_dot}{meta[:100]}</div>
+        <div class="film-meta">{rating_dot}<span data-es="{meta[:100]}" data-en="{film.get('meta_en', meta)[:100]}">{meta[:100]}</span></div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
       </div>
       <div class="cinema-links">
@@ -1125,7 +1125,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
         {title_html_grid}
-        <div class="grid-meta" data-es="{rating_dot}{meta[:80]}" data-en="{rating_dot}{film.get('meta_en', meta)[:80]}">{rating_dot}{meta[:80]}</div>
+        <div class="grid-meta">{rating_dot}<span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
