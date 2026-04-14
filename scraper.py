@@ -341,6 +341,9 @@ def tmdb_lookup(title: str) -> dict:
             "year":           (detail.get("release_date") or "")[:4],
             "tmdb_id":        movie_id,
             "rating_score":   round(vote, 1) if vote else None,
+            "genres_en":      [g["name"] for g in detail.get("genres", [])],
+            "runtime":        detail.get("runtime"),
+            "origin_country": detail.get("origin_country", []),
         }
 
     except Exception as e:
@@ -994,7 +997,7 @@ def film_card_html(film: dict) -> str:
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
       {title_html_list}
-      <div class="list-meta">{rating_dot}{meta[:120]}</div>
+      <div class="list-meta" data-es="{rating_dot}{meta[:120]}" data-en="{rating_dot}{film.get('meta_en', meta)[:120]}">{rating_dot}{meta[:120]}</div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1072,7 +1075,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
         {title_html_feat}
         {orig_label}
-        <div class="film-meta">{rating_dot}{meta[:100]}</div>
+        <div class="film-meta" data-es="{rating_dot}{meta[:100]}" data-en="{rating_dot}{film.get('meta_en', meta)[:100]}">{rating_dot}{meta[:100]}</div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
       </div>
       <div class="cinema-links">
@@ -1122,7 +1125,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
         {title_html_grid}
-        <div class="grid-meta">{rating_dot}{meta[:80]}</div>
+        <div class="grid-meta" data-es="{rating_dot}{meta[:80]}" data-en="{rating_dot}{film.get('meta_en', meta)[:80]}">{rating_dot}{meta[:80]}</div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1476,6 +1479,17 @@ def main():
                 film["synopsis_en"]    = tmdb.get("synopsis_en", "")
                 film["synopsis_es"]    = tmdb.get("synopsis_es") or film.get("synopsis", "")
                 film["rating_score"]   = tmdb.get("rating_score")
+                # Build English meta from TMDB data
+                genres_en = tmdb.get("genres_en", [])
+                runtime   = tmdb.get("runtime")
+                countries = tmdb.get("origin_country", [])
+                year      = tmdb.get("year", "")
+                parts = []
+                if countries: parts.append(", ".join(countries))
+                if year:      parts.append(year)
+                if genres_en: parts.append(" , ".join(genres_en))
+                if runtime:   parts.append(f"{runtime} min")
+                film["meta_en"] = " . ".join(parts) if parts else film.get("meta", "")
                 log.info(f"  ✓ {title} → {tmdb.get('title_en','?')} / {tmdb.get('title_original','?')} ⭐{tmdb.get('rating_score','?')}")
             else:
                 film["title_en"]       = title
@@ -1483,6 +1497,7 @@ def main():
                 film["synopsis_en"]    = film.get("synopsis", "")
                 film["synopsis_es"]    = film.get("synopsis", "")
                 film["rating_score"]   = None
+                film["meta_en"]        = film.get("meta", "")
     else:
         for film in films.values():
             film["title_en"]       = film["title"]
