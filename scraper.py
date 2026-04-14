@@ -487,6 +487,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
     vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
+    rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+    rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
     poster_html = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
@@ -527,6 +529,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
 .vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
 .score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
+.rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
 .hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
 .orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
 .hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
@@ -569,7 +572,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   <div class="film-hero">
     <div class="hero-poster">{poster_html}</div>
     <div class="hero-info">
-      <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+      <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
       <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
       {orig_label}
       <div class="hero-meta">{meta}</div>
@@ -669,6 +672,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
+.rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
@@ -714,7 +718,6 @@ function setLang(lang) {
   const url = new URL(window.location);
   url.searchParams.set('lang', lang);
   window.history.replaceState({}, '', url);
-  updateHeaderDate();
 }
 
 function getCookie(name) {
@@ -971,7 +974,8 @@ def film_card_html(film: dict) -> str:
     vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
     score       = film.get("rating_score")
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
-    rating_dot = f'<span class="rating rating-{rating}"></span>+{rating} &nbsp;·&nbsp; ' if rating != "TP" else '<span class="rating rating-TP"></span>'
+    rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+    rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
 
     cinema_tags = ""
     for c in cinemas:
@@ -996,9 +1000,9 @@ def film_card_html(film: dict) -> str:
   <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
-      <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+      <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
       {title_html_list}
-      <div class="list-meta">{rating_dot}<span data-es="{meta[:120]}" data-en="{film.get('meta_en', meta)[:120]}">{meta[:120]}</span></div>
+      <div class="list-meta"><span data-es="{meta[:120]}" data-en="{film.get('meta_en', meta)[:120]}">{meta[:120]}</span></div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1045,7 +1049,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
         score       = film.get("rating_score")
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
-        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+        rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
         cinema_tags = "".join(
             '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
@@ -1073,10 +1078,10 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
-        <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+        <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
         {title_html_feat}
         {orig_label}
-        <div class="film-meta">{rating_dot}<span data-es="{meta[:100]}" data-en="{film.get('meta_en', meta)[:100]}">{meta[:100]}</span></div>
+        <div class="film-meta"><span data-es="{meta[:100]}" data-en="{film.get('meta_en', meta)[:100]}">{meta[:100]}</span></div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
       </div>
       <div class="cinema-links">
@@ -1103,7 +1108,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
         score       = film.get("rating_score")
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
-        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+        rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
         cinema_tags = "".join(
             '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
@@ -1124,9 +1130,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
-        <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+        <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
         {title_html_grid}
-        <div class="grid-meta">{rating_dot}<span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
+        <div class="grid-meta"><span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
