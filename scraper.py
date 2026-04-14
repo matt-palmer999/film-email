@@ -147,8 +147,17 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
                 poster_url = src
                 break
 
-        # ── Rating: will be enriched from TMDB, default to ?
+        # ── Rating: scraped from mabuse, will be overridden by TMDB if available
         rating = "?"
+        for img in container.find_all("img"):
+            src = img.get("src", "")
+            if "calificacion" in src and not src.startswith("data:"):
+                if "ai.png"  in src: rating = "TP"
+                elif "18.png" in src: rating = "18"
+                elif "16.png" in src: rating = "16"
+                elif "12.png" in src: rating = "12"
+                elif "7.png"  in src: rating = "7"
+                break
 
         # ── Meta and synopsis: <p> tags immediately after the h3
         paragraphs = []
