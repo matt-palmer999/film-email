@@ -330,7 +330,10 @@ def tmdb_lookup(title: str) -> dict:
         try:
             rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
             rel_res.raise_for_status()
-            for entry in rel_res.json().get("results", []):
+            results = rel_res.json().get("results", [])
+
+            # Try ES first
+            for entry in results:
                 if entry.get("iso_3166_1") == "ES":
                     for rd in entry.get("release_dates", []):
                         cert = rd.get("certification", "").strip()
@@ -338,6 +341,31 @@ def tmdb_lookup(title: str) -> dict:
                             cert_es = cert
                             break
                     break
+
+            # Fallback: try GB and map to Spanish equivalent
+            if cert_es == "?":
+                gb_map = {"U": "TP", "PG": "TP", "12": "12", "12A": "12", "15": "16", "18": "18", "R18": "18"}
+                for entry in results:
+                    if entry.get("iso_3166_1") == "GB":
+                        for rd in entry.get("release_dates", []):
+                            cert = rd.get("certification", "").strip()
+                            if cert and cert in gb_map:
+                                cert_es = gb_map[cert]
+                                break
+                        break
+
+            # Fallback: try US and map to Spanish equivalent
+            if cert_es == "?":
+                us_map = {"G": "TP", "PG": "TP", "PG-13": "12", "R": "16", "NC-17": "18"}
+                for entry in results:
+                    if entry.get("iso_3166_1") == "US":
+                        for rd in entry.get("release_dates", []):
+                            cert = rd.get("certification", "").strip()
+                            if cert and cert in us_map:
+                                cert_es = us_map[cert]
+                                break
+                        break
+
         except Exception:
             pass
 
