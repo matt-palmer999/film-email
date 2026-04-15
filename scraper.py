@@ -764,6 +764,9 @@ function setLang(lang) {
   const url = new URL(window.location);
   url.searchParams.set('lang', lang);
   window.history.replaceState({}, '', url);
+  updateHeaderDate();
+  const titleEl = document.getElementById('header-title');
+  if (titleEl) titleEl.innerHTML = lang === 'en' ? 'Cinema<br>Listings' : 'Cartelera<br>Valencia';
 }
 
 function getCookie(name) {
@@ -1262,7 +1265,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
 
   <div class="header">
-    <div class="header-title">Cartelera<br>Valencia</div>
+    <div class="header-title" id="header-title">Cartelera<br>Valencia</div>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
     <div class="header-date" id="header-date"></div>
   </div>
