@@ -1336,6 +1336,7 @@ function applyVisibility() {
 window.addEventListener('DOMContentLoaded', () => {
   applyVisibility();
   loadUserPreferences();
+  attachCardClicks();
 
   // After preferences load, update film links to pass params through
   // We do this after a short delay to allow loadUserPreferences() to update the URL
@@ -1347,20 +1348,23 @@ window.addEventListener('DOMContentLoaded', () => {
         a.href = base + params;
       });
     }
+    attachCardClicks();
   }, 1500);
 });
 </script>
 <script>
 // ── CARD CLICK — make entire card clickable via title link
-document.querySelectorAll('.grid-card, .list-card, .featured-card').forEach(card => {
-  const titleLink = card.querySelector('a.grid-title, a.list-title, a.film-title');
-  if (!titleLink) return;
-  card.addEventListener('click', function(e) {
-    // Don't intercept clicks on actual links (cinema tags, title itself)
-    if (e.target.closest('a')) return;
-    window.location.href = titleLink.href;
+function attachCardClicks() {
+  document.querySelectorAll('.grid-card, .list-card, .featured-card').forEach(card => {
+    if (card._clickAttached) return;
+    card._clickAttached = true;
+    card.addEventListener('click', function(e) {
+      if (e.target.closest('a')) return;
+      const titleLink = card.querySelector('a.grid-title, a.list-title, a.film-title');
+      if (titleLink) window.location.href = titleLink.href;
+    });
   });
-});
+}
 
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
