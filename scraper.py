@@ -479,6 +479,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     syn_en     = (film.get("synopsis_en") or film.get("synopsis", ""))[:400]
     poster     = film.get("poster", "")
     meta       = film.get("meta", "")
+    meta_en    = film.get("meta_en", meta)
     score      = film.get("rating_score")
     rating     = film.get("rating", "?")
     vose       = film.get("any_vose", False)
@@ -621,7 +622,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
       <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
       <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
       {orig_label}
-      <div class="hero-meta">{meta}</div>
+      <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
     </div>
   </div>
