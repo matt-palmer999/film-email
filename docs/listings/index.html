@@ -1333,6 +1333,19 @@ function applyVisibility() {
 }
 
 
+// ── CARD CLICK — make entire card clickable via title link
+function attachCardClicks() {
+  document.querySelectorAll('.grid-card, .list-card, .featured-card').forEach(card => {
+    if (card._clickAttached) return;
+    card._clickAttached = true;
+    card.addEventListener('click', function(e) {
+      if (e.target.closest('a')) return;
+      const titleLink = card.querySelector('a.grid-title, a.list-title, a.film-title');
+      if (titleLink) window.location.href = titleLink.href;
+    });
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   applyVisibility();
   loadUserPreferences();
@@ -1353,19 +1366,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-// ── CARD CLICK — make entire card clickable via title link
-function attachCardClicks() {
-  document.querySelectorAll('.grid-card, .list-card, .featured-card').forEach(card => {
-    if (card._clickAttached) return;
-    card._clickAttached = true;
-    card.addEventListener('click', function(e) {
-      if (e.target.closest('a')) return;
-      const titleLink = card.querySelector('a.grid-title, a.list-title, a.film-title');
-      if (titleLink) window.location.href = titleLink.href;
-    });
-  });
-}
-
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .catch(err => console.log('SW registration failed:', err));
