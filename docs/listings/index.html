@@ -1118,6 +1118,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 </div>
 <div class="section-divider" id="section2-divider"></div>
 <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
+<div class="cinema-group-header" id="section2-header">
+<div>
+<div class="cinema-group-name">Cines Babel · Cinestudio D'Or · Clásicos en multiplex</div>
+<div class="cinema-group-desc" data-es="Cine de autor, sesiones VOSE especializadas y reposiciones clásicas" data-en="Arthouse cinema, specialist VOSE screenings and classic re-releases">Cine de autor, sesiones VOSE especializadas y reposiciones clásicas</div>
+</div>
+</div>
 <div id="section2-cards"></div>
 <div class="section-divider"></div>
 <div class="footer">
@@ -1372,10 +1378,13 @@ function applyVisibility() {
   const s2Container = document.getElementById('section2-cards');
   const s2Divider = document.getElementById('section2-divider');
   const s2Label = document.getElementById('section2-label');
+  const s2Header = document.getElementById('section2-header');
   if (s2Container) {
     const s2Visible = s2Container.querySelectorAll('.grid-card:not([style*="display: none"])').length;
-    if (s2Divider) s2Divider.style.display = s2Visible === 0 ? 'none' : '';
-    if (s2Label) s2Label.style.display = s2Visible === 0 ? 'none' : '';
+    const show = s2Visible > 0;
+    if (s2Divider) s2Divider.style.display = show ? '' : 'none';
+    if (s2Label) s2Label.style.display = show ? '' : 'none';
+    if (s2Header) s2Header.style.display = show ? '' : 'none';
   }
 }
 
@@ -1410,6 +1419,8 @@ function initSections() {
   if (s2Cards.length === 0) {
     if (s2Divider) s2Divider.style.display = 'none';
     if (s2Label) s2Label.style.display = 'none';
+    const s2Header = document.getElementById('section2-header');
+    if (s2Header) s2Header.style.display = 'none';
   }
 }
 
