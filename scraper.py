@@ -1322,7 +1322,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
   <div class="cinema-group-header" id="section2-header">
     <div>
-      <div class="cinema-group-name">Cines Babel · Cinestudio D'Or · Clásicos en multiplex</div>
+      <div class="cinema-group-name">Cines Babel · Cinestudio D'Or </div>
       <div class="cinema-group-desc" data-es="Cine de autor, sesiones VOSE especializadas y reposiciones clásicas" data-en="Arthouse cinema, specialist VOSE screenings and classic re-releases">Cine de autor, sesiones VOSE especializadas y reposiciones clásicas</div>
     </div>
   </div>
