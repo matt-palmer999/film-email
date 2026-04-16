@@ -273,9 +273,13 @@ def tmdb_lookup(title: str) -> dict:
     """
     import requests as req
     import time
+    import re as _re
 
     if not TMDB_API_KEY:
         return {}
+
+    # Clean title before searching — strip event suffixes like "-Proyecto Viridiana-...", "+Coloquio", etc.
+    search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', title)[0].strip()
 
     time.sleep(0.25)  # polite rate limiting
 
@@ -288,7 +292,7 @@ def tmdb_lookup(title: str) -> dict:
         # Search in Spanish first to match the scraped title
         search_url = (
             f"{TMDB_BASE}/search/movie"
-            f"?query={req.utils.quote(title)}"
+            f"?query={req.utils.quote(search_title)}"
             f"&language=es-ES"
             f"&region=ES"
         )
@@ -300,7 +304,7 @@ def tmdb_lookup(title: str) -> dict:
             # Try English search as fallback
             search_url_en = (
                 f"{TMDB_BASE}/search/movie"
-                f"?query={req.utils.quote(title)}"
+                f"?query={req.utils.quote(search_title)}"
                 f"&language=en-US"
             )
             res = req.get(search_url_en, headers=headers, timeout=10)
