@@ -912,80 +912,100 @@ function setFilter(filter) {
   applyVisibility();
 }
 
-function applyVisibility() {
+function initSections() {{
+  const s2Container = document.getElementById('section2-cards');
+  const s2Divider   = document.getElementById('section2-divider');
+  const s2Label     = document.getElementById('section2-label');
+  const s2Header    = document.getElementById('section2-header');
+  if (!s2Container) return;
+  const s2Cards = Array.from(document.querySelectorAll('.grid-card[data-section="2"]'));
+  s2Cards.forEach(card => {{
+    const row = card.closest('.grid-row');
+    card.remove();
+    if (row && row.querySelectorAll('.grid-card').length === 0) row.remove();
+  }});
+  for (let i = 0; i < s2Cards.length; i += 2) {{
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    row.appendChild(s2Cards[i]);
+    if (s2Cards[i + 1]) row.appendChild(s2Cards[i + 1]);
+    s2Container.appendChild(row);
+  }}
+  if (s2Cards.length === 0) {{
+    if (s2Divider) s2Divider.style.display = 'none';
+    if (s2Label)   s2Label.style.display   = 'none';
+    if (s2Header)  s2Header.style.display  = 'none';
+  }}
+}}
+
+function repairSection(container) {{
+  const allCards     = Array.from(container.querySelectorAll('.grid-row .grid-card'));
+  const visibleCards = allCards.filter(c => c.style.display !== 'none');
+  container.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
+  const rows = container.querySelectorAll('.grid-row');
+  let rowIndex = 0, cardIndex = 0;
+  while (cardIndex < visibleCards.length) {{
+    if (rowIndex >= rows.length) break;
+    const row      = rows[rowIndex];
+    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
+    rowCards.forEach(c => c.style.display = 'none');
+    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
+    batch.forEach((card, i) => {{ if (rowCards[i]) {{ row.appendChild(card); card.style.display = ''; }} }});
+    row.style.display = batch.length > 0 ? '' : 'none';
+    cardIndex += 2; rowIndex++;
+  }}
+}}
+
+function applyVisibility() {{
   const params   = new URLSearchParams(window.location.search);
   const filter   = params.get('filter')  || 'all';
   const voseOnly = params.get('vose')    === 'true';
   const newOnly  = params.get('new')     === 'true';
   const cinemas  = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
-  // Sync filter buttons
   const allBtn  = document.getElementById('filter-all');
   const voseBtn = document.getElementById('filter-vose');
   if (allBtn)  allBtn.classList.toggle('active',  !voseOnly && filter === 'all');
   if (voseBtn) voseBtn.classList.toggle('active', voseOnly  || filter === 'vose');
 
   let visible = 0;
-  document.querySelectorAll('[data-vose]').forEach(card => {
+  document.querySelectorAll('[data-vose]').forEach(card => {{
     let show = true;
-
-    // VOSE filter
-    if (voseOnly || filter === 'vose') {
-      if (card.dataset.vose !== 'true') show = false;
-    }
-
-    // New releases filter
+    if (voseOnly || filter === 'vose') {{ if (card.dataset.vose !== 'true') show = false; }}
     if (newOnly && card.dataset.isnew !== 'true') show = false;
-
-    // Cinema filter
-    if (cinemas && cinemas.length > 0) {
+    if (cinemas && cinemas.length > 0) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
-    }
-
+    }}
     card.style.display = show ? '' : 'none';
     if (show) visible++;
-  });
+  }});
 
-  // Re-pair visible grid cards so there are never gaps
-  // First collect all visible cards across all rows
-  const allGridCards = Array.from(document.querySelectorAll('.grid-row .grid-card'));
-  const visibleCards = allGridCards.filter(c => c.style.display !== 'none');
+  const s2El = document.getElementById('section2-cards');
+  const mainWrapper = document.querySelector('.wrapper');
+  if (mainWrapper) {{
+    const s2Parent = s2El ? s2El.parentNode : null;
+    const s2Next   = s2El ? s2El.nextSibling : null;
+    if (s2El && s2Parent) s2El.remove();
+    repairSection(mainWrapper);
+    if (s2El && s2Parent) s2Parent.insertBefore(s2El, s2Next);
+  }}
+  if (s2El) repairSection(s2El);
 
-  // Hide all grid rows first
-  document.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
-
-  // Create a temporary container to re-pair visible cards
-  // We reuse existing rows — fill them with visible cards in order
-  const rows = document.querySelectorAll('.grid-row');
-  let rowIndex = 0;
-  let cardIndex = 0;
-
-  while (cardIndex < visibleCards.length) {
-    if (rowIndex >= rows.length) break;
-    const row = rows[rowIndex];
-    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
-
-    // Place up to 2 visible cards in this row
-    rowCards.forEach(c => c.style.display = 'none'); // hide all first
-    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
-    batch.forEach((card, i) => {
-      if (rowCards[i]) {
-        // Move card to this slot by reordering in DOM
-        row.appendChild(card);
-        card.style.display = '';
-      }
-    });
-    row.style.display = batch.length > 0 ? '' : 'none';
-    cardIndex += 2;
-    rowIndex++;
-  }
-
-  // Empty state message
   const empty = document.getElementById('filter-empty');
   if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
 
-}
+  const s2Divider = document.getElementById('section2-divider');
+  const s2Label   = document.getElementById('section2-label');
+  const s2Header  = document.getElementById('section2-header');
+  if (s2El) {{
+    const s2Visible = s2El.querySelectorAll('.grid-card:not([style*="display: none"])').length;
+    const show = s2Visible > 0;
+    if (s2Divider) s2Divider.style.display = show ? '' : 'none';
+    if (s2Label)   s2Label.style.display   = show ? '' : 'none';
+    if (s2Header)  s2Header.style.display  = show ? '' : 'none';
+  }}
+}}
 
 """
 
@@ -1036,6 +1056,12 @@ def film_card_html(film: dict) -> str:
     where_en = "Where to see it"
 
     cinema_ids = ",".join(c["id"] for c in cinemas)
+
+    year       = film.get("year", "")
+    _cinemas_set = set(c["id"] for c in film["cinemas"])
+    _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
+    _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+    section    = "2" if (_arthouse_only or _is_old) else "1"
     title_es = title
     title_en = film.get("title_en", title)
     slug     = film.get("slug")
@@ -1047,7 +1073,7 @@ def film_card_html(film: dict) -> str:
     syn_en   = (film.get("synopsis_en") or synopsis)[:200]
 
     return f"""
-  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}">
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
@@ -1107,6 +1133,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         )
         where_es, where_en = "Dónde verla", "Where to see it"
         cinema_ids = ",".join(c["id"] for c in cinemas)
+
+        year       = film.get("year", "")
+        _cinemas_set = set(c["id"] for c in film["cinemas"])
+        _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
+        _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+        section    = "2" if (_arthouse_only or _is_old) else "1"
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
@@ -1124,7 +1156,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             orig_label = f'<div style="font-size:11px;color:var(--faint);margin-top:2px;" translate="no">{title_orig}</div>'
 
         return f"""
-  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}">
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
@@ -1166,6 +1198,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         )
         where_es, where_en = "Dónde verla", "Where to see it"
         cinema_ids = ",".join(c["id"] for c in cinemas)
+
+        year       = film.get("year", "")
+        _cinemas_set = set(c["id"] for c in film["cinemas"])
+        _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
+        _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+        section    = "2" if (_arthouse_only or _is_old) else "1"
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
@@ -1177,7 +1215,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         syn_en   = (film.get("synopsis_en") or synopsis)[:140]
 
         return f"""
-    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}">
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
@@ -1280,6 +1318,15 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
   {multiplex_cards}
 
+  <div class="section-divider" id="section2-divider"></div>
+  <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
+  <div class="cinema-group-header" id="section2-header">
+    <div>
+      <div class="cinema-group-name">Cines Babel · Cinestudio D'Or · Clásicos en multiplex</div>
+      <div class="cinema-group-desc" data-es="Cine de autor, sesiones VOSE especializadas y reposiciones clásicas" data-en="Arthouse cinema, specialist VOSE screenings and classic re-releases">Cine de autor, sesiones VOSE especializadas y reposiciones clásicas</div>
+    </div>
+  </div>
+  <div id="section2-cards"></div>
   <div class="section-divider"></div>
 
   <div class="footer">
@@ -1300,6 +1347,7 @@ window.SUPABASE_URL  = "{SUPABASE_URL}";
 window.SUPABASE_ANON = "{SUPABASE_ANON}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
+  initSections();
   applyVisibility();
   loadUserPreferences();
   attachCardClicks();
