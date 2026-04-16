@@ -1599,6 +1599,7 @@ def main():
                 film["synopsis_en"]    = tmdb.get("synopsis_en", "")
                 film["synopsis_es"]    = tmdb.get("synopsis_es") or film.get("synopsis", "")
                 film["rating_score"]   = tmdb.get("rating_score")
+                film["tmdb_id"]        = tmdb.get("tmdb_id")
                 if tmdb.get("cert_es") and tmdb["cert_es"] != "?":
                     cert = tmdb["cert_es"]
                     # Normalise TMDB ES cert to Spanish display format
@@ -1630,6 +1631,36 @@ def main():
             film["synopsis_en"]    = film.get("synopsis", "")
             film["synopsis_es"]    = film.get("synopsis", "")
             film["rating_score"]   = None
+
+    # Deduplicate films that resolved to the same TMDB ID
+    # (e.g. same film listed under different Spanish titles at different cinemas)
+    tmdb_id_map = {}  # tmdb_id -> canonical title
+    duplicates  = []
+    for title, film in films.items():
+        tid = film.get("tmdb_id")
+        if not tid:
+            continue
+        if tid in tmdb_id_map:
+            canonical = tmdb_id_map[tid]
+            log.info(f"  Merging '{title}' into '{canonical}' (same TMDB ID {tid})")
+            # Merge cinemas
+            existing_ids = {c["id"] for c in films[canonical]["cinemas"]}
+            for c in film["cinemas"]:
+                if c["id"] not in existing_ids:
+                    films[canonical]["cinemas"].append(c)
+                    existing_ids.add(c["id"])
+            # Merge flags
+            if film.get("any_vose"):
+                films[canonical]["any_vose"] = True
+            if film.get("is_new"):
+                films[canonical]["is_new"] = True
+            if film.get("poster") and not films[canonical].get("poster"):
+                films[canonical]["poster"] = film["poster"]
+            duplicates.append(title)
+        else:
+            tmdb_id_map[tid] = title
+    for title in duplicates:
+        del films[title]
 
     # Build the full bilingual listings page
     # Remove films with no future showtimes and assign slugs to the rest
