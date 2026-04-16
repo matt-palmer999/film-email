@@ -177,7 +177,7 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         synopsis_text = paragraphs[1] if len(paragraphs) > 1 else ""
 
         # ── VOSE and new release flags
-        vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
+        vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English|ENGLISH SUBTITLED", raw_html, re.IGNORECASE))
         is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
         # ── Showtimes: all dates are in page HTML as div.listafechas.fecha_YYYYMMDD
