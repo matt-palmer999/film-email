@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="Renoir - Secreto — Cartelera Valencia" data-en="Renoir - Secreto — Cartelera Valencia">Renoir - Secreto — Cartelera Valencia</title>
+<title data-es="Renoir - Secreto — Cartelera Valencia" data-en="Renoir — Cartelera Valencia">Renoir - Secreto — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -76,13 +76,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://mabuse.es/wp-content/uploads/2026/02/renoir-secreto-267x400.jpg" alt="Renoir - Secreto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/6rITdY5SdUMFZ0lKmLUCsNFoKmJ.jpg" alt="Renoir - Secreto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="vose-badge">VOSE</span><span class="rating-badge">+16</span></div>
-      <div class="hero-title" data-es="Renoir - Secreto" data-en="Renoir - Secreto">Renoir - Secreto</div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 6.3</span><span class="rating-badge">+12</span></div>
+      <div class="hero-title" data-es="Renoir - Secreto" data-en="Renoir">Renoir - Secreto</div>
       
-      <div class="hero-meta"><span data-es="Otros . 116 min ." data-en="Otros . 116 min .">Otros . 116 min .</span></div>
-      <div class="hero-synopsis" data-es="Preestrenos exclusivos en VOSE, emoción y el mejor cine, cada miércoles a las 20:00 h en ABC Park                                                                                                                                                                                     ..." data-en="Preestrenos exclusivos en VOSE, emoción y el mejor cine, cada miércoles a las 20:00 h en ABC Park                                                                                                                                                                                     ...">Preestrenos exclusivos en VOSE, emoción y el mejor cine, cada miércoles a las 20:00 h en ABC Park                                                                                                                                                                                     ...</div>
+      <div class="hero-meta"><span data-es="Otros . 116 min ." data-en="FR . 2012 . Drama , Romance . 111 min">Otros . 116 min .</span></div>
+      <div class="hero-synopsis" data-es="Auguste Renoir, en el ocaso de su vida, está atormentado por la pérdida de su esposa, los dolores artríticos y la noticia de que su hijo ha sido herido en la guerra. Sin embargo, cuando una joven entra en su mundo, el pintor se siente dueño de una nueva energía. Radiante de vida, bellísima, Andrée se convertirá en su última modelo. Jean regresa a casa para reponerse y también cae bajo el encanto d" data-en="In the French Riviera in the summer of 1915, Jean Renoir, son of the Impressionist painter Pierre-Auguste, returns home to convalesce after being wounded in World War I. At his side is Andrée, a young woman who rejuvenates, enchants, and inspires both father and son.">Auguste Renoir, en el ocaso de su vida, está atormentado por la pérdida de su esposa, los dolores artríticos y la noticia de que su hijo ha sido herido en la guerra. Sin embargo, cuando una joven entra en su mundo, el pintor se siente dueño de una nueva energía. Radiante de vida, bellísima, Andrée se convertirá en su última modelo. Jean regresa a casa para reponerse y también cae bajo el encanto d</div>
     </div>
   </div>
 
@@ -104,7 +104,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.textContent = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Renoir - Secreto' : 'Renoir - Secreto') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Renoir' : 'Renoir - Secreto') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function showDay(key) {
