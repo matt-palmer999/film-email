@@ -1610,6 +1610,7 @@ def main():
                 runtime   = tmdb.get("runtime")
                 countries = tmdb.get("origin_country", [])
                 year      = tmdb.get("year", "")
+                if year: film["year"] = year
                 parts = []
                 if countries: parts.append(", ".join(countries))
                 if year:      parts.append(year)
