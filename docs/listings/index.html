@@ -125,6 +125,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
     </div>
   </div>
+  <div id="section1-cards">
   
   <div class="grid-row">
     <div class="grid-card" data-vose="true" data-isnew="true" data-cinemas="babel,yelmo,kinepolis,ocine,lys,abc_park,mn4" data-year="2025" data-section="1">
@@ -1037,6 +1038,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       </div>
     </div>
   </div>
+  </div>
 
   <div class="section-divider" id="section2-divider"></div>
   <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
@@ -1297,15 +1299,10 @@ function applyVisibility() {{
     if (show) visible++;
   }});
 
+  // Re-pair each section independently using a dedicated container
   const s2El = document.getElementById('section2-cards');
-  const mainWrapper = document.querySelector('.wrapper');
-  if (mainWrapper) {{
-    const s2Parent = s2El ? s2El.parentNode : null;
-    const s2Next   = s2El ? s2El.nextSibling : null;
-    if (s2El && s2Parent) s2El.remove();
-    repairSection(mainWrapper);
-    if (s2El && s2Parent) s2Parent.insertBefore(s2El, s2Next);
-  }}
+  const s1El = document.getElementById('section1-cards');
+  if (s1El) repairSection(s1El);
   if (s2El) repairSection(s2El);
 
   const empty = document.getElementById('filter-empty');
