@@ -988,15 +988,10 @@ function applyVisibility() {{
     if (show) visible++;
   }});
 
+  // Re-pair each section independently using a dedicated container
   const s2El = document.getElementById('section2-cards');
-  const mainWrapper = document.querySelector('.wrapper');
-  if (mainWrapper) {{
-    const s2Parent = s2El ? s2El.parentNode : null;
-    const s2Next   = s2El ? s2El.nextSibling : null;
-    if (s2El && s2Parent) s2El.remove();
-    repairSection(mainWrapper);
-    if (s2El && s2Parent) s2Parent.insertBefore(s2El, s2Next);
-  }}
+  const s1El = document.getElementById('section1-cards');
+  if (s1El) repairSection(s1El);
   if (s2El) repairSection(s2El);
 
   const empty = document.getElementById('filter-empty');
@@ -1323,7 +1318,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
     </div>
   </div>
+  <div id="section1-cards">
   {multiplex_cards}
+  </div>
 
   <div class="section-divider" id="section2-divider"></div>
   <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
