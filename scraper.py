@@ -945,18 +945,21 @@ function initSections() {{
 function repairSection(container) {{
   const allCards     = Array.from(container.querySelectorAll('.grid-row .grid-card'));
   const visibleCards = allCards.filter(c => c.style.display !== 'none');
-  container.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
-  const rows = container.querySelectorAll('.grid-row');
-  let rowIndex = 0, cardIndex = 0;
-  while (cardIndex < visibleCards.length) {{
-    if (rowIndex >= rows.length) break;
-    const row      = rows[rowIndex];
-    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
-    rowCards.forEach(c => c.style.display = 'none');
-    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
-    batch.forEach((card, i) => {{ if (rowCards[i]) {{ row.appendChild(card); card.style.display = ''; }} }});
-    row.style.display = batch.length > 0 ? '' : 'none';
-    cardIndex += 2; rowIndex++;
+
+  // Remove all existing grid-rows from container
+  container.querySelectorAll('.grid-row').forEach(row => row.remove());
+
+  // Build fresh rows from visible cards only — no gaps
+  for (let i = 0; i < visibleCards.length; i += 2) {{
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    visibleCards[i].style.display = '';
+    row.appendChild(visibleCards[i]);
+    if (visibleCards[i + 1]) {{
+      visibleCards[i + 1].style.display = '';
+      row.appendChild(visibleCards[i + 1]);
+    }}
+    container.appendChild(row);
   }}
 }}
 
