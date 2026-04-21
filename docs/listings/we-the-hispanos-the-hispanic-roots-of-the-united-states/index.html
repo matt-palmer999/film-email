@@ -78,10 +78,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/uLW7MmC2yA1RyKNiXB7Rn88WqL6.jpg" alt="We The Hispanos" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span></div>
       <div class="hero-title" data-es="We The Hispanos" data-en="We the Hispanos: The Hispanic Roots of the United States">We The Hispanos</div>
       
-      <div class="hero-meta"><span data-es="Otros . 118 min ." data-en="ES . History , Documentary . 1 min">Otros . 118 min .</span></div>
+      <div class="hero-meta"><span data-es="2026 . Documental . 118 min ." data-en="ES . History , Documentary . 1 min">2026 . Documental . 118 min .</span></div>
       <div class="hero-synopsis" data-es="Uncover the United States of America&#39;s hidden Hispanic heritage and its enduring presence - an over 500 year legacy that continues to shape its art, music, and history, and without which it would not be the same." data-en="Uncover the United States of America&#39;s hidden Hispanic heritage and its enduring presence - an over 500 year legacy that continues to shape its art, music, and history, and without which it would not be the same.">Uncover the United States of America's hidden Hispanic heritage and its enduring presence - an over 500 year legacy that continues to shape its art, music, and history, and without which it would not be the same.</div>
     </div>
   </div>
@@ -102,7 +102,7 @@ function setLang(lang) {
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   });
   document.title = (lang === 'en' ? 'We the Hispanos: The Hispanic Roots of the United States' : 'We The Hispanos') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);

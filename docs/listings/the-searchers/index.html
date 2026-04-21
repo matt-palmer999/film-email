@@ -102,7 +102,7 @@ function setLang(lang) {
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   });
   document.title = (lang === 'en' ? 'The Searchers' : 'Centauros del desierto') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
