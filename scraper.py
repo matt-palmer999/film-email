@@ -36,8 +36,9 @@ RECIPIENTS = [r.strip() for r in os.environ["RECIPIENTS"].split(",") if r.strip(
 TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
 
 # Supabase credentials — injected into generated HTML pages
-SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
-SUPABASE_ANON = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_URL          = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON         = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 TMDB_BASE    = "https://api.themoviedb.org/3"
 
 # ─── Cinema definitions ───────────────────────────────────────────────────────
@@ -1561,11 +1562,12 @@ if ('serviceWorker' in navigator) {{
 def fetch_subscribers() -> list:
     """Fetch all active subscribers with their language preference from Supabase."""
     import urllib.request
+    key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
     try:
         url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,lang&order=email"
         req = urllib.request.Request(url, headers={
-            "apikey":        SUPABASE_ANON,
-            "Authorization": f"Bearer {SUPABASE_ANON}",
+            "apikey":        key,
+            "Authorization": f"Bearer {key}",
         })
         with urllib.request.urlopen(req, timeout=15) as resp:
             import json as _json
