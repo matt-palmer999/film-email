@@ -850,12 +850,12 @@ async function loadUserPreferences() {
 
     // Build URL params from preferences and reload if needed
     const newParams = new URLSearchParams();
-    if (prefs.vose_only)     newParams.set('vose',    'true');
-    if (prefs.vose_lang)     newParams.set('vose_lang', prefs.vose_lang);
-    if (prefs.new_only)      newParams.set('new',     'true');
-    if (prefs.family_only)   newParams.set('family',  'true');
-    if (prefs.evening_only)  newParams.set('evening', 'true');
-    if (prefs.classics)      newParams.set('classics','true');
+    if (prefs.vose_only)     newParams.set('vose',      'true');
+    if (prefs.vose_lang)     newParams.set('vose_lang',  prefs.vose_lang);
+    if (prefs.new_only)      newParams.set('new',       'true');
+    if (prefs.family_only)   newParams.set('family',    'true');
+    if (prefs.evening_only)  newParams.set('evening',   'true');
+    if (prefs.classics)      newParams.set('classics',  'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
@@ -969,16 +969,16 @@ function repairSection(container) {{
 }}
 
 function applyVisibility() {{
-  const params      = new URLSearchParams(window.location.search);
-  const filter      = params.get('filter')     || 'all';
-  const voseOnly    = params.get('vose')        === 'true';
-  const voseLang    = params.get('vose_lang')   || 'all';
-  const newOnly     = params.get('new')         === 'true';
-  const familyOnly  = params.get('family')      === 'true';
-  const eveningOnly = params.get('evening')     === 'true';
-  const alwaysClassics = params.get('classics') === 'true';
-  const minRating   = params.has('min_rating')  ? parseFloat(params.get('min_rating')) : null;
-  const cinemas     = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+  const params        = new URLSearchParams(window.location.search);
+  const filter        = params.get('filter')     || 'all';
+  const voseOnly      = params.get('vose')        === 'true';
+  const voseLang      = params.get('vose_lang')   || 'all';
+  const newOnly       = params.get('new')         === 'true';
+  const familyOnly    = params.get('family')      === 'true';
+  const eveningOnly   = params.get('evening')     === 'true';
+  const alwaysClassics= params.get('classics')    === 'true';
+  const minRating     = params.has('min_rating')  ? parseFloat(params.get('min_rating')) : null;
+  const cinemas       = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
   const allBtn  = document.getElementById('filter-all');
   const voseBtn = document.getElementById('filter-vose');
@@ -987,56 +987,51 @@ function applyVisibility() {{
 
   let visible = 0;
   document.querySelectorAll('[data-vose]').forEach(card => {{
-    let show = true;
     const isClassic = card.dataset.section === '2';
 
-    // Always show classics override — exempt section 2 from all filters except VOSE
+    // Classics override: only apply VOSE filter, skip all others
     if (alwaysClassics && isClassic) {{
-      let showClassic = true;
+      let show = true;
       if (voseOnly || filter === 'vose') {{
-        if (card.dataset.vose !== 'true') showClassic = false;
-        if (showClassic && voseLang === 'en') {{
+        if (card.dataset.vose !== 'true') show = false;
+        if (show && voseLang === 'en') {{
           const origins = (card.dataset.origin || '').split(',');
-          const englishOrigins = ['US','GB','AU','CA','IE','NZ'];
-          if (!origins.some(o => englishOrigins.includes(o.trim()))) showClassic = false;
+          const engOrigins = ['US','GB','AU','CA','IE','NZ'];
+          if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
         }}
       }}
-      card.style.display = showClassic ? '' : 'none';
-      if (showClassic) visible++;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
       return;
     }}
+
+    let show = true;
 
     // VOSE filter
     if (voseOnly || filter === 'vose') {{
       if (card.dataset.vose !== 'true') show = false;
-      // English only sub-filter
       if (show && voseLang === 'en') {{
         const origins = (card.dataset.origin || '').split(',');
-        const englishOrigins = ['US','GB','AU','CA','IE','NZ'];
-        if (!origins.some(o => englishOrigins.includes(o.trim()))) show = false;
+        const engOrigins = ['US','GB','AU','CA','IE','NZ'];
+        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
       }}
     }}
-
     // New releases filter
-    if (newOnly && card.dataset.isnew !== 'true') show = false;
-
-    // Family friendly filter (hide 13, 16, 18 rated films)
-    if (familyOnly) {{
-      const rating = (card.dataset.rating || '').replace('+','');
-      if (['13','16','18'].includes(rating)) show = false;
+    if (show && newOnly && card.dataset.isnew !== 'true') show = false;
+    // Family friendly: hide 16 and 18 rated films
+    if (show && familyOnly) {{
+      const r = (card.dataset.rating || '').replace('+','');
+      if (r === '16' || r === '18') show = false;
     }}
-
-    // Evening & weekends filter
-    if (eveningOnly && card.dataset.hasevening !== 'true') show = false;
-
+    // Evening & weekend filter
+    if (show && eveningOnly && card.dataset.hasevening !== 'true') show = false;
     // Minimum rating filter
-    if (minRating !== null) {{
+    if (show && minRating !== null) {{
       const score = parseFloat(card.dataset.score || '0');
       if (!score || score < minRating) show = false;
     }}
-
     // Cinema filter
-    if (cinemas && cinemas.length > 0) {{
+    if (show && cinemas && cinemas.length > 0) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
@@ -1122,30 +1117,25 @@ def film_card_html(film: dict) -> str:
     _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
     section    = "2" if (_arthouse_only or _is_old) else "1"
     origin     = ",".join(film.get("origin_country", []))
-    score_val  = film.get("rating_score") or ""
+    score_val  = str(film.get("rating_score") or "")
     rating_val = film.get("rating", "?").replace("+", "")
-    # hasevening: check if any cinema has a showtime >= 17:30 on a weekday
-    _today = __import__('datetime').date.today()
     _has_eve = False
     for _c in film.get("cinemas", []):
         for _dk, _times in _c.get("showtimes", {}).items():
             try:
                 _d = __import__('datetime').date.fromisoformat(_dk)
-                if _d.weekday() < 5:  # weekday
+                if _d.weekday() < 5:
                     for _t in _times:
                         _h = int(str(_t).split(":")[0])
                         _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
                         if _h > 17 or (_h == 17 and _m >= 30):
-                            _has_eve = True
-                            break
+                            _has_eve = True; break
                 else:
-                    _has_eve = True  # weekend always counts
-                if _has_eve:
-                    break
+                    _has_eve = True
+                if _has_eve: break
             except Exception:
                 pass
-        if _has_eve:
-            break
+        if _has_eve: break
     hasevening = "true" if _has_eve else "false"
     title_es = title
     title_en = film.get("title_en", title)
@@ -1225,7 +1215,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
         section    = "2" if (_arthouse_only or _is_old) else "1"
         origin     = ",".join(film.get("origin_country", []))
-        score_val  = film.get("rating_score") or ""
+        score_val  = str(film.get("rating_score") or "")
         rating_val = film.get("rating", "?").replace("+", "")
         _has_eve = False
         for _c in film.get("cinemas", []):
@@ -1244,7 +1234,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
                 except Exception:
                     pass
             if _has_eve: break
-        hasevening = "true" if _has_eve else "false"
+        hasevening = "true" if _has_eve else "false" 
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
@@ -1311,7 +1301,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
         section    = "2" if (_arthouse_only or _is_old) else "1"
         origin     = ",".join(film.get("origin_country", []))
-        score_val  = film.get("rating_score") or ""
+        score_val  = str(film.get("rating_score") or "")
         rating_val = film.get("rating", "?").replace("+", "")
         _has_eve = False
         for _c in film.get("cinemas", []):
@@ -1330,7 +1320,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
                 except Exception:
                     pass
             if _has_eve: break
-        hasevening = "true" if _has_eve else "false"
+        hasevening = "true" if _has_eve else "false" 
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
