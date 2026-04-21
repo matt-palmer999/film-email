@@ -1262,20 +1262,26 @@ function repairSection(container) {{
   const allCards     = Array.from(container.querySelectorAll('.grid-row .grid-card'));
   const visibleCards = allCards.filter(c => c.style.display !== 'none');
 
-  // Remove all existing grid-rows from container
+  // Detach all cards from their rows (keep them in memory)
   container.querySelectorAll('.grid-row').forEach(row => row.remove());
 
-  // Build fresh rows from visible cards only — no gaps
+  // Re-pair: visible cards get fresh rows, hidden cards go in hidden rows
   for (let i = 0; i < visibleCards.length; i += 2) {{
     const row = document.createElement('div');
     row.className = 'grid-row';
-    visibleCards[i].style.display = '';
     row.appendChild(visibleCards[i]);
-    if (visibleCards[i + 1]) {{
-      visibleCards[i + 1].style.display = '';
-      row.appendChild(visibleCards[i + 1]);
-    }}
+    if (visibleCards[i + 1]) row.appendChild(visibleCards[i + 1]);
     container.appendChild(row);
+  }}
+
+  // Put hidden cards in a hidden holding row so they stay in the DOM
+  const hiddenCards = allCards.filter(c => c.style.display === 'none');
+  if (hiddenCards.length > 0) {{
+    const holdingRow = document.createElement('div');
+    holdingRow.className = 'grid-row';
+    holdingRow.style.display = 'none';
+    hiddenCards.forEach(c => holdingRow.appendChild(c));
+    container.appendChild(holdingRow);
   }}
 }}
 
