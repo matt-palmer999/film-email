@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0810">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="whatson.movie">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <title>whatson.movie — Valencia Cinema Weekly</title>
+  <meta name="description" content="The weekly guide to cinema in Valencia. Every Thursday, all cinemas, VOSE highlighted. Free newsletter.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0810;
+      --bg2:       #0f0c14;
+      --bg3:       #160f24;
+      --border:    #2a1f3d;
+      --border2:   #1e1630;
+      --gold:      #ffb432;
+      --gold-dim:  rgba(255,180,50,0.15);
+      --gold-edge: rgba(255,180,50,0.3);
+      --text:      #f0eae0;
+      --text2:     #c5b8d8;
+      --muted:     #9b8faa;
+      --faint:     #8a7e9a;
+      --vose:      #ffd84a;
+      --vose-bg:   rgba(255,220,80,0.12);
+      --vose-edge: rgba(255,220,80,0.35);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,8,16,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-logo span { color: var(--gold); }
+
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+
+    .lang-toggle {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .lang-btn {
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--faint);
+      font-family: 'DM Sans', sans-serif;
+      transition: all .2s;
+    }
+
+    .lang-btn.active { background: var(--bg3); color: var(--text); }
+
+    .nav-cta {
+      padding: 8px 20px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,180,50,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(180,80,120,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 60% at 10% 60%, rgba(100,60,180,0.05) 0%, transparent 50%);
+    }
+
+    /* Film strip decoration */
+    .film-strip {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--gold) 0px, var(--gold) 20px,
+        transparent 20px, transparent 30px
+      );
+      opacity: 0.4;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(52px, 10vw, 100px);
+      font-weight: 700;
+      line-height: 0.95;
+      color: var(--text);
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero-title-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-desc {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    /* ── SIGNUP FORM ── */
+    .signup-wrap {
+      width: 100%;
+      max-width: 460px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .3s;
+    }
+
+    .signup-form:focus-within { border-color: var(--gold); }
+
+    .signup-input {
+      flex: 1;
+      padding: 15px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      outline: none;
+    }
+
+    .signup-input::placeholder { color: var(--faint); }
+
+    .signup-btn {
+      padding: 15px 24px;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+
+    .signup-btn:hover { opacity: 0.85; }
+    .signup-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .signup-note {
+      font-size: 12px;
+      color: var(--faint);
+      margin-top: 10px;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+
+    .signup-success {
+      display: none;
+      padding: 16px 24px;
+      background: rgba(80,200,140,0.1);
+      border: 1px solid rgba(80,200,140,0.3);
+      border-radius: 10px;
+      color: #50c88c;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .signup-error {
+      display: none;
+      font-size: 12px;
+      color: #e05050;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 56px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1s forwards;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.5s forwards;
+    }
+
+    .scroll-hint span {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--border), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    @media (max-height: 700px) {
+      .scroll-hint { display: none; }
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 56px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .step {
+      padding: 32px 28px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s;
+    }
+
+    .step:hover { border-color: rgba(255,180,50,0.3); }
+
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0.5;
+    }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── PREVIEW ── */
+    .preview-section {
+      background: var(--bg3);
+      border-top: 1px solid var(--border2);
+      border-bottom: 1px solid var(--border2);
+      padding: 100px 40px;
+    }
+
+    .preview-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-top: 56px;
+    }
+
+    .preview-text { }
+
+    .preview-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .preview-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-edge);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .preview-feature-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+
+    .preview-feature-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Mock email card */
+    .mock-email {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+    }
+
+    .mock-header {
+      background: linear-gradient(135deg, #1a0a2e, var(--bg));
+      padding: 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mock-header-eyebrow {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .mock-header-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mock-stats {
+      display: flex;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .mock-stat {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border-right: 1px solid var(--border2);
+    }
+
+    .mock-stat:last-child { border-right: none; }
+
+    .mock-stat-num {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mock-stat-label {
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .mock-film {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border2);
+      align-items: flex-start;
+    }
+
+    .mock-poster {
+      width: 42px;
+      height: 60px;
+      background: var(--bg3);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .mock-film-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .mock-film-meta {
+      font-size: 10px;
+      color: var(--faint);
+      margin-bottom: 5px;
+    }
+
+    .mock-vose {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: var(--vose-bg);
+      color: var(--vose);
+      border: 1px solid var(--vose-edge);
+    }
+
+    .mock-btn {
+      display: block;
+      margin: 16px;
+      padding: 12px;
+      background: var(--gold);
+      color: var(--bg);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .mock-btn:hover { text-decoration: none; opacity: 0.9; }
+
+    /* ── CINEMAS ── */
+    .cinemas-section {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .cinemas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 40px;
+    }
+
+    .cinema-pill {
+      padding: 8px 18px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      font-size: 13px;
+      color: var(--text2);
+      transition: all .2s;
+    }
+
+    .cinema-pill:hover {
+      border-color: rgba(255,180,50,0.4);
+      color: var(--text);
+    }
+
+    .cinema-pill.arthouse {
+      border-color: var(--vose-edge);
+      color: var(--vose);
+      background: var(--vose-bg);
+    }
+
+    /* ── CTA BOTTOM ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 40px 120px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,180,50,0.05) 0%, transparent 70%);
+    }
+
+    .cta-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cta-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 440px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    .cta-signup-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border2);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--faint);
+    }
+
+    .footer-logo span { color: var(--gold); opacity: 0.6; }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    .footer-link {
+      font-size: 12px;
+      color: var(--faint);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-link:hover { color: var(--text2); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { transform: scaleY(1); opacity: 0.4; }
+      50%       { transform: scaleY(0.6); opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 14px 20px; }
+      .nav-cta { display: none; }
+      .scroll-hint { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .stats { gap: 24px; }
+      .stat-num { font-size: 28px; }
+      .section { padding: 60px 24px; }
+      .steps { grid-template-columns: 1fr; gap: 16px; }
+      .preview-section { padding: 60px 24px; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .mock-email { transform: none; }
+      .cinemas-section { padding: 60px 24px; }
+      .cta-section { padding: 60px 24px 80px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+  <script>
+    // Redirect subscribers before page renders — avoids flash of subscribe page
+    (function() {
+      if (document.cookie.match(/(^| )cv_email=([^;]+)/)) {
+        window.location.replace('/listings/');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">whatson<span>.movie</span></span>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="film-strip"></div>
+
+    <p class="hero-eyebrow" data-es="🎬 Valencia" data-en="🎬 Valencia">🎬 Valencia</p>
+
+    <h1 class="hero-title">whatson<span class="hero-title-sub">.movie</span></h1>
+
+    <p class="hero-desc" data-es="Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email a tu medida cada jueves por la noche." data-en="Your personalised guide to cinema in Valencia. Every film, every cinema, filtered exactly how you like it. Plus a tailored email every Thursday evening.">Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email a tu medida cada jueves por la noche.</p>
+
+    <!-- SIGNUP -->
+    <div class="signup-wrap" id="signup">
+      <div class="signup-form" id="hero-form-wrap">
+        <input
+          type="email"
+          class="signup-input"
+          id="hero-email"
+          placeholder="tu@email.com"
+          data-placeholder-es="tu@email.com"
+          data-placeholder-en="your@email.com"
+        >
+        <button class="signup-btn" onclick="submitSignup('hero')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
+      </div>
+      <div class="signup-success" id="hero-success">
+        <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+        </div>
+      </div>
+      <div class="signup-error" id="hero-error"></div>
+      <p class="signup-note" data-es="Sin spam. Sin compromiso. Cancela cuando quieras." data-en="No spam. No commitment. Unsubscribe anytime.">Sin spam. Sin compromiso. Cancela cuando quieras.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-cinemas" style="display:inline-block;width:28px;text-align:right;">0</span></div>
+        <div class="stat-label" data-es="Cines" data-en="Cinemas">Cines</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
+        <div class="stat-label" data-es="Películas esta semana" data-en="Films this week">Películas esta semana</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-num" style="color:#ffb432;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;" id="stat-tailored" data-es="a tu gusto" data-en="tailored">a tu gusto</div>
+        <div class="stat-label" style="opacity:0;transition:opacity 0.6s ease 0.15s;" id="stat-tailored-label" data-es="a tu manera" data-en="your way">a tu manera</div>
+      </div>
+    </div>
+
+    <p style="margin-top:20px;font-size:12px;color:#8a7e9a;text-align:center;">
+      <span data-es="¿No listo para suscribirte?" data-en="Not ready to subscribe?">¿No listo para suscribirte?</span> <a href="./listings/" style="color:#c5b8d8;text-decoration:underline;text-underline-offset:3px;"><span data-es="Explora la cartelera sin filtros primero →" data-en="Browse the unfiltered listings first →">Explora la cartelera sin filtros primero →</span></a>
+    </p>
+
+    <div class="scroll-hint">
+      <span data-es="Ver más" data-en="Scroll">Ver más</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <p class="section-eyebrow" data-es="Cómo funciona" data-en="How it works">Cómo funciona</p>
+    <h2 class="section-title" data-es="Simple. Personalizado. A tu medida." data-en="Simple. Personalised. Tailored.">Simple. Personalizado. A tu medida.</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title" data-es="Te suscribes" data-en="Subscribe">Te suscribes</div>
+        <div class="step-desc" data-es="Introduce tu email arriba. Sin formularios largos, sin datos innecesarios." data-en="Enter your email above. No long forms, no unnecessary data.">Introduce tu email arriba. Sin formularios largos, sin datos innecesarios.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title" data-es="Configura tus preferencias" data-en="Set your preferences">Configura tus preferencias</div>
+        <div class="step-desc" data-es="Elige tus cines, filtra por VOSE, estrenos, noches... lo que más te convenga." data-en="Choose your cinemas, filter for VOSE, new releases, evenings — whatever suits you.">Elige tus cines, filtra por VOSE, estrenos, noches... lo que más te convenga.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title" data-es="Tu cartelera, a tu manera" data-en="Your listings, your way">Tu cartelera, a tu manera</div>
+        <div class="step-desc" data-es="Consulta tu cartelera personalizada cuando quieras, y recibe un email curado cada jueves a las 19:00." data-en="Browse your personalised listings any time, and get a curated email every Thursday at 7pm.">Consulta tu cartelera personalizada cuando quieras, y recibe un email curado cada jueves a las 19:00.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <div class="preview-section">
+    <div class="preview-inner">
+      <p class="section-eyebrow" data-es="Lo que recibes" data-en="What you get">Lo que recibes</p>
+      <h2 class="section-title" data-es="Tu cine, filtrado a tu manera" data-en="Your cinema, filtered your way">Tu cine, filtrado a tu manera</h2>
+
+      <div class="preview-grid">
+        <div class="preview-text">
+          <div class="preview-feature">
+            <div class="preview-icon">🎬</div>
+            <div>
+              <div class="preview-feature-title" data-es="Todos los cines cubiertos" data-en="Every cinema covered">Todos los cines cubiertos</div>
+              <div class="preview-feature-desc" data-es="Desde Kinépolis hasta Babel. Multiplex, cine de autor, sesión doble. Todo en un solo lugar." data-en="From Kinépolis to Babel. Multiplexes, arthouse, double bills. All in one place.">Desde Kinépolis hasta Babel. Multiplex, cine de autor, sesión doble. Todo en un solo lugar.</div>
+            </div>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon" style="background:var(--vose-bg);border-color:var(--vose-edge);">🌍</div>
+            <div>
+              <div class="preview-feature-title" data-es="Filtro VOSE" data-en="VOSE filter">Filtro VOSE</div>
+              <div class="preview-feature-desc" data-es="Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres." data-en="Show only original-language screenings. Narrow it further to English-only if you prefer.">Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres.</div>
+            </div>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon">⚙️</div>
+            <div>
+              <div class="preview-feature-title" data-es="Altamente personalizable" data-en="Highly customisable">Altamente personalizable</div>
+              <div class="preview-feature-desc" data-es="Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta." data-en="Your listings, your rules. Pick your cinemas, set your filters, and your preferences are saved — so every visit feels personal.">Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta.</div>
+            </div>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon">📧</div>
+            <div>
+              <div class="preview-feature-title" data-es="Email semanal cada jueves" data-en="Weekly email every Thursday">Email semanal cada jueves</div>
+              <div class="preview-feature-desc" data-es="Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada." data-en="A curated digest lands at 7pm — your personal listings, straight to your inbox.">Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOCK EMAIL -->
+        <div class="mock-email">
+          <div class="mock-header">
+            <div class="mock-header-eyebrow" data-es="🎬 Boletín Semanal" data-en="🎬 Weekly Newsletter">🎬 Boletín Semanal</div>
+            <div class="mock-header-title" data-es="Cartelera Valencia" data-en="Cinema Valencia">Cartelera Valencia</div>
+          </div>
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-num">32</div>
+              <div class="mock-stat-label" data-es="Películas" data-en="Films">Películas</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-num">18</div>
+              <div class="mock-stat-label">VOSE</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-num">6</div>
+              <div class="mock-stat-label" data-es="Estrenos" data-en="New">Estrenos</div>
+            </div>
+          </div>
+          <div class="mock-film">
+            <div class="mock-poster">🦫</div>
+            <div>
+              <div class="mock-film-title">Hoppers</div>
+              <div class="mock-film-meta" data-es="Pixar · 105 min · Dir. Daniel Chong" data-en="Pixar · 105 min · Dir. Daniel Chong">Pixar · 105 min · Dir. Daniel Chong</div>
+              <span class="mock-vose">VOSE</span>
+            </div>
+          </div>
+          <div class="mock-film">
+            <div class="mock-poster">😱</div>
+            <div>
+              <div class="mock-film-title">Scream 7</div>
+              <div class="mock-film-meta" data-es="Terror · 114 min · Neve Campbell" data-en="Horror · 114 min · Neve Campbell">Terror · 114 min · Neve Campbell</div>
+              <span class="mock-vose">VOSE</span>
+            </div>
+          </div>
+          <div class="mock-film">
+            <div class="mock-poster">🪓</div>
+            <div>
+              <div class="mock-film-title">Den sidste viking</div>
+              <div class="mock-film-meta" data-es="Comedia Negra · Mads Mikkelsen" data-en="Dark Comedy · Mads Mikkelsen">Comedia Negra · Mads Mikkelsen</div>
+              <span class="mock-vose">VOSE</span>
+            </div>
+          </div>
+          <a href="./listings/" class="mock-btn" data-es="Ver cartelera completa →" data-en="View full listings →">Ver cartelera completa →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CINEMAS -->
+  <section class="cinemas-section">
+    <p class="section-eyebrow" data-es="Cines cubiertos" data-en="Cinemas covered">Cines cubiertos</p>
+    <h2 class="section-title" data-es="Todos los cines de Valencia" data-en="Every cinema in Valencia">Todos los cines de Valencia</h2>
+    <div class="cinemas-grid">
+      <div class="cinema-pill">Kinépolis Valencia</div>
+      <div class="cinema-pill">Yelmo Campanar</div>
+      <div class="cinema-pill">Ocine Aqua</div>
+      <div class="cinema-pill">ABC El Saler</div>
+      <div class="cinema-pill">ABC Park</div>
+      <div class="cinema-pill">ABC Gran Turia</div>
+      <div class="cinema-pill">Cines MN4</div>
+      <div class="cinema-pill">Cines Lys</div>
+      <div class="cinema-pill">Cines Babel</div>
+      <div class="cinema-pill">Cinestudio D'Or</div>
+    </div>
+  </section>
+
+  <!-- CTA BOTTOM -->
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <h2 class="cta-title" data-es="¿Qué ponen esta semana?" data-en="What's on this week?">¿Qué ponen esta semana?</h2>
+    <p class="cta-sub" data-es="Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00." data-en="Subscribe free and get your personalised listings right away, plus a tailored email every Thursday at 7pm.">Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00.</p>
+
+    <div class="cta-signup-wrap">
+      <div class="signup-form" id="cta-form-wrap">
+        <input
+          type="email"
+          class="signup-input"
+          id="cta-email"
+          placeholder="tu@email.com"
+          data-placeholder-es="tu@email.com"
+          data-placeholder-en="your@email.com"
+        >
+        <button class="signup-btn" onclick="submitSignup('cta')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
+      </div>
+      <div class="signup-success" id="cta-success">
+        <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+        </div>
+      </div>
+      <div class="signup-error" id="cta-error"></div>
+      <p class="signup-note" data-es="Sin spam. Sin compromiso. Cancela cuando quieras." data-en="No spam. No commitment. Unsubscribe anytime.">Sin spam. Sin compromiso. Cancela cuando quieras.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">whatson<span>.movie</span></div>
+    <span class="footer-note" data-es="Valencia · España · 🎬" data-en="Valencia · Spain · 🎬">Valencia · España · 🎬</span>
+    <div style="display:flex;gap:20px;">
+      <a href="./listings/" class="footer-link" data-es="Ver cartelera →" data-en="This week's listings →">Ver cartelera →</a>
+      <a href="./privacy/" class="footer-link" data-es="Privacidad →" data-en="Privacy →">Privacidad →</a>
+    </div>
+  </footer>
+
+  <script>
+    /* ── REDIRECT EXISTING SUBSCRIBERS ── */
+    /* This is a no-op here — redirect handled in <head> */
+
+    /* ── LANGUAGE TOGGLE ── */
+    function setLang(lang) {
+      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.getElementById('html-root').setAttribute('lang', lang);
+
+      document.querySelectorAll('[data-es][data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+
+      // Update input placeholders separately
+      document.querySelectorAll('[data-placeholder-es][data-placeholder-en]').forEach(el => {
+        el.placeholder = el.getAttribute('data-placeholder-' + lang);
+      });
+
+      localStorage.setItem('lang', lang);
+    }
+
+    // Restore language preference
+    const savedLang = localStorage.getItem('lang') || 'es';
+    if (savedLang !== 'es') setLang(savedLang);
+
+    /* ── SIGNUP ── */
+    const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+
+    async function submitSignup(source) {
+      const emailEl   = document.getElementById(source + '-email');
+      const formWrap  = document.getElementById(source + '-form-wrap');
+      const successEl = document.getElementById(source + '-success');
+      const errorEl   = document.getElementById(source + '-error');
+      const btn       = formWrap.querySelector('.signup-btn');
+
+      const email = emailEl.value.trim();
+      const lang  = document.getElementById('html-root').getAttribute('lang') || 'es';
+
+      // Basic validation
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorEl.textContent = lang === 'es'
+          ? 'Por favor introduce un email válido.'
+          : 'Please enter a valid email address.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      errorEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            email: email,
+            lang: lang,
+            source: source,
+            subscribed_at: new Date().toISOString()
+          })
+        });
+
+        // 201 = created, 200 = ok, 409 = already exists (treat as success)
+        if (res.ok || res.status === 201 || res.status === 409) {
+          // Set a cookie so the preferences page knows who this is
+          const expires = new Date();
+          expires.setFullYear(expires.getFullYear() + 1);
+          document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+          formWrap.style.display = 'none';
+          successEl.style.display = 'block';
+        } else {
+          const body = await res.text();
+          console.error('Signup failed:', res.status, body);
+          throw new Error(`Status ${res.status}: ${body}`);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = lang === 'es' ? 'Apuntarme' : 'Subscribe';
+        errorEl.textContent = lang === 'es'
+          ? 'Algo ha fallado. Inténtalo de nuevo.'
+          : 'Something went wrong. Please try again.';
+        errorEl.style.display = 'block';
+        console.error('Signup error:', err);
+      }
+    }
+
+    // Allow Enter key in email inputs
+    document.querySelectorAll('.signup-input').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const source = input.id.replace('-email', '');
+          submitSignup(source);
+        }
+      });
+    });
+
+    /* ── SMOOTH SCROLL for nav CTA ── */
+    document.querySelectorAll('a[href="#signup"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById('signup').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => document.getElementById('hero-email').focus(), 600);
+      });
+    });
+
+    /* ── STATS ANIMATION ── */
+    function countUp(el, target, duration) {
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(ease * target);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    function runStatsAnimation(filmCount) {
+      const t  = document.getElementById('stat-tailored');
+      const tl = document.getElementById('stat-tailored-label');
+      const delay = 1600; // wait for hero fade-in (1s delay + 0.8s duration + buffer)
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 10, 900), delay);
+      setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), delay + 200);
+      setTimeout(() => {
+        t.style.opacity  = '1';
+        t.style.transform = 'translateY(0)';
+        tl.style.opacity = '1';
+      }, delay + 1400);
+    }
+
+    // Fetch live film count from stats.json, fall back to 30 if unavailable
+    fetch('/data/stats.json')
+      .then(r => r.json())
+      .then(d => runStatsAnimation(d.film_count || 30))
+      .catch(() => runStatsAnimation(30));
+  </script>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .catch(err => console.log('SW registration failed:', err));
+    });
+  }
+  </script>
+</body>
+</html>
