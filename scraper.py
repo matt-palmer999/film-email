@@ -701,7 +701,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
 .header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(220,80,120,.12) 0%,transparent 70%);border-radius:50%}
 .header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
-.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}
+.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px;margin-top:0}
 .header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
 .header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
 .section-label{padding:28px 40px 12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#c5b8d8;font-weight:600}
@@ -1430,8 +1430,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
+  <main>
   <div class="header">
-    <div class="header-title" id="header-title">Cartelera<br>Valencia</div>
+    <h1 class="header-title" id="header-title">Cartelera<br>Valencia</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
     <div class="header-date" id="header-date"></div>
   </div>
@@ -1457,6 +1458,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
   <div id="section2-cards"></div>
   <div class="section-divider"></div>
+  </main>
 
   <div class="footer">
     <div class="footer-logo">Cartelera Valencia</div>
