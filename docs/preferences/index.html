@@ -273,6 +273,19 @@
 
     .toggle-info { flex: 1; }
 
+    .toggle-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-right: 14px;
+    }
+
     .toggle-title {
       font-size: 14px;
       font-weight: 500;
@@ -581,6 +594,7 @@
 
         <!-- VOSE -->
         <div class="toggle-row vose-row" id="toggle-vose" onclick="togglePref('vose_only')">
+          <div class="toggle-icon">🎬</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo sesiones VOSE" data-en="VOSE sessions only">Solo sesiones VOSE</div>
             <div class="toggle-desc" data-es="Muestra únicamente películas con versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con versión original subtitulada</div>
@@ -597,6 +611,7 @@
 
         <!-- FAMILY FRIENDLY -->
         <div class="toggle-row" id="toggle-family" onclick="togglePref('family_only')">
+          <div class="toggle-icon">👨‍👩‍👧</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo apto para familias" data-en="Family friendly only">Solo apto para familias</div>
             <div class="toggle-desc" data-es="Solo películas con clasificación 12 o inferior" data-en="Only films rated 12 and under">Solo películas con clasificación 12 o inferior</div>
@@ -606,6 +621,7 @@
 
         <!-- EVENING & WEEKENDS -->
         <div class="toggle-row" id="toggle-evening" onclick="togglePref('evening_only')">
+          <div class="toggle-icon">🌙</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo tardes y fines de semana" data-en="Evenings &amp; weekends only">Solo tardes y fines de semana</div>
             <div class="toggle-desc" data-es="Solo sesiones a partir de las 17:30 en días laborables" data-en="Only screenings from 17:30 on weekdays">Solo sesiones a partir de las 17:30 en días laborables</div>
@@ -615,6 +631,7 @@
 
         <!-- NEW RELEASES -->
         <div class="toggle-row" id="toggle-new" onclick="togglePref('new_only')">
+          <div class="toggle-icon">✨</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo estrenos recientes" data-en="New releases only">Solo estrenos recientes</div>
             <div class="toggle-desc" data-es="Solo películas estrenadas en las últimas 2 semanas" data-en="Only films released in the last 2 weeks">Solo películas estrenadas en las últimas 2 semanas</div>
@@ -624,6 +641,7 @@
 
         <!-- ALWAYS SHOW CLASSICS -->
         <div class="toggle-row" id="toggle-classics" onclick="togglePref('classics')">
+          <div class="toggle-icon">🎭</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Mostrar siempre clásicos" data-en="Always show classics">Mostrar siempre clásicos</div>
             <div class="toggle-desc" data-es="Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos" data-en="Show arthouse and classic re-releases regardless of other filters">Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos</div>
@@ -633,6 +651,7 @@
 
         <!-- MIN RATING -->
         <div class="toggle-row" id="toggle-rating" onclick="togglePref('rating_filter')">
+          <div class="toggle-icon">⭐</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Puntuación mínima" data-en="Minimum rating">Puntuación mínima</div>
             <div class="toggle-desc" id="rating-desc" data-es="Oculta películas con puntuación baja en TMDB" data-en="Hide films below a minimum TMDB score">Oculta películas con puntuación baja en TMDB</div>
