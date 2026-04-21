@@ -4,6 +4,7 @@ Scrapes current listings from Mabuse.es and builds + sends a bilingual HTML emai
 Runs every Thursday evening via GitHub Actions.
 """
 
+import json
 import os
 import re
 import smtplib
@@ -1817,6 +1818,13 @@ def main():
     with open("docs/listings/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
+
+    # Write stats.json for homepage animation
+    os.makedirs("docs/data", exist_ok=True)
+    stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
+    with open("docs/data/stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f)
+    log.info(f"stats.json written: {stats}")
 
     # Clean up stale film detail pages from previous runs
     import shutil
