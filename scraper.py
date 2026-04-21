@@ -1003,7 +1003,8 @@ function applyVisibility() {{
         if (show && voseLang === 'en') {{
           const origins = (card.dataset.origin || '').split(',');
           const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-          if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
+          // Only hide if we have origin data and none are English
+          if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
         }}
       }}
       card.style.display = show ? '' : 'none';
@@ -1019,7 +1020,7 @@ function applyVisibility() {{
       if (show && voseLang === 'en') {{
         const origins = (card.dataset.origin || '').split(',');
         const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
+        if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
       }}
     }}
     // New releases filter
@@ -1736,6 +1737,7 @@ def main():
                 countries = tmdb.get("origin_country", [])
                 year      = tmdb.get("year", "")
                 if year: film["year"] = year
+                if countries: film["origin_country"] = countries
                 parts = []
                 if countries: parts.append(", ".join(countries))
                 if year:      parts.append(year)
