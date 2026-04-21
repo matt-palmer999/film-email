@@ -642,7 +642,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <div id="day-panels">{tab_panels}</div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
-      <span data-es="Coincide con tu filtro de tarde (después de las 17:30)" data-en="Matches your evening filter (after 17:30)">Coincide con tu filtro de tarde (después de las 17:30)</span>
+      <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
     </div>
   </div>
 
