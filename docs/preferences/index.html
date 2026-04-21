@@ -451,6 +451,90 @@
 
     .btn-unsub:hover { color: var(--red); border-color: rgba(224,80,80,0.3); }
 
+    /* Sub-options (shown below a toggle when active) */
+    .sub-option {
+      margin: -6px 0 10px;
+      padding: 14px 18px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .sub-option-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 10px;
+    }
+
+    .sub-option-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sub-pill {
+      flex: 1;
+      padding: 9px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text2);
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+    }
+
+    .sub-pill:hover { border-color: var(--gold-edge); }
+
+    .sub-pill.selected {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .rating-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rating-slider-bound {
+      font-size: 12px;
+      color: var(--faint);
+      flex-shrink: 0;
+    }
+
+    .rating-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      outline: none;
+    }
+
+    .rating-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+    }
+
+    .rating-slider-val {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gold);
+      min-width: 48px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 500px) {
       nav { padding: 14px 20px; }
       .container { padding: 40px 16px 80px; }
@@ -495,29 +579,75 @@
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Filtros de contenido" data-en="Content filters">Filtros de contenido</div>
 
+        <!-- VOSE -->
         <div class="toggle-row vose-row" id="toggle-vose" onclick="togglePref('vose_only')">
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo sesiones VOSE" data-en="VOSE sessions only">Solo sesiones VOSE</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas con sesiones en versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con sesiones en versión original subtitulada</div>
+            <div class="toggle-desc" data-es="Muestra únicamente películas con versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con versión original subtitulada</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="sub-option" id="sub-vose" style="display:none;">
+          <div class="sub-option-label" data-es="Idioma VOSE" data-en="VOSE language">Idioma VOSE</div>
+          <div class="sub-option-pills">
+            <div class="sub-pill selected" id="vose-lang-en" onclick="selectVoseLang('en')" data-es="Solo inglés" data-en="English only">Solo inglés</div>
+            <div class="sub-pill" id="vose-lang-all" onclick="selectVoseLang('all')" data-es="Todos los idiomas" data-en="All languages">Todos los idiomas</div>
+          </div>
+        </div>
+
+        <!-- FAMILY FRIENDLY -->
+        <div class="toggle-row" id="toggle-family" onclick="togglePref('family_only')">
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Solo apto para familias" data-en="Family friendly only">Solo apto para familias</div>
+            <div class="toggle-desc" data-es="Solo películas con clasificación 12 o inferior" data-en="Only films rated 12 and under">Solo películas con clasificación 12 o inferior</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
 
+        <!-- EVENING & WEEKENDS -->
+        <div class="toggle-row" id="toggle-evening" onclick="togglePref('evening_only')">
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Solo tardes y fines de semana" data-en="Evenings &amp; weekends only">Solo tardes y fines de semana</div>
+            <div class="toggle-desc" data-es="Solo sesiones a partir de las 17:30 en días laborables" data-en="Only screenings from 17:30 on weekdays">Solo sesiones a partir de las 17:30 en días laborables</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+
+        <!-- NEW RELEASES -->
         <div class="toggle-row" id="toggle-new" onclick="togglePref('new_only')">
           <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo estrenos" data-en="New releases only">Solo estrenos</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas que se estrenan esta semana" data-en="Only show films releasing this week">Muestra únicamente películas que se estrenan esta semana</div>
+            <div class="toggle-title" data-es="Solo estrenos recientes" data-en="New releases only">Solo estrenos recientes</div>
+            <div class="toggle-desc" data-es="Solo películas estrenadas en las últimas 2 semanas" data-en="Only films released in the last 2 weeks">Solo películas estrenadas en las últimas 2 semanas</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
 
+        <!-- ALWAYS SHOW CLASSICS -->
         <div class="toggle-row" id="toggle-classics" onclick="togglePref('classics')">
           <div class="toggle-info">
-            <div class="toggle-title" data-es="Incluir clásicos en reposición" data-en="Include classics &amp; reissues">Incluir clásicos en reposición</div>
-            <div class="toggle-desc" data-es="Incluye películas clásicas que vuelven a la gran pantalla (especialmente Cinestudio D'Or)" data-en="Include classic films returning to the big screen (especially Cinestudio D'Or)">Incluye películas clásicas que vuelven a la gran pantalla (especialmente Cinestudio D'Or)</div>
+            <div class="toggle-title" data-es="Mostrar siempre clásicos" data-en="Always show classics">Mostrar siempre clásicos</div>
+            <div class="toggle-desc" data-es="Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos" data-en="Show arthouse and classic re-releases regardless of other filters">Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
+
+        <!-- MIN RATING -->
+        <div class="toggle-row" id="toggle-rating" onclick="togglePref('rating_filter')">
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Puntuación mínima" data-en="Minimum rating">Puntuación mínima</div>
+            <div class="toggle-desc" id="rating-desc" data-es="Oculta películas con puntuación baja en TMDB" data-en="Hide films below a minimum TMDB score">Oculta películas con puntuación baja en TMDB</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="sub-option" id="sub-rating" style="display:none;">
+          <div class="sub-option-label" data-es="Puntuación mínima" data-en="Minimum score">Puntuación mínima</div>
+          <div class="rating-slider-row">
+            <span class="rating-slider-bound">6.0</span>
+            <input type="range" min="6" max="9" step="0.5" value="7" id="rating-slider" oninput="updateRatingLabel(this.value)" class="rating-slider" />
+            <span class="rating-slider-val" id="rating-slider-val">★ 7.0+</span>
+          </div>
+        </div>
+
       </div>
 
       <!-- CINEMAS -->
@@ -602,11 +732,16 @@
     let currentEmail  = '';
     let currentToken  = '';
     let prefs = {
-      vose_only: false,
-      new_only:  false,
-      classics:  false,
-      cinemas:   CINEMAS.map(c => c.id),
-      lang:      'es',
+      vose_only:    false,
+      vose_lang:    'en',
+      family_only:  false,
+      evening_only: false,
+      new_only:     false,
+      classics:     false,
+      rating_filter: false,
+      min_rating:   7.0,
+      cinemas:      CINEMAS.map(c => c.id),
+      lang:         'es',
     };
 
     // ── LANGUAGE TOGGLE ──
@@ -722,9 +857,14 @@
 
         const sub = subs[0];
         currentEmail = email;
-        prefs.vose_only = sub.vose_only || false;
-        prefs.new_only  = sub.new_only  || false;
-        prefs.classics  = sub.classics  || false;
+        prefs.vose_only    = sub.vose_only    || false;
+        prefs.vose_lang    = sub.vose_lang    || 'en';
+        prefs.family_only  = sub.family_only  || false;
+        prefs.evening_only = sub.evening_only || false;
+        prefs.new_only     = sub.new_only     || false;
+        prefs.classics     = sub.classics     || false;
+        prefs.rating_filter = sub.rating_filter || false;
+        prefs.min_rating   = sub.min_rating   || 7.0;
         prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
         prefs.lang      = sub.lang      || 'es';
 
@@ -784,11 +924,16 @@
 
         if (subs.length) {
           const sub = subs[0];
-          prefs.vose_only = sub.vose_only || false;
-          prefs.new_only  = sub.new_only  || false;
-          prefs.classics  = sub.classics  || false;
-          prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
-          prefs.lang      = sub.lang      || 'es';
+          prefs.vose_only    = sub.vose_only    || false;
+          prefs.vose_lang    = sub.vose_lang    || 'en';
+          prefs.family_only  = sub.family_only  || false;
+          prefs.evening_only = sub.evening_only || false;
+          prefs.new_only     = sub.new_only     || false;
+          prefs.classics     = sub.classics     || false;
+          prefs.rating_filter = sub.rating_filter || false;
+          prefs.min_rating   = sub.min_rating   || 7.0;
+          prefs.cinemas      = sub.cinemas      || CINEMAS.map(c => c.id);
+          prefs.lang         = sub.lang         || 'es';
         }
 
         renderPreferences();
@@ -805,13 +950,34 @@
     function renderPreferences() {
       // Toggles
       document.getElementById('toggle-vose').classList.toggle('on', prefs.vose_only);
+      document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
+      document.getElementById('toggle-evening').classList.toggle('on', prefs.evening_only);
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
       document.getElementById('toggle-classics').classList.toggle('on', prefs.classics);
+      document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
+
+      // Sub-options visibility
+      document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
+      if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-vose').style.borderRadius = '';
+
+      document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
+      if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-rating').style.borderRadius = '';
+
+      // VOSE language pills
+      document.getElementById('vose-lang-en').classList.toggle('selected', prefs.vose_lang === 'en');
+      document.getElementById('vose-lang-all').classList.toggle('selected', prefs.vose_lang === 'all');
+
+      // Rating slider
+      const slider = document.getElementById('rating-slider');
+      if (slider) slider.value = prefs.min_rating;
+      document.getElementById('rating-slider-val').textContent = '★ ' + parseFloat(prefs.min_rating).toFixed(1) + '+';
 
       // Cinema grid
       const grid = document.getElementById('cinema-grid');
       grid.innerHTML = CINEMAS.map(c => `
-        <div class="cinema-pill ${c.arthouse ? 'arthouse' : ''} ${prefs.cinemas.includes(c.id) ? 'selected' : ''}"
+        <div class="cinema-pill ${prefs.cinemas.includes(c.id) ? 'selected' : ''}"
              onclick="toggleCinema('${c.id}')">
           <div class="cinema-check">${prefs.cinemas.includes(c.id) ? '✓' : ''}</div>
           <div class="cinema-name" translate="no">${c.name}</div>
@@ -826,7 +992,29 @@
     // ── TOGGLE HELPERS ──
     function togglePref(key) {
       prefs[key] = !prefs[key];
+      // Show/hide sub-options
+      if (key === 'vose_only') {
+        document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
+        if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-vose').style.borderRadius = '';
+      }
+      if (key === 'rating_filter') {
+        document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
+        if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-rating').style.borderRadius = '';
+      }
       renderPreferences();
+    }
+
+    function selectVoseLang(lang) {
+      prefs.vose_lang = lang;
+      document.getElementById('vose-lang-en').classList.toggle('selected', lang === 'en');
+      document.getElementById('vose-lang-all').classList.toggle('selected', lang === 'all');
+    }
+
+    function updateRatingLabel(val) {
+      prefs.min_rating = parseFloat(val);
+      document.getElementById('rating-slider-val').textContent = '★ ' + parseFloat(val).toFixed(1) + '+';
     }
 
     function toggleCinema(id) {
@@ -865,12 +1053,17 @@
               'Prefer': 'return=minimal'
             },
             body: JSON.stringify({
-              vose_only:  prefs.vose_only,
-              new_only:   prefs.new_only,
-              classics:   prefs.classics,
-              cinemas:    prefs.cinemas,
-              lang:       prefs.lang,
-              updated_at: new Date().toISOString()
+              vose_only:    prefs.vose_only,
+              vose_lang:    prefs.vose_lang,
+              family_only:  prefs.family_only,
+              evening_only: prefs.evening_only,
+              new_only:     prefs.new_only,
+              classics:     prefs.classics,
+              rating_filter: prefs.rating_filter,
+              min_rating:   prefs.min_rating,
+              cinemas:      prefs.cinemas,
+              lang:         prefs.lang,
+              updated_at:   new Date().toISOString()
             })
           }
         );
