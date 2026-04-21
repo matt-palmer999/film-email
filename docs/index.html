@@ -1115,13 +1115,14 @@
     function runStatsAnimation(filmCount) {
       const t  = document.getElementById('stat-tailored');
       const tl = document.getElementById('stat-tailored-label');
-      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 10, 900), 100);
-      setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), 300);
+      const delay = 1600; // wait for hero fade-in (1s delay + 0.8s duration + buffer)
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 10, 900), delay);
+      setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), delay + 200);
       setTimeout(() => {
         t.style.opacity  = '1';
         t.style.transform = 'translateY(0)';
         tl.style.opacity = '1';
-      }, 1500);
+      }, delay + 1400);
     }
 
     // Fetch live film count from stats.json, fall back to 30 if unavailable
