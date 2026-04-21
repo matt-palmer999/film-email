@@ -1215,6 +1215,27 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
         _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
         section    = "2" if (_arthouse_only or _is_old) else "1"
+        origin     = ",".join(film.get("origin_country", []))
+        score_val  = film.get("rating_score") or ""
+        rating_val = film.get("rating", "?").replace("+", "")
+        _has_eve = False
+        for _c in film.get("cinemas", []):
+            for _dk, _times in _c.get("showtimes", {}).items():
+                try:
+                    _d = __import__('datetime').date.fromisoformat(_dk)
+                    if _d.weekday() < 5:
+                        for _t in _times:
+                            _h = int(str(_t).split(":")[0])
+                            _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
+                            if _h > 17 or (_h == 17 and _m >= 30):
+                                _has_eve = True; break
+                    else:
+                        _has_eve = True
+                    if _has_eve: break
+                except Exception:
+                    pass
+            if _has_eve: break
+        hasevening = "true" if _has_eve else "false"
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
@@ -1280,6 +1301,27 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
         _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
         section    = "2" if (_arthouse_only or _is_old) else "1"
+        origin     = ",".join(film.get("origin_country", []))
+        score_val  = film.get("rating_score") or ""
+        rating_val = film.get("rating", "?").replace("+", "")
+        _has_eve = False
+        for _c in film.get("cinemas", []):
+            for _dk, _times in _c.get("showtimes", {}).items():
+                try:
+                    _d = __import__('datetime').date.fromisoformat(_dk)
+                    if _d.weekday() < 5:
+                        for _t in _times:
+                            _h = int(str(_t).split(":")[0])
+                            _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
+                            if _h > 17 or (_h == 17 and _m >= 30):
+                                _has_eve = True; break
+                    else:
+                        _has_eve = True
+                    if _has_eve: break
+                except Exception:
+                    pass
+            if _has_eve: break
+        hasevening = "true" if _has_eve else "false"
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
