@@ -766,7 +766,7 @@
 
     <h1 class="hero-title">whatson<span class="hero-title-sub">.movie</span></h1>
 
-    <p class="hero-desc" data-es="La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche." data-en="The weekly guide to cinema in Valencia. Every cinema, every film, VOSE sessions highlighted. Free, every Thursday evening.">La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche.</p>
+    <p class="hero-desc" data-es="Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email curado cada jueves por la noche." data-en="Your personalised guide to cinema in Valencia. Every film, every cinema, filtered exactly how you like it. Plus a curated email every Thursday evening.">Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email curado cada jueves por la noche.</p>
 
     <!-- SIGNUP -->
     <div class="signup-wrap" id="signup">
@@ -795,18 +795,18 @@
     <!-- STATS -->
     <div class="stats">
       <div class="stat">
-        <div class="stat-num">10</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-cinemas" style="display:inline-block;width:28px;text-align:right;">0</span></div>
         <div class="stat-label" data-es="Cines" data-en="Cinemas">Cines</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num">30+</div>
-        <div class="stat-label" data-es="Películas" data-en="Films">Películas</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
+        <div class="stat-label" data-es="Películas esta semana" data-en="Films this week">Películas esta semana</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num">🕖</div>
-        <div class="stat-label" data-es="Cada Jueves" data-en="Every Thursday">Cada Jueves</div>
+        <div class="stat-num" style="color:#ffb432;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;" id="stat-tailored" data-es="a tu gusto" data-en="tailored">a tu gusto</div>
+        <div class="stat-label" style="opacity:0;transition:opacity 0.6s ease 0.15s;" id="stat-tailored-label" data-es="a tu manera" data-en="your way">a tu manera</div>
       </div>
     </div>
 
@@ -819,23 +819,23 @@
   <!-- HOW IT WORKS -->
   <section class="section">
     <p class="section-eyebrow" data-es="Cómo funciona" data-en="How it works">Cómo funciona</p>
-    <h2 class="section-title" data-es="Simple. Semanal. Gratis." data-en="Simple. Weekly. Free.">Simple. Semanal. Gratis.</h2>
+    <h2 class="section-title" data-es="Simple. Personalizado. Gratis." data-en="Simple. Personalised. Free.">Simple. Personalizado. Gratis.</h2>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
-        <div class="step-title" data-es="Te suscribes" data-en="You subscribe">Te suscribes</div>
+        <div class="step-title" data-es="Te suscribes" data-en="Subscribe">Te suscribes</div>
         <div class="step-desc" data-es="Introduce tu email arriba. Sin formularios largos, sin datos innecesarios." data-en="Enter your email above. No long forms, no unnecessary data.">Introduce tu email arriba. Sin formularios largos, sin datos innecesarios.</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <div class="step-title" data-es="Llega cada jueves" data-en="Arrives each Thursday">Llega cada jueves</div>
-        <div class="step-desc" data-es="A las 19:00, una guía completa con todos los cines de Valencia, películas, horarios y sesiones VOSE." data-en="At 7pm, a complete guide with every Valencia cinema, films, and VOSE sessions highlighted.">A las 19:00, una guía completa con todos los cines de Valencia, películas, horarios y sesiones VOSE.</div>
+        <div class="step-title" data-es="Configura tus preferencias" data-en="Set your preferences">Configura tus preferencias</div>
+        <div class="step-desc" data-es="Elige tus cines, filtra por VOSE, estrenos, noches... lo que más te convenga." data-en="Choose your cinemas, filter for VOSE, new releases, evenings — whatever suits you.">Elige tus cines, filtra por VOSE, estrenos, noches... lo que más te convenga.</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <div class="step-title" data-es="Tú eliges" data-en="You choose">Tú eliges</div>
-        <div class="step-desc" data-es="Filtra por VOSE, por cine, o por género. Haz clic y compra tu entrada directamente." data-en="Filter by VOSE, by cinema, or by genre. Click through to buy your ticket directly.">Filtra por VOSE, por cine, o por género. Haz clic y compra tu entrada directamente.</div>
+        <div class="step-title" data-es="Tu cartelera, a tu manera" data-en="Your listings, your way">Tu cartelera, a tu manera</div>
+        <div class="step-desc" data-es="Consulta tu cartelera personalizada cuando quieras, y recibe un email curado cada jueves a las 19:00." data-en="Browse your personalised listings any time, and get a curated email every Thursday at 7pm.">Consulta tu cartelera personalizada cuando quieras, y recibe un email curado cada jueves a las 19:00.</div>
       </div>
     </div>
   </section>
@@ -844,7 +844,7 @@
   <div class="preview-section">
     <div class="preview-inner">
       <p class="section-eyebrow" data-es="Lo que recibes" data-en="What you get">Lo que recibes</p>
-      <h2 class="section-title" data-es="Una guía que da gusto leer" data-en="A guide that's a pleasure to read">Una guía que da gusto leer</h2>
+      <h2 class="section-title" data-es="Tu cine, filtrado a tu manera" data-en="Your cinema, filtered your way">Tu cine, filtrado a tu manera</h2>
 
       <div class="preview-grid">
         <div class="preview-text">
@@ -858,22 +858,22 @@
           <div class="preview-feature">
             <div class="preview-icon" style="background:var(--vose-bg);border-color:var(--vose-edge);">🌍</div>
             <div>
-              <div class="preview-feature-title" data-es="VOSE siempre destacado" data-en="VOSE always highlighted">VOSE siempre destacado</div>
-              <div class="preview-feature-desc" data-es="Cada sesión en versión original identificada claramente. Filtra para ver solo VOSE con un clic." data-en="Every original-language screening clearly identified. Filter to VOSE-only with one click.">Cada sesión en versión original identificada claramente. Filtra para ver solo VOSE con un clic.</div>
+              <div class="preview-feature-title" data-es="Filtro VOSE" data-en="VOSE filter">Filtro VOSE</div>
+              <div class="preview-feature-desc" data-es="Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres." data-en="Show only original-language screenings. Narrow it further to English-only if you prefer.">Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres.</div>
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon">🌐</div>
+            <div class="preview-icon">⚙️</div>
             <div>
-              <div class="preview-feature-title" data-es="Bilingüe ES / EN" data-en="Bilingual ES / EN">Bilingüe ES / EN</div>
-              <div class="preview-feature-desc" data-es="Toda la guía disponible en español e inglés con un solo clic." data-en="The full guide available in Spanish and English with a single click.">Toda la guía disponible en español e inglés con un solo clic.</div>
+              <div class="preview-feature-title" data-es="Altamente personalizable" data-en="Highly customisable">Altamente personalizable</div>
+              <div class="preview-feature-desc" data-es="Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta." data-en="Your listings, your rules. Pick your cinemas, set your filters, and your preferences are saved — so every visit feels personal.">Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta.</div>
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon">📱</div>
+            <div class="preview-icon">📧</div>
             <div>
-              <div class="preview-feature-title" data-es="Optimizada para móvil" data-en="Mobile optimised">Optimizada para móvil</div>
-              <div class="preview-feature-desc" data-es="Lee la guía en cualquier dispositivo. Los enlaces van directamente a la web de cada cine." data-en="Read the guide on any device. Links go straight to each cinema's website.">Lee la guía en cualquier dispositivo. Los enlaces van directamente a la web de cada cine.</div>
+              <div class="preview-feature-title" data-es="Email semanal cada jueves" data-en="Weekly email every Thursday">Email semanal cada jueves</div>
+              <div class="preview-feature-desc" data-es="Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada." data-en="A curated digest lands at 7pm — your personal listings, straight to your inbox.">Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada.</div>
             </div>
           </div>
         </div>
@@ -950,7 +950,7 @@
   <section class="cta-section">
     <div class="cta-bg"></div>
     <h2 class="cta-title" data-es="¿Qué ponen esta semana?" data-en="What's on this week?">¿Qué ponen esta semana?</h2>
-    <p class="cta-sub" data-es="Únete y lo sabrás cada jueves a las 19:00. Gratis, siempre." data-en="Subscribe and you'll know every Thursday at 7pm. Free, always.">Únete y lo sabrás cada jueves a las 19:00. Gratis, siempre.</p>
+    <p class="cta-sub" data-es="Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email curado cada jueves a las 19:00. Siempre gratis." data-en="Subscribe free and get your personalised listings right away, plus a curated email every Thursday at 7pm. Free, always.">Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email curado cada jueves a las 19:00. Siempre gratis.</p>
 
     <div class="cta-signup-wrap">
       <div class="signup-form" id="cta-form-wrap">
@@ -1098,6 +1098,37 @@
         setTimeout(() => document.getElementById('hero-email').focus(), 600);
       });
     });
+
+    /* ── STATS ANIMATION ── */
+    function countUp(el, target, duration) {
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(ease * target);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    function runStatsAnimation(filmCount) {
+      const t  = document.getElementById('stat-tailored');
+      const tl = document.getElementById('stat-tailored-label');
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 10, 900), 100);
+      setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), 300);
+      setTimeout(() => {
+        t.style.opacity  = '1';
+        t.style.transform = 'translateY(0)';
+        tl.style.opacity = '1';
+      }, 1500);
+    }
+
+    // Fetch live film count from stats.json, fall back to 30 if unavailable
+    fetch('/data/stats.json')
+      .then(r => r.json())
+      .then(d => runStatsAnimation(d.film_count || 30))
+      .catch(() => runStatsAnimation(30));
   </script>
 
   <script>
