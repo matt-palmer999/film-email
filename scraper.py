@@ -521,7 +521,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     continue
                 vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
                 time_btns  = "".join(
-                    f'<a href="{c["website"]}" target="_blank" class="time-btn">{t}</a>'
+                    f'<a href="{c["website"]}" target="_blank" class="time-btn" data-time="{t}">{t}</a>'
                     for t in times
                 )
                 cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
@@ -600,6 +600,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
+.time-btn--match{{background:#0d2418;border-color:#1d6b3a;color:#50c88c}}
+.time-btn--match:hover{{background:#112e1e;border-color:#50c88c;color:#50c88c}}
+.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#6a5e7a;border-top:1px solid #1e1630}}
+.showtime-legend-dot{{width:10px;height:10px;border-radius:3px;background:#0d2418;border:1px solid #1d6b3a;flex-shrink:0}}
 .no-times{{font-size:13px;color:#4a3f5e;padding:20px 0;text-align:center}}
 .footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
@@ -636,6 +640,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
     <div class="day-tabs">{tab_btns}</div>
     <div id="day-panels">{tab_panels}</div>
+    <div class="showtime-legend" id="showtime-legend" style="display:none;">
+      <div class="showtime-legend-dot"></div>
+      <span data-es="Coincide con tu filtro de tarde (después de las 17:30)" data-en="Matches your evening filter (after 17:30)">Coincide con tu filtro de tarde (después de las 17:30)</span>
+    </div>
   </div>
 
   <div id="gate-section" style="display:none;margin:20px;padding:24px 20px;background:rgba(255,180,50,0.06);border:1px solid rgba(255,180,50,0.2);border-radius:10px;text-align:center;">
@@ -692,6 +700,21 @@ window.addEventListener('DOMContentLoaded', () => {{
         row.style.display = 'none';
       }}
     }});
+  }}
+
+  // Highlight times matching evening filter (after 17:30)
+  const eveningFilter = params.get('evening') === 'true';
+  if (eveningFilter) {{
+    document.querySelectorAll('.time-btn[data-time]').forEach(btn => {{
+      const t = btn.getAttribute('data-time');
+      const parts = t.split(':');
+      const mins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+      if (mins >= 17 * 60 + 30) {{
+        btn.classList.add('time-btn--match');
+      }}
+    }});
+    const legend = document.getElementById('showtime-legend');
+    if (legend) legend.style.display = 'flex';
   }}
 }});
 </script>
