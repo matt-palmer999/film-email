@@ -1056,6 +1056,7 @@
       const btn  = document.getElementById('save-btn');
       const alertEl = document.getElementById('prefs-alert');
       const lang = document.getElementById('html-root').getAttribute('lang');
+      let saveSuccess = false;
 
       btn.disabled = true;
       btn.querySelector('span').textContent = lang === 'es' ? 'Guardando...' : 'Saving...';
@@ -1125,12 +1126,10 @@
         p.set('v', Date.now()); // cache bust
         const listingsUrl = listingsBase + '?' + p.toString();
 
-        alertEl.className = 'alert alert-success';
-        alertEl.innerHTML = (lang === 'es'
-          ? '✅ Preferencias guardadas. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">Ver cartelera personalizada →</a>'
-          : '✅ Preferences saved. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">View your personalised listings →</a>');
-        alertEl.style.display = 'block';
-        alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        btn.querySelector('span').textContent = lang === 'es' ? '✓ Guardado' : '✓ Saved';
+        btn.style.background = '#2a7a4a';
+        saveSuccess = true;
+        setTimeout(() => { window.location.href = listingsUrl; }, 1000);
 
       } catch (err) {
         alertEl.className = 'alert alert-error';
@@ -1140,9 +1139,11 @@
         alertEl.style.display = 'block';
         console.error(err);
       } finally {
-        btn.disabled = false;
-        const savedLang = document.getElementById('html-root').getAttribute('lang');
-        btn.querySelector('span').textContent = savedLang === 'es' ? 'Guardar preferencias' : 'Save preferences';
+        if (!saveSuccess) {
+          btn.disabled = false;
+          const savedLang = document.getElementById('html-root').getAttribute('lang');
+          btn.querySelector('span').textContent = savedLang === 'es' ? 'Guardar preferencias' : 'Save preferences';
+        }
       }
     }
 
