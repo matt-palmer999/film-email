@@ -858,7 +858,7 @@
       try {
         const subRes = await fetch(
           `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`, 'x-subscriber-email': email } }
         );
         const subs = await subRes.json();
 
@@ -937,7 +937,7 @@
         // Load subscriber preferences
         const subRes = await fetch(
           `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(currentEmail)}&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`, 'x-subscriber-email': currentEmail } }
         );
         const subs = await subRes.json();
 
@@ -1070,7 +1070,8 @@
               'Content-Type': 'application/json',
               'apikey': SUPABASE_ANON,
               'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal'
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({
               vose_only:    prefs.vose_only,
@@ -1163,7 +1164,8 @@
               'Content-Type': 'application/json',
               'apikey': SUPABASE_ANON,
               'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal'
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({ active: false })
           }
