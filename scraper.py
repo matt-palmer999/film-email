@@ -632,10 +632,18 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     </div>
   </div>
 
-  <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-  <div class="day-tabs">{tab_btns}</div>
+  <div id="showtimes-section" style="display:none;">
+    <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
+    <div class="day-tabs">{tab_btns}</div>
+    <div id="day-panels">{tab_panels}</div>
+  </div>
 
-  <div id="day-panels">{tab_panels}</div>
+  <div id="gate-section" style="display:none;margin:20px;padding:24px 20px;background:rgba(255,180,50,0.06);border:1px solid rgba(255,180,50,0.2);border-radius:10px;text-align:center;">
+    <div style="font-size:24px;margin-bottom:12px;">🎬</div>
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;margin-bottom:8px;" data-es="Los horarios son para suscriptores" data-en="Showtimes are for subscribers">Los horarios son para suscriptores</div>
+    <div style="font-size:13px;color:#9b8faa;line-height:1.6;margin-bottom:20px;" data-es="Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves." data-en="Subscribe to see showtimes across all cinemas, filtered exactly how you like it, plus get a tailored email every Thursday.">Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves.</div>
+    <a href="../../" style="display:inline-block;padding:11px 28px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:7px;text-decoration:none;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
+  </div>
 
   <div class="footer">
     <span data-es="Horarios sujetos a cambios — verifica siempre en la web del cine." data-en="Showtimes subject to change — always verify on the cinema's website.">Horarios sujetos a cambios — verifica siempre en la web del cine.</span>
@@ -666,6 +674,11 @@ window.addEventListener('DOMContentLoaded', () => {{
   const urlParams = new URLSearchParams(window.location.search);
   const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
+
+  // Gate: show showtimes for subscribers, gate for non-subscribers
+  const isSubscriber = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
+  document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
 
   // Apply cinema filter from URL params (set by preferences)
   const params  = new URLSearchParams(window.location.search);
