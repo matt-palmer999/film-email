@@ -1535,9 +1535,30 @@ if ('serviceWorker' in navigator) {{
 # ─── Email sender ─────────────────────────────────────────────────────────────
 
 
-def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "") -> str:
+def fetch_subscribers() -> list:
+    """Fetch all active subscribers with their language preference from Supabase."""
+    import urllib.request
+    try:
+        url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,lang&order=email"
+        req = urllib.request.Request(url, headers={
+            "apikey":        SUPABASE_ANON,
+            "Authorization": f"Bearer {SUPABASE_ANON}",
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            import json as _json
+            subscribers = _json.loads(resp.read().decode())
+            log.info(f"Fetched {len(subscribers)} subscribers from Supabase")
+            return subscribers
+    except Exception as e:
+        log.warning(f"Could not fetch subscribers from Supabase: {e} — falling back to RECIPIENTS env var")
+        return [{"email": r, "lang": "es"} for r in RECIPIENTS]
+
+
+def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "", lang: str = "en") -> str:
     """Build a clean, simple teaser email that links to the full hosted page."""
-    date_en = week_range_en(anchor)
+    is_es   = (lang == "es")
+    date_str = week_range_es(anchor) if is_es else week_range_en(anchor)
+    date_en  = week_range_en(anchor)  # kept for legacy f-string refs below
 
     total_films   = len(films_by_title)
     total_cinemas = len(CINEMAS)
@@ -1564,16 +1585,19 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         )
         badges = ""
         if film["is_new"]:
-            badges += '<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid #ffb43260;margin-right:4px;">NEW</span>'
+            new_label = "ESTRENO" if is_es else "NEW"
+            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid #ffb43260;margin-right:4px;">{new_label}</span>'
         if film["any_vose"]:
             badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid #ffd84a50;">VOSE</span>'
 
         cinemas_str = " · ".join(c["name"] for c in film["cinemas"][:4])
         if len(film["cinemas"]) > 4:
-            cinemas_str += f' +{len(film["cinemas"])-4} more'
+            more_label = f'+{len(film["cinemas"])-4} más' if is_es else f'+{len(film["cinemas"])-4} more'
+            cinemas_str += f' {more_label}'
 
-        synopsis   = film.get("synopsis", "")
-        meta_clean = film["meta"][:80].strip(". ")
+        film_title = film.get("title_es" if is_es else "title_en") or film.get("title", "")
+        synopsis   = (film.get("synopsis_es") or film.get("synopsis", "")) if is_es else (film.get("synopsis_en") or film.get("synopsis", ""))
+        meta_clean = (film.get("meta_es") or film.get("meta", ""))[:80].strip(". ") if is_es else (film.get("meta_en") or film.get("meta", ""))[:80].strip(". ")
 
         return f"""
         <tr>
@@ -1583,7 +1607,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
                 <td width="70" valign="top" style="padding-right:14px;">{poster_html}</td>
                 <td valign="top">
                   <div style="margin-bottom:5px;">{badges}</div>
-                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film["title"]}</div>
+                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film_title}</div>
                   <div style="font-size:11px;color:#7a6d8a;margin-bottom:5px;">{meta_clean}</div>
                   <div style="font-size:12px;color:#8c8090;margin-bottom:6px;line-height:1.4;">{synopsis[:160] if synopsis else ""}</div>
                   <div style="font-size:11px;color:#5a4e6a;">{cinemas_str}</div>
@@ -1600,7 +1624,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Valencia Cinema – {date_en}</title>
+<title>{"Cartelera Valencia" if is_es else "Valencia Cinema"} – {date_str}</title>
 </head>
 <body style="margin:0;padding:0;background:#0f0c14;font-family:Helvetica,Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0c14;">
@@ -1611,10 +1635,10 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- HEADER -->
         <tr>
           <td style="background:linear-gradient(135deg,#1a0a2e,#0f0c14);border-bottom:1px solid #3a2a55;padding:36px 40px 28px;text-align:center;border-radius:12px 12px 0 0;">
-            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 Weekly Newsletter</div>
-            <div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">Cartelera<br>Valencia</div>
-            <div style="font-size:13px;color:#9b8faa;">Your weekly guide to cinema in Valencia</div>
-            <div style="display:inline-block;margin-top:16px;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_en}</div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">{"🎬 Boletín Semanal" if is_es else "🎬 Weekly Newsletter"}</div>
+            <div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">{"Cartelera<br>Valencia" if is_es else "Cinema<br>Valencia"}</div>
+            <div style="font-size:13px;color:#9b8faa;">{"Tu guía semanal del cine en Valencia" if is_es else "Your weekly guide to cinema in Valencia"}</div>
+            <div style="display:inline-block;margin-top:16px;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_str}</div>
           </td>
         </tr>
 
@@ -1625,15 +1649,15 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
               <tr>
                 <td style="text-align:center;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{total_films}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">Films showing</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Películas" if is_es else "Films showing"}</div>
                 </td>
                 <td style="text-align:center;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(vose_films)}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">With VOSE</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Con VOSE" if is_es else "With VOSE"}</div>
                 </td>
                 <td style="text-align:center;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(new_films)}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">New releases</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Estrenos" if is_es else "New releases"}</div>
                 </td>
               </tr>
             </table>
@@ -1643,7 +1667,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- HIGHLIGHTS -->
         <tr>
           <td style="background:#0f0c14;padding:20px 40px 10px;">
-            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">This week's highlights</div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">{"Destacados de esta semana" if is_es else "This week's highlights"}</div>
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               {highlights_html}
             </table>
@@ -1653,8 +1677,8 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- CTA BUTTON -->
         <tr>
           <td style="background:#0f0c14;padding:24px 40px 32px;text-align:center;">
-            <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">See the full programme — all cinemas, all films, VOSE sessions highlighted</div>
-            <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">View Full Listings →</a>
+            <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">{"Ver la programación completa — todos los cines, todas las películas, sesiones VOSE destacadas" if is_es else "See the full programme — all cinemas, all films, VOSE sessions highlighted"}</div>
+            <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">{"Ver cartelera completa →" if is_es else "View Full Listings →"}</a>
             <br><br>
             <div style="font-size:11px;color:#5a4e6a;">Or copy this link: <a href="{page_url}" target="_blank" style="color:#7a6a9a;word-break:break-all;">{page_url}</a></div>
           </td>
@@ -1674,10 +1698,10 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <tr>
           <td style="background:#0a0810;padding:14px 40px 24px;text-align:center;border-radius:0 0 12px 12px;">
             <div style="font-size:11px;color:#3a2e50;line-height:1.6;">
-              Showtimes may vary — always check the cinema's website before you go.<br>
-              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">⚙️ Manage preferences</a>
+              {"Los horarios pueden variar — consulta siempre la web del cine." if is_es else "Showtimes may vary — always check the cinema's website before you go."}<br>
+              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">{"⚙️ Gestionar preferencias" if is_es else "⚙️ Manage preferences"}</a>
               &nbsp;·&nbsp;
-              <a href="{unsub_url}" style="color:#5a4e6a;text-decoration:none;">Unsubscribe</a><br>
+              <a href="{unsub_url}" style="color:#5a4e6a;text-decoration:none;">{"Darse de baja" if is_es else "Unsubscribe"}</a><br>
               © {anchor.year} Cartelera Valencia Weekly
             </div>
           </td>
@@ -1691,27 +1715,28 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 </html>"""
 
 
-def send_email(html: str, anchor: datetime) -> None:
-    date_en = week_range_en(anchor)
-    subject = f"🎬 Valencia Cinema – {date_en}"
+def send_email(html: str, anchor: datetime, recipient: str, lang: str = "en") -> None:
+    if lang == "es":
+        subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
+        plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"
+    else:
+        subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
+        plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-    msg["To"]      = ", ".join(RECIPIENTS)
+    msg["To"]      = recipient
 
-    # Plain-text fallback
-    plain = f"Valencia Cinema Weekly – {date_en}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
     msg.attach(MIMEText(plain, "plain", "utf-8"))
     msg.attach(MIMEText(html,  "html",  "utf-8"))
 
-    log.info(f"Connecting to {SMTP_HOST}:{SMTP_PORT} ...")
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.ehlo()
         server.starttls()
         server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_ADDRESS, RECIPIENTS, msg.as_string())
-    log.info(f"Email sent to {len(RECIPIENTS)} recipient(s).")
+        server.sendmail(FROM_ADDRESS, [recipient], msg.as_string())
+    log.info(f"Email sent to {recipient} ({lang})")
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
@@ -1892,12 +1917,41 @@ def main():
     force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
 
     if is_thursday or force_email:
-        teaser = build_teaser_email(films, anchor, page_url, prefs_url, unsub_url)
+        subscribers = fetch_subscribers()
+        sent = 0
+        errors = 0
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            for sub in subscribers:
+                email = sub.get("email", "").strip()
+                lang  = sub.get("lang") or "es"
+                if not email:
+                    continue
+                try:
+                    teaser = build_teaser_email(films, anchor, page_url, prefs_url, unsub_url, lang=lang)
+                    if lang == "es":
+                        subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
+                        plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"
+                    else:
+                        subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
+                        plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
+                    msg = MIMEMultipart("alternative")
+                    msg["Subject"] = subject
+                    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
+                    msg["To"]      = email
+                    msg.attach(MIMEText(plain,  "plain", "utf-8"))
+                    msg.attach(MIMEText(teaser, "html",  "utf-8"))
+                    server.sendmail(FROM_ADDRESS, [email], msg.as_string())
+                    log.info(f"  Sent to {email} ({lang})")
+                    sent += 1
+                except Exception as e:
+                    log.warning(f"  Failed to send to {email}: {e}")
+                    errors += 1
+        log.info(f"Email send complete: {sent} sent, {errors} errors")
     else:
         log.info(f"Not Thursday (weekday={anchor.weekday()}) — skipping email send")
-        teaser = None
-    if teaser:
-        send_email(teaser, anchor)
     close_browser()
 
 
