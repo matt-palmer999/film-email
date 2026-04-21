@@ -44,9 +44,10 @@ jobs:
           FROM_NAME:     ${{ secrets.FROM_NAME }}
           RECIPIENTS:    ${{ secrets.RECIPIENTS }}
           LISTINGS_URL:  ${{ secrets.LISTINGS_URL }}
-          SUPABASE_URL:  ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON: ${{ secrets.SUPABASE_ANON }}
-          TMDB_API_KEY:  ${{ secrets.TMDB_API_KEY }}
+          SUPABASE_URL:          ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON:         ${{ secrets.SUPABASE_ANON }}
+          SUPABASE_SERVICE_KEY:  ${{ secrets.SUPABASE_SERVICE_KEY }}
+          TMDB_API_KEY:          ${{ secrets.TMDB_API_KEY }}
         run: python scraper.py
 
       - name: Publish listings page to GitHub Pages
