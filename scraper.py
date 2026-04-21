@@ -647,7 +647,7 @@ function setLang(lang) {{
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {{
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   }});
   document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
@@ -762,7 +762,7 @@ function setLang(lang) {
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   });
   localStorage.setItem('cv_lang', lang);
   // Update URL with lang param so detail pages pick it up
@@ -795,10 +795,8 @@ function applyPreferencesFromURL() {
 }
 
 function setSubscriberUI(isSubscriber) {
-  // Nav — show preferences link for subscribers, subscribe button for anon
-  const navPrefs     = document.getElementById('nav-prefs');
+  // Nav — hide subscribe button for subscribers
   const navSubscribe = document.getElementById('nav-subscribe');
-  if (navPrefs)     navPrefs.style.display     = isSubscriber ? '' : 'none';
   if (navSubscribe) navSubscribe.style.display  = isSubscriber ? 'none' : '';
 
   // Banners
@@ -1410,15 +1408,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../preferences/" id="nav-prefs" style="display:none;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
       <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
   </div>
 
   <!-- SUBSCRIBER BANNER — shown to subscribers only -->
-  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span style="font-size:12px;color:#c5a84a;" data-es="🎬 Estás viendo tu cartelera personalizada" data-en="🎬 You're viewing your personalised listings">🎬 Estás viendo tu cartelera personalizada</span>
-    <a href="../preferences/" style="font-size:11px;color:#ffb432;text-decoration:none;" data-es="⚙️ Cambiar preferencias →" data-en="⚙️ Change preferences →">⚙️ Cambiar preferencias →</a>
+  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:12px 20px;display:none;align-items:center;justify-content:center;">
+    <span style="font-size:14px;color:#c5a84a;" data-es="🎬 Estás viendo tu <a href='../preferences/' style='color:#ffb432;text-decoration:underline;text-underline-offset:3px;'>cartelera personalizada</a>" data-en="🎬 You're viewing your <a href='../preferences/' style='color:#ffb432;text-decoration:underline;text-underline-offset:3px;'>personalised listings</a>">🎬 Estás viendo tu <a href="../preferences/" style="color:#ffb432;text-decoration:underline;text-underline-offset:3px;">cartelera personalizada</a></span>
   </div>
 
   <!-- ANONYMOUS BANNER — shown to non-subscribers -->
