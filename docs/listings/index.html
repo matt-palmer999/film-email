@@ -1301,10 +1301,19 @@ function applyVisibility() {{
     let show = true;
     const isClassic = card.dataset.section === '2';
 
-    // Always show classics override — exempt section 2 from most filters
+    // Always show classics override — exempt section 2 from all filters except VOSE
     if (alwaysClassics && isClassic) {{
-      card.style.display = '';
-      visible++;
+      let showClassic = true;
+      if (voseOnly || filter === 'vose') {{
+        if (card.dataset.vose !== 'true') showClassic = false;
+        if (showClassic && voseLang === 'en') {{
+          const origins = (card.dataset.origin || '').split(',');
+          const englishOrigins = ['US','GB','AU','CA','IE','NZ'];
+          if (!origins.some(o => englishOrigins.includes(o.trim()))) showClassic = false;
+        }}
+      }}
+      card.style.display = showClassic ? '' : 'none';
+      if (showClassic) visible++;
       return;
     }}
 
