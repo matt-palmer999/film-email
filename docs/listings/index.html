@@ -1153,11 +1153,17 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
       { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
-    if (!rows.length) return;
+
+    // No row found or subscriber has unsubscribed — clear cookie and show anon state
+    if (!rows.length || rows[0].active === false) {
+      document.cookie = 'cv_email=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax';
+      setSubscriberUI(false);
+      return;
+    }
 
     const prefs = rows[0];
 
