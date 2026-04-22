@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
@@ -751,7 +753,6 @@
 
     // Current state
     let currentEmail  = '';
-    let currentToken  = '';
     let prefs = {
       vose_only:    false,
       vose_lang:    'en',
@@ -788,73 +789,7 @@
       document.getElementById(id).classList.add('active');
     }
 
-    // ── REQUEST MAGIC LINK ──
-    async function requestLink() {
-      const emailEl = document.getElementById('request-email');
-      const btn     = document.getElementById('request-btn');
-      const alertEl = document.getElementById('request-alert');
-      const lang    = document.getElementById('html-root').getAttribute('lang');
-      const email   = emailEl.value.trim();
-
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showAlert(alertEl, 'error',
-          lang === 'es' ? 'Por favor introduce un email válido.' : 'Please enter a valid email address.'
-        );
-        return;
-      }
-
-      btn.disabled = true;
-
-      // Generate a random token
-      const token = crypto.randomUUID();
-
-      try {
-        // 1. Store token in Supabase
-        const tokenRes = await fetch(`${SUPABASE_URL}/rest/v1/preference_tokens`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON,
-            'Authorization': `Bearer ${SUPABASE_ANON}`,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ email, token })
-        });
-
-        if (!tokenRes.ok) throw new Error(`Token store failed: ${tokenRes.status}`);
-
-        // 2. Call Edge Function to send the magic link email
-        const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-magic-link`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON}`,
-          },
-          body: JSON.stringify({ email, token, lang })
-        });
-
-        if (!emailRes.ok) {
-          const err = await emailRes.json();
-          throw new Error(`Email send failed: ${JSON.stringify(err)}`);
-        }
-
-        document.getElementById('request-form').style.display = 'none';
-        showAlert(alertEl, 'success',
-          lang === 'es'
-            ? '✅ ¡Enlace enviado! Revisa tu bandeja de entrada.'
-            : '✅ Link sent! Check your inbox.'
-        );
-
-      } catch (err) {
-        showAlert(alertEl, 'error',
-          lang === 'es' ? 'Algo ha fallado. Inténtalo de nuevo.' : 'Something went wrong. Please try again.'
-        );
-        btn.disabled = false;
-        console.error(err);
-      }
-    }
-
-    // ── LOAD PREFERENCES FROM COOKIE EMAIL (no token needed) ──
+    // ── LOAD PREFERENCES FROM COOKIE EMAIL ──
     async function loadFromEmail(email) {
       const lang = document.getElementById('html-root').getAttribute('lang');
       try {
@@ -888,74 +823,6 @@
         prefs.min_rating   = sub.min_rating   || 7.0;
         prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
         prefs.lang      = sub.lang      || 'es';
-
-        renderPreferences();
-        document.getElementById('prefs-email-display').textContent = currentEmail;
-        showPanel('panel-prefs');
-
-      } catch (err) {
-        console.error(err);
-        showPanel('panel-request');
-      }
-    }
-
-    // ── LOAD PREFERENCES FROM TOKEN ──
-    async function loadFromToken(token) {
-      const lang = document.getElementById('html-root').getAttribute('lang');
-
-      try {
-        // Look up token
-        const tokenRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${token}&used=eq.false&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
-        );
-        const tokens = await tokenRes.json();
-
-        if (!tokens.length) {
-          showPanel('panel-request');
-          const alertEl = document.getElementById('request-alert');
-          showAlert(alertEl, 'error',
-            lang === 'es'
-              ? 'Este enlace ha caducado o ya fue usado. Solicita uno nuevo.'
-              : 'This link has expired or was already used. Please request a new one.'
-          );
-          return;
-        }
-
-        const tokenRow = tokens[0];
-        // Check expiry
-        if (new Date(tokenRow.expires_at) < new Date()) {
-          showPanel('panel-request');
-          const alertEl = document.getElementById('request-alert');
-          showAlert(alertEl, 'error',
-            lang === 'es' ? 'Este enlace ha caducado. Solicita uno nuevo.' : 'This link has expired. Please request a new one.'
-          );
-          return;
-        }
-
-        currentEmail = tokenRow.email;
-        currentToken = token;
-
-        // Load subscriber preferences
-        const subRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(currentEmail)}&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`, 'x-subscriber-email': currentEmail } }
-        );
-        const subs = await subRes.json();
-
-        if (subs.length) {
-          const sub = subs[0];
-          prefs.vose_only    = sub.vose_only    || false;
-          prefs.vose_lang    = sub.vose_lang    || 'en';
-          prefs.family_only  = sub.family_only  || false;
-          prefs.evening_only = sub.evening_only || false;
-          prefs.new_only     = sub.new_only     || false;
-          prefs.classics     = sub.classics     || false;
-          prefs.rating_filter = sub.rating_filter || false;
-          prefs.min_rating   = sub.min_rating   || 7.0;
-          prefs.cinemas      = sub.cinemas      || CINEMAS.map(c => c.id);
-          prefs.lang         = sub.lang         || 'es';
-        }
 
         renderPreferences();
         document.getElementById('prefs-email-display').textContent = currentEmail;
@@ -1096,23 +963,6 @@
         // Refresh cookie on save
         setCookie('cv_email', currentEmail);
 
-        // Mark token as used if we have one
-        if (currentToken) {
-          await fetch(
-            `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${currentToken}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_ANON,
-                'Authorization': `Bearer ${SUPABASE_ANON}`,
-                'Prefer': 'return=minimal'
-              },
-              body: JSON.stringify({ used: true })
-            }
-          );
-        }
-
         // Build personalised listings URL from saved preferences
         const listingsBase = '../listings/';
         const p = new URLSearchParams();
@@ -1211,15 +1061,10 @@
 
     // ── INIT: check cookie first, then URL token ──
     window.addEventListener('DOMContentLoaded', () => {
-      console.log('All cookies:', document.cookie);
       const urlParams   = new URLSearchParams(window.location.search);
-      const urlToken    = urlParams.get('token');
       const cookieEmail = getCookie('cv_email');
-      console.log('cv_email cookie:', cookieEmail);
 
-      if (urlToken) {
-        loadFromToken(urlToken);
-      } else if (cookieEmail) {
+      if (cookieEmail) {
         loadFromEmail(cookieEmail);
       }
     });
