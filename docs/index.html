@@ -813,7 +813,7 @@
       </div>
     </div>
 
-    <p style="margin-top:20px;font-size:12px;color:#8a7e9a;text-align:center;">
+    <p id="browse-line" style="margin-top:20px;font-size:12px;color:#8a7e9a;text-align:center;">
       <span data-es="¿No listo para suscribirte?" data-en="Not ready to subscribe?">¿No listo para suscribirte?</span> <a href="./listings/" style="color:#c5b8d8;text-decoration:underline;text-underline-offset:3px;"><span data-es="Explora la cartelera sin filtros primero →" data-en="Browse the unfiltered listings first →">Explora la cartelera sin filtros primero →</span></a>
     </p>
 
@@ -1090,6 +1090,8 @@
           document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
           formWrap.style.display = 'none';
           successEl.style.display = 'block';
+          const browseLine = document.getElementById('browse-line');
+          if (browseLine) browseLine.style.display = 'none';
         } else {
           const body = await res.text();
           console.error('Signup failed:', res.status, body);
