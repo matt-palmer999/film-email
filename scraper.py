@@ -871,7 +871,7 @@ async function loadUserPreferences() {
   try {
     const res = await fetch(
       window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
-      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON } }
+      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
     if (!rows.length) return;
