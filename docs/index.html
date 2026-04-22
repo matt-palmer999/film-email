@@ -1056,8 +1056,7 @@
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON,
             'Authorization': `Bearer ${SUPABASE_ANON}`,
-            'Prefer': 'resolution=merge-duplicates,return=minimal',
-            'x-subscriber-email': email
+            'Prefer': 'return=minimal'
           },
           body: JSON.stringify({
             email: email,
@@ -1068,8 +1067,23 @@
           })
         });
 
-        // 201 = created, 200 = updated (upsert)
-        if (res.ok || res.status === 201) {
+        // If email already exists, reactivate the existing row
+        if (res.status === 409) {
+          await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON,
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': email
+            },
+            body: JSON.stringify({ active: true, subscribed_at: new Date().toISOString() })
+          });
+        }
+
+        // 201 = created, 409 = already existed (now reactivated)
+        if (res.ok || res.status === 201 || res.status === 409) {
           // Set a cookie so the preferences page knows who this is
           const expires = new Date();
           expires.setFullYear(expires.getFullYear() + 1);
