@@ -1056,18 +1056,19 @@
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON,
             'Authorization': `Bearer ${SUPABASE_ANON}`,
-            'Prefer': 'return=minimal'
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
           },
           body: JSON.stringify({
             email: email,
             lang: lang,
             source: source,
+            active: true,
             subscribed_at: new Date().toISOString()
           })
         });
 
-        // 201 = created, 200 = ok, 409 = already exists (treat as success)
-        if (res.ok || res.status === 201 || res.status === 409) {
+        // 201 = created, 200 = updated (upsert)
+        if (res.ok || res.status === 201) {
           // Set a cookie so the preferences page knows who this is
           const expires = new Date();
           expires.setFullYear(expires.getFullYear() + 1);
