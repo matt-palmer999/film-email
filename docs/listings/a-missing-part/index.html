@@ -123,6 +123,26 @@ function setLang(lang) {
   document.title = (lang === 'en' ? 'A Missing Part' : 'Una hija en Tokio') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
+function isWeekend(dateKey) {
+  const d = new Date(dateKey);
+  return d.getDay() === 0 || d.getDay() === 6;
+}
+function applyEveningHighlights(eveningFilter) {
+  if (!eveningFilter) return;
+  document.querySelectorAll('.time-btn[data-time]').forEach(btn => {
+    const panel = btn.closest('.day-panel');
+    const dayKey = panel ? panel.id.replace('day-', '') : '';
+    const weekend = isWeekend(dayKey);
+    const t = btn.getAttribute('data-time');
+    const parts = t.split(':');
+    const mins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+    if (weekend || mins >= 17 * 60 + 30) {
+      btn.classList.add('time-btn--match');
+    } else {
+      btn.classList.remove('time-btn--match');
+    }
+  });
+}
 function showDay(key) {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
@@ -130,6 +150,8 @@ function showDay(key) {
   const panel = document.getElementById('day-' + key);
   if (tab) tab.classList.add('active');
   if (panel) panel.classList.add('active');
+  const params = new URLSearchParams(window.location.search);
+  applyEveningHighlights(params.get('evening') === 'true');
 }
 window.addEventListener('DOMContentLoaded', () => {
   // Read lang from URL param (passed from listings) or localStorage fallback
@@ -156,17 +178,10 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Highlight times matching evening filter (after 17:30)
+  // Highlight times matching evening/weekend filter
   const eveningFilter = params.get('evening') === 'true';
   if (eveningFilter) {
-    document.querySelectorAll('.time-btn[data-time]').forEach(btn => {
-      const t = btn.getAttribute('data-time');
-      const parts = t.split(':');
-      const mins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
-      if (mins >= 17 * 60 + 30) {
-        btn.classList.add('time-btn--match');
-      }
-    });
+    applyEveningHighlights(true);
     const legend = document.getElementById('showtime-legend');
     if (legend) legend.style.display = 'flex';
   }
