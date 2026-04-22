@@ -714,9 +714,12 @@ window.addEventListener('DOMContentLoaded', () => {{
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
 
   // Apply cinema filter from URL params (set by preferences)
+  // Skip if this is a classic film and the classics override is on
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas');
-  if (cinemas) {{
+  const isClassicFilm = params.get('classic') === 'true';
+  const alwaysClassics = params.get('classics') === 'true';
+  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
@@ -838,12 +841,17 @@ function applyPreferencesFromURL() {
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
-  // Hide cinema tags for excluded cinemas
+  // Hide cinema tags for excluded cinemas (but not on classics cards when classics override is on)
+  const alwaysClassics = params.get('classics') === 'true';
   if (cinemas) {
     document.querySelectorAll('.cinema-tag').forEach(tag => {
       const cid = tag.dataset.cinema;
       if (cid && !cinemas.includes(cid)) {
-        tag.style.display = 'none';
+        const card = tag.closest('[data-section]');
+        const isClassic = card && card.dataset.section === '2';
+        if (!(alwaysClassics && isClassic)) {
+          tag.style.display = 'none';
+        }
       }
     });
   }
@@ -922,13 +930,16 @@ async function loadUserPreferences() {
     }
 
     // Update all film links to carry preferences params through to detail pages
-    const finalParams = window.location.search;
-    if (finalParams) {
-      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-        const base = a.getAttribute('href').split('?')[0];
-        a.href = base + finalParams;
-      });
-    }
+    const finalParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(finalParams);
+      if (card && card.dataset.section === '2') {
+        linkParams.set('classic', 'true');
+      }
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    });
 
   } catch(e) {
     console.warn('Could not load preferences:', e);
