@@ -719,7 +719,7 @@ window.addEventListener('DOMContentLoaded', () => {{
   const cinemas = params.get('cinemas');
   const isClassicFilm = params.get('classic') === 'true';
   const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
+  if (cinemas && !alwaysClassics) {{
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
