@@ -516,7 +516,12 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         for i, day in enumerate(days):
             active = "active" if i == 0 else ""
             dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
-            tab_btns += f'<button class="day-tab {active}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
+            has_shows = any(
+                c.get("showtimes", {}).get(dk)
+                for c in film["cinemas"]
+            )
+            show_class = "has-shows" if has_shows else "no-shows"
+            tab_btns += f'<button class="day-tab {active} {show_class}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
             # Cinema rows — each gets data-cinema-id for JS filtering
             cinema_rows = ""
@@ -598,6 +603,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .day-tabs::-webkit-scrollbar{{display:none}}
 .day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;margin-right:6px;flex-shrink:0}}
 .day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
+.day-tab.has-shows{{color:#50c88c}}
+.day-tab.no-shows{{color:#3a2e50;border-color:#1e1630}}
 .day-panel{{display:none;padding:0 20px 20px}}
 .day-panel.active{{display:block}}
 .showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
