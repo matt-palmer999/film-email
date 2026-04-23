@@ -10,6 +10,9 @@ import re
 import smtplib
 import logging
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+VALENCIA_TZ = ZoneInfo("Europe/Madrid")
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -477,6 +480,7 @@ def slugify(title: str) -> str:
 def build_film_detail_page(film: dict, anchor: datetime) -> str:
     """Build a standalone HTML page for a single film with showtimes by day."""
     from datetime import date as _date, timedelta as _td
+    from zoneinfo import ZoneInfo as _ZI
 
     title_es   = film["title"]
     title_en   = film.get("title_en", title_es)
@@ -492,7 +496,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     is_new     = film.get("is_new", False)
 
     # Build day tabs for today + 6 days
-    today = _date.today()
+    today = datetime.now(ZoneInfo("Europe/Madrid")).date()
     DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
@@ -1191,7 +1195,7 @@ def film_card_html(film: dict) -> str:
     year       = film.get("year", "")
     _cinemas_set = set(c["id"] for c in film["cinemas"])
     _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-    _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+    _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
     section    = "2" if (_arthouse_only or _is_old) else "1"
     origin     = ",".join(film.get("origin_country", []))
     score_val  = str(film.get("rating_score") or "")
@@ -1289,7 +1293,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         year       = film.get("year", "")
         _cinemas_set = set(c["id"] for c in film["cinemas"])
         _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-        _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+        _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
         section    = "2" if (_arthouse_only or _is_old) else "1"
         origin     = ",".join(film.get("origin_country", []))
         score_val  = str(film.get("rating_score") or "")
@@ -1375,7 +1379,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         year       = film.get("year", "")
         _cinemas_set = set(c["id"] for c in film["cinemas"])
         _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-        _is_old    = bool(year) and int(year) <= (__import__('datetime').date.today().year - 3)
+        _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
         section    = "2" if (_arthouse_only or _is_old) else "1"
         origin     = ",".join(film.get("origin_country", []))
         score_val  = str(film.get("rating_score") or "")
@@ -1804,8 +1808,8 @@ def send_email(html: str, anchor: datetime, recipient: str, lang: str = "en") ->
 
 def main():
     # The newsletter covers Friday → Thursday; anchor on this coming Friday
-    today  = datetime.now()
-    anchor = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    today  = datetime.now(VALENCIA_TZ)
+    anchor = today.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
     log.info(f"Building newsletter for week starting {anchor.date()} ...")
     warm_up_session()
@@ -1893,11 +1897,10 @@ def main():
 
     # Build the full bilingual listings page
     # Remove films with no future showtimes and assign slugs to the rest
-    from datetime import date as _date
-    today_str = _date.today().strftime("%Y-%m-%d")
-
-    from datetime import timedelta as _td2
-    week_ahead = (_date.today() + _td2(days=7)).strftime("%Y-%m-%d")
+    from datetime import date as _date, timedelta as _td2
+    _today_local = datetime.now(VALENCIA_TZ).date()
+    today_str = _today_local.strftime("%Y-%m-%d")
+    week_ahead = (_today_local + _td2(days=7)).strftime("%Y-%m-%d")
     stale = [title for title, film in films.items()
              if not any(
                  any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
