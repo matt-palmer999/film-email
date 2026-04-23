@@ -1255,7 +1255,7 @@ def cinemas_in_window(film: dict) -> list:
     """Return only cinemas that have at least one showtime within the next 7 days."""
     from datetime import date as _d, timedelta as _td
     today = datetime.now(VALENCIA_TZ).date()
-    week_ahead = (today + _td(days=7)).strftime("%Y-%m-%d")
+    week_ahead = (today + _td(days=6)).strftime("%Y-%m-%d")
     today_str  = today.strftime("%Y-%m-%d")
     return [
         c for c in film.get("cinemas", [])
@@ -1919,7 +1919,7 @@ def main():
     from datetime import date as _date, timedelta as _td2
     _today_local = datetime.now(VALENCIA_TZ).date()
     today_str = _today_local.strftime("%Y-%m-%d")
-    week_ahead = (_today_local + _td2(days=7)).strftime("%Y-%m-%d")
+    week_ahead = (_today_local + _td2(days=6)).strftime("%Y-%m-%d")
     stale = [title for title, film in films.items()
              if not any(
                  any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
