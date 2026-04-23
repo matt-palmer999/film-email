@@ -1987,8 +1987,9 @@ def main():
     # Only send email on Thursdays (scraper now runs daily)
     is_thursday = anchor.weekday() == 3
     force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
+    is_scheduled = os.environ.get("TRIGGERED_BY", "schedule") == "schedule"
 
-    if is_thursday or force_email:
+    if (is_thursday and is_scheduled) or force_email:
         subscribers = fetch_subscribers()
         sent = 0
         errors = 0
