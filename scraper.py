@@ -520,7 +520,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                 c.get("showtimes", {}).get(dk)
                 for c in film["cinemas"]
             )
-            show_class = "has-shows" if has_shows else "no-shows"
+            show_class = "has-shows" if has_shows else ""
             tab_btns += f'<button class="day-tab {active} {show_class}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
             # Cinema rows — each gets data-cinema-id for JS filtering
@@ -605,7 +605,6 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
 .day-tab.active.has-shows{{color:#ffb432;border-color:rgba(255,180,50,.4)}}
 .day-tab.has-shows{{color:#50c88c}}
-.day-tab.no-shows{{color:#3a2e50;border-color:#1e1630}}
 .day-panel{{display:none;padding:0 20px 20px}}
 .day-panel.active{{display:block}}
 .showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
