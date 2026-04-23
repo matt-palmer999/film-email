@@ -1197,7 +1197,7 @@ def film_card_html(film: dict) -> str:
     where_es = "Dónde verla"
     where_en = "Where to see it"
 
-    cinema_ids = ",".join(c["id"] for c in cinemas)
+    cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
 
     year       = film.get("year", "")
     _cinemas_set = set(c["id"] for c in film["cinemas"])
@@ -1251,6 +1251,18 @@ def film_card_html(film: dict) -> str:
   </div>"""
 
 
+def cinemas_in_window(film: dict) -> list:
+    """Return only cinemas that have at least one showtime within the next 7 days."""
+    from datetime import date as _d, timedelta as _td
+    today = datetime.now(VALENCIA_TZ).date()
+    week_ahead = (today + _td(days=7)).strftime("%Y-%m-%d")
+    today_str  = today.strftime("%Y-%m-%d")
+    return [
+        c for c in film.get("cinemas", [])
+        if any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
+    ]
+
+
 def build_html(films_by_title: dict, anchor: datetime) -> str:
     date_es = week_range_es(anchor)
     date_en = week_range_en(anchor)
@@ -1295,7 +1307,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas)
+        cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
 
         year       = film.get("year", "")
         _cinemas_set = set(c["id"] for c in film["cinemas"])
@@ -1381,7 +1393,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas)
+        cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
 
         year       = film.get("year", "")
         _cinemas_set = set(c["id"] for c in film["cinemas"])
