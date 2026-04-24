@@ -153,7 +153,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.3</span><span class="rating-badge">+12</span></div>
         <a href="./the-devil-wears-prada-2/" class="grid-title" data-es="El diablo viste de Prada 2" data-en="The Devil Wears Prada 2">El diablo viste de Prada 2</a>
         <div class="grid-meta"><span data-es="Estados Unidos. 2026 . Comedia , Drama ." data-en="US . 2026 . Drama , Comedy . 119 min">Estados Unidos. 2026 . Comedia , Drama .</span></div>
-        <div class="grid-synopsis" data-es="Sigue la lucha de Miranda Priestly contra Emily Charlton, su ex asistente convertida en ejecutiva rival, mientras compiten por los ingresos " data-en="Miranda Priestly navigates her career amid the decline of traditional magazine publishing. She faces off against Emily Charlton, her one-tim">Sigue la lucha de Miranda Priestly contra Emily Charlton, su ex asistente convertida en ejecutiva rival, mientras compiten por los ingresos </div>
+        <div class="grid-synopsis" data-es="Sigue la lucha de Miranda Priestly contra Emily Charlton, su ex asistente convertida en ejecutiva rival, mientras compiten por los ingresos " data-en="As Miranda Priestly nears retirement, she reunites with Andy Sachs to face off against her former assistant turned rival: Emily Charlton.">Sigue la lucha de Miranda Priestly contra Emily Charlton, su ex asistente convertida en ejecutiva rival, mientras compiten por los ingresos </div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://www.yelmocines.es" class="cinema-tag" data-cinema="yelmo">Yelmo Campanar<span class="vose-mini">VOSE</span></a><a href="https://www.kinepolis.es/valencia" class="cinema-tag" data-cinema="kinepolis">Kinépolis<span class="vose-mini">VOSE</span></a><a href="https://www.ocine.es" class="cinema-tag" data-cinema="ocine">Ocine Aqua<span class="vose-mini">VOSE</span></a><a href="https://cineslys.com" class="cinema-tag" data-cinema="lys">Cines Lys<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a><a href="https://www.cinesmn4.com" class="cinema-tag" data-cinema="mn4">Cines MN4</a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="gran_turia">ABC Gran Turia</a></div>
@@ -1397,6 +1397,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-showdays]').forEach(card => {
       if (!dayKey) {
         delete card.dataset.qfhide;
+        card.style.display = '';
       } else {
         const showdays = (card.dataset.showdays || '').split(',');
         if (!showdays.includes(dayKey)) {
