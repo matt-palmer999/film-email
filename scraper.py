@@ -1118,9 +1118,8 @@ function applyVisibility() {{
       const score = parseFloat(card.dataset.score || '0');
       if (!score || score < minRating) show = false;
     }}
-    // Cinema filter — skip for section 2 cards when classics override is on
-    const isClassicCard = card.dataset.section === '2';
-    if (show && cinemas && cinemas.length > 0 && !(alwaysClassics && isClassicCard)) {{
+    // Cinema filter
+    if (show && cinemas && cinemas.length > 0) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
@@ -1576,6 +1575,19 @@ window.addEventListener('DOMContentLoaded', () => {{
   applyVisibility();
   loadUserPreferences();
   attachCardClicks();
+
+  // After preferences load, update film links to pass params through
+  // We do this after a short delay to allow loadUserPreferences() to update the URL
+  setTimeout(() => {{
+    const params = window.location.search;
+    if (params) {{
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + params;
+      }});
+    }}
+    attachCardClicks();
+  }}, 1500);
 }});
 
 // ── CARD CLICK — make entire card clickable via title link
@@ -1607,8 +1619,23 @@ if ('serviceWorker' in navigator) {{
 
 
 def fetch_subscribers() -> list:
-    """TEMP TEST MODE — only sends to matt_palmer@outlook.com"""
-    return [{"email": "matt_palmer@outlook.com", "lang": "en"}]
+    """Fetch all active subscribers with their language preference from Supabase."""
+    import urllib.request
+    key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
+    try:
+        url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,lang&order=email"
+        req = urllib.request.Request(url, headers={
+            "apikey":        key,
+            "Authorization": f"Bearer {key}",
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            import json as _json
+            subscribers = _json.loads(resp.read().decode())
+            log.info(f"Fetched {len(subscribers)} subscribers from Supabase")
+            return subscribers
+    except Exception as e:
+        log.warning(f"Could not fetch subscribers from Supabase: {e} — falling back to RECIPIENTS env var")
+        return [{"email": r, "lang": "es"} for r in RECIPIENTS]
 
 
 def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "", lang: str = "en") -> str:
@@ -1973,7 +2000,7 @@ def main():
     force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
     is_scheduled = os.environ.get("TRIGGERED_BY", "schedule") == "schedule"
 
-    if True:  # TEMP TEST MODE — remove before production
+    if (is_thursday and is_scheduled) or force_email:
         subscribers = fetch_subscribers()
         sent = 0
         errors = 0
