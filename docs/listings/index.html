@@ -474,7 +474,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.1</span><span class="rating-badge">+18</span></div>
         <a href="./kill-bill-the-whole-bloody-affair/" class="grid-title" data-es="Kill Bill: The Whole Bloody Affair" data-en="Kill Bill: The Whole Bloody Affair">Kill Bill: The Whole Bloody Affair</a>
         <div class="grid-meta"><span data-es="EEUU. 2006 . Acción , Crimen , Thriller . 275 min ." data-en="US . 2011 . Action , Crime . 253 min">EEUU. 2006 . Acción , Crimen , Thriller . 275 min .</span></div>
-        <div class="grid-synopsis" data-es="Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti" data-en="Quentin Tarantino&#39;s complete cut combining Kill Bill: Vol. 1 and Vol. 2 follows The Bride, a former assassin who awakens from a four-year co">Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti</div>
+        <div class="grid-synopsis" data-es="Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti" data-en="A former assassin, known simply as The Bride, wakes from a coma four years after her jealous ex-lover Bill attempts to murder her on her wed">Kill Bill es una película de acción y suspense de dos partes estrenada en 2003 y 2004 respectivamente, que fue escrita y dirigida por Quenti</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="Dónde verla" data-en="Where to see it">Dónde verla</div>
           <div class="cinema-tags"><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_saler">ABC El Saler<span class="vose-mini">VOSE</span></a><a href="https://cinesabc.com" class="cinema-tag" data-cinema="abc_park">ABC Park<span class="vose-mini">VOSE</span></a></div>
@@ -1266,9 +1266,8 @@ function applyVisibility() {{
       const score = parseFloat(card.dataset.score || '0');
       if (!score || score < minRating) show = false;
     }}
-    // Cinema filter — skip for section 2 cards when classics override is on
-    const isClassicCard = card.dataset.section === '2';
-    if (show && cinemas && cinemas.length > 0 && !(alwaysClassics && isClassicCard)) {{
+    // Cinema filter
+    if (show && cinemas && cinemas.length > 0) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
@@ -1304,6 +1303,19 @@ window.addEventListener('DOMContentLoaded', () => {
   applyVisibility();
   loadUserPreferences();
   attachCardClicks();
+
+  // After preferences load, update film links to pass params through
+  // We do this after a short delay to allow loadUserPreferences() to update the URL
+  setTimeout(() => {
+    const params = window.location.search;
+    if (params) {
+      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+        const base = a.getAttribute('href').split('?')[0];
+        a.href = base + params;
+      });
+    }
+    attachCardClicks();
+  }, 1500);
 });
 
 // ── CARD CLICK — make entire card clickable via title link
