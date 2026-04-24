@@ -1118,8 +1118,9 @@ function applyVisibility() {{
       const score = parseFloat(card.dataset.score || '0');
       if (!score || score < minRating) show = false;
     }}
-    // Cinema filter
-    if (show && cinemas && cinemas.length > 0) {{
+    // Cinema filter — skip for section 2 cards when classics override is on
+    const isClassicCard = card.dataset.section === '2';
+    if (show && cinemas && cinemas.length > 0 && !(alwaysClassics && isClassicCard)) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
