@@ -1252,20 +1252,21 @@ def film_card_html(film: dict) -> str:
     _today_qf   = datetime.now(VALENCIA_TZ).date()
     _window_end = _today_qf + timedelta(days=6)
     _showdays   = set()
-    _showtimes_by_day = {}
+    _showtimes_by_cinema_day = {}
     for _c in film.get("cinemas", []):
+        _cid = _c.get("id", "")
         for _dk, _times in _c.get("showtimes", {}).items():
             try:
                 _d = date.fromisoformat(_dk)
                 if _today_qf <= _d <= _window_end:
                     _showdays.add(_dk)
-                    _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+                    _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
             except Exception:
                 pass
     showdays_attr = ",".join(sorted(_showdays))
     showtimes_attrs = " ".join(
-        f'data-times-{dk}="{"|".join(sorted(times))}"'
-        for dk, times in _showtimes_by_day.items()
+        f'data-t-{key}="{"|".join(sorted(times))}"'
+        for key, times in _showtimes_by_cinema_day.items()
     )
 
     title_es = title
@@ -1384,20 +1385,21 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _today_qf   = datetime.now(VALENCIA_TZ).date()
         _window_end = _today_qf + timedelta(days=6)
         _showdays   = set()
-        _showtimes_by_day = {}
+        _showtimes_by_cinema_day = {}
         for _c in film.get("cinemas", []):
+            _cid = _c.get("id", "")
             for _dk, _times in _c.get("showtimes", {}).items():
                 try:
                     _d = date.fromisoformat(_dk)
                     if _today_qf <= _d <= _window_end:
                         _showdays.add(_dk)
-                        _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+                        _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
                 except Exception:
                     pass
         showdays_attr = ",".join(sorted(_showdays))
         showtimes_attrs = " ".join(
-            f'data-times-{dk}="{"|".join(sorted(times))}"'
-            for dk, times in _showtimes_by_day.items()
+            f'data-t-{key}="{"|".join(sorted(times))}"'
+            for key, times in _showtimes_by_cinema_day.items()
         )
 
         title_es  = film["title"]
@@ -1492,20 +1494,21 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         _today_qf   = datetime.now(VALENCIA_TZ).date()
         _window_end = _today_qf + timedelta(days=6)
         _showdays   = set()
-        _showtimes_by_day = {}
+        _showtimes_by_cinema_day = {}
         for _c in film.get("cinemas", []):
+            _cid = _c.get("id", "")
             for _dk, _times in _c.get("showtimes", {}).items():
                 try:
                     _d = date.fromisoformat(_dk)
                     if _today_qf <= _d <= _window_end:
                         _showdays.add(_dk)
-                        _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+                        _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
                 except Exception:
                     pass
         showdays_attr = ",".join(sorted(_showdays))
         showtimes_attrs = " ".join(
-            f'data-times-{dk}="{"|".join(sorted(times))}"' 
-            for dk, times in _showtimes_by_day.items()
+            f'data-t-{key}="{"|".join(sorted(times))}"'
+            for key, times in _showtimes_by_cinema_day.items()
         )
 
         title_es = film["title"]
@@ -1754,10 +1757,13 @@ window.addEventListener('DOMContentLoaded', () => {{
           card.classList.add('qf-hidden');
           return;
         }}
-        // Time filter on specific day
+        // Time filter on specific day — only check selected cinemas
         if (qfTime !== 'anytime') {{
-          const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
-          const times = timesAttr.split('|').filter(Boolean);
+          const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
+          const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
+          const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dayKey));
+          const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
+          const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
           const matches = times.some(t => {{
             const h = parseInt(t.split(':')[0]);
             if (qfTime === 'morning')   return h < 12;
@@ -1773,11 +1779,14 @@ window.addEventListener('DOMContentLoaded', () => {{
         return;
       }}
 
-      // No day selected but time filter active — check across ALL days
+      // No day selected but time filter active — check across ALL days, filtered by selected cinemas
+      const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
+      const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
       const showdays = (card.dataset.showdays || '').split(',').filter(Boolean);
       const matches = showdays.some(dk => {{
-        const timesAttr = card.getAttribute('data-times-'+dk) || '';
-        const times = timesAttr.split('|').filter(Boolean);
+        const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dk));
+        const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
+        const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
         return times.some(t => {{
           const h = parseInt(t.split(':')[0]);
           if (qfTime === 'morning')   return h < 12;
