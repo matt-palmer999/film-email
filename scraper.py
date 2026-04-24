@@ -881,9 +881,7 @@ function setSubscriberUI(isSubscriber) {
   if (qf) qf.style.display = isSubscriber ? 'block' : 'none';
 
   // Banners
-  const subBanner  = document.getElementById('subscriber-banner');
   const anonBanner = document.getElementById('anon-banner');
-  if (subBanner)  subBanner.style.display  = isSubscriber ? 'flex' : 'none';
   if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
 
 }
@@ -1596,11 +1594,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     </div>
   </div>
 
-  <!-- SUBSCRIBER BANNER — shown to subscribers only -->
-  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:12px 20px;display:none;align-items:center;justify-content:center;">
-    <span style="font-size:14px;color:#c5a84a;" data-es="🎬 Estás viendo tu <a href='../preferences/' style='color:#ffb432;text-decoration:underline;text-underline-offset:3px;'>cartelera personalizada</a>" data-en="🎬 You're viewing your <a href='../preferences/' style='color:#ffb432;text-decoration:underline;text-underline-offset:3px;'>personalised listings</a>">🎬 Estás viendo tu <a href="../preferences/" style="color:#ffb432;text-decoration:underline;text-underline-offset:3px;">cartelera personalizada</a></span>
-  </div>
-
   <!-- ANONYMOUS BANNER — shown to non-subscribers -->
   <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;gap:4px;">
@@ -1741,7 +1734,7 @@ window.addEventListener('DOMContentLoaded', () => {{
 
     document.querySelectorAll('[data-showdays]').forEach(card => {{
       if (!dayKey) {{
-        card.dataset.qfhide = 'false';
+        delete card.dataset.qfhide;
       }} else {{
         const showdays = (card.dataset.showdays || '').split(',');
         if (!showdays.includes(dayKey)) {{
