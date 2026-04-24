@@ -821,6 +821,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
 .filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
 .filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
+.qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#6a5e7a;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.qf-btn:hover{color:#c5b8d8;border-color:#4a3a60}
+.qf-active{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}
 .filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
@@ -872,6 +875,10 @@ function setSubscriberUI(isSubscriber) {
   // Nav — hide subscribe button for subscribers
   const navSubscribe = document.getElementById('nav-subscribe');
   if (navSubscribe) navSubscribe.style.display  = isSubscriber ? 'none' : '';
+
+  // Quick filter — show for subscribers only
+  const qf = document.getElementById('quick-filter');
+  if (qf) qf.style.display = isSubscriber ? 'block' : 'none';
 
   // Banners
   const subBanner  = document.getElementById('subscriber-banner');
@@ -1135,6 +1142,9 @@ function applyVisibility() {{
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
 
+    // Quick filter override
+    if (show && card.dataset.qfhide === 'true') show = false;
+
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   }});
@@ -1236,6 +1246,27 @@ def film_card_html(film: dict) -> str:
                 pass
         if _has_eve: break
     hasevening = "true" if _has_eve else "false"
+
+    # Build showday/showtime data for quick filter
+    _today_qf   = datetime.now(VALENCIA_TZ).date()
+    _window_end = _today_qf + timedelta(days=6)
+    _showdays   = set()
+    _showtimes_by_day = {}
+    for _c in film.get("cinemas", []):
+        for _dk, _times in _c.get("showtimes", {}).items():
+            try:
+                _d = date.fromisoformat(_dk)
+                if _today_qf <= _d <= _window_end:
+                    _showdays.add(_dk)
+                    _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+            except Exception:
+                pass
+    showdays_attr = ",".join(sorted(_showdays))
+    showtimes_attrs = " ".join(
+        f'data-times-{dk}="{"|".join(sorted(times))}"'
+        for dk, times in _showtimes_by_day.items()
+    )
+
     title_es = title
     title_en = film.get("title_en", title)
     slug     = film.get("slug")
@@ -1248,7 +1279,7 @@ def film_card_html(film: dict) -> str:
     syn_en   = (film.get("synopsis_en") or synopsis)[:200]
 
     return f"""
-  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}">
+  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
       <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
@@ -1346,7 +1377,28 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
                 except Exception:
                     pass
             if _has_eve: break
-        hasevening = "true" if _has_eve else "false" 
+        hasevening = "true" if _has_eve else "false"
+
+        # Build showday/showtime data for quick filter
+        _today_qf   = datetime.now(VALENCIA_TZ).date()
+        _window_end = _today_qf + timedelta(days=6)
+        _showdays   = set()
+        _showtimes_by_day = {}
+        for _c in film.get("cinemas", []):
+            for _dk, _times in _c.get("showtimes", {}).items():
+                try:
+                    _d = date.fromisoformat(_dk)
+                    if _today_qf <= _d <= _window_end:
+                        _showdays.add(_dk)
+                        _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+                except Exception:
+                    pass
+        showdays_attr = ",".join(sorted(_showdays))
+        showtimes_attrs = " ".join(
+            f'data-times-{dk}="{"|".join(sorted(times))}"'
+            for dk, times in _showtimes_by_day.items()
+        )
+
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
@@ -1365,7 +1417,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             orig_label = f'<div style="font-size:11px;color:var(--faint);margin-top:2px;" translate="no">{title_orig}</div>'
 
         return f"""
-  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}">
+  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
@@ -1433,7 +1485,28 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
                 except Exception:
                     pass
             if _has_eve: break
-        hasevening = "true" if _has_eve else "false" 
+        hasevening = "true" if _has_eve else "false"
+
+        # Build showday/showtime data for quick filter
+        _today_qf   = datetime.now(VALENCIA_TZ).date()
+        _window_end = _today_qf + timedelta(days=6)
+        _showdays   = set()
+        _showtimes_by_day = {}
+        for _c in film.get("cinemas", []):
+            for _dk, _times in _c.get("showtimes", {}).items():
+                try:
+                    _d = date.fromisoformat(_dk)
+                    if _today_qf <= _d <= _window_end:
+                        _showdays.add(_dk)
+                        _showtimes_by_day.setdefault(_dk, set()).update(str(t) for t in _times)
+                except Exception:
+                    pass
+        showdays_attr = ",".join(sorted(_showdays))
+        showtimes_attrs = " ".join(
+            f'data-times-{dk}="{"|".join(sorted(times))}"' 
+            for dk, times in _showtimes_by_day.items()
+        )
+
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
@@ -1446,7 +1519,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         syn_en   = (film.get("synopsis_en") or synopsis)[:140]
 
         return f"""
-    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}">
+    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
@@ -1537,6 +1610,23 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
+  <!-- QUICK FILTER — shown to subscribers only -->
+  <div id="quick-filter" style="display:none;background:#0f0c14;border-bottom:2px solid #2a1f3d;padding:14px 20px;">
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;margin-bottom:3px;">quick<em style="color:#ffb432;font-style:italic;">filter</em></div>
+    <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:14px;" data-es="filtros avanzados →" data-en="advanced filters →">filtros avanzados →</a>
+    <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
+      <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
+      <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
+      <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
+    </div>
+    <div id="qf-times" style="display:flex;gap:8px;">
+      <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
+      <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
+      <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
+      <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
+    </div>
+  </div>
+
   <main>
   <div class="header">
     <h1 class="header-title" id="header-title">Cartelera<br>Valencia</h1>
@@ -1606,6 +1696,77 @@ window.addEventListener('DOMContentLoaded', () => {{
     attachCardClicks();
   }}, 1500);
 }});
+
+// ── QUICK FILTER ──
+(function() {{
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const plus1   = new Date(today); plus1.setDate(today.getDate()+2);
+
+  function toDateKey(d) {{
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }}
+
+  const todayKey    = toDateKey(today);
+  const tomorrowKey = toDateKey(tomorrow);
+  const plus1Key    = toDateKey(plus1);
+
+  const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+  const plus1Btn = document.getElementById('qf-plus1');
+  if (plus1Btn) plus1Btn.textContent = days[plus1.getDay()] + ' ' + plus1.getDate();
+
+  let qfDay  = null;
+  let qfTime = 'anytime';
+
+  window.setQFDay = function(day) {{
+    qfDay = (qfDay === day) ? null : day;
+    ['today','tomorrow','plus1'].forEach(d => {{
+      document.getElementById('qf-'+d)?.classList.toggle('qf-active', qfDay === d);
+    }});
+    applyQF();
+  }};
+
+  window.setQFTime = function(time) {{
+    qfTime = time;
+    ['morning','afternoon','evening','anytime'].forEach(t => {{
+      document.getElementById('qf-'+t)?.classList.toggle('qf-active', qfTime === t);
+    }});
+    applyQF();
+  }};
+
+  function applyQF() {{
+    const dayKey = qfDay === 'today' ? todayKey : qfDay === 'tomorrow' ? tomorrowKey : qfDay === 'plus1' ? plus1Key : null;
+
+    document.querySelectorAll('[data-showdays]').forEach(card => {{
+      if (!dayKey) {{
+        card.dataset.qfhide = 'false';
+      }} else {{
+        const showdays = (card.dataset.showdays || '').split(',');
+        if (!showdays.includes(dayKey)) {{
+          card.dataset.qfhide = 'true';
+          return;
+        }}
+        if (qfTime === 'anytime') {{
+          card.dataset.qfhide = 'false';
+          return;
+        }}
+        const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
+        const times = timesAttr.split('|').filter(Boolean);
+        const matches = times.some(t => {{
+          const h = parseInt(t.split(':')[0]);
+          if (qfTime === 'morning')   return h < 12;
+          if (qfTime === 'afternoon') return h >= 12 && h < 18;
+          if (qfTime === 'evening')   return h >= 18;
+          return true;
+        }});
+        card.dataset.qfhide = matches ? 'false' : 'true';
+      }}
+    }});
+    applyVisibility();
+  }}
+}})();
 
 // ── CARD CLICK — make entire card clickable via title link
 function attachCardClicks() {{
