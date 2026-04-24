@@ -169,11 +169,12 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
 
   // Apply cinema filter from URL params (set by preferences)
-  // Skip entirely if classics override is on — classic films show all cinemas
+  // Skip if this is a classic film and the classics override is on
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas');
+  const isClassicFilm = params.get('classic') === 'true';
   const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !alwaysClassics) {
+  if (cinemas && !(alwaysClassics && isClassicFilm)) {
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
