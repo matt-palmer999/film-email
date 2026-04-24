@@ -1046,17 +1046,8 @@ function initSections() {{
 }}
 
 function repairSection(container) {{
-  // Collect ALL grid-cards — including any floating directly in container
-  const allCards = Array.from(container.querySelectorAll('.grid-card'));
-
-  // Also grab any cards directly in container (not in a row)
-  Array.from(container.children).forEach(child => {{
-    if (child.classList.contains('grid-card') && !allCards.includes(child)) {{
-      allCards.push(child);
-    }}
-  }});
-
-  const visibleCards = allCards.filter(c => c.style.display !== 'none');
+  const allCards     = Array.from(container.querySelectorAll('.grid-card'));
+  const visibleCards = allCards.filter(c => c.style.display !== 'none' && !c.classList.contains('qf-hidden'));
 
   // Remove all rows
   container.querySelectorAll('.grid-row').forEach(row => row.remove());
@@ -1076,7 +1067,7 @@ function repairSection(container) {{
   }}
 
   // Put hidden cards in a hidden holding row
-  const hiddenCards = allCards.filter(c => c.style.display === 'none');
+  const hiddenCards = allCards.filter(c => c.style.display === 'none' || c.classList.contains('qf-hidden'));
   if (hiddenCards.length > 0) {{
     const holdingRow = document.createElement('div');
     holdingRow.className = 'grid-row';
@@ -1775,6 +1766,7 @@ window.addEventListener('DOMContentLoaded', () => {{
       if (matches) card.classList.remove('qf-hidden');
       else card.classList.add('qf-hidden');
     }});
+    applyVisibility();
   }}
 }})();
 
