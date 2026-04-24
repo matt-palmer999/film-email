@@ -9,7 +9,7 @@ import os
 import re
 import smtplib
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
 
 VALENCIA_TZ = ZoneInfo("Europe/Madrid")
