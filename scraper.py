@@ -725,11 +725,12 @@ window.addEventListener('DOMContentLoaded', () => {{
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
 
   // Apply cinema filter from URL params (set by preferences)
-  // Skip entirely if classics override is on — classic films show all cinemas
+  // Skip if this is a classic film and the classics override is on
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas');
+  const isClassicFilm = params.get('classic') === 'true';
   const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !alwaysClassics) {{
+  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
@@ -1227,8 +1228,9 @@ def film_card_html(film: dict) -> str:
     title_es = title
     title_en = film.get("title_en", title)
     slug     = film.get("slug")
+    classic_param = '?classic=true' if section == '2' else ''
     if slug:
-        title_html_list = f'<a href="./{slug}/" class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+        title_html_list = f'<a href="./{slug}/{classic_param}" class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
     else:
         title_html_list = f'<div class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
     syn_es   = (film.get("synopsis_es") or synopsis)[:200]
@@ -1337,8 +1339,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
+        classic_param_feat = '?classic=true' if section == '2' else ''
         if slug:
-            title_html_feat = f'<a href="./{slug}/" class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            title_html_feat = f'<a href="./{slug}/{classic_param_feat}" class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html_feat = f'<div class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         title_orig= film.get("title_original", film["title"])
@@ -1424,7 +1427,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
         if slug:
-            title_html_grid = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            classic_param_grid = '?classic=true' if section == '2' else ''
+            title_html_grid = f'<a href="./{slug}/{classic_param_grid}" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html_grid = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         syn_es   = (film.get("synopsis_es") or synopsis)[:140]
