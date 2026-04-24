@@ -1303,19 +1303,6 @@ window.addEventListener('DOMContentLoaded', () => {
   applyVisibility();
   loadUserPreferences();
   attachCardClicks();
-
-  // After preferences load, update film links to pass params through
-  // We do this after a short delay to allow loadUserPreferences() to update the URL
-  setTimeout(() => {
-    const params = window.location.search;
-    if (params) {
-      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-        const base = a.getAttribute('href').split('?')[0];
-        a.href = base + params;
-      });
-    }
-    attachCardClicks();
-  }, 1500);
 });
 
 // ── CARD CLICK — make entire card clickable via title link
