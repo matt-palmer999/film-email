@@ -1318,13 +1318,16 @@ window.addEventListener('DOMContentLoaded', () => {
   // After preferences load, update film links to pass params through
   // We do this after a short delay to allow loadUserPreferences() to update the URL
   setTimeout(() => {
-    const params = window.location.search;
-    if (params) {
-      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-        const base = a.getAttribute('href').split('?')[0];
-        a.href = base + params;
-      });
-    }
+    const currentParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(currentParams);
+      if (card && card.dataset.section === '2') {
+        linkParams.set('classic', 'true');
+      }
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    });
     attachCardClicks();
   }, 1500);
 });
