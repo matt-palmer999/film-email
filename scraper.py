@@ -1741,27 +1741,50 @@ window.addEventListener('DOMContentLoaded', () => {{
     const dayKey = qfDay === 'today' ? todayKey : qfDay === 'tomorrow' ? tomorrowKey : qfDay === 'plus1' ? plus1Key : null;
 
     document.querySelectorAll('[data-showdays]').forEach(card => {{
-      if (!dayKey) {{
+      // No day filter and any time = show all
+      if (!dayKey && qfTime === 'anytime') {{
         card.classList.remove('qf-hidden');
         return;
       }}
-      const showdays = (card.dataset.showdays || '').split(',');
-      if (!showdays.includes(dayKey)) {{
-        card.classList.add('qf-hidden');
-        return;
-      }}
-      if (qfTime === 'anytime') {{
+
+      // Day filter: check if film shows on selected day
+      if (dayKey) {{
+        const showdays = (card.dataset.showdays || '').split(',');
+        if (!showdays.includes(dayKey)) {{
+          card.classList.add('qf-hidden');
+          return;
+        }}
+        // Time filter on specific day
+        if (qfTime !== 'anytime') {{
+          const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
+          const times = timesAttr.split('|').filter(Boolean);
+          const matches = times.some(t => {{
+            const h = parseInt(t.split(':')[0]);
+            if (qfTime === 'morning')   return h < 12;
+            if (qfTime === 'afternoon') return h >= 12 && h < 18;
+            if (qfTime === 'evening')   return h >= 18;
+            return true;
+          }});
+          if (matches) card.classList.remove('qf-hidden');
+          else card.classList.add('qf-hidden');
+          return;
+        }}
         card.classList.remove('qf-hidden');
         return;
       }}
-      const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
-      const times = timesAttr.split('|').filter(Boolean);
-      const matches = times.some(t => {{
-        const h = parseInt(t.split(':')[0]);
-        if (qfTime === 'morning')   return h < 12;
-        if (qfTime === 'afternoon') return h >= 12 && h < 18;
-        if (qfTime === 'evening')   return h >= 18;
-        return true;
+
+      // No day selected but time filter active — check across ALL days
+      const showdays = (card.dataset.showdays || '').split(',').filter(Boolean);
+      const matches = showdays.some(dk => {{
+        const timesAttr = card.getAttribute('data-times-'+dk) || '';
+        const times = timesAttr.split('|').filter(Boolean);
+        return times.some(t => {{
+          const h = parseInt(t.split(':')[0]);
+          if (qfTime === 'morning')   return h < 12;
+          if (qfTime === 'afternoon') return h >= 12 && h < 18;
+          if (qfTime === 'evening')   return h >= 18;
+          return true;
+        }});
       }});
       if (matches) card.classList.remove('qf-hidden');
       else card.classList.add('qf-hidden');
