@@ -894,6 +894,17 @@ async function loadUserPreferences() {
   if (hasParams) {
     setSubscriberUI(true);
     applyPreferencesFromURL();
+    // Update section 2 links to carry classic=true
+    const currentParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(currentParams);
+      if (card && card.dataset.section === '2') {
+        linkParams.set('classic', 'true');
+      }
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    });
     return;
   }
 
