@@ -1045,7 +1045,7 @@ function initSections() {{
 }}
 
 function repairSection(container) {{
-  const allCards     = Array.from(container.querySelectorAll('.grid-row .grid-card'));
+  const allCards     = Array.from(container.querySelectorAll('.grid-card'));
   const visibleCards = allCards.filter(c => c.style.display !== 'none');
 
   // Detach all cards from their rows (keep them in memory)
