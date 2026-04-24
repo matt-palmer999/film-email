@@ -824,6 +824,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#6a5e7a;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
 .qf-btn:hover{color:#c5b8d8;border-color:#4a3a60}
 .qf-active{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}
+.qf-hidden{display:none!important}
 .filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
@@ -1045,13 +1046,27 @@ function initSections() {{
 }}
 
 function repairSection(container) {{
-  const allCards     = Array.from(container.querySelectorAll('.grid-card'));
+  // Collect ALL grid-cards — including any floating directly in container
+  const allCards = Array.from(container.querySelectorAll('.grid-card'));
+
+  // Also grab any cards directly in container (not in a row)
+  Array.from(container.children).forEach(child => {{
+    if (child.classList.contains('grid-card') && !allCards.includes(child)) {{
+      allCards.push(child);
+    }}
+  }});
+
   const visibleCards = allCards.filter(c => c.style.display !== 'none');
 
-  // Detach all cards from their rows (keep them in memory)
+  // Remove all rows
   container.querySelectorAll('.grid-row').forEach(row => row.remove());
 
-  // Re-pair: visible cards get fresh rows, hidden cards go in hidden rows
+  // Remove any floating cards directly in container
+  Array.from(container.children).forEach(child => {{
+    if (child.classList.contains('grid-card')) child.remove();
+  }});
+
+  // Re-pair visible cards into fresh rows
   for (let i = 0; i < visibleCards.length; i += 2) {{
     const row = document.createElement('div');
     row.className = 'grid-row';
@@ -1060,7 +1075,7 @@ function repairSection(container) {{
     container.appendChild(row);
   }}
 
-  // Put hidden cards in a hidden holding row so they stay in the DOM
+  // Put hidden cards in a hidden holding row
   const hiddenCards = allCards.filter(c => c.style.display === 'none');
   if (hiddenCards.length > 0) {{
     const holdingRow = document.createElement('div');
@@ -1139,9 +1154,6 @@ function applyVisibility() {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }}
-
-    // Quick filter override
-    if (show && card.dataset.qfhide === 'true') show = false;
 
     card.style.display = show ? '' : 'none';
     if (show) visible++;
@@ -1734,31 +1746,30 @@ window.addEventListener('DOMContentLoaded', () => {{
 
     document.querySelectorAll('[data-showdays]').forEach(card => {{
       if (!dayKey) {{
-        delete card.dataset.qfhide;
-        card.style.display = '';
-      }} else {{
-        const showdays = (card.dataset.showdays || '').split(',');
-        if (!showdays.includes(dayKey)) {{
-          card.dataset.qfhide = 'true';
-          return;
-        }}
-        if (qfTime === 'anytime') {{
-          card.dataset.qfhide = 'false';
-          return;
-        }}
-        const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
-        const times = timesAttr.split('|').filter(Boolean);
-        const matches = times.some(t => {{
-          const h = parseInt(t.split(':')[0]);
-          if (qfTime === 'morning')   return h < 12;
-          if (qfTime === 'afternoon') return h >= 12 && h < 18;
-          if (qfTime === 'evening')   return h >= 18;
-          return true;
-        }});
-        card.dataset.qfhide = matches ? 'false' : 'true';
+        card.classList.remove('qf-hidden');
+        return;
       }}
+      const showdays = (card.dataset.showdays || '').split(',');
+      if (!showdays.includes(dayKey)) {{
+        card.classList.add('qf-hidden');
+        return;
+      }}
+      if (qfTime === 'anytime') {{
+        card.classList.remove('qf-hidden');
+        return;
+      }}
+      const timesAttr = card.getAttribute('data-times-'+dayKey) || '';
+      const times = timesAttr.split('|').filter(Boolean);
+      const matches = times.some(t => {{
+        const h = parseInt(t.split(':')[0]);
+        if (qfTime === 'morning')   return h < 12;
+        if (qfTime === 'afternoon') return h >= 12 && h < 18;
+        if (qfTime === 'evening')   return h >= 18;
+        return true;
+      }});
+      if (matches) card.classList.remove('qf-hidden');
+      else card.classList.add('qf-hidden');
     }});
-    applyVisibility();
   }}
 }})();
 
