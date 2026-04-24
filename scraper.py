@@ -1620,15 +1620,16 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;margin-bottom:3px;">quick<em style="color:#ffb432;font-style:italic;">filter</em></div>
     <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:14px;" data-es="filtros avanzados →" data-en="advanced filters →">filtros avanzados →</a>
     <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
+      <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
       <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
       <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
       <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
     </div>
     <div id="qf-times" style="display:flex;gap:8px;">
+      <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
       <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
       <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
       <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
-      <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
     </div>
   </div>
 
@@ -1720,15 +1721,19 @@ window.addEventListener('DOMContentLoaded', () => {{
 
   const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
   const plus1Btn = document.getElementById('qf-plus1');
-  if (plus1Btn) plus1Btn.textContent = days[plus1.getDay()] + ' ' + plus1.getDate();
+  if (plus1Btn) {{
+    const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+    plus1Btn.textContent = days[plus1.getDay()] + ' ' + plus1.getDate();
+  }}
 
   let qfDay  = null;
   let qfTime = 'anytime';
 
   window.setQFDay = function(day) {{
-    qfDay = (qfDay === day) ? null : day;
-    ['today','tomorrow','plus1'].forEach(d => {{
-      document.getElementById('qf-'+d)?.classList.toggle('qf-active', qfDay === d);
+    qfDay = (day === 'all') ? null : day;
+    ['all','today','tomorrow','plus1'].forEach(d => {{
+      const active = (d === 'all' && !qfDay) || (d === qfDay);
+      document.getElementById('qf-'+d)?.classList.toggle('qf-active', active);
     }});
     applyQF();
   }};
