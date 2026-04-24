@@ -1735,6 +1735,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     document.querySelectorAll('[data-showdays]').forEach(card => {{
       if (!dayKey) {{
         delete card.dataset.qfhide;
+        card.style.display = '';
       }} else {{
         const showdays = (card.dataset.showdays || '').split(',');
         if (!showdays.includes(dayKey)) {{
