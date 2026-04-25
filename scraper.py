@@ -719,6 +719,20 @@ window.addEventListener('DOMContentLoaded', () => {{
   const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
 
+  // Activate correct day tab if tab param is set (from quick filter)
+  const tabParam = urlParams.get('tab');
+  if (tabParam) {{
+    const today    = new Date();
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const plus1    = new Date(today); plus1.setDate(today.getDate()+2);
+    function toKey(d) {{ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }}
+    const targetKey = tabParam === 'today' ? toKey(today) : tabParam === 'tomorrow' ? toKey(tomorrow) : tabParam === 'plus1' ? toKey(plus1) : null;
+    if (targetKey) {{
+      const tab = document.querySelector(`.day-tab[data-day="${{targetKey}}"]`);
+      if (tab) tab.click();
+    }}
+  }}
+
   // Gate: show showtimes for subscribers, gate for non-subscribers
   const isSubscriber = document.cookie.match(/(^| )cv_email=([^;]+)/);
   document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
@@ -1691,6 +1705,10 @@ window.addEventListener('DOMContentLoaded', () => {{
   // We do this after a short delay to allow loadUserPreferences() to update the URL
   setTimeout(() => {{
     const currentParams = new URLSearchParams(window.location.search);
+    // Add selected quick filter day as tab param for detail page
+    if (typeof qfDay !== 'undefined' && qfDay && qfDay !== 'all') {{
+      currentParams.set('tab', qfDay);
+    }}
     document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
       const base = a.getAttribute('href').split('?')[0];
       const card = a.closest('[data-section]');
