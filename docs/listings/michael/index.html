@@ -89,7 +89,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.3</span><span class="rating-badge">+12</span></div>
       <div class="hero-title" data-es="Michael" data-en="Michael">Michael</div>
       
-      <div class="hero-meta"><span data-es="EEUU. 2026 . Biopic , Drama , Música . 127 min ." data-en="US . 2026 . Music , Drama . 127 min">EEUU. 2026 . Biopic , Drama , Música . 127 min .</span></div>
+      <div class="hero-meta"><span data-es="EEUU. 2026 . Biopic , Drama , Música . 127 min ." data-en="US . 2026 . Music , Drama . 155 min">EEUU. 2026 . Biopic , Drama , Música . 127 min .</span></div>
       <div class="hero-synopsis" data-es="El viaje de Michael Jackson más allá de la música, desde el descubrimiento de su extraordinario talento como líder de los Jackson Five hasta convertirse en una visionaria estrella cuya ambición creativa despertó un incansable afán por consagrarse como el mayor icono de la industria del entretenimiento." data-en="Discover the story of Michael Jackson, one of the most influential artists the world has ever known, and his life beyond the music, tracing his journey from the discovery of his extraordinary talent as the lead of the Jackson Five, to the visionary artist whose creative ambition fueled a relentless pursuit to become the biggest entertainer in the world, highlighting both his life off-stage and som">El viaje de Michael Jackson más allá de la música, desde el descubrimiento de su extraordinario talento como líder de los Jackson Five hasta convertirse en una visionaria estrella cuya ambición creativa despertó un incansable afán por consagrarse como el mayor icono de la industria del entretenimiento.</div>
     </div>
   </div>
@@ -195,6 +195,34 @@ window.addEventListener('DOMContentLoaded', () => {
       const cid = row.getAttribute('data-cinema-id');
       if (!allowed.includes(cid)) {
         row.style.display = 'none';
+      }
+    });
+    // After hiding rows, update each day panel:
+    // 1. If all rows in a panel are now hidden, show the "no screenings" message
+    // 2. Remove has-shows from the day tab so it doesn't show green falsely
+    document.querySelectorAll('.day-panel').forEach(panel => {
+      const dayKey = panel.id.replace('day-', '');
+      const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
+                               .filter(r => r.style.display !== 'none');
+      const noTimesEl = panel.querySelector('.no-times');
+      if (visibleRows.length === 0) {
+        // Show "no screenings" message — create it if it doesn't already exist
+        if (!noTimesEl) {
+          const msg = document.createElement('div');
+          msg.className = 'no-times';
+          msg.setAttribute('data-es', 'Sin sesiones este día');
+          msg.setAttribute('data-en', 'No screenings this day');
+          msg.textContent = 'Sin sesiones este día';
+          panel.appendChild(msg);
+        } else {
+          noTimesEl.style.display = '';
+        }
+        // Remove the green has-shows indicator from the corresponding tab
+        const tab = document.querySelector(`.day-tab[data-day="${dayKey}"]`);
+        if (tab) tab.classList.remove('has-shows');
+      } else {
+        // Visible rows exist — keep any no-times message hidden
+        if (noTimesEl) noTimesEl.style.display = 'none';
       }
     });
   }

@@ -197,6 +197,34 @@ window.addEventListener('DOMContentLoaded', () => {
         row.style.display = 'none';
       }
     });
+    // After hiding rows, update each day panel:
+    // 1. If all rows in a panel are now hidden, show the "no screenings" message
+    // 2. Remove has-shows from the day tab so it doesn't show green falsely
+    document.querySelectorAll('.day-panel').forEach(panel => {
+      const dayKey = panel.id.replace('day-', '');
+      const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
+                               .filter(r => r.style.display !== 'none');
+      const noTimesEl = panel.querySelector('.no-times');
+      if (visibleRows.length === 0) {
+        // Show "no screenings" message — create it if it doesn't already exist
+        if (!noTimesEl) {
+          const msg = document.createElement('div');
+          msg.className = 'no-times';
+          msg.setAttribute('data-es', 'Sin sesiones este día');
+          msg.setAttribute('data-en', 'No screenings this day');
+          msg.textContent = 'Sin sesiones este día';
+          panel.appendChild(msg);
+        } else {
+          noTimesEl.style.display = '';
+        }
+        // Remove the green has-shows indicator from the corresponding tab
+        const tab = document.querySelector(`.day-tab[data-day="${dayKey}"]`);
+        if (tab) tab.classList.remove('has-shows');
+      } else {
+        // Visible rows exist — keep any no-times message hidden
+        if (noTimesEl) noTimesEl.style.display = 'none';
+      }
+    });
   }
 
   // Highlight times matching evening/weekend filter
