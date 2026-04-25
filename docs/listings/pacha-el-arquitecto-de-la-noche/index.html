@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="El arquitecto — Cartelera Valencia" data-en="The Great Arch — Cartelera Valencia">El arquitecto — Cartelera Valencia</title>
+<title data-es="El arquitecto — Cartelera Valencia" data-en="Pachá: El arquitecto de la noche — Cartelera Valencia">El arquitecto — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -84,13 +84,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/zriwECvMyJNcUdXrELeYSrXF0f2.jpg" alt="El arquitecto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://mabuse.es/wp-content/uploads/2026/01/El-arquitecto-1-279x400.jpg" alt="El arquitecto" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.2</span><span class="rating-badge">+12</span></div>
-      <div class="hero-title" data-es="El arquitecto" data-en="The Great Arch">El arquitecto</div>
-      <div class="orig-title" translate="no">L'Inconnu de la Grande Arche</div>
-      <div class="hero-meta"><span data-es="Francia. 2025 . Biopic , Drama , Historia . 105 min ." data-en="FR . 2025 . Drama , History . 104 min">Francia. 2025 . Biopic , Drama , Historia . 105 min .</span></div>
-      <div class="hero-synopsis" data-es="1983. El nuevo gobierno francés convoca el mayor concurso de arquitectura. Codiciado por los grandes estudios, el ganador es, sorprendentemente, un absoluto desconocido: Johan Otto von Spreckelsen, un profesor de arquitectura danés que hasta entonces solo había construido su casa y tres pequeñas capillas. De golpe, se ve al frente de un proyecto colosal: la construcción del Arco de la Defensa de P" data-en="France, 1983. The biggest architectural competition in history is launched by the new socialist president, François Mitterrand. Coveted by all the biggest international architectural firms, the open-call competition is surprisingly won by an unknown: Johan Otto von Spreckelsen, an architecture teacher from Copenhagen. Until then, the fifty-year-old Dane had built only four buildings: his home, and">1983. El nuevo gobierno francés convoca el mayor concurso de arquitectura. Codiciado por los grandes estudios, el ganador es, sorprendentemente, un absoluto desconocido: Johan Otto von Spreckelsen, un profesor de arquitectura danés que hasta entonces solo había construido su casa y tres pequeñas capillas. De golpe, se ve al frente de un proyecto colosal: la construcción del Arco de la Defensa de P</div>
+      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span><span class="rating-badge">+12</span></div>
+      <div class="hero-title" data-es="El arquitecto" data-en="Pachá: El arquitecto de la noche">El arquitecto</div>
+      
+      <div class="hero-meta"><span data-es="Francia. 2025 . Biopic , Drama , Historia . 105 min ." data-en="ES . 2015 . Documentary">Francia. 2025 . Biopic , Drama , Historia . 105 min .</span></div>
+      <div class="hero-synopsis" data-es="Miguel Bardem firma este documental que invita a conocer al fundador del imperio PACHA, Ricardo Urgell, que ha dedicado toda su vida a crear un modo global de entender el ocio, a través de un mensaje de libertad, fiesta, música, diversión y, sobre todo, baile." data-en="De Stéphane Demoustier . Con Claes Bang , Sidse Babett Knudsen , Xavier Dolan .">Miguel Bardem firma este documental que invita a conocer al fundador del imperio PACHA, Ricardo Urgell, que ha dedicado toda su vida a crear un modo global de entender el ocio, a través de un mensaje de libertad, fiesta, música, diversión y, sobre todo, baile.</div>
     </div>
   </div>
 
@@ -124,7 +124,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'The Great Arch' : 'El arquitecto') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Pachá: El arquitecto de la noche' : 'El arquitecto') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
@@ -162,6 +162,20 @@ window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
+
+  // Activate correct day tab if tab param is set (from quick filter)
+  const tabParam = urlParams.get('tab');
+  if (tabParam) {
+    const today    = new Date();
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const plus1    = new Date(today); plus1.setDate(today.getDate()+2);
+    function toKey(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    const targetKey = tabParam === 'today' ? toKey(today) : tabParam === 'tomorrow' ? toKey(tomorrow) : tabParam === 'plus1' ? toKey(plus1) : null;
+    if (targetKey) {
+      const tab = document.querySelector(`.day-tab[data-day="${targetKey}"]`);
+      if (tab) tab.click();
+    }
+  }
 
   // Gate: show showtimes for subscribers, gate for non-subscribers
   const isSubscriber = document.cookie.match(/(^| )cv_email=([^;]+)/);

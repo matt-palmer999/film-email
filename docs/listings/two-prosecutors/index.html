@@ -86,7 +86,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/dU46ROG7HoP7biPtntaMTjkGbU6.jpg" alt="Dos fiscales" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 6.8</span><span class="rating-badge">+12</span></div>
+      <div class="badges"><span class="score-badge">⭐ 6.9</span><span class="rating-badge">+12</span></div>
       <div class="hero-title" data-es="Dos fiscales" data-en="Two Prosecutors">Dos fiscales</div>
       <div class="orig-title" translate="no">Zwei Staatsanwälte</div>
       <div class="hero-meta"><span data-es="Ucrania. 2025 . Drama Histórico , Misterio , Thriller . 118 min ." data-en="DE, FR, LV, LT, NL, UA, RO . 2025 . Drama , Mystery , Thriller , History . 118 min">Ucrania. 2025 . Drama Histórico , Misterio , Thriller . 118 min .</span></div>
@@ -162,6 +162,20 @@ window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
+
+  // Activate correct day tab if tab param is set (from quick filter)
+  const tabParam = urlParams.get('tab');
+  if (tabParam) {
+    const today    = new Date();
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const plus1    = new Date(today); plus1.setDate(today.getDate()+2);
+    function toKey(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    const targetKey = tabParam === 'today' ? toKey(today) : tabParam === 'tomorrow' ? toKey(tomorrow) : tabParam === 'plus1' ? toKey(plus1) : null;
+    if (targetKey) {
+      const tab = document.querySelector(`.day-tab[data-day="${targetKey}"]`);
+      if (tab) tab.click();
+    }
+  }
 
   // Gate: show showtimes for subscribers, gate for non-subscribers
   const isSubscriber = document.cookie.match(/(^| )cv_email=([^;]+)/);
