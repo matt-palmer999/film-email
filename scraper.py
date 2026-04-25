@@ -1201,6 +1201,82 @@ def t(el_type: str, es: str, en: str, cls: str = "") -> str:
     return f'<{el_type}{c} data-es="{es}" data-en="{en}">{es}</{el_type}>'
 
 
+def compute_card_data(film: dict) -> dict:
+    """
+    Compute all data-* attribute values that every card type needs.
+    Extracted here so the identical block doesn't have to live three times
+    (film_card_html, featured_card_html, grid_card_html).
+    Nothing here touches HTML — it only returns plain Python values.
+    """
+    year         = film.get("year", "")
+    cinemas_set  = set(c["id"] for c in film["cinemas"])
+    arthouse_only = cinemas_set.issubset({"babel", "dor"})
+    is_old       = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
+    section      = "2" if (arthouse_only or is_old) else "1"
+    origin       = ",".join(film.get("origin_country", []))
+    score_val    = str(film.get("rating_score") or "")
+    rating_val   = film.get("rating", "?").replace("+", "")
+    cinema_ids   = ",".join(c["id"] for c in cinemas_in_window(film))
+
+    # Does this film have any evening/weekend showtime? (powers the evening filter)
+    has_eve = False
+    for _c in film.get("cinemas", []):
+        for _dk, _times in _c.get("showtimes", {}).items():
+            try:
+                _d = date.fromisoformat(_dk)
+                if _d.weekday() < 5:          # weekday — check for after 17:30
+                    for _t in _times:
+                        _h = int(str(_t).split(":")[0])
+                        _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
+                        if _h > 17 or (_h == 17 and _m >= 30):
+                            has_eve = True
+                            break
+                else:                          # weekend — always counts
+                    has_eve = True
+                if has_eve:
+                    break
+            except Exception:
+                pass
+        if has_eve:
+            break
+    hasevening = "true" if has_eve else "false"
+
+    # Build per-cinema-per-day showtime lookup (powers the quick-filter day/time buttons)
+    today_qf   = datetime.now(VALENCIA_TZ).date()
+    window_end = today_qf + timedelta(days=6)
+    showdays: set = set()
+    showtimes_by_cinema_day: dict = {}
+    for _c in film.get("cinemas", []):
+        _cid = _c.get("id", "")
+        for _dk, _times in _c.get("showtimes", {}).items():
+            try:
+                _d = date.fromisoformat(_dk)
+                if today_qf <= _d <= window_end:
+                    showdays.add(_dk)
+                    showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(
+                        str(t) for t in _times
+                    )
+            except Exception:
+                pass
+    showdays_attr   = ",".join(sorted(showdays))
+    showtimes_attrs = " ".join(
+        f'data-t-{key}="{"|".join(sorted(times))}"'
+        for key, times in showtimes_by_cinema_day.items()
+    )
+
+    return {
+        "year":           year,
+        "section":        section,
+        "origin":         origin,
+        "score_val":      score_val,
+        "rating_val":     rating_val,
+        "cinema_ids":     cinema_ids,
+        "hasevening":     hasevening,
+        "showdays_attr":  showdays_attr,
+        "showtimes_attrs": showtimes_attrs,
+    }
+
+
 def film_card_html(film: dict) -> str:
     """Build a list-card for one film."""
     title    = film["title"]
@@ -1235,55 +1311,16 @@ def film_card_html(film: dict) -> str:
     where_es = "Dónde verla"
     where_en = "Where to see it"
 
-    cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
-
-    year       = film.get("year", "")
-    _cinemas_set = set(c["id"] for c in film["cinemas"])
-    _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-    _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
-    section    = "2" if (_arthouse_only or _is_old) else "1"
-    origin     = ",".join(film.get("origin_country", []))
-    score_val  = str(film.get("rating_score") or "")
-    rating_val = film.get("rating", "?").replace("+", "")
-    _has_eve = False
-    for _c in film.get("cinemas", []):
-        for _dk, _times in _c.get("showtimes", {}).items():
-            try:
-                _d = __import__('datetime').date.fromisoformat(_dk)
-                if _d.weekday() < 5:
-                    for _t in _times:
-                        _h = int(str(_t).split(":")[0])
-                        _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
-                        if _h > 17 or (_h == 17 and _m >= 30):
-                            _has_eve = True; break
-                else:
-                    _has_eve = True
-                if _has_eve: break
-            except Exception:
-                pass
-        if _has_eve: break
-    hasevening = "true" if _has_eve else "false"
-
-    # Build showday/showtime data for quick filter
-    _today_qf   = datetime.now(VALENCIA_TZ).date()
-    _window_end = _today_qf + timedelta(days=6)
-    _showdays   = set()
-    _showtimes_by_cinema_day = {}
-    for _c in film.get("cinemas", []):
-        _cid = _c.get("id", "")
-        for _dk, _times in _c.get("showtimes", {}).items():
-            try:
-                _d = date.fromisoformat(_dk)
-                if _today_qf <= _d <= _window_end:
-                    _showdays.add(_dk)
-                    _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
-            except Exception:
-                pass
-    showdays_attr = ",".join(sorted(_showdays))
-    showtimes_attrs = " ".join(
-        f'data-t-{key}="{"|".join(sorted(times))}"'
-        for key, times in _showtimes_by_cinema_day.items()
-    )
+    cd = compute_card_data(film)
+    year            = cd["year"]
+    section         = cd["section"]
+    origin          = cd["origin"]
+    score_val       = cd["score_val"]
+    rating_val      = cd["rating_val"]
+    cinema_ids      = cd["cinema_ids"]
+    hasevening      = cd["hasevening"]
+    showdays_attr   = cd["showdays_attr"]
+    showtimes_attrs = cd["showtimes_attrs"]
 
     title_es = title
     title_en = film.get("title_en", title)
@@ -1368,55 +1405,16 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
-
-        year       = film.get("year", "")
-        _cinemas_set = set(c["id"] for c in film["cinemas"])
-        _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-        _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
-        section    = "2" if (_arthouse_only or _is_old) else "1"
-        origin     = ",".join(film.get("origin_country", []))
-        score_val  = str(film.get("rating_score") or "")
-        rating_val = film.get("rating", "?").replace("+", "")
-        _has_eve = False
-        for _c in film.get("cinemas", []):
-            for _dk, _times in _c.get("showtimes", {}).items():
-                try:
-                    _d = __import__('datetime').date.fromisoformat(_dk)
-                    if _d.weekday() < 5:
-                        for _t in _times:
-                            _h = int(str(_t).split(":")[0])
-                            _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
-                            if _h > 17 or (_h == 17 and _m >= 30):
-                                _has_eve = True; break
-                    else:
-                        _has_eve = True
-                    if _has_eve: break
-                except Exception:
-                    pass
-            if _has_eve: break
-        hasevening = "true" if _has_eve else "false"
-
-        # Build showday/showtime data for quick filter
-        _today_qf   = datetime.now(VALENCIA_TZ).date()
-        _window_end = _today_qf + timedelta(days=6)
-        _showdays   = set()
-        _showtimes_by_cinema_day = {}
-        for _c in film.get("cinemas", []):
-            _cid = _c.get("id", "")
-            for _dk, _times in _c.get("showtimes", {}).items():
-                try:
-                    _d = date.fromisoformat(_dk)
-                    if _today_qf <= _d <= _window_end:
-                        _showdays.add(_dk)
-                        _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
-                except Exception:
-                    pass
-        showdays_attr = ",".join(sorted(_showdays))
-        showtimes_attrs = " ".join(
-            f'data-t-{key}="{"|".join(sorted(times))}"'
-            for key, times in _showtimes_by_cinema_day.items()
-        )
+        cd = compute_card_data(film)
+        year            = cd["year"]
+        section         = cd["section"]
+        origin          = cd["origin"]
+        score_val       = cd["score_val"]
+        rating_val      = cd["rating_val"]
+        cinema_ids      = cd["cinema_ids"]
+        hasevening      = cd["hasevening"]
+        showdays_attr   = cd["showdays_attr"]
+        showtimes_attrs = cd["showtimes_attrs"]
 
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
@@ -1477,55 +1475,16 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas_in_window(film))
-
-        year       = film.get("year", "")
-        _cinemas_set = set(c["id"] for c in film["cinemas"])
-        _arthouse_only = _cinemas_set.issubset({"babel", "dor"})
-        _is_old    = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
-        section    = "2" if (_arthouse_only or _is_old) else "1"
-        origin     = ",".join(film.get("origin_country", []))
-        score_val  = str(film.get("rating_score") or "")
-        rating_val = film.get("rating", "?").replace("+", "")
-        _has_eve = False
-        for _c in film.get("cinemas", []):
-            for _dk, _times in _c.get("showtimes", {}).items():
-                try:
-                    _d = __import__('datetime').date.fromisoformat(_dk)
-                    if _d.weekday() < 5:
-                        for _t in _times:
-                            _h = int(str(_t).split(":")[0])
-                            _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
-                            if _h > 17 or (_h == 17 and _m >= 30):
-                                _has_eve = True; break
-                    else:
-                        _has_eve = True
-                    if _has_eve: break
-                except Exception:
-                    pass
-            if _has_eve: break
-        hasevening = "true" if _has_eve else "false"
-
-        # Build showday/showtime data for quick filter
-        _today_qf   = datetime.now(VALENCIA_TZ).date()
-        _window_end = _today_qf + timedelta(days=6)
-        _showdays   = set()
-        _showtimes_by_cinema_day = {}
-        for _c in film.get("cinemas", []):
-            _cid = _c.get("id", "")
-            for _dk, _times in _c.get("showtimes", {}).items():
-                try:
-                    _d = date.fromisoformat(_dk)
-                    if _today_qf <= _d <= _window_end:
-                        _showdays.add(_dk)
-                        _showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(str(t) for t in _times)
-                except Exception:
-                    pass
-        showdays_attr = ",".join(sorted(_showdays))
-        showtimes_attrs = " ".join(
-            f'data-t-{key}="{"|".join(sorted(times))}"'
-            for key, times in _showtimes_by_cinema_day.items()
-        )
+        cd = compute_card_data(film)
+        year            = cd["year"]
+        section         = cd["section"]
+        origin          = cd["origin"]
+        score_val       = cd["score_val"]
+        rating_val      = cd["rating_val"]
+        cinema_ids      = cd["cinema_ids"]
+        hasevening      = cd["hasevening"]
+        showdays_attr   = cd["showdays_attr"]
+        showtimes_attrs = cd["showtimes_attrs"]
 
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
