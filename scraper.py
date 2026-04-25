@@ -57,6 +57,8 @@ CINEMAS = {
     "mn4":        {"name": "Cines MN4",          "url": "https://mabuse.es/cine/cines-mn4/",          "website": "https://www.cinesmn4.com",          "type": "multiplex"},
     "dor":        {"name": "Cinestudio D'Or",    "url": "https://mabuse.es/cine/cinestudio-dor/",     "website": "https://cinestudiodor.es",          "type": "arthouse"},
     "gran_turia": {"name": "ABC Gran Turia",     "url": "https://mabuse.es/cine/abc-gran-turia/",     "website": "https://cinesabc.com",              "type": "multiplex"},
+    "cinesa":     {"name": "Cinesa Bonaire",     "url": "https://mabuse.es/cine/cinesa-bonaire/",     "website": "https://www.cinesa.es/cines/bonaire/", "type": "multiplex"},
+    "tivoli":     {"name": "Cine Tívoli",        "url": "https://mabuse.es/cine/cine-tivoli/",        "website": "https://exhicine.es/cine-tivoli/",    "type": "multiplex"},
 }
 
 # Playwright browser instance — shared across all cinema fetches
@@ -1645,7 +1647,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
   <div class="cinema-group-header">
     <div>
-      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys</div>
+      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys · Cinesa · Tívoli</div>
       <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
     </div>
   </div>
@@ -2010,7 +2012,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
           <td style="background:#0a0810;border-top:1px solid #1e1630;padding:18px 40px;text-align:center;">
             <div style="font-size:11px;color:#4a3f5e;line-height:1.8;">
               Kinépolis · Yelmo Campanar · Ocine Aqua · ABC El Saler · ABC Park · ABC Gran Turia<br>
-              Cines MN4 · Cines Lys · <strong style="color:#6a5e7a;">Cines Babel</strong> · <strong style="color:#6a5e7a;">Cinestudio D'Or</strong>
+              Cines MN4 · Cines Lys · Cinesa Bonaire · Cine Tívoli · <strong style="color:#6a5e7a;">Cines Babel</strong> · <strong style="color:#6a5e7a;">Cinestudio D'Or</strong>
             </div>
           </td>
         </tr>
