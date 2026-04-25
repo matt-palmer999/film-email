@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0810">
+  <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,27 +18,27 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <title>whatson.movie — Mis Preferencias / My Preferences</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0a0810;
-      --bg2:       #0f0c14;
-      --bg3:       #160f24;
-      --border:    #2a1f3d;
-      --border2:   #1e1630;
-      --gold:      #ffb432;
-      --gold-dim:  rgba(255,180,50,0.12);
-      --gold-edge: rgba(255,180,50,0.3);
-      --text:      #f0eae0;
-      --text2:     #c5b8d8;
-      --muted:     #9b8faa;
-      --faint:     #8a7e9a;
-      --vose:      #ffd84a;
-      --vose-bg:   rgba(255,220,80,0.12);
-      --vose-edge: rgba(255,220,80,0.35);
-      --green:     #50c88c;
-      --green-bg:  rgba(80,200,140,0.1);
-      --green-edge:rgba(80,200,140,0.3);
+      --bg:        #ffffff;
+      --bg2:       #f5f5f2;
+      --bg3:       #f0f0ec;
+      --border:    #e8e8e4;
+      --border2:   #e0e0da;
+      --gold:      #c0392b;
+      --gold-dim:  rgba(192,57,43,0.08);
+      --gold-edge: rgba(192,57,43,0.4);
+      --text:      #111111;
+      --text2:     #333333;
+      --muted:     #696969;
+      --faint:     #696969;
+      --vose:      #1a3a5c;
+      --vose-bg:   rgba(26,58,92,0.1);
+      --vose-edge: rgba(26,58,92,0.4);
+      --green:     #1a6b3a;
+      --green-bg:  rgba(26,107,58,0.1);
+      --green-edge:rgba(26,107,58,0.4);
       --red:       #e05050;
     }
 
@@ -42,15 +46,15 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: #f5f5f2;
+      color: #111111;
       font-family: 'DM Sans', Helvetica, sans-serif;
       font-weight: 300;
       min-height: 100vh;
     }
 
     /* ── GRAIN ── */
-    body::before {
+    body::before-disabled {
       content: '';
       position: fixed;
       inset: 0;
@@ -66,24 +70,24 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid #e0e0da;
     }
 
     .nav-logo {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 20px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       text-decoration: none;
     }
 
-    .nav-logo span { color: var(--gold); }
+    .nav-logo span { color: #c0392b; }
 
     .lang-toggle {
       display: flex;
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid #cccccc;
     }
 
     .lang-btn {
@@ -95,12 +99,12 @@
       cursor: pointer;
       border: none;
       background: transparent;
-      color: var(--faint);
+      color: #696969;
       font-family: 'DM Sans', sans-serif;
       transition: all .2s;
     }
 
-    .lang-btn.active { background: var(--bg3); color: var(--text); }
+    .lang-btn.active { background: #f0f0ec; color: #111111; }
 
     /* ── MAIN CONTAINER ── */
     .container {
@@ -127,22 +131,22 @@
       font-size: 10px;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #c0392b;
       margin-bottom: 14px;
     }
 
     .page-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 38px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       line-height: 1.1;
       margin-bottom: 10px;
     }
 
     .page-desc {
       font-size: 15px;
-      color: var(--muted);
+      color: #696969;
       line-height: 1.7;
       margin-bottom: 36px;
     }
@@ -154,17 +158,17 @@
       font-size: 11px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--faint);
+      color: #696969;
       margin-bottom: 8px;
     }
 
     .form-input {
       width: 100%;
       padding: 14px 18px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      color: #111111;
       font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       font-weight: 300;
@@ -172,16 +176,16 @@
       transition: border-color .3s;
     }
 
-    .form-input:focus { border-color: var(--gold); }
-    .form-input::placeholder { color: var(--faint); }
+    .form-input:focus { border-color: #c0392b; }
+    .form-input::placeholder { color: #696969; }
 
     .btn-primary {
       width: 100%;
       padding: 15px;
-      background: var(--gold);
-      color: var(--bg);
+      background: #c0392b;
+      color: #111111;
       border: none;
-      border-radius: 10px;
+      border-radius: 4px;
       font-family: 'DM Sans', sans-serif;
       font-size: 13px;
       font-weight: 600;
@@ -197,45 +201,45 @@
 
     .alert {
       padding: 14px 18px;
-      border-radius: 10px;
+      border-radius: 4px;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 16px;
     }
 
     .alert-success {
-      background: var(--green-bg);
-      border: 1px solid var(--green-edge);
-      color: var(--green);
+      background: rgba(26,107,58,0.1);
+      border: 1px solid rgba(26,107,58,0.4);
+      color: #1a6b3a;
     }
 
     .alert-error {
       background: rgba(224,80,80,0.1);
       border: 1px solid rgba(224,80,80,0.3);
-      color: var(--red);
+      color: #c0392b;
     }
 
     .alert-info {
-      background: var(--gold-dim);
-      border: 1px solid var(--gold-edge);
-      color: var(--gold);
+      background: rgba(192,57,43,0.08);
+      border: 1px solid rgba(192,57,43,0.4);
+      color: #c0392b;
     }
 
     /* ── PREFERENCES PANEL ── */
     .prefs-header {
       margin-bottom: 36px;
       padding-bottom: 24px;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid #e0e0da;
     }
 
     .prefs-email {
       display: inline-block;
       padding: 4px 12px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       font-size: 13px;
-      color: var(--text2);
+      color: #333333;
       margin-top: 8px;
     }
 
@@ -247,10 +251,10 @@
       font-size: 10px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--faint);
+      color: #696969;
       margin-bottom: 14px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid #e0e0da;
     }
 
     /* Toggle switch */
@@ -259,38 +263,51 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 18px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       margin-bottom: 10px;
       cursor: pointer;
       transition: border-color .2s;
     }
 
-    .toggle-row:hover { border-color: rgba(255,180,50,0.3); }
+    .toggle-row:hover { border-color: rgba(192,57,43,0.4); }
 
-    .toggle-row.vose-row:hover { border-color: var(--vose-edge); }
+    .toggle-row.vose-row:hover { border-color: rgba(26,58,92,0.4); }
 
     .toggle-info { flex: 1; }
+
+    .toggle-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-right: 14px;
+    }
 
     .toggle-title {
       font-size: 14px;
       font-weight: 500;
-      color: var(--text2);
+      color: #333333;
       margin-bottom: 2px;
     }
 
     .toggle-desc {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
       line-height: 1.4;
     }
 
     .toggle-switch {
       width: 44px;
       height: 24px;
-      background: var(--border);
-      border-radius: 12px;
+      background: #cccccc;
+      border-radius: 4px;
       position: relative;
       flex-shrink: 0;
       margin-left: 16px;
@@ -302,7 +319,7 @@
       position: absolute;
       width: 18px;
       height: 18px;
-      background: var(--muted);
+      background: #696969;
       border-radius: 50%;
       top: 3px;
       left: 3px;
@@ -310,16 +327,16 @@
     }
 
     .toggle-row.on .toggle-switch {
-      background: var(--gold);
+      background: #c0392b;
     }
 
     .toggle-row.on .toggle-switch::after {
       transform: translateX(20px);
-      background: var(--bg);
+      background: #f5f5f2;
     }
 
     .toggle-row.vose-row.on .toggle-switch {
-      background: var(--vose);
+      background: #1a3a5c;
     }
 
     /* Cinema grid */
@@ -334,31 +351,26 @@
       align-items: center;
       gap: 10px;
       padding: 12px 16px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       cursor: pointer;
       transition: all .2s;
       user-select: none;
     }
 
-    .cinema-pill:hover { border-color: rgba(255,180,50,0.3); }
+    .cinema-pill:hover { border-color: rgba(192,57,43,0.4); }
 
     .cinema-pill.selected {
-      border-color: var(--gold);
-      background: var(--gold-dim);
-    }
-
-    .cinema-pill.arthouse.selected {
-      border-color: var(--vose-edge);
-      background: var(--vose-bg);
+      border-color: #c0392b;
+      background: rgba(192,57,43,0.08);
     }
 
     .cinema-check {
       width: 18px;
       height: 18px;
       border-radius: 4px;
-      border: 1px solid var(--border);
+      border: 1px solid #cccccc;
       background: transparent;
       flex-shrink: 0;
       display: flex;
@@ -369,24 +381,17 @@
     }
 
     .cinema-pill.selected .cinema-check {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--bg);
-    }
-
-    .cinema-pill.arthouse.selected .cinema-check {
-      background: var(--vose);
-      border-color: var(--vose);
+      background: #c0392b;
+      border-color: #c0392b;
+      color: #111111;
     }
 
     .cinema-name {
       font-size: 13px;
-      color: var(--text2);
+      color: #333333;
       font-weight: 400;
       line-height: 1.3;
     }
-
-    .cinema-pill.arthouse .cinema-name { color: var(--vose); }
 
     /* Language selector */
     .lang-choice {
@@ -397,19 +402,19 @@
     .lang-option {
       flex: 1;
       padding: 14px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       text-align: center;
       cursor: pointer;
       transition: all .2s;
     }
 
-    .lang-option:hover { border-color: rgba(255,180,50,0.3); }
+    .lang-option:hover { border-color: rgba(192,57,43,0.4); }
 
     .lang-option.selected {
-      border-color: var(--gold);
-      background: var(--gold-dim);
+      border-color: #c0392b;
+      background: rgba(192,57,43,0.08);
     }
 
     .lang-option-flag { font-size: 24px; margin-bottom: 4px; }
@@ -417,7 +422,7 @@
     .lang-option-label {
       font-size: 12px;
       font-weight: 500;
-      color: var(--text2);
+      color: #333333;
       letter-spacing: 1px;
     }
 
@@ -425,16 +430,16 @@
     .save-area {
       margin-top: 36px;
       padding-top: 24px;
-      border-top: 1px solid var(--border2);
+      border-top: 1px solid #e0e0da;
     }
 
     .btn-save {
       width: 100%;
       padding: 16px;
-      background: var(--gold);
-      color: var(--bg);
+      background: #c0392b;
+      color: #111111;
       border: none;
-      border-radius: 10px;
+      border-radius: 4px;
       font-family: 'DM Sans', sans-serif;
       font-size: 13px;
       font-weight: 600;
@@ -452,16 +457,100 @@
       width: 100%;
       padding: 12px;
       background: transparent;
-      color: var(--faint);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
+      color: #696969;
+      border: 1px solid #e0e0da;
+      border-radius: 4px;
       font-family: 'DM Sans', sans-serif;
       font-size: 12px;
       cursor: pointer;
       transition: all .2s;
     }
 
-    .btn-unsub:hover { color: var(--red); border-color: rgba(224,80,80,0.3); }
+    .btn-unsub:hover { color: #c0392b; border-color: rgba(224,80,80,0.3); }
+
+    /* Sub-options (shown below a toggle when active) */
+    .sub-option {
+      margin: -6px 0 10px;
+      padding: 14px 18px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .sub-option-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #696969;
+      margin-bottom: 10px;
+    }
+
+    .sub-option-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sub-pill {
+      flex: 1;
+      padding: 9px 14px;
+      background: #ffffff;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #333333;
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+    }
+
+    .sub-pill:hover { border-color: rgba(192,57,43,0.4); }
+
+    .sub-pill.selected {
+      background: rgba(192,57,43,0.08);
+      border-color: #c0392b;
+      color: #c0392b;
+      font-weight: 500;
+    }
+
+    .rating-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rating-slider-bound {
+      font-size: 12px;
+      color: #696969;
+      flex-shrink: 0;
+    }
+
+    .rating-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: #cccccc;
+      outline: none;
+    }
+
+    .rating-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #c0392b;
+      cursor: pointer;
+    }
+
+    .rating-slider-val {
+      font-size: 14px;
+      font-weight: 500;
+      color: #c0392b;
+      min-width: 48px;
+      text-align: right;
+      flex-shrink: 0;
+    }
 
     @media (max-width: 500px) {
       nav { padding: 14px 20px; }
@@ -489,7 +578,7 @@
       <h1 class="page-title" data-es="Cargando preferencias..." data-en="Loading preferences...">Cargando preferencias...</h1>
       <p class="page-desc" data-es="Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder." data-en="If you see this for more than a few seconds, you may be on a different device to the one you subscribed on. Go back to the homepage and sign up again to get access.">Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder.</p>
       <div id="request-alert" style="display:none;"></div>
-      <a href="../" style="color:var(--gold);font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
+      <a href="../" style="color:#c0392b;font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
     </div>
 
     <!-- ── PANEL 2: PREFERENCES ── -->
@@ -507,29 +596,81 @@
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Filtros de contenido" data-en="Content filters">Filtros de contenido</div>
 
+        <!-- VOSE -->
         <div class="toggle-row vose-row" id="toggle-vose" onclick="togglePref('vose_only')">
+          <div class="toggle-icon">🎬</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo sesiones VOSE" data-en="VOSE sessions only">Solo sesiones VOSE</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas con sesiones en versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con sesiones en versión original subtitulada</div>
+            <div class="toggle-desc" data-es="Muestra únicamente películas con versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con versión original subtitulada</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="sub-option" id="sub-vose" style="display:none;">
+          <div class="sub-option-label" data-es="Idioma VOSE" data-en="VOSE language">Idioma VOSE</div>
+          <div class="sub-option-pills">
+            <div class="sub-pill selected" id="vose-lang-en" onclick="selectVoseLang('en')" data-es="Solo inglés" data-en="English only">Solo inglés</div>
+            <div class="sub-pill" id="vose-lang-all" onclick="selectVoseLang('all')" data-es="Todos los idiomas" data-en="All languages">Todos los idiomas</div>
+          </div>
+        </div>
+
+        <!-- FAMILY FRIENDLY -->
+        <div class="toggle-row" id="toggle-family" onclick="togglePref('family_only')">
+          <div class="toggle-icon">👨‍👩‍👧</div>
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Solo apto para familias" data-en="Family friendly only">Solo apto para familias</div>
+            <div class="toggle-desc" data-es="Solo películas con clasificación 12 o inferior" data-en="Only films rated 12 and under">Solo películas con clasificación 12 o inferior</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
 
+        <!-- EVENING & WEEKENDS -->
+        <div class="toggle-row" id="toggle-evening" onclick="togglePref('evening_only')">
+          <div class="toggle-icon">🌙</div>
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Solo tardes y fines de semana" data-en="Evenings &amp; weekends only">Solo tardes y fines de semana</div>
+            <div class="toggle-desc" data-es="Solo sesiones a partir de las 17:30 en días laborables" data-en="Only screenings from 17:30 on weekdays">Solo sesiones a partir de las 17:30 en días laborables</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+
+        <!-- NEW RELEASES -->
         <div class="toggle-row" id="toggle-new" onclick="togglePref('new_only')">
+          <div class="toggle-icon">✨</div>
           <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo estrenos" data-en="New releases only">Solo estrenos</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas que se estrenan esta semana" data-en="Only show films releasing this week">Muestra únicamente películas que se estrenan esta semana</div>
+            <div class="toggle-title" data-es="Solo estrenos recientes" data-en="New releases only">Solo estrenos recientes</div>
+            <div class="toggle-desc" data-es="Solo películas estrenadas en las últimas 2 semanas" data-en="Only films released in the last 2 weeks">Solo películas estrenadas en las últimas 2 semanas</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
 
+        <!-- ALWAYS SHOW CLASSICS -->
         <div class="toggle-row" id="toggle-classics" onclick="togglePref('classics')">
+          <div class="toggle-icon">🎭</div>
           <div class="toggle-info">
-            <div class="toggle-title" data-es="Incluir clásicos en reposición" data-en="Include classics &amp; reissues">Incluir clásicos en reposición</div>
-            <div class="toggle-desc" data-es="Incluye películas clásicas que vuelven a la gran pantalla (especialmente Cinestudio D'Or)" data-en="Include classic films returning to the big screen (especially Cinestudio D'Or)">Incluye películas clásicas que vuelven a la gran pantalla (especialmente Cinestudio D'Or)</div>
+            <div class="toggle-title" data-es="Mostrar siempre clásicos" data-en="Always show classics">Mostrar siempre clásicos</div>
+            <div class="toggle-desc" data-es="Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos" data-en="Show arthouse and classic re-releases regardless of other filters">Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
+
+        <!-- MIN RATING -->
+        <div class="toggle-row" id="toggle-rating" onclick="togglePref('rating_filter')">
+          <div class="toggle-icon">⭐</div>
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Puntuación mínima" data-en="Minimum rating">Puntuación mínima</div>
+            <div class="toggle-desc" id="rating-desc" data-es="Oculta películas con puntuación baja en TMDB" data-en="Hide films below a minimum TMDB score">Oculta películas con puntuación baja en TMDB</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="sub-option" id="sub-rating" style="display:none;">
+          <div class="sub-option-label" data-es="Puntuación mínima" data-en="Minimum score">Puntuación mínima</div>
+          <div class="rating-slider-row">
+            <span class="rating-slider-bound">6.0</span>
+            <input type="range" min="6" max="9" step="0.5" value="7" id="rating-slider" oninput="updateRatingLabel(this.value)" class="rating-slider" />
+            <span class="rating-slider-val" id="rating-slider-val">★ 7.0+</span>
+          </div>
+        </div>
+
       </div>
 
       <!-- CINEMAS -->
@@ -573,7 +714,7 @@
       <h1 class="page-title" data-es="¿Seguro que quieres darte de baja?" data-en="Are you sure you want to unsubscribe?">¿Seguro que quieres darte de baja?</h1>
       <p class="page-desc" data-es="No recibirás más emails. Puedes volver a suscribirte en cualquier momento." data-en="You will not receive any more emails. You can resubscribe at any time.">No recibirás más emails. Puedes volver a suscribirte en cualquier momento.</p>
       <div style="display:flex;gap:12px;margin-top:8px;">
-        <button class="btn-primary" style="background:var(--red);" onclick="confirmUnsub()">
+        <button class="btn-primary" style="background:#c0392b;" onclick="confirmUnsub()">
           <span data-es="Sí, darme de baja" data-en="Yes, unsubscribe">Sí, darme de baja</span>
         </button>
         <button class="btn-primary" style="flex:0.6;" onclick="showPanel('panel-prefs')">
@@ -587,7 +728,7 @@
       <p class="page-eyebrow">✅</p>
       <h1 class="page-title" id="done-title">Done</h1>
       <p class="page-desc" id="done-desc"></p>
-      <a href="/" style="color:var(--gold);font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
+      <a href="/" style="color:#c0392b;font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
     </div>
 
   </div>
@@ -606,19 +747,24 @@
       { id: 'abc_park',   name: 'ABC Park',            arthouse: false },
       { id: 'gran_turia', name: 'ABC Gran Turia',      arthouse: false },
       { id: 'mn4',        name: 'Cines MN4',           arthouse: false },
-      { id: 'babel',      name: '🎭 Cines Babel',      arthouse: true  },
-      { id: 'dor',        name: "🎞️ Cinestudio D'Or",  arthouse: true  },
+      { id: 'tivoli',     name: 'Cine Tívoli',         arthouse: false },
+      { id: 'babel',      name: 'Cines Babel',         arthouse: true  },
+      { id: 'dor',        name: "Cinestudio D'Or",     arthouse: true  },
     ];
 
     // Current state
     let currentEmail  = '';
-    let currentToken  = '';
     let prefs = {
-      vose_only: false,
-      new_only:  false,
-      classics:  false,
-      cinemas:   CINEMAS.map(c => c.id),
-      lang:      'es',
+      vose_only:    false,
+      vose_lang:    'en',
+      family_only:  false,
+      evening_only: false,
+      new_only:     false,
+      classics:     false,
+      rating_filter: false,
+      min_rating:   7.0,
+      cinemas:      CINEMAS.map(c => c.id),
+      lang:         'es',
     };
 
     // ── LANGUAGE TOGGLE ──
@@ -644,79 +790,13 @@
       document.getElementById(id).classList.add('active');
     }
 
-    // ── REQUEST MAGIC LINK ──
-    async function requestLink() {
-      const emailEl = document.getElementById('request-email');
-      const btn     = document.getElementById('request-btn');
-      const alertEl = document.getElementById('request-alert');
-      const lang    = document.getElementById('html-root').getAttribute('lang');
-      const email   = emailEl.value.trim();
-
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showAlert(alertEl, 'error',
-          lang === 'es' ? 'Por favor introduce un email válido.' : 'Please enter a valid email address.'
-        );
-        return;
-      }
-
-      btn.disabled = true;
-
-      // Generate a random token
-      const token = crypto.randomUUID();
-
-      try {
-        // 1. Store token in Supabase
-        const tokenRes = await fetch(`${SUPABASE_URL}/rest/v1/preference_tokens`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON,
-            'Authorization': `Bearer ${SUPABASE_ANON}`,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ email, token })
-        });
-
-        if (!tokenRes.ok) throw new Error(`Token store failed: ${tokenRes.status}`);
-
-        // 2. Call Edge Function to send the magic link email
-        const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-magic-link`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON}`,
-          },
-          body: JSON.stringify({ email, token, lang })
-        });
-
-        if (!emailRes.ok) {
-          const err = await emailRes.json();
-          throw new Error(`Email send failed: ${JSON.stringify(err)}`);
-        }
-
-        document.getElementById('request-form').style.display = 'none';
-        showAlert(alertEl, 'success',
-          lang === 'es'
-            ? '✅ ¡Enlace enviado! Revisa tu bandeja de entrada.'
-            : '✅ Link sent! Check your inbox.'
-        );
-
-      } catch (err) {
-        showAlert(alertEl, 'error',
-          lang === 'es' ? 'Algo ha fallado. Inténtalo de nuevo.' : 'Something went wrong. Please try again.'
-        );
-        btn.disabled = false;
-        console.error(err);
-      }
-    }
-
-    // ── LOAD PREFERENCES FROM COOKIE EMAIL (no token needed) ──
+    // ── LOAD PREFERENCES FROM COOKIE EMAIL ──
     async function loadFromEmail(email) {
       const lang = document.getElementById('html-root').getAttribute('lang');
       try {
         const subRes = await fetch(
           `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`, 'x-subscriber-email': email } }
         );
         const subs = await subRes.json();
 
@@ -734,74 +814,16 @@
 
         const sub = subs[0];
         currentEmail = email;
-        prefs.vose_only = sub.vose_only || false;
-        prefs.new_only  = sub.new_only  || false;
-        prefs.classics  = sub.classics  || false;
+        prefs.vose_only    = sub.vose_only    || false;
+        prefs.vose_lang    = sub.vose_lang    || 'en';
+        prefs.family_only  = sub.family_only  || false;
+        prefs.evening_only = sub.evening_only || false;
+        prefs.new_only     = sub.new_only     || false;
+        prefs.classics     = sub.classics     || false;
+        prefs.rating_filter = sub.rating_filter || false;
+        prefs.min_rating   = sub.min_rating   || 7.0;
         prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
         prefs.lang      = sub.lang      || 'es';
-
-        renderPreferences();
-        document.getElementById('prefs-email-display').textContent = currentEmail;
-        showPanel('panel-prefs');
-
-      } catch (err) {
-        console.error(err);
-        showPanel('panel-request');
-      }
-    }
-
-    // ── LOAD PREFERENCES FROM TOKEN ──
-    async function loadFromToken(token) {
-      const lang = document.getElementById('html-root').getAttribute('lang');
-
-      try {
-        // Look up token
-        const tokenRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${token}&used=eq.false&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
-        );
-        const tokens = await tokenRes.json();
-
-        if (!tokens.length) {
-          showPanel('panel-request');
-          const alertEl = document.getElementById('request-alert');
-          showAlert(alertEl, 'error',
-            lang === 'es'
-              ? 'Este enlace ha caducado o ya fue usado. Solicita uno nuevo.'
-              : 'This link has expired or was already used. Please request a new one.'
-          );
-          return;
-        }
-
-        const tokenRow = tokens[0];
-        // Check expiry
-        if (new Date(tokenRow.expires_at) < new Date()) {
-          showPanel('panel-request');
-          const alertEl = document.getElementById('request-alert');
-          showAlert(alertEl, 'error',
-            lang === 'es' ? 'Este enlace ha caducado. Solicita uno nuevo.' : 'This link has expired. Please request a new one.'
-          );
-          return;
-        }
-
-        currentEmail = tokenRow.email;
-        currentToken = token;
-
-        // Load subscriber preferences
-        const subRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(currentEmail)}&select=*`,
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
-        );
-        const subs = await subRes.json();
-
-        if (subs.length) {
-          const sub = subs[0];
-          prefs.vose_only = sub.vose_only || false;
-          prefs.new_only  = sub.new_only  || false;
-          prefs.classics  = sub.classics  || false;
-          prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
-          prefs.lang      = sub.lang      || 'es';
-        }
 
         renderPreferences();
         document.getElementById('prefs-email-display').textContent = currentEmail;
@@ -817,13 +839,34 @@
     function renderPreferences() {
       // Toggles
       document.getElementById('toggle-vose').classList.toggle('on', prefs.vose_only);
+      document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
+      document.getElementById('toggle-evening').classList.toggle('on', prefs.evening_only);
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
       document.getElementById('toggle-classics').classList.toggle('on', prefs.classics);
+      document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
+
+      // Sub-options visibility
+      document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
+      if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-vose').style.borderRadius = '';
+
+      document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
+      if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-rating').style.borderRadius = '';
+
+      // VOSE language pills
+      document.getElementById('vose-lang-en').classList.toggle('selected', prefs.vose_lang === 'en');
+      document.getElementById('vose-lang-all').classList.toggle('selected', prefs.vose_lang === 'all');
+
+      // Rating slider
+      const slider = document.getElementById('rating-slider');
+      if (slider) slider.value = prefs.min_rating;
+      document.getElementById('rating-slider-val').textContent = '★ ' + parseFloat(prefs.min_rating).toFixed(1) + '+';
 
       // Cinema grid
       const grid = document.getElementById('cinema-grid');
       grid.innerHTML = CINEMAS.map(c => `
-        <div class="cinema-pill ${c.arthouse ? 'arthouse' : ''} ${prefs.cinemas.includes(c.id) ? 'selected' : ''}"
+        <div class="cinema-pill ${prefs.cinemas.includes(c.id) ? 'selected' : ''}"
              onclick="toggleCinema('${c.id}')">
           <div class="cinema-check">${prefs.cinemas.includes(c.id) ? '✓' : ''}</div>
           <div class="cinema-name" translate="no">${c.name}</div>
@@ -838,7 +881,29 @@
     // ── TOGGLE HELPERS ──
     function togglePref(key) {
       prefs[key] = !prefs[key];
+      // Show/hide sub-options
+      if (key === 'vose_only') {
+        document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
+        if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-vose').style.borderRadius = '';
+      }
+      if (key === 'rating_filter') {
+        document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
+        if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-rating').style.borderRadius = '';
+      }
       renderPreferences();
+    }
+
+    function selectVoseLang(lang) {
+      prefs.vose_lang = lang;
+      document.getElementById('vose-lang-en').classList.toggle('selected', lang === 'en');
+      document.getElementById('vose-lang-all').classList.toggle('selected', lang === 'all');
+    }
+
+    function updateRatingLabel(val) {
+      prefs.min_rating = parseFloat(val);
+      document.getElementById('rating-slider-val').textContent = '★ ' + parseFloat(val).toFixed(1) + '+';
     }
 
     function toggleCinema(id) {
@@ -861,6 +926,7 @@
       const btn  = document.getElementById('save-btn');
       const alertEl = document.getElementById('prefs-alert');
       const lang = document.getElementById('html-root').getAttribute('lang');
+      let saveSuccess = false;
 
       btn.disabled = true;
       btn.querySelector('span').textContent = lang === 'es' ? 'Guardando...' : 'Saving...';
@@ -874,15 +940,21 @@
               'Content-Type': 'application/json',
               'apikey': SUPABASE_ANON,
               'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal'
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({
-              vose_only:  prefs.vose_only,
-              new_only:   prefs.new_only,
-              classics:   prefs.classics,
-              cinemas:    prefs.cinemas,
-              lang:       prefs.lang,
-              updated_at: new Date().toISOString()
+              vose_only:    prefs.vose_only,
+              vose_lang:    prefs.vose_lang,
+              family_only:  prefs.family_only,
+              evening_only: prefs.evening_only,
+              new_only:     prefs.new_only,
+              classics:     prefs.classics,
+              rating_filter: prefs.rating_filter,
+              min_rating:   prefs.min_rating,
+              cinemas:      prefs.cinemas,
+              lang:         prefs.lang,
+              updated_at:   new Date().toISOString()
             })
           }
         );
@@ -892,39 +964,26 @@
         // Refresh cookie on save
         setCookie('cv_email', currentEmail);
 
-        // Mark token as used if we have one
-        if (currentToken) {
-          await fetch(
-            `${SUPABASE_URL}/rest/v1/preference_tokens?token=eq.${currentToken}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_ANON,
-                'Authorization': `Bearer ${SUPABASE_ANON}`,
-                'Prefer': 'return=minimal'
-              },
-              body: JSON.stringify({ used: true })
-            }
-          );
-        }
-
         // Build personalised listings URL from saved preferences
         const listingsBase = '../listings/';
         const p = new URLSearchParams();
-        if (prefs.vose_only) p.set('vose', 'true');
-        if (prefs.new_only)  p.set('new',  'true');
-        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
+        if (prefs.vose_only)     p.set('vose',      'true');
+        if (prefs.vose_lang)     p.set('vose_lang',  prefs.vose_lang);
+        if (prefs.new_only)      p.set('new',       'true');
+        if (prefs.family_only)   p.set('family',    'true');
+        if (prefs.evening_only)  p.set('evening',   'true');
+        if (prefs.classics)      p.set('classics',  'true');
+        if (prefs.rating_filter) p.set('min_rating', prefs.min_rating || 7);
+        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor'];
         const missing = allCinemas.filter(c => !prefs.cinemas.includes(c));
         if (missing.length > 0) p.set('cinemas', prefs.cinemas.join(','));
-        const listingsUrl = listingsBase + (p.toString() ? '?' + p.toString() : '');
+        p.set('v', Date.now()); // cache bust
+        const listingsUrl = listingsBase + '?' + p.toString();
 
-        alertEl.className = 'alert alert-success';
-        alertEl.innerHTML = (lang === 'es'
-          ? '✅ Preferencias guardadas. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">Ver cartelera personalizada →</a>'
-          : '✅ Preferences saved. <a href="' + listingsUrl + '" style="color:#50c88c;font-weight:500;">View your personalised listings →</a>');
-        alertEl.style.display = 'block';
-        alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        btn.querySelector('span').textContent = lang === 'es' ? '✓ Guardado' : '✓ Saved';
+        btn.style.background = '#2a7a4a';
+        saveSuccess = true;
+        setTimeout(() => { window.location.href = listingsUrl; }, 1000);
 
       } catch (err) {
         alertEl.className = 'alert alert-error';
@@ -934,9 +993,11 @@
         alertEl.style.display = 'block';
         console.error(err);
       } finally {
-        btn.disabled = false;
-        const savedLang = document.getElementById('html-root').getAttribute('lang');
-        btn.querySelector('span').textContent = savedLang === 'es' ? 'Guardar preferencias' : 'Save preferences';
+        if (!saveSuccess) {
+          btn.disabled = false;
+          const savedLang = document.getElementById('html-root').getAttribute('lang');
+          btn.querySelector('span').textContent = savedLang === 'es' ? 'Guardar preferencias' : 'Save preferences';
+        }
       }
     }
 
@@ -956,21 +1017,28 @@
               'Content-Type': 'application/json',
               'apikey': SUPABASE_ANON,
               'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal'
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({ active: false })
           }
         );
-
-        document.getElementById('done-title').textContent = lang === 'es' ? 'Hasta pronto 👋' : 'See you around 👋';
-        document.getElementById('done-desc').textContent = lang === 'es'
-          ? 'Te has dado de baja correctamente. Puedes volver a suscribirte en cualquier momento.'
-          : 'You have been successfully unsubscribed. You can resubscribe at any time.';
-        showPanel('panel-done');
-
       } catch (err) {
         console.error(err);
       }
+      // Always delete cookie and redirect regardless of Supabase result
+      const past = 'Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = `cv_email=;expires=${past};path=/;SameSite=Lax`;
+      document.cookie = `cv_email=;expires=${past};path=/`;
+      document.cookie = `cv_email=;expires=${past};path=/;domain=${location.hostname}`;
+      document.cookie = `cv_email=;expires=${past};path=/;domain=.${location.hostname}`;
+      document.cookie = `cv_email=;max-age=0;path=/`;
+      setTimeout(() => { window.location.href = '/'; }, 2000);
+      document.getElementById('done-title').textContent = lang === 'es' ? 'Hasta pronto 👋' : 'See you around 👋';
+      document.getElementById('done-desc').textContent = lang === 'es'
+        ? 'Te has dado de baja correctamente. Redirigiendo al inicio...'
+        : 'You have been successfully unsubscribed. Redirecting to home...';
+      showPanel('panel-done');
     }
 
     // ── ALERT HELPER ──
@@ -994,15 +1062,10 @@
 
     // ── INIT: check cookie first, then URL token ──
     window.addEventListener('DOMContentLoaded', () => {
-      console.log('All cookies:', document.cookie);
       const urlParams   = new URLSearchParams(window.location.search);
-      const urlToken    = urlParams.get('token');
       const cookieEmail = getCookie('cv_email');
-      console.log('cv_email cookie:', cookieEmail);
 
-      if (urlToken) {
-        loadFromToken(urlToken);
-      } else if (cookieEmail) {
+      if (cookieEmail) {
         loadFromEmail(cookieEmail);
       }
     });

@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
   <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0810">
+  <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,24 +17,24 @@
   <title>whatson.movie — Valencia Cinema Weekly</title>
   <meta name="description" content="The weekly guide to cinema in Valencia. Every Thursday, all cinemas, VOSE highlighted. Free newsletter.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0a0810;
-      --bg2:       #0f0c14;
-      --bg3:       #160f24;
-      --border:    #2a1f3d;
-      --border2:   #1e1630;
-      --gold:      #ffb432;
-      --gold-dim:  rgba(255,180,50,0.15);
-      --gold-edge: rgba(255,180,50,0.3);
-      --text:      #f0eae0;
-      --text2:     #c5b8d8;
-      --muted:     #9b8faa;
-      --faint:     #8a7e9a;
-      --vose:      #ffd84a;
-      --vose-bg:   rgba(255,220,80,0.12);
-      --vose-edge: rgba(255,220,80,0.35);
+      --bg:        #ffffff;
+      --bg2:       #f5f5f2;
+      --bg3:       #f0f0ec;
+      --border:    #e8e8e4;
+      --border2:   #e0e0da;
+      --gold:      #c0392b;
+      --gold-dim:  rgba(192,57,43,0.1);
+      --gold-edge: rgba(192,57,43,0.4);
+      --text:      #111111;
+      --text2:     #333333;
+      --muted:     #696969;
+      --faint:     #696969;
+      --vose:      #1a3a5c;
+      --vose-bg:   rgba(26,58,92,0.1);
+      --vose-edge: rgba(26,58,92,0.4);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -40,15 +42,15 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: #f5f5f2;
+      color: #111111;
       font-family: 'DM Sans', Helvetica, sans-serif;
       font-weight: 300;
       overflow-x: hidden;
     }
 
     /* ── GRAIN OVERLAY ── */
-    body::before {
+    body::before-disabled {
       content: '';
       position: fixed;
       inset: 0;
@@ -67,29 +69,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(10,8,16,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border2);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(4px);
+      border-bottom: 1px solid #e0e0da;
     }
 
     .nav-logo {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 20px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       text-decoration: none;
       letter-spacing: 0.5px;
     }
 
-    .nav-logo span { color: var(--gold); }
+    .nav-logo span { color: #c0392b; }
 
     .nav-right { display: flex; align-items: center; gap: 16px; }
 
     .lang-toggle {
       display: flex;
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid #cccccc;
     }
 
     .lang-btn {
@@ -101,22 +103,22 @@
       cursor: pointer;
       border: none;
       background: transparent;
-      color: var(--faint);
+      color: #696969;
       font-family: 'DM Sans', sans-serif;
       transition: all .2s;
     }
 
-    .lang-btn.active { background: var(--bg3); color: var(--text); }
+    .lang-btn.active { background: #f0f0ec; color: #111111; }
 
     .nav-cta {
       padding: 8px 20px;
-      background: var(--gold);
-      color: var(--bg);
+      background: #c0392b;
+      color: #111111;
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 1px;
       text-transform: uppercase;
-      border-radius: 6px;
+      border-radius: 4px;
       text-decoration: none;
       transition: opacity .2s;
     }
@@ -139,6 +141,7 @@
     .hero-bg {
       position: absolute;
       inset: 0;
+      pointer-events: none;
       background:
         radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,180,50,0.08) 0%, transparent 60%),
         radial-gradient(ellipse 60% 40% at 80% 80%, rgba(180,80,120,0.06) 0%, transparent 50%),
@@ -152,7 +155,7 @@
       height: 4px;
       background: repeating-linear-gradient(
         90deg,
-        var(--gold) 0px, var(--gold) 20px,
+        #c0392b 0px, #c0392b 20px,
         transparent 20px, transparent 30px
       );
       opacity: 0.4;
@@ -163,7 +166,7 @@
       font-weight: 500;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #c0392b;
       margin-bottom: 20px;
       opacity: 0;
       animation: fadeUp 0.8s ease 0.2s forwards;
@@ -174,22 +177,22 @@
       font-size: clamp(52px, 10vw, 100px);
       font-weight: 700;
       line-height: 0.95;
-      color: var(--text);
+      color: #111111;
       margin-bottom: 8px;
       opacity: 0;
       animation: fadeUp 0.8s ease 0.4s forwards;
     }
 
     .hero-title-sub {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-style: italic;
-      color: var(--gold);
+      color: #c0392b;
     }
 
     .hero-desc {
       font-size: 17px;
       font-weight: 300;
-      color: var(--muted);
+      color: #696969;
       max-width: 520px;
       line-height: 1.7;
       margin-bottom: 48px;
@@ -208,33 +211,33 @@
     .signup-form {
       display: flex;
       gap: 0;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       overflow: hidden;
       transition: border-color .3s;
     }
 
-    .signup-form:focus-within { border-color: var(--gold); }
+    .signup-form:focus-within { border-color: #c0392b; }
 
     .signup-input {
       flex: 1;
       padding: 15px 20px;
       background: transparent;
       border: none;
-      color: var(--text);
+      color: #111111;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       font-weight: 300;
       outline: none;
     }
 
-    .signup-input::placeholder { color: var(--faint); }
+    .signup-input::placeholder { color: #696969; }
 
     .signup-btn {
       padding: 15px 24px;
-      background: var(--gold);
-      color: var(--bg);
+      background: #c0392b;
+      color: #111111;
       border: none;
       font-family: 'DM Sans', sans-serif;
       font-size: 12px;
@@ -251,7 +254,7 @@
 
     .signup-note {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
       margin-top: 10px;
       text-align: center;
       letter-spacing: 0.3px;
@@ -260,10 +263,10 @@
     .signup-success {
       display: none;
       padding: 16px 24px;
-      background: rgba(80,200,140,0.1);
-      border: 1px solid rgba(80,200,140,0.3);
-      border-radius: 10px;
-      color: #50c88c;
+      background: rgba(26,107,58,0.1);
+      border: 1px solid rgba(26,107,58,0.4);
+      border-radius: 4px;
+      color: #1a6b3a;
       font-size: 14px;
       text-align: center;
       line-height: 1.5;
@@ -291,10 +294,10 @@
     }
 
     .stat-num {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 36px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       line-height: 1;
       margin-bottom: 4px;
     }
@@ -303,12 +306,12 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--faint);
+      color: #696969;
     }
 
     .stat-divider {
       width: 1px;
-      background: var(--border);
+      background: #cccccc;
       align-self: stretch;
     }
 
@@ -330,13 +333,13 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--faint);
+      color: #696969;
     }
 
     .scroll-arrow {
       width: 1px;
       height: 40px;
-      background: linear-gradient(to bottom, var(--border), transparent);
+      background: linear-gradient(to bottom, #cccccc, transparent);
       animation: scrollPulse 2s ease infinite;
     }
 
@@ -355,15 +358,15 @@
       font-size: 10px;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #c0392b;
       margin-bottom: 16px;
     }
 
     .section-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: clamp(32px, 5vw, 52px);
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       line-height: 1.1;
       margin-bottom: 56px;
     }
@@ -376,53 +379,53 @@
 
     .step {
       padding: 32px 28px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       position: relative;
       overflow: hidden;
       transition: border-color .3s;
     }
 
-    .step:hover { border-color: rgba(255,180,50,0.3); }
+    .step:hover { border-color: rgba(192,57,43,0.4); }
 
     .step::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, var(--gold), transparent);
+      background: linear-gradient(90deg, #c0392b, transparent);
       opacity: 0.5;
     }
 
     .step-num {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 52px;
       font-weight: 700;
-      color: var(--border);
+      color: #cccccc;
       line-height: 1;
       margin-bottom: 16px;
     }
 
     .step-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 22px;
       font-weight: 600;
-      color: var(--text);
+      color: #111111;
       margin-bottom: 10px;
     }
 
     .step-desc {
       font-size: 14px;
-      color: var(--muted);
+      color: #696969;
       line-height: 1.7;
     }
 
     /* ── PREVIEW ── */
     .preview-section {
-      background: var(--bg3);
-      border-top: 1px solid var(--border2);
-      border-bottom: 1px solid var(--border2);
+      background: #f0f0ec;
+      border-top: 1px solid #e0e0da;
+      border-bottom: 1px solid #e0e0da;
       padding: 100px 40px;
     }
 
@@ -452,9 +455,9 @@
       width: 40px;
       height: 40px;
       flex-shrink: 0;
-      background: var(--gold-dim);
-      border: 1px solid var(--gold-edge);
-      border-radius: 10px;
+      background: rgba(192,57,43,0.08);
+      border: 1px solid rgba(192,57,43,0.4);
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -464,63 +467,57 @@
     .preview-feature-title {
       font-size: 15px;
       font-weight: 500;
-      color: var(--text2);
+      color: #333333;
       margin-bottom: 4px;
     }
 
     .preview-feature-desc {
       font-size: 13px;
-      color: var(--muted);
+      color: #696969;
       line-height: 1.6;
     }
 
     /* Mock email card */
     .mock-email {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: #f5f5f2;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       overflow: hidden;
       box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-      transform: perspective(800px) rotateY(-4deg) rotateX(2deg);
-      transition: transform .4s;
-    }
-
-    .mock-email:hover {
-      transform: perspective(800px) rotateY(0deg) rotateX(0deg);
     }
 
     .mock-header {
-      background: linear-gradient(135deg, #1a0a2e, var(--bg));
+      background: linear-gradient(135deg, #1a0a2e, #f5f5f2);
       padding: 24px;
       text-align: center;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #cccccc;
     }
 
     .mock-header-eyebrow {
       font-size: 9px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #c0392b;
       margin-bottom: 6px;
     }
 
     .mock-header-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 28px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
     }
 
     .mock-stats {
       display: flex;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid #e0e0da;
     }
 
     .mock-stat {
       flex: 1;
       padding: 12px;
       text-align: center;
-      border-right: 1px solid var(--border2);
+      border-right: 1px solid #e0e0da;
     }
 
     .mock-stat:last-child { border-right: none; }
@@ -528,28 +525,28 @@
     .mock-stat-num {
       font-size: 20px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
     }
 
     .mock-stat-label {
       font-size: 9px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--faint);
+      color: #696969;
     }
 
     .mock-film {
       display: flex;
       gap: 12px;
       padding: 14px 16px;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid #e0e0da;
       align-items: flex-start;
     }
 
     .mock-poster {
       width: 42px;
       height: 60px;
-      background: var(--bg3);
+      background: #f0f0ec;
       border-radius: 4px;
       flex-shrink: 0;
       display: flex;
@@ -559,16 +556,16 @@
     }
 
     .mock-film-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 15px;
       font-weight: 600;
-      color: var(--text);
+      color: #111111;
       margin-bottom: 3px;
     }
 
     .mock-film-meta {
       font-size: 10px;
-      color: var(--faint);
+      color: #696969;
       margin-bottom: 5px;
     }
 
@@ -579,24 +576,26 @@
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 1px;
-      background: var(--vose-bg);
-      color: var(--vose);
-      border: 1px solid var(--vose-edge);
+      background: rgba(26,58,92,0.1);
+      color: #1a3a5c;
+      border: 1px solid rgba(26,58,92,0.4);
     }
 
     .mock-btn {
       display: block;
       margin: 16px;
       padding: 12px;
-      background: var(--gold);
-      color: var(--bg);
+      background: #c0392b;
+      color: #111111;
       text-align: center;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 1px;
       text-transform: uppercase;
-      border-radius: 6px;
+      border-radius: 4px;
+      text-decoration: none;
     }
+    .mock-btn:hover { text-decoration: none; opacity: 0.9; }
 
     /* ── CINEMAS ── */
     .cinemas-section {
@@ -614,23 +613,23 @@
 
     .cinema-pill {
       padding: 8px 18px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
       border-radius: 24px;
       font-size: 13px;
-      color: var(--text2);
+      color: #333333;
       transition: all .2s;
     }
 
     .cinema-pill:hover {
       border-color: rgba(255,180,50,0.4);
-      color: var(--text);
+      color: #111111;
     }
 
     .cinema-pill.arthouse {
-      border-color: var(--vose-edge);
-      color: var(--vose);
-      background: var(--vose-bg);
+      border-color: rgba(26,58,92,0.4);
+      color: #1a3a5c;
+      background: rgba(26,58,92,0.1);
     }
 
     /* ── CTA BOTTOM ── */
@@ -648,10 +647,10 @@
     }
 
     .cta-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: clamp(36px, 6vw, 64px);
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       line-height: 1.1;
       margin-bottom: 20px;
       position: relative;
@@ -659,7 +658,7 @@
 
     .cta-sub {
       font-size: 16px;
-      color: var(--muted);
+      color: #696969;
       max-width: 440px;
       margin: 0 auto 40px;
       line-height: 1.7;
@@ -674,7 +673,7 @@
 
     /* ── FOOTER ── */
     footer {
-      border-top: 1px solid var(--border2);
+      border-top: 1px solid #e0e0da;
       padding: 32px 40px;
       display: flex;
       align-items: center;
@@ -682,27 +681,27 @@
     }
 
     .footer-logo {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 18px;
       font-weight: 700;
-      color: var(--faint);
+      color: #696969;
     }
 
-    .footer-logo span { color: var(--gold); opacity: 0.6; }
+    .footer-logo span { color: #c0392b; opacity: 0.6; }
 
     .footer-note {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
     }
 
     .footer-link {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
       text-decoration: none;
       transition: color .2s;
     }
 
-    .footer-link:hover { color: var(--text2); }
+    .footer-link:hover { color: #333333; }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -751,7 +750,7 @@
 
   <!-- NAV -->
   <nav>
-    <a href="./listings/" class="nav-logo">whatson<span>.movie</span></a>
+    <span class="nav-logo">whatson<span>.movie</span></span>
     <div class="nav-right">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
@@ -770,7 +769,7 @@
 
     <h1 class="hero-title">whatson<span class="hero-title-sub">.movie</span></h1>
 
-    <p class="hero-desc" data-es="La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche." data-en="The weekly guide to cinema in Valencia. Every cinema, every film, VOSE sessions highlighted. Free, every Thursday evening.">La guía semanal del cine en Valencia. Todos los cines, todas las películas, sesiones VOSE destacadas. Gratis, cada jueves por la noche.</p>
+    <p class="hero-desc" data-es="Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email a tu medida cada jueves por la noche." data-en="Your personalised guide to cinema in Valencia. Every film, every cinema, filtered exactly how you like it. Plus a tailored email every Thursday evening.">Tu guía personalizada del cine en Valencia. Todas las películas, todos los cines, filtrados exactamente como quieres. Y un email a tu medida cada jueves por la noche.</p>
 
     <!-- SIGNUP -->
     <div class="signup-wrap" id="signup">
@@ -788,8 +787,8 @@
       <div class="signup-success" id="hero-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#696969;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="hero-error"></div>
@@ -799,20 +798,24 @@
     <!-- STATS -->
     <div class="stats">
       <div class="stat">
-        <div class="stat-num">10</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-cinemas" style="display:inline-block;width:28px;text-align:right;">0</span></div>
         <div class="stat-label" data-es="Cines" data-en="Cinemas">Cines</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num">30+</div>
-        <div class="stat-label" data-es="Películas" data-en="Films">Películas</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
+        <div class="stat-label" data-es="Películas esta semana" data-en="Films this week">Películas esta semana</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num">🕖</div>
-        <div class="stat-label" data-es="Cada Jueves" data-en="Every Thursday">Cada Jueves</div>
+        <div class="stat-num" style="color:#c0392b;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;" id="stat-tailored" data-es="a tu gusto" data-en="tailored">a tu gusto</div>
+        <div class="stat-label" style="opacity:0;transition:opacity 0.6s ease 0.15s;" id="stat-tailored-label" data-es="a tu manera" data-en="your way">a tu manera</div>
       </div>
     </div>
+
+    <p id="browse-line" style="margin-top:20px;font-size:12px;color:#696969;text-align:center;">
+      <span data-es="¿No listo para suscribirte?" data-en="Not ready to subscribe?">¿No listo para suscribirte?</span> <a href="./listings/" style="color:#333333;text-decoration:underline;text-underline-offset:3px;"><span data-es="Explora la cartelera sin filtros primero →" data-en="Browse the unfiltered listings first →">Explora la cartelera sin filtros primero →</span></a>
+    </p>
 
     <div class="scroll-hint">
       <span data-es="Ver más" data-en="Scroll">Ver más</span>
@@ -823,23 +826,23 @@
   <!-- HOW IT WORKS -->
   <section class="section">
     <p class="section-eyebrow" data-es="Cómo funciona" data-en="How it works">Cómo funciona</p>
-    <h2 class="section-title" data-es="Simple. Semanal. Gratis." data-en="Simple. Weekly. Free.">Simple. Semanal. Gratis.</h2>
+    <h2 class="section-title" data-es="Simple. Personalizado. Tuyo." data-en="Simple. Personalised. Yours.">Simple. Personalizado. Tuyo.</h2>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
-        <div class="step-title" data-es="Te suscribes" data-en="You subscribe">Te suscribes</div>
+        <div class="step-title" data-es="Te suscribes" data-en="Subscribe">Te suscribes</div>
         <div class="step-desc" data-es="Introduce tu email arriba. Sin formularios largos, sin datos innecesarios." data-en="Enter your email above. No long forms, no unnecessary data.">Introduce tu email arriba. Sin formularios largos, sin datos innecesarios.</div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <div class="step-title" data-es="Llega cada jueves" data-en="Arrives each Thursday">Llega cada jueves</div>
-        <div class="step-desc" data-es="A las 19:00, una guía completa con todos los cines de Valencia, películas, horarios y sesiones VOSE." data-en="At 7pm, a complete guide with every Valencia cinema, films, and VOSE sessions highlighted.">A las 19:00, una guía completa con todos los cines de Valencia, películas, horarios y sesiones VOSE.</div>
+        <div class="step-title" data-es="Configura tus preferencias" data-en="Set your preferences">Configura tus preferencias</div>
+        <div class="step-desc" data-es="Elige tus cines, filtra por VOSE (versión original), estrenos, noches... lo que más te convenga." data-en="Choose your cinemas, filter for VOSE (original language), new releases, evenings — whatever suits you.">Elige tus cines, filtra por VOSE (versión original), estrenos, noches... lo que más te convenga.</div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <div class="step-title" data-es="Tú eliges" data-en="You choose">Tú eliges</div>
-        <div class="step-desc" data-es="Filtra por VOSE, por cine, o por género. Haz clic y compra tu entrada directamente." data-en="Filter by VOSE, by cinema, or by genre. Click through to buy your ticket directly.">Filtra por VOSE, por cine, o por género. Haz clic y compra tu entrada directamente.</div>
+        <div class="step-title" data-es="Tu cartelera, a tu manera" data-en="Your listings, your way">Tu cartelera, a tu manera</div>
+        <div class="step-desc" data-es="Consulta tu cartelera personalizada cuando quieras, y recibe un email a tu medida cada jueves a las 19:00." data-en="Browse your personalised listings any time, and get a tailored email every Thursday at 7pm.">Consulta tu cartelera personalizada cuando quieras, y recibe un email a tu medida cada jueves a las 19:00.</div>
       </div>
     </div>
   </section>
@@ -848,7 +851,7 @@
   <div class="preview-section">
     <div class="preview-inner">
       <p class="section-eyebrow" data-es="Lo que recibes" data-en="What you get">Lo que recibes</p>
-      <h2 class="section-title" data-es="Una guía que da gusto leer" data-en="A guide that's a pleasure to read">Una guía que da gusto leer</h2>
+      <h2 class="section-title" data-es="Tu cine, filtrado a tu manera" data-en="Your cinema, filtered your way">Tu cine, filtrado a tu manera</h2>
 
       <div class="preview-grid">
         <div class="preview-text">
@@ -860,24 +863,24 @@
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon" style="background:var(--vose-bg);border-color:var(--vose-edge);">🌍</div>
+            <div class="preview-icon" style="background:rgba(26,58,92,0.1);border-color:rgba(26,58,92,0.4);">🌍</div>
             <div>
-              <div class="preview-feature-title" data-es="VOSE siempre destacado" data-en="VOSE always highlighted">VOSE siempre destacado</div>
-              <div class="preview-feature-desc" data-es="Cada sesión en versión original identificada claramente. Filtra para ver solo VOSE con un clic." data-en="Every original-language screening clearly identified. Filter to VOSE-only with one click.">Cada sesión en versión original identificada claramente. Filtra para ver solo VOSE con un clic.</div>
+              <div class="preview-feature-title" data-es="Filtro VOSE (versión original)" data-en="VOSE filter (original language)">Filtro VOSE (versión original)</div>
+              <div class="preview-feature-desc" data-es="Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres." data-en="Show only original-language screenings. Narrow it further to English-only if you prefer.">Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres.</div>
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon">🌐</div>
+            <div class="preview-icon">⚙️</div>
             <div>
-              <div class="preview-feature-title" data-es="Bilingüe ES / EN" data-en="Bilingual ES / EN">Bilingüe ES / EN</div>
-              <div class="preview-feature-desc" data-es="Toda la guía disponible en español e inglés con un solo clic." data-en="The full guide available in Spanish and English with a single click.">Toda la guía disponible en español e inglés con un solo clic.</div>
+              <div class="preview-feature-title" data-es="Altamente personalizable" data-en="Highly customisable">Altamente personalizable</div>
+              <div class="preview-feature-desc" data-es="Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta." data-en="Your listings, your rules. Pick your cinemas, set your filters, and your preferences are saved — so every visit feels personal.">Tu cartelera, tus normas. Elige tus cines, configura tus filtros, y tus preferencias se guardan — para que cada visita sea perfecta.</div>
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon">📱</div>
+            <div class="preview-icon">📧</div>
             <div>
-              <div class="preview-feature-title" data-es="Optimizada para móvil" data-en="Mobile optimised">Optimizada para móvil</div>
-              <div class="preview-feature-desc" data-es="Lee la guía en cualquier dispositivo. Los enlaces van directamente a la web de cada cine." data-en="Read the guide on any device. Links go straight to each cinema's website.">Lee la guía en cualquier dispositivo. Los enlaces van directamente a la web de cada cine.</div>
+              <div class="preview-feature-title" data-es="Email semanal cada jueves" data-en="Weekly email every Thursday">Email semanal cada jueves</div>
+              <div class="preview-feature-desc" data-es="Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada." data-en="A curated digest lands at 7pm — your personal listings, straight to your inbox.">Un resumen curado llega a las 19:00 — tu cartelera personalizada, directamente en tu bandeja de entrada.</div>
             </div>
           </div>
         </div>
@@ -885,8 +888,8 @@
         <!-- MOCK EMAIL -->
         <div class="mock-email">
           <div class="mock-header">
-            <div class="mock-header-eyebrow">🎬 Weekly Newsletter</div>
-            <div class="mock-header-title">Cartelera Valencia</div>
+            <div class="mock-header-eyebrow" data-es="🎬 Boletín Semanal" data-en="🎬 Weekly Newsletter">🎬 Boletín Semanal</div>
+            <div class="mock-header-title" data-es="Cartelera Valencia" data-en="Cinema Listings">Cartelera Valencia</div>
           </div>
           <div class="mock-stats">
             <div class="mock-stat">
@@ -906,24 +909,27 @@
             <div class="mock-poster">🦫</div>
             <div>
               <div class="mock-film-title">Hoppers</div>
-              <div class="mock-film-meta">Pixar · 105 min · Dir. Daniel Chong</div>
+              <div class="mock-film-meta" data-es="Pixar · 105 min · Dir. Daniel Chong" data-en="Pixar · 105 min · Dir. Daniel Chong">Pixar · 105 min · Dir. Daniel Chong</div>
               <span class="mock-vose">VOSE</span>
+              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">TP</span>
             </div>
           </div>
           <div class="mock-film">
             <div class="mock-poster">😱</div>
             <div>
               <div class="mock-film-title">Scream 7</div>
-              <div class="mock-film-meta">Terror · 114 min · Neve Campbell</div>
+              <div class="mock-film-meta" data-es="Terror · 114 min · Neve Campbell" data-en="Horror · 114 min · Neve Campbell">Terror · 114 min · Neve Campbell</div>
               <span class="mock-vose">VOSE</span>
+              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">+18</span>
             </div>
           </div>
           <div class="mock-film">
             <div class="mock-poster">🪓</div>
             <div>
               <div class="mock-film-title">Den sidste viking</div>
-              <div class="mock-film-meta">Comedia Negra · Mads Mikkelsen</div>
+              <div class="mock-film-meta" data-es="Comedia Negra · Mads Mikkelsen" data-en="Dark Comedy · Mads Mikkelsen">Comedia Negra · Mads Mikkelsen</div>
               <span class="mock-vose">VOSE</span>
+              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">+12</span>
             </div>
           </div>
           <a href="./listings/" class="mock-btn" data-es="Ver cartelera completa →" data-en="View full listings →">Ver cartelera completa →</a>
@@ -945,8 +951,9 @@
       <div class="cinema-pill">ABC Gran Turia</div>
       <div class="cinema-pill">Cines MN4</div>
       <div class="cinema-pill">Cines Lys</div>
-      <div class="cinema-pill arthouse">🎭 Cines Babel — VOSE</div>
-      <div class="cinema-pill arthouse">🎞️ Cinestudio D'Or — VOSE</div>
+      <div class="cinema-pill">Cine Tívoli</div>
+      <div class="cinema-pill">Cines Babel</div>
+      <div class="cinema-pill">Cinestudio D'Or</div>
     </div>
   </section>
 
@@ -954,7 +961,7 @@
   <section class="cta-section">
     <div class="cta-bg"></div>
     <h2 class="cta-title" data-es="¿Qué ponen esta semana?" data-en="What's on this week?">¿Qué ponen esta semana?</h2>
-    <p class="cta-sub" data-es="Únete y lo sabrás cada jueves a las 19:00. Gratis, siempre." data-en="Subscribe and you'll know every Thursday at 7pm. Free, always.">Únete y lo sabrás cada jueves a las 19:00. Gratis, siempre.</p>
+    <p class="cta-sub" data-es="Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00." data-en="Subscribe free and get your personalised listings right away, plus a tailored email every Thursday at 7pm.">Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00.</p>
 
     <div class="cta-signup-wrap">
       <div class="signup-form" id="cta-form-wrap">
@@ -971,8 +978,8 @@
       <div class="signup-success" id="cta-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#696969;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="cta-error"></div>
@@ -986,7 +993,6 @@
     <span class="footer-note" data-es="Valencia · España · 🎬" data-en="Valencia · Spain · 🎬">Valencia · España · 🎬</span>
     <div style="display:flex;gap:20px;">
       <a href="./listings/" class="footer-link" data-es="Ver cartelera →" data-en="This week's listings →">Ver cartelera →</a>
-      <a href="./preferences/" class="footer-link" data-es="Mis preferencias →" data-en="My preferences →">Mis preferencias →</a>
       <a href="./privacy/" class="footer-link" data-es="Privacidad →" data-en="Privacy →">Privacidad →</a>
     </div>
   </footer>
@@ -1057,11 +1063,27 @@
             email: email,
             lang: lang,
             source: source,
+            active: true,
             subscribed_at: new Date().toISOString()
           })
         });
 
-        // 201 = created, 200 = ok, 409 = already exists (treat as success)
+        // If email already exists, reactivate the existing row
+        if (res.status === 409) {
+          await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON,
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'Prefer': 'return=minimal',
+              'x-subscriber-email': email
+            },
+            body: JSON.stringify({ active: true, subscribed_at: new Date().toISOString() })
+          });
+        }
+
+        // 201 = created, 409 = already existed (now reactivated)
         if (res.ok || res.status === 201 || res.status === 409) {
           // Set a cookie so the preferences page knows who this is
           const expires = new Date();
@@ -1069,6 +1091,8 @@
           document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
           formWrap.style.display = 'none';
           successEl.style.display = 'block';
+          const browseLine = document.getElementById('browse-line');
+          if (browseLine) browseLine.style.display = 'none';
         } else {
           const body = await res.text();
           console.error('Signup failed:', res.status, body);
@@ -1103,6 +1127,38 @@
         setTimeout(() => document.getElementById('hero-email').focus(), 600);
       });
     });
+
+    /* ── STATS ANIMATION ── */
+    function countUp(el, target, duration) {
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(ease * target);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    function runStatsAnimation(filmCount) {
+      const t  = document.getElementById('stat-tailored');
+      const tl = document.getElementById('stat-tailored-label');
+      const delay = 1600; // wait for hero fade-in (1s delay + 0.8s duration + buffer)
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 11, 900), delay);
+      setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), delay + 200);
+      setTimeout(() => {
+        t.style.opacity  = '1';
+        t.style.transform = 'translateY(0)';
+        tl.style.opacity = '1';
+      }, delay + 1400);
+    }
+
+    // Fetch live film count from stats.json, fall back to 30 if unavailable
+    fetch('/data/stats.json')
+      .then(r => r.json())
+      .then(d => runStatsAnimation(d.film_count || 30))
+      .catch(() => runStatsAnimation(30));
   </script>
 
   <script>

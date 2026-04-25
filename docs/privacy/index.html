@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0a0810">
+  <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,35 +15,35 @@
   <title>Política de Privacidad / Privacy Policy — whatson.movie</title>
   <meta name="description" content="Política de privacidad y protección de datos de whatson.movie. Privacy policy for whatson.movie.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0a0810;
-      --bg2:       #0f0c14;
-      --bg3:       #160f24;
-      --border:    #2a1f3d;
-      --border2:   #1e1630;
-      --gold:      #ffb432;
-      --gold-dim:  rgba(255,180,50,0.15);
-      --gold-edge: rgba(255,180,50,0.3);
-      --text:      #f0eae0;
-      --text2:     #c5b8d8;
-      --muted:     #9b8faa;
-      --faint:     #8a7e9a;
+      --bg:        #ffffff;
+      --bg2:       #f5f5f2;
+      --bg3:       #f0f0ec;
+      --border:    #e8e8e4;
+      --border2:   #e0e0da;
+      --gold:      #c0392b;
+      --gold-dim:  rgba(192,57,43,0.1);
+      --gold-edge: rgba(192,57,43,0.4);
+      --text:      #111111;
+      --text2:     #333333;
+      --muted:     #696969;
+      --faint:     #696969;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: #f5f5f2;
+      color: #111111;
       font-family: 'DM Sans', Helvetica, sans-serif;
       font-weight: 300;
       overflow-x: hidden;
     }
 
-    body::before {
+    body::before-disabled {
       content: '';
       position: fixed;
       inset: 0;
@@ -61,28 +61,28 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(10,8,16,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border2);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(4px);
+      border-bottom: 1px solid #e0e0da;
     }
 
     .nav-logo {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 20px;
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       text-decoration: none;
       letter-spacing: 0.5px;
     }
-    .nav-logo span { color: var(--gold); }
+    .nav-logo span { color: #c0392b; }
 
     .nav-right { display: flex; align-items: center; gap: 16px; }
 
     .lang-toggle {
       display: flex;
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid #cccccc;
     }
 
     .lang-btn {
@@ -94,11 +94,11 @@
       cursor: pointer;
       border: none;
       background: transparent;
-      color: var(--faint);
+      color: #696969;
       font-family: 'DM Sans', sans-serif;
       transition: all .2s;
     }
-    .lang-btn.active { background: var(--bg3); color: var(--text); }
+    .lang-btn.active { background: #f0f0ec; color: #111111; }
 
     .page-wrap {
       max-width: 740px;
@@ -108,7 +108,7 @@
 
     .film-strip {
       height: 4px;
-      background: repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 20px, transparent 20px, transparent 30px);
+      background: repeating-linear-gradient(90deg, #c0392b 0px, #c0392b 20px, transparent 20px, transparent 30px);
       opacity: 0.4;
       margin-bottom: 48px;
       animation: fadeIn 1s ease 0.2s both;
@@ -119,16 +119,16 @@
       font-weight: 500;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #c0392b;
       margin-bottom: 16px;
       animation: fadeUp 0.7s ease 0.2s both;
     }
 
     h1 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: clamp(36px, 6vw, 56px);
       font-weight: 700;
-      color: var(--text);
+      color: #111111;
       line-height: 1.1;
       margin-bottom: 12px;
       animation: fadeUp 0.7s ease 0.3s both;
@@ -136,7 +136,7 @@
 
     .updated {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
       margin-bottom: 48px;
       letter-spacing: 0.3px;
       animation: fadeUp 0.7s ease 0.4s both;
@@ -147,14 +147,14 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      color: var(--muted);
+      color: #696969;
       text-decoration: none;
       border: none;
       margin-bottom: 40px;
       transition: color .2s;
       animation: fadeUp 0.7s ease 0.1s both;
     }
-    .back-link:hover { color: var(--text); }
+    .back-link:hover { color: #111111; }
 
     .lang-section { display: none; }
     .lang-section.visible { display: block; }
@@ -162,28 +162,28 @@
     .policy-section {
       margin-bottom: 20px;
       padding: 28px 32px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: #f0f0ec;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
       position: relative;
       overflow: hidden;
       transition: border-color .3s;
     }
-    .policy-section:hover { border-color: var(--gold-edge); }
+    .policy-section:hover { border-color: rgba(192,57,43,0.4); }
     .policy-section::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, var(--gold), transparent);
+      background: linear-gradient(90deg, #c0392b, transparent);
       opacity: 0.4;
     }
 
     h2 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 22px;
       font-weight: 600;
-      color: var(--text);
+      color: #111111;
       margin-bottom: 14px;
       display: flex;
       align-items: center;
@@ -192,7 +192,7 @@
 
     p {
       font-size: 15px;
-      color: var(--text2);
+      color: #333333;
       line-height: 1.8;
       margin-bottom: 12px;
     }
@@ -205,7 +205,7 @@
     }
     ul li {
       font-size: 15px;
-      color: var(--text2);
+      color: #333333;
       line-height: 1.8;
       padding-left: 20px;
       position: relative;
@@ -215,50 +215,50 @@
       content: '—';
       position: absolute;
       left: 0;
-      color: var(--gold);
+      color: #c0392b;
     }
 
     a {
-      color: var(--gold);
+      color: #c0392b;
       text-decoration: none;
-      border-bottom: 1px solid var(--gold-edge);
+      border-bottom: 1px solid rgba(192,57,43,0.4);
       transition: border-color .2s;
     }
-    a:hover { border-color: var(--gold); }
+    a:hover { border-color: #c0392b; }
 
-    strong { font-weight: 500; color: var(--text); }
+    strong { font-weight: 500; color: #111111; }
 
     code {
-      background: var(--bg);
+      background: #f5f5f2;
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 13px;
-      color: var(--gold);
+      color: #c0392b;
     }
 
     footer {
-      border-top: 1px solid var(--border2);
+      border-top: 1px solid #e0e0da;
       padding: 32px 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .footer-logo {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'DM Sans', Helvetica, sans-serif;
       font-size: 18px;
       font-weight: 700;
-      color: var(--faint);
+      color: #696969;
     }
-    .footer-logo span { color: var(--gold); opacity: 0.6; }
-    .footer-note { font-size: 12px; color: var(--faint); }
+    .footer-logo span { color: #c0392b; opacity: 0.6; }
+    .footer-note { font-size: 12px; color: #696969; }
     .footer-link {
       font-size: 12px;
-      color: var(--faint);
+      color: #696969;
       text-decoration: none;
       border: none;
       transition: color .2s;
     }
-    .footer-link:hover { color: var(--text2); }
+    .footer-link:hover { color: #333333; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }

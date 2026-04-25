@@ -4,11 +4,15 @@ Scrapes current listings from Mabuse.es and builds + sends a bilingual HTML emai
 Runs every Thursday evening via GitHub Actions.
 """
 
+import json
 import os
 import re
 import smtplib
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from zoneinfo import ZoneInfo
+
+VALENCIA_TZ = ZoneInfo("Europe/Madrid")
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -35,8 +39,9 @@ RECIPIENTS = [r.strip() for r in os.environ["RECIPIENTS"].split(",") if r.strip(
 TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
 
 # Supabase credentials — injected into generated HTML pages
-SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
-SUPABASE_ANON = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_URL          = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON         = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_SERVICE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 TMDB_BASE    = "https://api.themoviedb.org/3"
 
 # ─── Cinema definitions ───────────────────────────────────────────────────────
@@ -52,6 +57,7 @@ CINEMAS = {
     "mn4":        {"name": "Cines MN4",          "url": "https://mabuse.es/cine/cines-mn4/",          "website": "https://www.cinesmn4.com",          "type": "multiplex"},
     "dor":        {"name": "Cinestudio D'Or",    "url": "https://mabuse.es/cine/cinestudio-dor/",     "website": "https://cinestudiodor.es",          "type": "arthouse"},
     "gran_turia": {"name": "ABC Gran Turia",     "url": "https://mabuse.es/cine/abc-gran-turia/",     "website": "https://cinesabc.com",              "type": "multiplex"},
+    "tivoli":     {"name": "Cine Tívoli",        "url": "https://mabuse.es/cine/cine-tivoli/",        "website": "https://exhicine.es/cine-tivoli/",    "type": "multiplex"},
 }
 
 # Playwright browser instance — shared across all cinema fetches
@@ -147,7 +153,7 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
                 poster_url = src
                 break
 
-        # ── Rating: first calificacion img with a real URL
+        # ── Rating: scraped from mabuse, will be overridden by TMDB if available
         rating = "?"
         for img in container.find_all("img"):
             src = img.get("src", "")
@@ -177,7 +183,7 @@ def fetch_cinema(cinema_id: str) -> list[dict]:
         synopsis_text = paragraphs[1] if len(paragraphs) > 1 else ""
 
         # ── VOSE and new release flags
-        vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English", raw_html, re.IGNORECASE))
+        vose   = bool(re.search(r"VOSE|INGL[ÉE]S SUBTITULADO|English.*es\b|nosubt.*English|ENGLISH SUBTITLED", raw_html, re.IGNORECASE))
         is_new = bool(re.search(r"ESTRENO", raw_html, re.IGNORECASE))
 
         # ── Showtimes: all dates are in page HTML as div.listafechas.fecha_YYYYMMDD
@@ -273,9 +279,13 @@ def tmdb_lookup(title: str) -> dict:
     """
     import requests as req
     import time
+    import re as _re
 
     if not TMDB_API_KEY:
         return {}
+
+    # Clean title before searching — strip event suffixes like "-Proyecto Viridiana-...", "+Coloquio", etc.
+    search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', title)[0].strip()
 
     time.sleep(0.25)  # polite rate limiting
 
@@ -288,7 +298,7 @@ def tmdb_lookup(title: str) -> dict:
         # Search in Spanish first to match the scraped title
         search_url = (
             f"{TMDB_BASE}/search/movie"
-            f"?query={req.utils.quote(title)}"
+            f"?query={req.utils.quote(search_title)}"
             f"&language=es-ES"
             f"&region=ES"
         )
@@ -300,7 +310,7 @@ def tmdb_lookup(title: str) -> dict:
             # Try English search as fallback
             search_url_en = (
                 f"{TMDB_BASE}/search/movie"
-                f"?query={req.utils.quote(title)}"
+                f"?query={req.utils.quote(search_title)}"
                 f"&language=en-US"
             )
             res = req.get(search_url_en, headers=headers, timeout=10)
@@ -325,6 +335,50 @@ def tmdb_lookup(title: str) -> dict:
         detail_es_res.raise_for_status()
         detail_es = detail_es_res.json()
 
+        # Fetch ES certification from release_dates
+        cert_es = "?"
+        try:
+            rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
+            rel_res.raise_for_status()
+            results = rel_res.json().get("results", [])
+
+            # Try ES first
+            for entry in results:
+                if entry.get("iso_3166_1") == "ES":
+                    for rd in entry.get("release_dates", []):
+                        cert = rd.get("certification", "").strip()
+                        if cert:
+                            cert_es = cert
+                            break
+                    break
+
+            # Fallback: try GB and map to Spanish equivalent
+            if cert_es == "?":
+                gb_map = {"U": "TP", "PG": "TP", "12": "12", "12A": "12", "15": "16", "18": "18", "R18": "18"}
+                for entry in results:
+                    if entry.get("iso_3166_1") == "GB":
+                        for rd in entry.get("release_dates", []):
+                            cert = rd.get("certification", "").strip()
+                            if cert and cert in gb_map:
+                                cert_es = gb_map[cert]
+                                break
+                        break
+
+            # Fallback: try US and map to Spanish equivalent
+            if cert_es == "?":
+                us_map = {"G": "TP", "PG": "TP", "PG-13": "12", "R": "16", "NC-17": "18"}
+                for entry in results:
+                    if entry.get("iso_3166_1") == "US":
+                        for rd in entry.get("release_dates", []):
+                            cert = rd.get("certification", "").strip()
+                            if cert and cert in us_map:
+                                cert_es = us_map[cert]
+                                break
+                        break
+
+        except Exception:
+            pass
+
         # Use Spanish overview if available, fall back to English
         synopsis_es = detail_es.get("overview") or detail.get("overview", "")
 
@@ -341,6 +395,10 @@ def tmdb_lookup(title: str) -> dict:
             "year":           (detail.get("release_date") or "")[:4],
             "tmdb_id":        movie_id,
             "rating_score":   round(vote, 1) if vote else None,
+            "genres_en":      [g["name"] for g in detail.get("genres", [])],
+            "runtime":        detail.get("runtime"),
+            "origin_country": detail.get("origin_country", []),
+            "cert_es":        cert_es,
         }
 
     except Exception as e:
@@ -423,6 +481,7 @@ def slugify(title: str) -> str:
 def build_film_detail_page(film: dict, anchor: datetime) -> str:
     """Build a standalone HTML page for a single film with showtimes by day."""
     from datetime import date as _date, timedelta as _td
+    from zoneinfo import ZoneInfo as _ZI
 
     title_es   = film["title"]
     title_en   = film.get("title_en", title_es)
@@ -431,12 +490,14 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     syn_en     = (film.get("synopsis_en") or film.get("synopsis", ""))[:400]
     poster     = film.get("poster", "")
     meta       = film.get("meta", "")
+    meta_en    = film.get("meta_en", meta)
     score      = film.get("rating_score")
+    rating     = film.get("rating", "?")
     vose       = film.get("any_vose", False)
     is_new     = film.get("is_new", False)
 
     # Build day tabs for today + 6 days
-    today = _date.today()
+    today = datetime.now(ZoneInfo("Europe/Madrid")).date()
     DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
@@ -456,7 +517,12 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         for i, day in enumerate(days):
             active = "active" if i == 0 else ""
             dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
-            tab_btns += f'<button class="day-tab {active}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
+            has_shows = any(
+                c.get("showtimes", {}).get(dk)
+                for c in film["cinemas"]
+            )
+            show_class = "has-shows" if has_shows else ""
+            tab_btns += f'<button class="day-tab {active} {show_class}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
             # Cinema rows — each gets data-cinema-id for JS filtering
             cinema_rows = ""
@@ -466,7 +532,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     continue
                 vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
                 time_btns  = "".join(
-                    f'<a href="{c["website"]}" target="_blank" class="time-btn">{t}</a>'
+                    f'<a href="{c["website"]}" target="_blank" class="time-btn" data-time="{t}">{t}</a>'
                     for t in times
                 )
                 cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
@@ -484,6 +550,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     new_badge  = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
     vose_badge = '<span class="vose-badge">VOSE</span>' if vose else ""
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
+    rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+    rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
     poster_html = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
@@ -492,6 +560,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
@@ -503,47 +573,54 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}}
-.wrapper{{max-width:640px;margin:0 auto;background:#0f0c14}}
-.lang-bar{{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
-.lang-bar a{{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap}}
-.lang-bar a span{{color:#ffb432}}
-.lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
-.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;transition:all .2s}}
-.lang-btn.active{{background:#160f24;color:#f0eae0}}
-.back-bar{{padding:12px 20px;background:#0a0810;border-bottom:1px solid #1e1630}}
-.back-link{{font-size:12px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px}}
-.back-link:hover{{color:#c5b8d8}}
-.film-hero{{display:flex;gap:16px;padding:20px;background:#160f24;border-bottom:1px solid #2e2040}}
-.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#2a1f3d}}
+body{{background:#f5f5f2;font-family:'DM Sans',Helvetica,sans-serif;color:#111111;min-height:100vh}}
+.wrapper{{max-width:640px;margin:0 auto;background:#f5f5f2}}
+.lang-bar{{background:#ffffff;border-bottom:2px solid #111111;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
+.lang-bar a{{font-size:15px;font-weight:700;color:#111111;text-decoration:none;white-space:nowrap}}
+.lang-bar a span{{color:#c0392b}}
+.lang-toggle{{display:flex;border-radius:3px;overflow:hidden;border:1px solid #cccccc}}
+.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#696969;font-family:'DM Sans',sans-serif;transition:all .2s}}
+.lang-btn.active{{background:#111111;color:#ffffff}}
+.back-bar{{padding:12px 20px;background:#ffffff;border-bottom:1px solid #e0e0da}}
+.back-link{{font-size:12px;color:#1a3a5c;text-decoration:underline;text-underline-offset:2px;letter-spacing:0.5px}}
+.back-link:hover{{color:#c0392b}}
+.film-hero{{display:flex;gap:16px;padding:20px;background:#ffffff;border-bottom:1px solid #e0e0da}}
+.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:2px;overflow:hidden;background:#f0f0ec}}
 .hero-info{{flex:1;display:flex;flex-direction:column;justify-content:center}}
 .badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}}
-.film-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px}}
-.badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
-.vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
-.score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
-.hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
-.orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
-.hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
-.hero-synopsis{{font-size:12px;color:#9d909e;line-height:1.6}}
-.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a3f5e;padding:20px 20px 10px}}
-.day-tabs{{display:flex;gap:0;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none}}
-.day-tabs::-webkit-scrollbar{{display:none}}
-.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;margin-right:6px;flex-shrink:0}}
-.day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
+.film-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}}
+.badge-new{{background:#c0392b;color:#ffffff}}
+.vose-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#1a3a5c;color:#ffffff}}
+.score-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}}
+.rating-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}}
+.hero-title{{font-size:22px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px}}
+.orig-title{{font-size:11px;color:#696969;margin-bottom:6px}}
+.hero-meta{{font-size:11px;color:#696969;line-height:1.55;margin-bottom:8px}}
+.hero-synopsis{{font-size:12px;color:#555555;line-height:1.6}}
+.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#696969;padding:20px 20px 10px;font-weight:700}}
+.day-tabs{{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}}
+.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #cccccc;background:transparent;color:#555555;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
+.day-tab.active{{background:#c0392b;color:#ffffff;border-color:#c0392b}}
+.day-tab.active.has-shows{{background:#c0392b;color:#ffffff;border-color:#c0392b}}
+.day-tab.has-shows{{color:#1a6b3a;border-color:#1a6b3a;font-weight:600}}
 .day-panel{{display:none;padding:0 20px 20px}}
 .day-panel.active{{display:block}}
-.showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
+.showtime-row{{padding:14px 0;border-bottom:1px solid #e0e0da}}
 .showtime-row:last-child{{border-bottom:none}}
-.showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
-.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
+.showtime-cinema{{font-size:13px;font-weight:500;color:#111111;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
+.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:#1a3a5c;color:#ffffff;border-radius:2px}}
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
-.time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
-.time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
-.no-times{{font-size:13px;color:#4a3f5e;padding:20px 0;text-align:center}}
-.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
+.time-btn{{padding:6px 14px;background:#ffffff;border:1px solid #cccccc;border-radius:3px;font-size:13px;color:#111111;text-decoration:none;transition:all .2s;font-weight:500}}
+.time-btn:hover{{background:#f0f0ec;border-color:#c0392b;color:#c0392b}}
+.time-btn--match{{background:#e8f4ee;border-color:#1a6b3a;color:#1a6b3a}}
+.time-btn--match:hover{{background:#d0eadb;border-color:#1a6b3a;color:#1a6b3a}}
+.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#696969;border-top:1px solid #e0e0da}}
+.showtime-legend-dot{{width:10px;height:10px;border-radius:2px;background:#e8f4ee;border:1px solid #1a6b3a;flex-shrink:0}}
+.no-times{{font-size:13px;color:#696969;padding:20px 0;text-align:center}}
+.footer{{background:#111111;border-top:1px solid #333333;padding:20px;text-align:center;font-size:11px;color:#aaaaaa}}
+.footer a{{color:#cccccc;text-decoration:underline}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
 </style>
 </head>
@@ -566,18 +643,30 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   <div class="film-hero">
     <div class="hero-poster">{poster_html}</div>
     <div class="hero-info">
-      <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+      <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
       <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
       {orig_label}
-      <div class="hero-meta">{meta}</div>
+      <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
     </div>
   </div>
 
-  <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-  <div class="day-tabs">{tab_btns}</div>
+  <div id="showtimes-section" style="display:none;">
+    <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
+    <div class="day-tabs">{tab_btns}</div>
+    <div id="day-panels">{tab_panels}</div>
+    <div class="showtime-legend" id="showtime-legend" style="display:none;">
+      <div class="showtime-legend-dot"></div>
+      <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
+    </div>
+  </div>
 
-  <div id="day-panels">{tab_panels}</div>
+  <div id="gate-section" style="display:none;margin:20px;padding:24px 20px;background:#fff8f6;border:1px solid #f0d0c8;border-radius:3px;text-align:center;">
+    <div style="font-size:24px;margin-bottom:12px;">🎬</div>
+    <div style="font-size:17px;font-weight:700;color:#111111;margin-bottom:8px;" data-es="Los horarios son para suscriptores" data-en="Showtimes are for subscribers">Los horarios son para suscriptores</div>
+    <div style="font-size:13px;color:#555555;line-height:1.6;margin-bottom:20px;" data-es="Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves." data-en="Subscribe to see showtimes across all cinemas, filtered exactly how you like it, plus get a tailored email every Thursday.">Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves.</div>
+    <a href="../../" style="display:inline-block;padding:11px 28px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;text-decoration:none;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
+  </div>
 
   <div class="footer">
     <span data-es="Horarios sujetos a cambios — verifica siempre en la web del cine." data-en="Showtimes subject to change — always verify on the cinema's website.">Horarios sujetos a cambios — verifica siempre en la web del cine.</span>
@@ -590,10 +679,30 @@ function setLang(lang) {{
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {{
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   }});
   document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
+}}
+function isWeekend(dateKey) {{
+  const d = new Date(dateKey);
+  return d.getDay() === 0 || d.getDay() === 6;
+}}
+function applyEveningHighlights(eveningFilter) {{
+  if (!eveningFilter) return;
+  document.querySelectorAll('.time-btn[data-time]').forEach(btn => {{
+    const panel = btn.closest('.day-panel');
+    const dayKey = panel ? panel.id.replace('day-', '') : '';
+    const weekend = isWeekend(dayKey);
+    const t = btn.getAttribute('data-time');
+    const parts = t.split(':');
+    const mins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+    if (weekend || mins >= 17 * 60 + 30) {{
+      btn.classList.add('time-btn--match');
+    }} else {{
+      btn.classList.remove('time-btn--match');
+    }}
+  }});
 }}
 function showDay(key) {{
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
@@ -602,6 +711,8 @@ function showDay(key) {{
   const panel = document.getElementById('day-' + key);
   if (tab) tab.classList.add('active');
   if (panel) panel.classList.add('active');
+  const params = new URLSearchParams(window.location.search);
+  applyEveningHighlights(params.get('evening') === 'true');
 }}
 window.addEventListener('DOMContentLoaded', () => {{
   // Read lang from URL param (passed from listings) or localStorage fallback
@@ -609,10 +720,32 @@ window.addEventListener('DOMContentLoaded', () => {{
   const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
 
+  // Activate correct day tab if tab param is set (from quick filter)
+  const tabParam = urlParams.get('tab');
+  if (tabParam) {{
+    const today    = new Date();
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const plus1    = new Date(today); plus1.setDate(today.getDate()+2);
+    function toKey(d) {{ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }}
+    const targetKey = tabParam === 'today' ? toKey(today) : tabParam === 'tomorrow' ? toKey(tomorrow) : tabParam === 'plus1' ? toKey(plus1) : null;
+    if (targetKey) {{
+      const tab = document.querySelector(`.day-tab[data-day="${{targetKey}}"]`);
+      if (tab) tab.click();
+    }}
+  }}
+
+  // Gate: show showtimes for subscribers, gate for non-subscribers
+  const isSubscriber = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
+  document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
+
   // Apply cinema filter from URL params (set by preferences)
+  // Skip if this is a classic film and the classics override is on
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas');
-  if (cinemas) {{
+  const isClassicFilm = params.get('classic') === 'true';
+  const alwaysClassics = params.get('classics') === 'true';
+  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
@@ -621,6 +754,42 @@ window.addEventListener('DOMContentLoaded', () => {{
         row.style.display = 'none';
       }}
     }});
+    // After hiding rows, update each day panel:
+    // 1. If all rows in a panel are now hidden, show the "no screenings" message
+    // 2. Remove has-shows from the day tab so it doesn't show green falsely
+    document.querySelectorAll('.day-panel').forEach(panel => {{
+      const dayKey = panel.id.replace('day-', '');
+      const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
+                               .filter(r => r.style.display !== 'none');
+      const noTimesEl = panel.querySelector('.no-times');
+      if (visibleRows.length === 0) {{
+        // Show "no screenings" message — create it if it doesn't already exist
+        if (!noTimesEl) {{
+          const msg = document.createElement('div');
+          msg.className = 'no-times';
+          msg.setAttribute('data-es', 'Sin sesiones este día');
+          msg.setAttribute('data-en', 'No screenings this day');
+          msg.textContent = 'Sin sesiones este día';
+          panel.appendChild(msg);
+        }} else {{
+          noTimesEl.style.display = '';
+        }}
+        // Remove the green has-shows indicator from the corresponding tab
+        const tab = document.querySelector(`.day-tab[data-day="${{dayKey}}"]`);
+        if (tab) tab.classList.remove('has-shows');
+      }} else {{
+        // Visible rows exist — keep any no-times message hidden
+        if (noTimesEl) noTimesEl.style.display = 'none';
+      }}
+    }});
+  }}
+
+  // Highlight times matching evening/weekend filter
+  const eveningFilter = params.get('evening') === 'true';
+  if (eveningFilter) {{
+    applyEveningHighlights(true);
+    const legend = document.getElementById('showtime-legend');
+    if (legend) legend.style.display = 'flex';
   }}
 }});
 </script>
@@ -631,70 +800,77 @@ window.addEventListener('DOMContentLoaded', () => {{
 # ─── HTML builder ─────────────────────────────────────────────────────────────
 
 CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
-.wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
-.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
-.lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
-.lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
-.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
-.lang-btn.active{background:#2e2040;color:#f0eae0}
-.header{background:linear-gradient(135deg,#1a0a2e 0%,#0f0c14 60%);border-bottom:1px solid #3a2a55;padding:40px 40px 32px;text-align:center;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
-.header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(220,80,120,.12) 0%,transparent 70%);border-radius:50%}
-.header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
-.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}
-.header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
-.header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
-.section-label{padding:28px 40px 12px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;font-weight:500}
-.section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
-.cinema-group-header{margin:0 24px 14px;padding:12px 16px;background:#160f24;border:1px solid #2a1f3d;border-radius:10px;display:flex;align-items:center;gap:10px}
-.cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#c5b8d8}
-.cinema-group-desc{font-size:11px;color:#6a5e7a}
-.cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
-.list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start}
-.list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
+body{background:#f5f5f2;font-family:'DM Sans',Helvetica,sans-serif;color:#111111}
+.wrapper{max-width:640px;margin:0 auto;background:#f5f5f2}
+.lang-bar{background:#ffffff;border-bottom:2px solid #111111;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
+.lang-toggle{display:flex;border-radius:3px;overflow:hidden;border:1px solid #cccccc}
+.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#696969;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn.active{background:#111111;color:#ffffff}
+.header{background:#ffffff;border-bottom:1px solid #e0e0da;padding:36px 24px 28px}
+.header-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:#c0392b;margin-bottom:12px}
+.header-title{font-size:42px;font-weight:700;color:#111111;line-height:0.95;margin-bottom:10px;margin-top:0;letter-spacing:-1.5px}
+.header-subtitle{font-size:14px;color:#696969;font-weight:300}
+.header-date{display:inline-block;margin-top:16px;padding:4px 14px;background:#111111;color:#ffffff;font-size:11px;letter-spacing:1px}
+.section-label{padding:24px 24px 10px;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#111111;font-weight:700;display:block}
+.section-divider{height:1px;background:#e0e0da;margin:0 24px 16px}
+.cinema-group-header{margin:0 24px 14px;padding:14px 18px;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;border-radius:3px;display:flex;align-items:center;gap:10px}
+#section2-header{border-left-color:#1a3a5c}
+.cinema-group-name{font-size:15px;font-weight:700;color:#111111}
+.cinema-group-desc{font-size:12px;color:#696969}
+.cinema-group-link{margin-left:auto;font-size:11px;color:#1a3a5c;text-decoration:none;white-space:nowrap}
+.list-card{margin:0 24px 10px;padding:14px 16px;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;border-radius:3px;display:flex;gap:14px;align-items:flex-start;position:relative;cursor:pointer;transition:border-color .15s}.list-card:hover{border-color:#c0392b}
+.list-poster{width:54px;height:78px;flex-shrink:0;background:#f0f0ec;border-radius:2px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
 .list-poster img{width:100%;height:100%;object-fit:cover;display:block}
 .list-body{flex:1}
-.list-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
-.list-meta{font-size:11px;color:#7a6d8a;margin-bottom:5px;line-height:1.5}
-.list-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.list-title{font-size:15px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}
+.list-title:hover{color:#c0392b}
+.list-meta{font-size:11px;color:#696969;margin-bottom:5px;line-height:1.5}
+.list-synopsis{font-size:11.5px;color:#555555;line-height:1.5;margin-bottom:8px}
 .badges{margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.film-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
-.badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
-.badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
-.vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
-.score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
-.cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
+.film-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.badge-new{background:#c0392b;color:#ffffff}
+.badge-genre{background:#1a3a5c;color:#ffffff}
+.vose-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;background:#1a3a5c;color:#ffffff}
+.score-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}
+.rating-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}
+.cinema-links-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#aaaaaa;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
-.vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
+.cinema-tag{display:inline-block;font-size:11px;color:#1a3a5c;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#9abccc;line-height:1.4}
+.cinema-tag:hover{color:#c0392b;text-decoration-color:#c0392b}
+.vose-mini{display:inline-block;margin-left:3px;font-size:9px;font-weight:700;letter-spacing:1px;color:#1a3a5c;vertical-align:middle}
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
-.rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
-.featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px}
-.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
+.rating-TP{background:#2a7a4a}.rating-12{background:#1a3a5c}.rating-16{background:#c0622a}.rating-18{background:#c0392b}.rating-7{background:#2a7a4a}
+.featured-card{margin:0 24px 16px;border-radius:3px;overflow:hidden;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;display:flex;min-height:200px;position:relative;cursor:pointer;transition:border-color .15s}.featured-card:hover{border-color:#c0392b}
+.featured-poster{width:120px;flex-shrink:0;background:#f0f0ec;display:flex;align-items:flex-start;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
-.film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
-.film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
-.grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
-.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden}
-.grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
-.grid-info{padding:12px 14px 14px}
-.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
-.grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
-.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
-.footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
-.footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
-.footer a{color:#7a6a9a;text-decoration:none}
-.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
-.filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
-.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a3f5e;font-weight:500}
-.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
-.filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
-.filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
-.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
+.film-title{font-size:20px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#c0392b}
+.film-meta{font-size:12px;color:#696969;margin-bottom:8px;line-height:1.55}
+.film-synopsis{font-size:13px;color:#555555;line-height:1.55;margin-bottom:11px}
+.grid-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 24px 12px}
+.grid-card{background:#ffffff;border:1px solid #e0e0da;border-top:3px solid #c0392b;border-radius:3px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}.grid-card:active{background:#f9f9f7}
+.grid-card[data-section="2"]{border-top-color:#1a3a5c}
+.grid-poster{width:100%;background:#f0f0ec;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
+.grid-info{padding:12px 12px 14px}
+.grid-title{font-size:14px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#c0392b}
+.grid-meta{font-size:10px;color:#696969;margin-bottom:6px;line-height:1.5}
+.grid-synopsis{font-size:11px;color:#555555;line-height:1.5;margin-bottom:8px}
+.footer{background:#111111;border-top:1px solid #333333;padding:28px 24px;text-align:center}
+.footer p{font-size:12px;color:#aaaaaa;line-height:1.7}
+.footer a{color:#cccccc;text-decoration:underline;text-underline-offset:2px}
+.footer-logo{font-size:18px;font-weight:700;color:#ffffff;margin-bottom:10px}
+.footer-logo span{color:#c0392b}
+.filter-bar{background:#ffffff;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #e0e0da;flex-wrap:wrap}
+.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#696969;font-weight:500}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #cccccc;background:transparent;color:#555555;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.filter-btn:hover{color:#111111;border-color:#111111}
+.filter-btn.active{background:#1a3a5c;color:#ffffff;border-color:#1a3a5c}
+.qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #cccccc;background:transparent;color:#555555;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
+@media(hover:hover){.qf-btn:hover{color:#111111;border-color:#111111}}
+.qf-active{background:#c0392b;color:#ffffff;border-color:#c0392b}
+.qf-hidden{display:none!important}
+.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#696969;font-size:14px;border:1px dashed #cccccc;border-radius:3px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
 
@@ -704,13 +880,16 @@ function setLang(lang) {
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
   document.getElementById('html-root').setAttribute('lang', lang);
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    el.textContent = el.getAttribute('data-' + lang);
+    el.innerHTML = el.getAttribute('data-' + lang);
   });
   localStorage.setItem('cv_lang', lang);
   // Update URL with lang param so detail pages pick it up
   const url = new URL(window.location);
   url.searchParams.set('lang', lang);
   window.history.replaceState({}, '', url);
+  updateHeaderDate();
+  const titleEl = document.getElementById('header-title');
+  if (titleEl) titleEl.innerHTML = lang === 'en' ? 'Cinema<br>Listings' : 'Cartelera<br>Valencia';
 }
 
 function getCookie(name) {
@@ -722,28 +901,35 @@ function applyPreferencesFromURL() {
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
-  // Hide cinema tags for excluded cinemas
+  // Hide cinema tags for excluded cinemas (but not on classics cards when classics override is on)
+  const alwaysClassics = params.get('classics') === 'true';
   if (cinemas) {
     document.querySelectorAll('.cinema-tag').forEach(tag => {
       const cid = tag.dataset.cinema;
       if (cid && !cinemas.includes(cid)) {
-        tag.style.display = 'none';
+        const card = tag.closest('[data-section]');
+        const isClassic = card && card.dataset.section === '2';
+        if (!(alwaysClassics && isClassic)) {
+          tag.style.display = 'none';
+        }
       }
     });
   }
 }
 
 function setSubscriberUI(isSubscriber) {
-  // Nav — show preferences link for subscribers, subscribe button for anon
-  const navPrefs     = document.getElementById('nav-prefs');
+  // Nav — hide subscribe button for subscribers
   const navSubscribe = document.getElementById('nav-subscribe');
-  if (navPrefs)     navPrefs.style.display     = isSubscriber ? '' : 'none';
   if (navSubscribe) navSubscribe.style.display  = isSubscriber ? 'none' : '';
 
+  // Quick filter — show for subscribers only
+  const qf = document.getElementById('quick-filter');
+  const qfOverlay = document.getElementById('qf-lock-overlay');
+  if (qf) qf.style.display = 'block';
+  if (qfOverlay) qfOverlay.style.display = isSubscriber ? 'none' : 'flex';
+
   // Banners
-  const subBanner  = document.getElementById('subscriber-banner');
   const anonBanner = document.getElementById('anon-banner');
-  if (subBanner)  subBanner.style.display  = isSubscriber ? 'flex' : 'none';
   if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
 
 }
@@ -761,6 +947,17 @@ async function loadUserPreferences() {
   if (hasParams) {
     setSubscriberUI(true);
     applyPreferencesFromURL();
+    // Update section 2 links to carry classic=true
+    const currentParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(currentParams);
+      if (card && card.dataset.section === '2') {
+        linkParams.set('classic', 'true');
+      }
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    });
     return;
   }
 
@@ -773,11 +970,17 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=lang,cinemas,vose_only,new_only',
-      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON } }
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
+      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
-    if (!rows.length) return;
+
+    // No row found or subscriber has unsubscribed — clear cookie and show anon state
+    if (!rows.length || rows[0].active === false) {
+      document.cookie = 'cv_email=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax';
+      setSubscriberUI(false);
+      return;
+    }
 
     const prefs = rows[0];
 
@@ -789,8 +992,13 @@ async function loadUserPreferences() {
 
     // Build URL params from preferences and reload if needed
     const newParams = new URLSearchParams();
-    if (prefs.vose_only) newParams.set('vose', 'true');
-    if (prefs.new_only)  newParams.set('new',  'true');
+    if (prefs.vose_only)     newParams.set('vose',      'true');
+    if (prefs.vose_lang)     newParams.set('vose_lang',  prefs.vose_lang);
+    if (prefs.new_only)      newParams.set('new',       'true');
+    if (prefs.family_only)   newParams.set('family',    'true');
+    if (prefs.evening_only)  newParams.set('evening',   'true');
+    if (prefs.classics)      newParams.set('classics',  'true');
+    if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
       newParams.set('cinemas', prefs.cinemas.join(','));
@@ -803,13 +1011,16 @@ async function loadUserPreferences() {
     }
 
     // Update all film links to carry preferences params through to detail pages
-    const finalParams = window.location.search;
-    if (finalParams) {
-      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-        const base = a.getAttribute('href').split('?')[0];
-        a.href = base + finalParams;
-      });
-    }
+    const finalParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(finalParams);
+      if (card && card.dataset.section === '2') {
+        linkParams.set('classic', 'true');
+      }
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    });
 
   } catch(e) {
     console.warn('Could not load preferences:', e);
@@ -855,80 +1066,157 @@ function setFilter(filter) {
   applyVisibility();
 }
 
-function applyVisibility() {
-  const params   = new URLSearchParams(window.location.search);
-  const filter   = params.get('filter')  || 'all';
-  const voseOnly = params.get('vose')    === 'true';
-  const newOnly  = params.get('new')     === 'true';
-  const cinemas  = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+function initSections() {{
+  const s2Container = document.getElementById('section2-cards');
+  const s2Divider   = document.getElementById('section2-divider');
+  const s2Label     = document.getElementById('section2-label');
+  const s2Header    = document.getElementById('section2-header');
+  if (!s2Container) return;
+  const s2Cards = Array.from(document.querySelectorAll('.grid-card[data-section="2"]'));
+  s2Cards.forEach(card => {{
+    const row = card.closest('.grid-row');
+    card.remove();
+    if (row && row.querySelectorAll('.grid-card').length === 0) row.remove();
+  }});
+  for (let i = 0; i < s2Cards.length; i += 2) {{
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    row.appendChild(s2Cards[i]);
+    if (s2Cards[i + 1]) row.appendChild(s2Cards[i + 1]);
+    s2Container.appendChild(row);
+  }}
+  if (s2Cards.length === 0) {{
+    if (s2Divider) s2Divider.style.display = 'none';
+    if (s2Label)   s2Label.style.display   = 'none';
+    if (s2Header)  s2Header.style.display  = 'none';
+  }}
+}}
 
-  // Sync filter buttons
+function repairSection(container) {{
+  const allCards     = Array.from(container.querySelectorAll('.grid-card'));
+  const visibleCards = allCards.filter(c => c.style.display !== 'none' && !c.classList.contains('qf-hidden'));
+
+  // Remove all rows
+  container.querySelectorAll('.grid-row').forEach(row => row.remove());
+
+  // Remove any floating cards directly in container
+  Array.from(container.children).forEach(child => {{
+    if (child.classList.contains('grid-card')) child.remove();
+  }});
+
+  // Re-pair visible cards into fresh rows
+  for (let i = 0; i < visibleCards.length; i += 2) {{
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    row.appendChild(visibleCards[i]);
+    if (visibleCards[i + 1]) row.appendChild(visibleCards[i + 1]);
+    container.appendChild(row);
+  }}
+
+  // Put hidden cards in a hidden holding row
+  const hiddenCards = allCards.filter(c => c.style.display === 'none' || c.classList.contains('qf-hidden'));
+  if (hiddenCards.length > 0) {{
+    const holdingRow = document.createElement('div');
+    holdingRow.className = 'grid-row';
+    holdingRow.style.display = 'none';
+    hiddenCards.forEach(c => holdingRow.appendChild(c));
+    container.appendChild(holdingRow);
+  }}
+}}
+
+function applyVisibility() {{
+  const params        = new URLSearchParams(window.location.search);
+  const filter        = params.get('filter')     || 'all';
+  const voseOnly      = params.get('vose')        === 'true';
+  const voseLang      = params.get('vose_lang')   || 'all';
+  const newOnly       = params.get('new')         === 'true';
+  const familyOnly    = params.get('family')      === 'true';
+  const eveningOnly   = params.get('evening')     === 'true';
+  const alwaysClassics= params.get('classics')    === 'true';
+  const minRating     = params.has('min_rating')  ? parseFloat(params.get('min_rating')) : null;
+  const cinemas       = params.get('cinemas') ? params.get('cinemas').split(',') : null;
+
   const allBtn  = document.getElementById('filter-all');
   const voseBtn = document.getElementById('filter-vose');
   if (allBtn)  allBtn.classList.toggle('active',  !voseOnly && filter === 'all');
   if (voseBtn) voseBtn.classList.toggle('active', voseOnly  || filter === 'vose');
 
   let visible = 0;
-  document.querySelectorAll('[data-vose]').forEach(card => {
+  document.querySelectorAll('[data-vose]').forEach(card => {{
+    const isClassic = card.dataset.section === '2';
+
+    // Classics override: only apply VOSE filter, skip all others
+    if (alwaysClassics && isClassic) {{
+      let show = true;
+      if (voseOnly || filter === 'vose') {{
+        if (card.dataset.vose !== 'true') show = false;
+        if (show && voseLang === 'en') {{
+          const origins = (card.dataset.origin || '').split(',');
+          const engOrigins = ['US','GB','AU','CA','IE','NZ'];
+          // Only hide if we have origin data and none are English
+          if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
+        }}
+      }}
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+      return;
+    }}
+
     let show = true;
 
     // VOSE filter
-    if (voseOnly || filter === 'vose') {
+    if (voseOnly || filter === 'vose') {{
       if (card.dataset.vose !== 'true') show = false;
-    }
-
+      if (show && voseLang === 'en') {{
+        const origins = (card.dataset.origin || '').split(',');
+        const engOrigins = ['US','GB','AU','CA','IE','NZ'];
+        if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
+      }}
+    }}
     // New releases filter
-    if (newOnly && card.dataset.isnew !== 'true') show = false;
-
+    if (show && newOnly && card.dataset.isnew !== 'true') show = false;
+    // Family friendly: hide 16 and 18 rated films
+    if (show && familyOnly) {{
+      const r = (card.dataset.rating || '').replace('+','');
+      if (r === '16' || r === '18') show = false;
+    }}
+    // Evening & weekend filter
+    if (show && eveningOnly && card.dataset.hasevening !== 'true') show = false;
+    // Minimum rating filter
+    if (show && minRating !== null) {{
+      const score = parseFloat(card.dataset.score || '0');
+      if (!score || score < minRating) show = false;
+    }}
     // Cinema filter
-    if (cinemas && cinemas.length > 0) {
+    if (show && cinemas && cinemas.length > 0) {{
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
-    }
+    }}
 
     card.style.display = show ? '' : 'none';
     if (show) visible++;
-  });
+  }});
 
-  // Re-pair visible grid cards so there are never gaps
-  // First collect all visible cards across all rows
-  const allGridCards = Array.from(document.querySelectorAll('.grid-row .grid-card'));
-  const visibleCards = allGridCards.filter(c => c.style.display !== 'none');
+  // Re-pair each section independently using a dedicated container
+  const s2El = document.getElementById('section2-cards');
+  const s1El = document.getElementById('section1-cards');
+  if (s1El) repairSection(s1El);
+  if (s2El) repairSection(s2El);
 
-  // Hide all grid rows first
-  document.querySelectorAll('.grid-row').forEach(row => row.style.display = 'none');
-
-  // Create a temporary container to re-pair visible cards
-  // We reuse existing rows — fill them with visible cards in order
-  const rows = document.querySelectorAll('.grid-row');
-  let rowIndex = 0;
-  let cardIndex = 0;
-
-  while (cardIndex < visibleCards.length) {
-    if (rowIndex >= rows.length) break;
-    const row = rows[rowIndex];
-    const rowCards = Array.from(row.querySelectorAll('.grid-card'));
-
-    // Place up to 2 visible cards in this row
-    rowCards.forEach(c => c.style.display = 'none'); // hide all first
-    const batch = visibleCards.slice(cardIndex, cardIndex + 2);
-    batch.forEach((card, i) => {
-      if (rowCards[i]) {
-        // Move card to this slot by reordering in DOM
-        row.appendChild(card);
-        card.style.display = '';
-      }
-    });
-    row.style.display = batch.length > 0 ? '' : 'none';
-    cardIndex += 2;
-    rowIndex++;
-  }
-
-  // Empty state message
   const empty = document.getElementById('filter-empty');
   if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
 
-}
+  const s2Divider = document.getElementById('section2-divider');
+  const s2Label   = document.getElementById('section2-label');
+  const s2Header  = document.getElementById('section2-header');
+  if (s2El) {{
+    const s2Visible = s2El.querySelectorAll('.grid-card:not([style*="display: none"])').length;
+    const show = s2Visible > 0;
+    if (s2Divider) s2Divider.style.display = show ? '' : 'none';
+    if (s2Label)   s2Label.style.display   = show ? '' : 'none';
+    if (s2Header)  s2Header.style.display  = show ? '' : 'none';
+  }}
+}}
 
 """
 
@@ -942,6 +1230,82 @@ def t(el_type: str, es: str, en: str, cls: str = "") -> str:
     """Render a bilingual element."""
     c = f' class="{cls}"' if cls else ""
     return f'<{el_type}{c} data-es="{es}" data-en="{en}">{es}</{el_type}>'
+
+
+def compute_card_data(film: dict) -> dict:
+    """
+    Compute all data-* attribute values that every card type needs.
+    Extracted here so the identical block doesn't have to live three times
+    (film_card_html, featured_card_html, grid_card_html).
+    Nothing here touches HTML — it only returns plain Python values.
+    """
+    year         = film.get("year", "")
+    cinemas_set  = set(c["id"] for c in film["cinemas"])
+    arthouse_only = cinemas_set.issubset({"babel", "dor"})
+    is_old       = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
+    section      = "2" if (arthouse_only or is_old) else "1"
+    origin       = ",".join(film.get("origin_country", []))
+    score_val    = str(film.get("rating_score") or "")
+    rating_val   = film.get("rating", "?").replace("+", "")
+    cinema_ids   = ",".join(c["id"] for c in cinemas_in_window(film))
+
+    # Does this film have any evening/weekend showtime? (powers the evening filter)
+    has_eve = False
+    for _c in film.get("cinemas", []):
+        for _dk, _times in _c.get("showtimes", {}).items():
+            try:
+                _d = date.fromisoformat(_dk)
+                if _d.weekday() < 5:          # weekday — check for after 17:30
+                    for _t in _times:
+                        _h = int(str(_t).split(":")[0])
+                        _m = int(str(_t).split(":")[1]) if ":" in str(_t) else 0
+                        if _h > 17 or (_h == 17 and _m >= 30):
+                            has_eve = True
+                            break
+                else:                          # weekend — always counts
+                    has_eve = True
+                if has_eve:
+                    break
+            except Exception:
+                pass
+        if has_eve:
+            break
+    hasevening = "true" if has_eve else "false"
+
+    # Build per-cinema-per-day showtime lookup (powers the quick-filter day/time buttons)
+    today_qf   = datetime.now(VALENCIA_TZ).date()
+    window_end = today_qf + timedelta(days=6)
+    showdays: set = set()
+    showtimes_by_cinema_day: dict = {}
+    for _c in film.get("cinemas", []):
+        _cid = _c.get("id", "")
+        for _dk, _times in _c.get("showtimes", {}).items():
+            try:
+                _d = date.fromisoformat(_dk)
+                if today_qf <= _d <= window_end:
+                    showdays.add(_dk)
+                    showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(
+                        str(t) for t in _times
+                    )
+            except Exception:
+                pass
+    showdays_attr   = ",".join(sorted(showdays))
+    showtimes_attrs = " ".join(
+        f'data-t-{key}="{"|".join(sorted(times))}"'
+        for key, times in showtimes_by_cinema_day.items()
+    )
+
+    return {
+        "year":           year,
+        "section":        section,
+        "origin":         origin,
+        "score_val":      score_val,
+        "rating_val":     rating_val,
+        "cinema_ids":     cinema_ids,
+        "hasevening":     hasevening,
+        "showdays_attr":  showdays_attr,
+        "showtimes_attrs": showtimes_attrs,
+    }
 
 
 def film_card_html(film: dict) -> str:
@@ -967,7 +1331,8 @@ def film_card_html(film: dict) -> str:
     vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
     score       = film.get("rating_score")
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
-    rating_dot = f'<span class="rating rating-{rating}"></span>+{rating} &nbsp;·&nbsp; ' if rating != "TP" else '<span class="rating rating-TP"></span>'
+    rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+    rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
 
     cinema_tags = ""
     for c in cinemas:
@@ -977,24 +1342,35 @@ def film_card_html(film: dict) -> str:
     where_es = "Dónde verla"
     where_en = "Where to see it"
 
-    cinema_ids = ",".join(c["id"] for c in cinemas)
+    cd = compute_card_data(film)
+    year            = cd["year"]
+    section         = cd["section"]
+    origin          = cd["origin"]
+    score_val       = cd["score_val"]
+    rating_val      = cd["rating_val"]
+    cinema_ids      = cd["cinema_ids"]
+    hasevening      = cd["hasevening"]
+    showdays_attr   = cd["showdays_attr"]
+    showtimes_attrs = cd["showtimes_attrs"]
+
     title_es = title
     title_en = film.get("title_en", title)
     slug     = film.get("slug")
+    classic_param = '?classic=true' if section == '2' else ''
     if slug:
-        title_html_list = f'<a href="./{slug}/" class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+        title_html_list = f'<a href="./{slug}/{classic_param}" class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
     else:
         title_html_list = f'<div class="list-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
     syn_es   = (film.get("synopsis_es") or synopsis)[:200]
     syn_en   = (film.get("synopsis_en") or synopsis)[:200]
 
     return f"""
-  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+  <div class="list-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
     <div class="list-poster">{poster_html}</div>
     <div class="list-body">
-      <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+      <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
       {title_html_list}
-      <div class="list-meta">{rating_dot}{meta[:120]}</div>
+      <div class="list-meta"><span data-es="{meta[:120]}" data-en="{film.get('meta_en', meta)[:120]}">{meta[:120]}</span></div>
       {f'<div class="list-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>' if synopsis else ""}
       <div class="cinema-links">
         <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1002,6 +1378,18 @@ def film_card_html(film: dict) -> str:
       </div>
     </div>
   </div>"""
+
+
+def cinemas_in_window(film: dict) -> list:
+    """Return only cinemas that have at least one showtime within the next 7 days."""
+    from datetime import date as _d, timedelta as _td
+    today = datetime.now(VALENCIA_TZ).date()
+    week_ahead = (today + _td(days=6)).strftime("%Y-%m-%d")
+    today_str  = today.strftime("%Y-%m-%d")
+    return [
+        c for c in film.get("cinemas", [])
+        if any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
+    ]
 
 
 def build_html(films_by_title: dict, anchor: datetime) -> str:
@@ -1016,7 +1404,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         cinema_types = {c["type"] for c in film["cinemas"]}
         cinema_ids   = {c["id"]   for c in film["cinemas"]}
 
-        if "multiplex" in cinema_types:
+        if "multiplex" in cinema_types or cinema_ids.issubset({"babel", "dor"}):
             multiplex_films.append(film)
 
         for cid in ["babel", "dor"]:
@@ -1041,18 +1429,30 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
         score       = film.get("rating_score")
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
-        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+        rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
         cinema_tags = "".join(
             '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas)
+        cd = compute_card_data(film)
+        year            = cd["year"]
+        section         = cd["section"]
+        origin          = cd["origin"]
+        score_val       = cd["score_val"]
+        rating_val      = cd["rating_val"]
+        cinema_ids      = cd["cinema_ids"]
+        hasevening      = cd["hasevening"]
+        showdays_attr   = cd["showdays_attr"]
+        showtimes_attrs = cd["showtimes_attrs"]
+
         title_es  = film["title"]
         title_en  = film.get("title_en", film["title"])
         slug      = film.get("slug")
+        classic_param_feat = '?classic=true' if section == '2' else ''
         if slug:
-            title_html_feat = f'<a href="./{slug}/" class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            title_html_feat = f'<a href="./{slug}/{classic_param_feat}" class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html_feat = f'<div class="film-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         title_orig= film.get("title_original", film["title"])
@@ -1065,14 +1465,14 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             orig_label = f'<div style="font-size:11px;color:var(--faint);margin-top:2px;" translate="no">{title_orig}</div>'
 
         return f"""
-  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+  <div class="featured-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
     <div class="featured-poster">{poster_html}</div>
     <div class="featured-info">
       <div>
-        <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+        <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
         {title_html_feat}
         {orig_label}
-        <div class="film-meta">{rating_dot}{meta[:100]}</div>
+        <div class="film-meta"><span data-es="{meta[:100]}" data-en="{film.get('meta_en', meta)[:100]}">{meta[:100]}</span></div>
         <div class="film-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
       </div>
       <div class="cinema-links">
@@ -1099,30 +1499,42 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
         score       = film.get("rating_score")
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""  ""
-        rating_dot = f'<span class="rating rating-{rating}"></span>+{rating}&nbsp;·&nbsp;' if rating not in ("?","TP") else ""
+        rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+        rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
         cinema_tags = "".join(
             '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
-        cinema_ids = ",".join(c["id"] for c in cinemas)
+        cd = compute_card_data(film)
+        year            = cd["year"]
+        section         = cd["section"]
+        origin          = cd["origin"]
+        score_val       = cd["score_val"]
+        rating_val      = cd["rating_val"]
+        cinema_ids      = cd["cinema_ids"]
+        hasevening      = cd["hasevening"]
+        showdays_attr   = cd["showdays_attr"]
+        showtimes_attrs = cd["showtimes_attrs"]
+
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
         if slug:
-            title_html_grid = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            classic_param_grid = '?classic=true' if section == '2' else ''
+            title_html_grid = f'<a href="./{slug}/{classic_param_grid}" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html_grid = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         syn_es   = (film.get("synopsis_es") or synopsis)[:140]
         syn_en   = (film.get("synopsis_en") or synopsis)[:140]
 
         return f"""
-    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}">
+    <div class="grid-card" data-vose="{"true" if vose else "false"}" data-isnew="{"true" if is_new else "false"}" data-cinemas="{cinema_ids}" data-year="{year}" data-section="{section}" data-rating="{rating_val}" data-score="{score_val}" data-origin="{origin}" data-hasevening="{hasevening}" data-showdays="{showdays_attr}" {showtimes_attrs}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
-        <div class="badges">{new_badge}{vose_badge}{score_badge}</div>
+        <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
         {title_html_grid}
-        <div class="grid-meta">{rating_dot}{meta[:80]}</div>
+        <div class="grid-meta"><span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
         <div class="cinema-links">
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
@@ -1150,16 +1562,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             inner = "".join(grid_card_html(f) for f in pair)
             babel_grid += f'\n  <div class="grid-row">{inner}\n  </div>'
         babel_cards = babel_grid
-        if babel_shared:
-            shared_tags = "".join(
-                '<span class="cinema-tag" style="cursor:default;">' + f["title"] + ('<span class="vose-mini">VOSE</span>' if f["any_vose"] else "") + '</span>'
-                for f in babel_shared
-            )
-            babel_cards += f"""
-  <div style="margin:0 24px 16px;padding:12px 16px;background:#130d20;border:1px solid #261d3a;border-radius:10px;">
-    <div class="cinema-links-label" data-es="También en Babel esta semana" data-en="Also at Babel this week" style="margin-bottom:8px;">También en Babel esta semana</div>
-    <div class="cinema-tags">{shared_tags}</div>
-  </div>"""
 
     dor_cards = ""
     if "dor" in arthouse_films:
@@ -1173,6 +1575,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
@@ -1189,70 +1596,77 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <div class="wrapper">
 
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <a href="../" style="font-size:15px;font-weight:700;color:#111111;text-decoration:none;white-space:nowrap;">whatson<span style="color:#c0392b;">.movie</span></a>
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../preferences/" id="nav-prefs" style="display:none;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap;" data-es="⚙️ Preferencias" data-en="⚙️ Preferences">⚙️ Preferencias</a>
-      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:#c0392b;color:#ffffff;border-radius:3px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
-  </div>
-
-  <!-- SUBSCRIBER BANNER — shown to subscribers only -->
-  <div id="subscriber-banner" style="display:none;background:rgba(255,180,50,0.08);border-bottom:1px solid rgba(255,180,50,0.2);padding:10px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span style="font-size:12px;color:#c5a84a;" data-es="🎬 Estás viendo tu cartelera personalizada" data-en="🎬 You're viewing your personalised listings">🎬 Estás viendo tu cartelera personalizada</span>
-    <a href="../preferences/" style="font-size:11px;color:#ffb432;text-decoration:none;" data-es="⚙️ Cambiar preferencias →" data-en="⚙️ Change preferences →">⚙️ Cambiar preferencias →</a>
   </div>
 
   <!-- ANONYMOUS BANNER — shown to non-subscribers -->
-  <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+  <div id="anon-banner" style="background:#fff8f6;border-bottom:1px solid #f0d0c8;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;gap:4px;">
-      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="🎬 Más de 30 películas. 10 cines. Cada semana." data-en="🎬 30+ films. 10 cinemas. Every week.">🎬 Más de 30 películas. 10 cines. Cada semana.</span>
-      <span style="font-size:12px;color:#9b8faa;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
+      <span style="font-size:15px;font-weight:500;color:#111111;" data-es="🎬 Más de 30 películas. 11 cines. Cada semana." data-en="🎬 30+ films. 11 cinemas. Every week.">🎬 Más de 30 películas. 11 cines. Cada semana.</span>
+      <span style="font-size:12px;color:#555555;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
     </div>
-    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#c0392b;color:#ffffff;border-radius:3px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
+  <main>
   <div class="header">
-    <div class="header-title">Cartelera<br>Valencia</div>
+    <h1 class="header-title" id="header-title">Cartelera<br>Valencia</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
     <div class="header-date" id="header-date"></div>
+  </div>
+
+  <!-- QUICK FILTER — shown to subscribers only -->
+  <div id="quick-filter" style="display:block;background:#ffffff;border-bottom:1px solid #e0e0da;padding:14px 20px;position:relative;">
+    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(245,245,242,0.85);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span style="font-size:12px;color:#c0392b;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
+      <a href="../" style="font-size:11px;color:#1a3a5c;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
+    </div>
+    <div style="font-size:17px;font-weight:700;color:#111111;line-height:1;margin-bottom:3px;">quick<em style="color:#c0392b;font-style:italic;">filter</em></div>
+    <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:14px;" data-es="filtros avanzados →" data-en="advanced filters →">filtros avanzados →</a>
+    <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
+      <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
+      <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
+      <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
+      <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
+    </div>
+    <div id="qf-times" style="display:flex;gap:8px;">
+      <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
+      <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
+      <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
+      <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
+    </div>
   </div>
 
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
   <div class="cinema-group-header">
     <div>
-      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys</div>
+      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys · Tívoli</div>
       <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
     </div>
   </div>
+  <div id="section1-cards">
   {multiplex_cards}
-
-  <div class="section-divider"></div>
-  <div class="section-label" data-es="🎭 Cines Babel — Cine Independiente &amp; VOSE" data-en="🎭 Cines Babel — Independent &amp; VOSE Cinema">🎭 Cines Babel — Cine Independiente &amp; VOSE</div>
-  <div class="cinema-group-header">
-    <div>
-      <div class="cinema-group-name">Cines Babel</div>
-      <div class="cinema-group-desc" data-es="C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE" data-en="C/ Vicent Sancho Tello, 10 · 5 screens · Independent &amp; VOSE specialists">C/ Vicent Sancho Tello, 10 · 5 salas · Especialistas en cine independiente y VOSE</div>
-    </div>
-    <a href="https://www.cinesalbatrosbabel.com" class="cinema-group-link">cinesalbatrosbabel.com →</a>
   </div>
-  {babel_cards}
 
-  <div class="section-divider"></div>
-  <div class="section-label" data-es="🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor" data-en="🎞️ Cinestudio D'Or — Double Bills &amp; Art Cinema">🎞️ Cinestudio D'Or — Sesión Doble, Cine de Autor</div>
-  <div class="cinema-group-header">
+  <div class="section-divider" id="section2-divider"></div>
+  <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
+  <div class="cinema-group-header" id="section2-header">
     <div>
-      <div class="cinema-group-name">Cinestudio D'Or</div>
-      <div class="cinema-group-desc" data-es="C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua" data-en="C/ Almirante Cadarso, 31 · Valencia's oldest cinema · Continuous double-bill screenings">C/ Almirante Cadarso, 31 · El cine más antiguo de Valencia · Sesión doble continua</div>
+      <div class="cinema-group-name">Cines Babel · Cinestudio D'Or </div>
+      <div class="cinema-group-desc" data-es="Cine de autor, sesiones VOSE especializadas y reposiciones clásicas" data-en="Arthouse cinema, specialist VOSE screenings and classic re-releases">Cine de autor, sesiones VOSE especializadas y reposiciones clásicas</div>
     </div>
-    <a href="https://cinestudiodor.es" class="cinema-group-link">cinestudiodor.es →</a>
   </div>
-  {dor_cards}
-
+  <div id="section2-cards"></div>
   <div class="section-divider"></div>
+  </main>
 
   <div class="footer">
     <div class="footer-logo">Cartelera Valencia</div>
@@ -1260,9 +1674,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span data-es="Fuentes:" data-en="Sources:">Fuentes:</span>
       <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.themoviedb.org">TMDB</a><br>
       <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
-      <em style="color:#7a6a9a;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
-      <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
-      <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <em style="color:#696969;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
+      <em style="color:#555555;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
+      <span style="color:#aaaaaa;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
@@ -1272,21 +1686,162 @@ window.SUPABASE_URL  = "{SUPABASE_URL}";
 window.SUPABASE_ANON = "{SUPABASE_ANON}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
+  initSections();
   applyVisibility();
   loadUserPreferences();
+  attachCardClicks();
 
   // After preferences load, update film links to pass params through
   // We do this after a short delay to allow loadUserPreferences() to update the URL
   setTimeout(() => {{
-    const params = window.location.search;
-    if (params) {{
-      document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
-        const base = a.getAttribute('href').split('?')[0];
-        a.href = base + params;
-      }});
+    const currentParams = new URLSearchParams(window.location.search);
+    // Add selected quick filter day as tab param for detail page
+    if (window._qfDay && window._qfDay !== 'all') {{
+      currentParams.set('tab', window._qfDay);
     }}
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
+      const base = a.getAttribute('href').split('?')[0];
+      const card = a.closest('[data-section]');
+      const linkParams = new URLSearchParams(currentParams);
+      if (card && card.dataset.section === '2') {{
+        linkParams.set('classic', 'true');
+      }}
+      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
+    }});
+    attachCardClicks();
   }}, 1500);
 }});
+
+// ── QUICK FILTER ──
+(function() {{
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const plus1   = new Date(today); plus1.setDate(today.getDate()+2);
+
+  function toDateKey(d) {{
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }}
+
+  const todayKey    = toDateKey(today);
+  const tomorrowKey = toDateKey(tomorrow);
+  const plus1Key    = toDateKey(plus1);
+
+  const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+  const plus1Btn = document.getElementById('qf-plus1');
+  if (plus1Btn) {{
+    const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+    plus1Btn.textContent = days[plus1.getDay()] + ' ' + plus1.getDate();
+  }}
+
+  let qfDay  = null;
+  window._qfDay = null;
+  let qfTime = 'anytime';
+
+  window.setQFDay = function(day) {{
+    qfDay = (day === 'all') ? null : day;
+    window._qfDay = qfDay;
+    // Update film links with tab param
+    const currentParams = new URLSearchParams(window.location.search);
+    if (qfDay) currentParams.set('tab', qfDay);
+    else currentParams.delete('tab');
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
+      const base = a.getAttribute('href').split('?')[0].split('?')[0];
+      const lp = new URLSearchParams(currentParams);
+      const card = a.closest('[data-section]');
+      if (card && card.dataset.section === '2') lp.set('classic', 'true');
+      a.href = base + (lp.toString() ? '?' + lp.toString() : '');
+    }});
+    ['all','today','tomorrow','plus1'].forEach(d => {{
+      const active = (d === 'all' && !qfDay) || (d === qfDay);
+      document.getElementById('qf-'+d)?.classList.toggle('qf-active', active);
+    }});
+    applyQF();
+  }};
+
+  window.setQFTime = function(time) {{
+    qfTime = time;
+    ['morning','afternoon','evening','anytime'].forEach(t => {{
+      document.getElementById('qf-'+t)?.classList.toggle('qf-active', qfTime === t);
+    }});
+    applyQF();
+  }};
+
+  function applyQF() {{
+    const dayKey = qfDay === 'today' ? todayKey : qfDay === 'tomorrow' ? tomorrowKey : qfDay === 'plus1' ? plus1Key : null;
+
+    document.querySelectorAll('[data-showdays]').forEach(card => {{
+      // No day filter and any time = show all
+      if (!dayKey && qfTime === 'anytime') {{
+        card.classList.remove('qf-hidden');
+        return;
+      }}
+
+      // Day filter: check if film shows on selected day
+      if (dayKey) {{
+        const showdays = (card.dataset.showdays || '').split(',');
+        if (!showdays.includes(dayKey)) {{
+          card.classList.add('qf-hidden');
+          return;
+        }}
+        // Time filter on specific day — only check selected cinemas
+        if (qfTime !== 'anytime') {{
+          const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
+          const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
+          const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dayKey));
+          const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
+          const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
+          const matches = times.some(t => {{
+            const h = parseInt(t.split(':')[0]);
+            if (qfTime === 'morning')   return h < 12;
+            if (qfTime === 'afternoon') return h >= 12 && h < 18;
+            if (qfTime === 'evening')   return h >= 18;
+            return true;
+          }});
+          if (matches) card.classList.remove('qf-hidden');
+          else card.classList.add('qf-hidden');
+          return;
+        }}
+        card.classList.remove('qf-hidden');
+        return;
+      }}
+
+      // No day selected but time filter active — check across ALL days, filtered by selected cinemas
+      const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
+      const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
+      const showdays = (card.dataset.showdays || '').split(',').filter(Boolean);
+      const matches = showdays.some(dk => {{
+        const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dk));
+        const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
+        const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
+        return times.some(t => {{
+          const h = parseInt(t.split(':')[0]);
+          if (qfTime === 'morning')   return h < 12;
+          if (qfTime === 'afternoon') return h >= 12 && h < 18;
+          if (qfTime === 'evening')   return h >= 18;
+          return true;
+        }});
+      }});
+      if (matches) card.classList.remove('qf-hidden');
+      else card.classList.add('qf-hidden');
+    }});
+    applyVisibility();
+  }}
+}})();
+
+// ── CARD CLICK — make entire card clickable via title link
+function attachCardClicks() {{
+  document.querySelectorAll('.grid-card, .list-card, .featured-card').forEach(card => {{
+    if (card._clickAttached) return;
+    card._clickAttached = true;
+    card.addEventListener('click', function(e) {{
+      if (e.target.closest('a')) return;
+      const titleLink = card.querySelector('a.grid-title, a.list-title, a.film-title');
+      if (titleLink) window.location.href = titleLink.href;
+    }});
+  }});
+}}
 </script>
 <script>
 if ('serviceWorker' in navigator) {{
@@ -1303,9 +1858,31 @@ if ('serviceWorker' in navigator) {{
 # ─── Email sender ─────────────────────────────────────────────────────────────
 
 
-def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "") -> str:
+def fetch_subscribers() -> list:
+    """Fetch all active subscribers with their language preference from Supabase."""
+    import urllib.request
+    key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
+    try:
+        url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,lang&order=email"
+        req = urllib.request.Request(url, headers={
+            "apikey":        key,
+            "Authorization": f"Bearer {key}",
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            import json as _json
+            subscribers = _json.loads(resp.read().decode())
+            log.info(f"Fetched {len(subscribers)} subscribers from Supabase")
+            return subscribers
+    except Exception as e:
+        log.warning(f"Could not fetch subscribers from Supabase: {e} — falling back to RECIPIENTS env var")
+        return [{"email": r, "lang": "es"} for r in RECIPIENTS]
+
+
+def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "", lang: str = "en") -> str:
     """Build a clean, simple teaser email that links to the full hosted page."""
-    date_en = week_range_en(anchor)
+    is_es   = (lang == "es")
+    date_str = week_range_es(anchor) if is_es else week_range_en(anchor)
+    date_en  = week_range_en(anchor)  # kept for legacy f-string refs below
 
     total_films   = len(films_by_title)
     total_cinemas = len(CINEMAS)
@@ -1332,16 +1909,19 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         )
         badges = ""
         if film["is_new"]:
-            badges += '<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid #ffb43260;margin-right:4px;">NEW</span>'
+            new_label = "ESTRENO" if is_es else "NEW"
+            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid #ffb43260;margin-right:4px;">{new_label}</span>'
         if film["any_vose"]:
             badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid #ffd84a50;">VOSE</span>'
 
         cinemas_str = " · ".join(c["name"] for c in film["cinemas"][:4])
         if len(film["cinemas"]) > 4:
-            cinemas_str += f' +{len(film["cinemas"])-4} more'
+            more_label = f'+{len(film["cinemas"])-4} más' if is_es else f'+{len(film["cinemas"])-4} more'
+            cinemas_str += f' {more_label}'
 
-        synopsis   = film.get("synopsis", "")
-        meta_clean = film["meta"][:80].strip(". ")
+        film_title = film.get("title_es" if is_es else "title_en") or film.get("title", "")
+        synopsis   = (film.get("synopsis_es") or film.get("synopsis", "")) if is_es else (film.get("synopsis_en") or film.get("synopsis", ""))
+        meta_clean = (film.get("meta_es") or film.get("meta", ""))[:80].strip(". ") if is_es else (film.get("meta_en") or film.get("meta", ""))[:80].strip(". ")
 
         return f"""
         <tr>
@@ -1351,7 +1931,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
                 <td width="70" valign="top" style="padding-right:14px;">{poster_html}</td>
                 <td valign="top">
                   <div style="margin-bottom:5px;">{badges}</div>
-                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film["title"]}</div>
+                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:4px;">{film_title}</div>
                   <div style="font-size:11px;color:#7a6d8a;margin-bottom:5px;">{meta_clean}</div>
                   <div style="font-size:12px;color:#8c8090;margin-bottom:6px;line-height:1.4;">{synopsis[:160] if synopsis else ""}</div>
                   <div style="font-size:11px;color:#5a4e6a;">{cinemas_str}</div>
@@ -1368,7 +1948,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Valencia Cinema – {date_en}</title>
+<title>{"Cartelera Valencia" if is_es else "Valencia Cinema"} – {date_str}</title>
 </head>
 <body style="margin:0;padding:0;background:#0f0c14;font-family:Helvetica,Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0c14;">
@@ -1379,10 +1959,10 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- HEADER -->
         <tr>
           <td style="background:linear-gradient(135deg,#1a0a2e,#0f0c14);border-bottom:1px solid #3a2a55;padding:36px 40px 28px;text-align:center;border-radius:12px 12px 0 0;">
-            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 Weekly Newsletter</div>
-            <div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">Cartelera<br>Valencia</div>
-            <div style="font-size:13px;color:#9b8faa;">Your weekly guide to cinema in Valencia</div>
-            <div style="display:inline-block;margin-top:16px;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_en}</div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">{"🎬 Boletín Semanal" if is_es else "🎬 Weekly Newsletter"}</div>
+            <div style="font-family:Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">{"Cartelera<br>Valencia" if is_es else "Cinema<br>Valencia"}</div>
+            <div style="font-size:13px;color:#9b8faa;">{"Tu guía semanal del cine en Valencia" if is_es else "Your weekly guide to cinema in Valencia"}</div>
+            <div style="display:inline-block;margin-top:16px;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_str}</div>
           </td>
         </tr>
 
@@ -1393,15 +1973,15 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
               <tr>
                 <td style="text-align:center;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{total_films}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">Films showing</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Películas" if is_es else "Films showing"}</div>
                 </td>
                 <td style="text-align:center;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(vose_films)}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">With VOSE</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Con VOSE" if is_es else "With VOSE"}</div>
                 </td>
                 <td style="text-align:center;">
                   <div style="font-size:22px;font-weight:700;color:#f0eae0;">{len(new_films)}</div>
-                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">New releases</div>
+                  <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Estrenos" if is_es else "New releases"}</div>
                 </td>
               </tr>
             </table>
@@ -1411,7 +1991,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- HIGHLIGHTS -->
         <tr>
           <td style="background:#0f0c14;padding:20px 40px 10px;">
-            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">This week's highlights</div>
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">{"Destacados de esta semana" if is_es else "This week's highlights"}</div>
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               {highlights_html}
             </table>
@@ -1421,8 +2001,8 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <!-- CTA BUTTON -->
         <tr>
           <td style="background:#0f0c14;padding:24px 40px 32px;text-align:center;">
-            <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">See the full programme — all cinemas, all films, VOSE sessions highlighted</div>
-            <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">View Full Listings →</a>
+            <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">{"Ver la programación completa — todos los cines, todas las películas, sesiones VOSE destacadas" if is_es else "See the full programme — all cinemas, all films, VOSE sessions highlighted"}</div>
+            <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">{"Ver cartelera completa →" if is_es else "View Full Listings →"}</a>
             <br><br>
             <div style="font-size:11px;color:#5a4e6a;">Or copy this link: <a href="{page_url}" target="_blank" style="color:#7a6a9a;word-break:break-all;">{page_url}</a></div>
           </td>
@@ -1433,7 +2013,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
           <td style="background:#0a0810;border-top:1px solid #1e1630;padding:18px 40px;text-align:center;">
             <div style="font-size:11px;color:#4a3f5e;line-height:1.8;">
               Kinépolis · Yelmo Campanar · Ocine Aqua · ABC El Saler · ABC Park · ABC Gran Turia<br>
-              Cines MN4 · Cines Lys · <strong style="color:#6a5e7a;">Cines Babel</strong> · <strong style="color:#6a5e7a;">Cinestudio D'Or</strong>
+              Cines MN4 · Cines Lys · Cine Tívoli · <strong style="color:#6a5e7a;">Cines Babel</strong> · <strong style="color:#6a5e7a;">Cinestudio D'Or</strong>
             </div>
           </td>
         </tr>
@@ -1442,10 +2022,10 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
         <tr>
           <td style="background:#0a0810;padding:14px 40px 24px;text-align:center;border-radius:0 0 12px 12px;">
             <div style="font-size:11px;color:#3a2e50;line-height:1.6;">
-              Showtimes may vary — always check the cinema's website before you go.<br>
-              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">⚙️ Manage preferences</a>
+              {"Los horarios pueden variar — consulta siempre la web del cine." if is_es else "Showtimes may vary — always check the cinema's website before you go."}<br>
+              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">{"⚙️ Gestionar preferencias" if is_es else "⚙️ Manage preferences"}</a>
               &nbsp;·&nbsp;
-              <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">Unsubscribe</a><br>
+              <a href="{unsub_url}" style="color:#5a4e6a;text-decoration:none;">{"Darse de baja" if is_es else "Unsubscribe"}</a><br>
               © {anchor.year} Cartelera Valencia Weekly
             </div>
           </td>
@@ -1459,35 +2039,36 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 </html>"""
 
 
-def send_email(html: str, anchor: datetime) -> None:
-    date_en = week_range_en(anchor)
-    subject = f"🎬 Valencia Cinema – {date_en}"
+def send_email(html: str, anchor: datetime, recipient: str, lang: str = "en") -> None:
+    if lang == "es":
+        subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
+        plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"
+    else:
+        subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
+        plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-    msg["To"]      = ", ".join(RECIPIENTS)
+    msg["To"]      = recipient
 
-    # Plain-text fallback
-    plain = f"Valencia Cinema Weekly – {date_en}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
     msg.attach(MIMEText(plain, "plain", "utf-8"))
     msg.attach(MIMEText(html,  "html",  "utf-8"))
 
-    log.info(f"Connecting to {SMTP_HOST}:{SMTP_PORT} ...")
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.ehlo()
         server.starttls()
         server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_ADDRESS, RECIPIENTS, msg.as_string())
-    log.info(f"Email sent to {len(RECIPIENTS)} recipient(s).")
+        server.sendmail(FROM_ADDRESS, [recipient], msg.as_string())
+    log.info(f"Email sent to {recipient} ({lang})")
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 def main():
     # The newsletter covers Friday → Thursday; anchor on this coming Friday
-    today  = datetime.now()
-    anchor = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    today  = datetime.now(VALENCIA_TZ)
+    anchor = today.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
     log.info(f"Building newsletter for week starting {anchor.date()} ...")
     warm_up_session()
@@ -1508,6 +2089,25 @@ def main():
                 film["synopsis_en"]    = tmdb.get("synopsis_en", "")
                 film["synopsis_es"]    = tmdb.get("synopsis_es") or film.get("synopsis", "")
                 film["rating_score"]   = tmdb.get("rating_score")
+                film["tmdb_id"]        = tmdb.get("tmdb_id")
+                if tmdb.get("cert_es") and tmdb["cert_es"] != "?":
+                    cert = tmdb["cert_es"]
+                    # Normalise TMDB ES cert to Spanish display format
+                    if cert in ("A", "APTA", "TP"): cert = "TP"
+                    film["rating"] = cert
+                # Build English meta from TMDB data
+                genres_en = tmdb.get("genres_en", [])
+                runtime   = tmdb.get("runtime")
+                countries = tmdb.get("origin_country", [])
+                year      = tmdb.get("year", "")
+                if year: film["year"] = year
+                if countries: film["origin_country"] = countries
+                parts = []
+                if countries: parts.append(", ".join(countries))
+                if year:      parts.append(year)
+                if genres_en: parts.append(" , ".join(genres_en))
+                if runtime:   parts.append(f"{runtime} min")
+                film["meta_en"] = " . ".join(parts) if parts else film.get("meta", "")
                 log.info(f"  ✓ {title} → {tmdb.get('title_en','?')} / {tmdb.get('title_original','?')} ⭐{tmdb.get('rating_score','?')}")
             else:
                 film["title_en"]       = title
@@ -1515,6 +2115,7 @@ def main():
                 film["synopsis_en"]    = film.get("synopsis", "")
                 film["synopsis_es"]    = film.get("synopsis", "")
                 film["rating_score"]   = None
+                film["meta_en"]        = film.get("meta", "")
     else:
         for film in films.values():
             film["title_en"]       = film["title"]
@@ -1523,13 +2124,42 @@ def main():
             film["synopsis_es"]    = film.get("synopsis", "")
             film["rating_score"]   = None
 
+    # Deduplicate films that resolved to the same TMDB ID
+    # (e.g. same film listed under different Spanish titles at different cinemas)
+    tmdb_id_map = {}  # tmdb_id -> canonical title
+    duplicates  = []
+    for title, film in films.items():
+        tid = film.get("tmdb_id")
+        if not tid:
+            continue
+        if tid in tmdb_id_map:
+            canonical = tmdb_id_map[tid]
+            log.info(f"  Merging '{title}' into '{canonical}' (same TMDB ID {tid})")
+            # Merge cinemas
+            existing_ids = {c["id"] for c in films[canonical]["cinemas"]}
+            for c in film["cinemas"]:
+                if c["id"] not in existing_ids:
+                    films[canonical]["cinemas"].append(c)
+                    existing_ids.add(c["id"])
+            # Merge flags
+            if film.get("any_vose"):
+                films[canonical]["any_vose"] = True
+            if film.get("is_new"):
+                films[canonical]["is_new"] = True
+            if film.get("poster") and not films[canonical].get("poster"):
+                films[canonical]["poster"] = film["poster"]
+            duplicates.append(title)
+        else:
+            tmdb_id_map[tid] = title
+    for title in duplicates:
+        del films[title]
+
     # Build the full bilingual listings page
     # Remove films with no future showtimes and assign slugs to the rest
-    from datetime import date as _date
-    today_str = _date.today().strftime("%Y-%m-%d")
-
-    from datetime import timedelta as _td2
-    week_ahead = (_date.today() + _td2(days=7)).strftime("%Y-%m-%d")
+    from datetime import date as _date, timedelta as _td2
+    _today_local = datetime.now(VALENCIA_TZ).date()
+    today_str = _today_local.strftime("%Y-%m-%d")
+    week_ahead = (_today_local + _td2(days=6)).strftime("%Y-%m-%d")
     stale = [title for title, film in films.items()
              if not any(
                  any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
@@ -1549,6 +2179,13 @@ def main():
     with open("docs/listings/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
     log.info("Full listings page saved to docs/listings/index.html")
+
+    # Write stats.json for homepage animation
+    os.makedirs("docs/data", exist_ok=True)
+    stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
+    with open("docs/data/stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f)
+    log.info(f"stats.json written: {stats}")
 
     # Clean up stale film detail pages from previous runs
     import shutil
@@ -1594,20 +2231,51 @@ def main():
         log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
 
     # Build and send the teaser email
-    page_url  = os.environ.get("LISTINGS_URL", "https://whatson.movie/listings")
-    prefs_url = page_url.replace("/listings", "/preferences")
+    page_url   = os.environ.get("LISTINGS_URL", "https://whatson.movie/listings")
+    prefs_url  = page_url.replace("/listings", "/preferences")
+    unsub_url  = page_url.replace("/listings", "/unsubscribe")
 
     # Only send email on Thursdays (scraper now runs daily)
     is_thursday = anchor.weekday() == 3
     force_email = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
+    is_scheduled = os.environ.get("TRIGGERED_BY", "schedule") == "schedule"
 
-    if is_thursday or force_email:
-        teaser = build_teaser_email(films, anchor, page_url, prefs_url)
+    if (is_thursday and is_scheduled) or force_email:
+        subscribers = fetch_subscribers()
+        sent = 0
+        errors = 0
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            for sub in subscribers:
+                email = sub.get("email", "").strip()
+                lang  = sub.get("lang") or "es"
+                if not email:
+                    continue
+                try:
+                    teaser = build_teaser_email(films, anchor, page_url, prefs_url, unsub_url, lang=lang)
+                    if lang == "es":
+                        subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
+                        plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"
+                    else:
+                        subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
+                        plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
+                    msg = MIMEMultipart("alternative")
+                    msg["Subject"] = subject
+                    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
+                    msg["To"]      = email
+                    msg.attach(MIMEText(plain,  "plain", "utf-8"))
+                    msg.attach(MIMEText(teaser, "html",  "utf-8"))
+                    server.sendmail(FROM_ADDRESS, [email], msg.as_string())
+                    log.info(f"  Sent to {email} ({lang})")
+                    sent += 1
+                except Exception as e:
+                    log.warning(f"  Failed to send to {email}: {e}")
+                    errors += 1
+        log.info(f"Email send complete: {sent} sent, {errors} errors")
     else:
         log.info(f"Not Thursday (weekday={anchor.weekday()}) — skipping email send")
-        teaser = None
-    if teaser:
-        send_email(teaser, anchor)
     close_browser()
 
 
