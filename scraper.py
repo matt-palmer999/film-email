@@ -1706,8 +1706,8 @@ window.addEventListener('DOMContentLoaded', () => {{
   setTimeout(() => {{
     const currentParams = new URLSearchParams(window.location.search);
     // Add selected quick filter day as tab param for detail page
-    if (typeof qfDay !== 'undefined' && qfDay && qfDay !== 'all') {{
-      currentParams.set('tab', qfDay);
+    if (window._qfDay && window._qfDay !== 'all') {{
+      currentParams.set('tab', window._qfDay);
     }}
     document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
       const base = a.getAttribute('href').split('?')[0];
@@ -1746,10 +1746,23 @@ window.addEventListener('DOMContentLoaded', () => {{
   }}
 
   let qfDay  = null;
+  window._qfDay = null;
   let qfTime = 'anytime';
 
   window.setQFDay = function(day) {{
     qfDay = (day === 'all') ? null : day;
+    window._qfDay = qfDay;
+    // Update film links with tab param
+    const currentParams = new URLSearchParams(window.location.search);
+    if (qfDay) currentParams.set('tab', qfDay);
+    else currentParams.delete('tab');
+    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {{
+      const base = a.getAttribute('href').split('?')[0].split('?')[0];
+      const lp = new URLSearchParams(currentParams);
+      const card = a.closest('[data-section]');
+      if (card && card.dataset.section === '2') lp.set('classic', 'true');
+      a.href = base + (lp.toString() ? '?' + lp.toString() : '');
+    }});
     ['all','today','tomorrow','plus1'].forEach(d => {{
       const active = (d === 'all' && !qfDay) || (d === qfDay);
       document.getElementById('qf-'+d)?.classList.toggle('qf-active', active);
