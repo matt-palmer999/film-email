@@ -20,9 +20,17 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install system dependencies for Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2t64 libatk-bridge2.0-0 libatk1.0-0 libcups2 \
+            libdbus-1-3 libdrm2 libgbm1 libgtk-3-0 libnspr4 libnss3 \
+            libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 xvfb
+
       - name: Install dependencies
         run: |
-          pip install playwright requests beautifulsoup4
+          pip install -r requirements.txt
           playwright install chromium
 
       - name: Run scraper
@@ -38,6 +46,7 @@ jobs:
           TMDB_API_KEY:   ${{ secrets.TMDB_API_KEY }}
           SUPABASE_URL:   ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON:  ${{ secrets.SUPABASE_ANON }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           FORCE_EMAIL:    "false"
         run: python scraper.py
 
