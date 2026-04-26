@@ -50,6 +50,14 @@ jobs:
           FORCE_EMAIL:    "false"
         run: python scraper.py
 
+      - name: Commit generated files back to dev
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/listings/ docs/data/stats.json
+          git diff --staged --quiet || git commit -m "chore: update dev listings $(date +%Y-%m-%d)"
+          git push origin dev
+
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3
         with:
