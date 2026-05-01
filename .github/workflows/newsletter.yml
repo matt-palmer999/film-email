@@ -1,8 +1,8 @@
 name: Valencia Cinema Weekly Newsletter
 
 on:
-  schedule:
-    - cron: "5 23 * * *"   # Every day at 23:05 UTC (00:05 Valencia time), email only on Thursdays
+  # schedule:
+  #   - cron: "5 23 * * *"   # Disabled — mabuse.es is down, re-enable when new data source is ready
   workflow_dispatch:         # Allow manual trigger for testing
 
 jobs:
