@@ -1046,7 +1046,7 @@ async function loadUserPreferences() {
 }
 
 function updateHeaderDate() {
-  const today = new Date();
+  const today = new Date(window.DATA_ANCHOR || new Date());
   const end   = new Date(today);
   end.setDate(today.getDate() + 6);
 
@@ -1702,6 +1702,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <script>
 window.SUPABASE_URL  = "{SUPABASE_URL}";
 window.SUPABASE_ANON = "{SUPABASE_ANON}";
+window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}"; // scrape date — keeps filters working on cached data
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
   initSections();
@@ -1734,7 +1735,7 @@ window.addEventListener('DOMContentLoaded', () => {{
 (function() {{
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const today = new Date();
+  const today = new Date(window.DATA_ANCHOR || new Date());
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
   const plus1   = new Date(today); plus1.setDate(today.getDate()+2);
 
