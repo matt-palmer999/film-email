@@ -245,5 +245,18 @@ window.addEventListener('DOMContentLoaded', () => {
     <button onclick="hideComingSoon()" style="margin-top:20px;padding:8px 24px;background:#c0392b;color:#ffffff;border:none;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">OK</button>
   </div>
 </div>
+<script>
+function showComingSoon() {
+  const overlay = document.getElementById('coming-soon-overlay');
+  overlay.style.display = 'flex';
+  const lang = document.getElementById('html-root').lang || 'es';
+  overlay.querySelectorAll('[data-es][data-en]').forEach(el => {
+    el.innerHTML = el.getAttribute('data-' + lang);
+  });
+}
+function hideComingSoon() {
+  document.getElementById('coming-soon-overlay').style.display = 'none';
+}
+</script>
 </body>
 </html>
