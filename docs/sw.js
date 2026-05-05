@@ -1,5 +1,5 @@
 // whatson.movie Service Worker
-const CACHE_NAME = 'whatson-v1';
+const CACHE_NAME = 'whatson-v2';
 const OFFLINE_URL = '/listings/';
 
 // Assets to pre-cache on install
