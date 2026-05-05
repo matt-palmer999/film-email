@@ -2093,6 +2093,13 @@ def main():
     films = fetch_all()
     log.info(f"Total unique films found: {len(films)}")
 
+    # Safety guard — if fewer than 10 films found, data source is likely down.
+    # Abort without touching docs/ to preserve the last good cached listings.
+    if len(films) < 10:
+        log.error(f"Only {len(films)} films found — data source may be down. Aborting to preserve cached listings.")
+        close_browser()
+        return
+
     # Enrich each film with TMDB data
     log.info(f"TMDB_API_KEY present: {bool(TMDB_API_KEY)}, length: {len(TMDB_API_KEY)}, value_start: {TMDB_API_KEY[:4] if TMDB_API_KEY else 'empty'}")
     if TMDB_API_KEY:
