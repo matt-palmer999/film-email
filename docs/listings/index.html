@@ -1177,8 +1177,15 @@ async function loadUserPreferences() {
   }
 }
 
+function _anchorDate() {
+  if (window.DATA_ANCHOR) {
+    const p = window.DATA_ANCHOR.split('-');
+    return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+  }
+  return new Date();
+}
 function updateHeaderDate() {
-  const today = new Date();
+  const today = _anchorDate();
   const end   = new Date(today);
   end.setDate(today.getDate() + 6);
 
@@ -1400,7 +1407,7 @@ window.addEventListener('DOMContentLoaded', () => {
 (function() {
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const today = new Date();
+  const today = _anchorDate();
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
   const plus1   = new Date(today); plus1.setDate(today.getDate()+2);
 
