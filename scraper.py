@@ -532,7 +532,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     continue
                 vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
                 time_btns  = "".join(
-                    f'<a href="{c["website"]}" target="_blank" class="time-btn" data-time="{t}">{t}</a>'
+                    f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}">{t}</button>'
                     for t in times
                 )
                 cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
@@ -672,6 +672,16 @@ body{{background:#f5f5f2;font-family:'DM Sans',Helvetica,sans-serif;color:#11111
     <span data-es="Horarios sujetos a cambios — verifica siempre en la web del cine." data-en="Showtimes subject to change — always verify on the cinema's website.">Horarios sujetos a cambios — verifica siempre en la web del cine.</span>
   </div>
 </div>
+
+<!-- Coming Soon popup -->
+<div id="coming-soon-overlay" onclick="hideComingSoon()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#ffffff;border-radius:4px;padding:28px 32px;text-align:center;max-width:280px;margin:0 20px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="font-size:28px;margin-bottom:12px;">🎬</div>
+    <div style="font-size:16px;font-weight:700;color:#111111;margin-bottom:8px;" data-es="Próximamente" data-en="Coming soon">Próximamente</div>
+    <div style="font-size:13px;color:#555555;line-height:1.5;" data-es="La compra de entradas estará disponible muy pronto." data-en="Ticket purchasing will be available very soon.">La compra de entradas estará disponible muy pronto.</div>
+    <button onclick="hideComingSoon()" style="margin-top:20px;padding:8px 24px;background:#c0392b;color:#ffffff;border:none;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">OK</button>
+  </div>
+</div>
 <script>
 function setLang(lang) {{
   document.getElementById('html-root').lang = lang;
@@ -792,6 +802,17 @@ window.addEventListener('DOMContentLoaded', () => {{
     if (legend) legend.style.display = 'flex';
   }}
 }});
+function showComingSoon() {{
+  const overlay = document.getElementById('coming-soon-overlay');
+  overlay.style.display = 'flex';
+  const lang = document.getElementById('html-root').lang || 'es';
+  overlay.querySelectorAll('[data-es][data-en]').forEach(el => {{
+    el.innerHTML = el.getAttribute('data-' + lang);
+  }});
+}}
+function hideComingSoon() {{
+  document.getElementById('coming-soon-overlay').style.display = 'none';
+}}
 </script>
 </body>
 </html>"""
