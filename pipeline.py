@@ -237,10 +237,19 @@ def aggregate_scrapers() -> dict:
         meta_info = CINEMA_META.get(cinema_id, {})
 
         # Flat showtimes → {date: [time_str]}
+        # Handles two formats:
+        #   {"date": "YYYY-MM-DD", "time": "HH:MM"}          (most scrapers)
+        #   {"datetime_local": "YYYY-MM-DDTHH:MM:SS", ...}   (Kinepolis, Yelmo)
         showtimes_by_date: dict = {}
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
+            if (not d or not t):
+                dl = str(st.get("datetime_local", ""))
+                if len(dl) >= 10 and not d:
+                    d = dl[:10]
+                if len(dl) >= 16 and not t:
+                    t = dl[11:16]
             if d and t:
                 bucket = showtimes_by_date.setdefault(d, [])
                 if t not in bucket:
