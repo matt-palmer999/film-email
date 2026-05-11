@@ -1353,25 +1353,29 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <div class="header-date" id="header-date"></div>
   </div>
 
-  <div id="quick-filter" style="display:block;background:#0f0c14;border-bottom:2px solid #2a1f3d;padding:14px 20px;position:relative;">
-    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(10,8,16,0.7);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
+  <div id="quick-filter" style="display:block;position:relative;">
+    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(10,8,16,0.7);z-index:10;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffb432" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       <span style="font-size:12px;color:#ffb432;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
       <a href="../" style="font-size:11px;color:#9b8faa;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
     </div>
-    <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;margin-bottom:3px;">quick<em style="color:#ffb432;font-style:italic;">filter</em></div>
-    <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:14px;" data-es="filtros avanzados →" data-en="advanced filters →">filtros avanzados →</a>
-    <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
-      <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
-      <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
-      <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
-      <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
+    <div style="display:flex;align-items:flex-end;padding:0 20px;">
+      <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;background:#0f0c14;border:2px solid #2a1f3d;border-bottom:2px solid #0f0c14;border-radius:8px 8px 0 0;padding:8px 16px 10px;position:relative;z-index:2;">quick<em style="color:#ffb432;font-style:italic;">filters</em></div>
+      <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #2a1f3d;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
     </div>
-    <div id="qf-times" style="display:flex;gap:8px;">
-      <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
-      <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
-      <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
-      <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
+    <div style="background:#0f0c14;border:2px solid #2a1f3d;border-top:none;border-bottom:2px solid #2a1f3d;padding:14px 20px;">
+      <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
+        <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
+        <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
+        <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
+        <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
+      </div>
+      <div id="qf-times" style="display:flex;gap:8px;">
+        <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
+        <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
+        <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
+        <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
+      </div>
     </div>
   </div>
 

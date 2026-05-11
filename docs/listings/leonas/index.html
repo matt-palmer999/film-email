@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="LEONAS — Cartelera Valencia" data-en="Leonas — Cartelera Valencia">LEONAS — Cartelera Valencia</title>
+<title data-es="LEONAS — Cartelera Valencia" data-en="LEONAS — Cartelera Valencia">LEONAS — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/dv0VzxxRnTGvc3rqFxcbYsSIOVY.jpg" alt="LEONAS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cdn.cinesabc.com/1884167d11d5b998db2f6216d0d6f2ce.jpg" alt="LEONAS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 2.0</span></div>
-      <div class="hero-title" data-es="LEONAS" data-en="Leonas">LEONAS</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="LEONAS" data-en="LEONAS">LEONAS</div>
       
-      <div class="hero-meta"><span data-es="CR · 2022" data-en="CR · 2022 · Documentary">CR · 2022</span></div>
-      <div class="hero-synopsis" data-es="Una propuesta audiovisual de 10 historias que destacan  y celebran las historias humanas detrás del fútbol femenino en Costa Rica. “¿Cuál es el pasó de la mujer en el fútbol? ¿De dónde viene, y hacia dónde va? ¿Cuáles son sus desafíos? ¿Cuáles son sus sueños?”" data-en="En el corazón de la gran ciudad, un cachorro humano amenazado por gigantes: la soledad, la enfermedad, la indiferencia, la burocracia  El desenlace trágico parece inevitable. ¡Pero surge una joven con un arma secreta: su corazón de madre! Y sus rugidos alertan a otras hembras. Si una madre tiene tanto poder... ¿qué no logrará un ejército de madres? Tras 15 años de lucha feroz, ¡han salvado a miles">Una propuesta audiovisual de 10 historias que destacan  y celebran las historias humanas detrás del fútbol femenino en Costa Rica. “¿Cuál es el pasó de la mujer en el fútbol? ¿De dónde viene, y hacia dónde va? ¿Cuáles son sus desafíos? ¿Cuáles son sus sueños?”</div>
+      <div class="hero-meta"><span data-es="" data-en=""></span></div>
+      <div class="hero-synopsis" data-es="En el corazón de la gran ciudad, un cachorro humano amenazado por gigantes: la soledad, la enfermedad, la indiferencia, la burocracia  El desenlace trágico parece inevitable. ¡Pero surge una joven con un arma secreta: su corazón de madre! Y sus rugidos alertan a otras hembras. Si una madre tiene tanto poder... ¿qué no logrará un ejército de madres? Tras 15 años de lucha feroz, ¡han salvado a miles" data-en="En el corazón de la gran ciudad, un cachorro humano amenazado por gigantes: la soledad, la enfermedad, la indiferencia, la burocracia  El desenlace trágico parece inevitable. ¡Pero surge una joven con un arma secreta: su corazón de madre! Y sus rugidos alertan a otras hembras. Si una madre tiene tanto poder... ¿qué no logrará un ejército de madres? Tras 15 años de lucha feroz, ¡han salvado a miles">En el corazón de la gran ciudad, un cachorro humano amenazado por gigantes: la soledad, la enfermedad, la indiferencia, la burocracia  El desenlace trágico parece inevitable. ¡Pero surge una joven con un arma secreta: su corazón de madre! Y sus rugidos alertan a otras hembras. Si una madre tiene tanto poder... ¿qué no logrará un ejército de madres? Tras 15 años de lucha feroz, ¡han salvado a miles</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Leonas' : 'LEONAS') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'LEONAS' : 'LEONAS') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
