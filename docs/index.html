@@ -773,7 +773,7 @@
 
     <!-- SIGNUP -->
     <div class="signup-wrap" id="signup">
-      <form class="signup-form" id="hero-form-wrap" onsubmit="submitSignup('hero'); return false;" action="#">
+      <div class="signup-form" id="hero-form-wrap">
         <input
           type="email"
           class="signup-input"
@@ -782,8 +782,8 @@
           data-placeholder-es="tu@email.com"
           data-placeholder-en="your@email.com"
         >
-        <button type="submit" class="signup-btn" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
-      </form>
+        <button type="button" class="signup-btn" onclick="submitSignup('hero')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
+      </div>
       <div class="signup-success" id="hero-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
@@ -964,7 +964,7 @@
     <p class="cta-sub" data-es="Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00." data-en="Subscribe free and get your personalised listings right away, plus a tailored email every Thursday at 7pm.">Suscríbete gratis y accede a tu cartelera personalizada al instante, más un email a tu medida cada jueves a las 19:00.</p>
 
     <div class="cta-signup-wrap">
-      <form class="signup-form" id="cta-form-wrap" onsubmit="submitSignup('cta'); return false;" action="#">
+      <div class="signup-form" id="cta-form-wrap">
         <input
           type="email"
           class="signup-input"
@@ -973,8 +973,8 @@
           data-placeholder-es="tu@email.com"
           data-placeholder-en="your@email.com"
         >
-        <button type="submit" class="signup-btn" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
-      </form>
+        <button type="button" class="signup-btn" onclick="submitSignup('cta')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
+      </div>
       <div class="signup-success" id="cta-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
