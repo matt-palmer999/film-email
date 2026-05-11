@@ -82,6 +82,11 @@ def tmdb_lookup(title: str) -> dict:
 
     # Strip regional language prefixes added by Spanish exhibitors (e.g. "CAT ", "VA ", "EUS ", "GAL ")
     search_title = _re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=_re.IGNORECASE)
+    # Strip anniversary / re-release suffixes, e.g. "(40 Aniversario)", "(40º Aniversario)", "(Reestreno)", "(1986)"
+    search_title = _re.sub(
+        r'\s*\(?\s*(\d+[°ºo]?\s*(Aniversario|Aniversari|Anniversary)|Reestreno|Re-estreno|\d{4})\s*\)?$',
+        '', search_title, flags=_re.IGNORECASE
+    ).strip()
     search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', search_title)[0].strip()
     _time.sleep(0.25)
 
