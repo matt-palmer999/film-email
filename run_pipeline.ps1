@@ -1,8 +1,8 @@
 # run_pipeline.ps1
-# Valencia cinema listings — daily update script.
+# Valencia cinema listings - daily update script.
 # Runs pipeline.py, then commits and pushes the updated docs/ to GitHub.
 #
-# ── ONE-TIME TASK SCHEDULER SETUP ────────────────────────────────────────────
+# ONE-TIME TASK SCHEDULER SETUP
 # Open PowerShell as Administrator and run:
 #
 #   $action  = New-ScheduledTaskAction `
@@ -16,7 +16,6 @@
 #     -RunLevel Highest
 #
 # To run manually at any time: .\run_pipeline.ps1
-# ─────────────────────────────────────────────────────────────────────────────
 
 $RepoDir = $PSScriptRoot          # directory where this script lives
 $LogDir  = Join-Path $RepoDir "logs"
@@ -24,7 +23,7 @@ $LogFile = Join-Path $LogDir "pipeline.log"
 $EnvFile = Join-Path $RepoDir ".env"
 $Python  = "python3.12"
 
-# ── Logging ───────────────────────────────────────────────────────────────────
+# Logging
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir | Out-Null
 }
@@ -45,7 +44,7 @@ if ((Test-Path $LogFile) -and (Get-Item $LogFile).Length -gt 5MB) {
 
 Write-Log "=== Pipeline starting ==="
 
-# ── Load .env ─────────────────────────────────────────────────────────────────
+# Load .env
 if (Test-Path $EnvFile) {
     Get-Content $EnvFile | Where-Object { $_ -match '^\s*[^#\s]' -and $_ -match '=' } | ForEach-Object {
         $key, $val = $_ -split '=', 2
@@ -57,10 +56,10 @@ if (Test-Path $EnvFile) {
     }
     Write-Log "Loaded secrets from .env"
 } else {
-    Write-Log "WARNING: No .env file found at $EnvFile — API keys may be missing"
+    Write-Log "WARNING: No .env file found at $EnvFile - API keys may be missing"
 }
 
-# ── Run pipeline ──────────────────────────────────────────────────────────────
+# Run pipeline
 Set-Location $RepoDir
 Write-Log "Running pipeline.py ..."
 
@@ -70,19 +69,19 @@ $exitCode = $LASTEXITCODE
 $output | ForEach-Object { Write-Log "  $_" }
 
 if ($exitCode -ne 0) {
-    Write-Log "ERROR: pipeline.py exited with code $exitCode — aborting git push"
+    Write-Log "ERROR: pipeline.py exited with code $exitCode - aborting git push"
     exit $exitCode
 }
 
 Write-Log "Pipeline succeeded."
 
-# ── Commit and push docs/ ─────────────────────────────────────────────────────
+# Commit and push docs/
 git -C $RepoDir add docs/listings/ docs/data/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
 
 # Check if there are staged changes
 $staged = git -C $RepoDir diff --cached --name-only
 if (-not $staged) {
-    Write-Log "No changes in docs/ — nothing to commit."
+    Write-Log "No changes in docs/ - nothing to commit."
     Write-Log "=== Done (no-op) ==="
     exit 0
 }
@@ -103,5 +102,5 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Log "Pushed to GitHub — Pages will redeploy automatically."
+Write-Log "Pushed to GitHub - Pages will redeploy automatically."
 Write-Log "=== Pipeline complete ==="
