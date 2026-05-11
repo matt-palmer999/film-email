@@ -1,8 +1,8 @@
 name: Valencia Cinema Weekly Newsletter
 
 on:
-  schedule:
-    - cron: "0 17 * * *"   # Every day at 17:00 UTC (19:00 Valencia time), email only on Thursdays
+  # schedule:
+  #   - cron: "5 23 * * *"   # Disabled — mabuse.es is down, re-enable when new data source is ready
   workflow_dispatch:         # Allow manual trigger for testing
 
 jobs:
@@ -44,15 +44,17 @@ jobs:
           FROM_NAME:     ${{ secrets.FROM_NAME }}
           RECIPIENTS:    ${{ secrets.RECIPIENTS }}
           LISTINGS_URL:  ${{ secrets.LISTINGS_URL }}
-          SUPABASE_URL:  ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON: ${{ secrets.SUPABASE_ANON }}
-          TMDB_API_KEY:  ${{ secrets.TMDB_API_KEY }}
+          SUPABASE_URL:          ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON:         ${{ secrets.SUPABASE_ANON }}
+          SUPABASE_SERVICE_KEY:  ${{ secrets.SUPABASE_SERVICE_KEY }}
+          TMDB_API_KEY:          ${{ secrets.TMDB_API_KEY }}
+          TRIGGERED_BY:          ${{ github.event_name }}
         run: python scraper.py
 
       - name: Publish listings page to GitHub Pages
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/listings/ docs/preferences/index.html
+          git add docs/index.html docs/listings/ docs/preferences/index.html docs/data/stats.json
           git diff --staged --quiet || git commit -m "chore: update listings $(date +%Y-%m-%d)"
           git push

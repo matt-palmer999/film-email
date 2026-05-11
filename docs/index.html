@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#0a0810">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,24 +17,24 @@
   <title>whatson.movie — Valencia Cinema Weekly</title>
   <meta name="description" content="The weekly guide to cinema in Valencia. Every Thursday, all cinemas, VOSE highlighted. Free newsletter.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #ffffff;
-      --bg2:       #f5f5f2;
-      --bg3:       #f0f0ec;
-      --border:    #e8e8e4;
-      --border2:   #e0e0da;
-      --gold:      #c0392b;
-      --gold-dim:  rgba(192,57,43,0.1);
-      --gold-edge: rgba(192,57,43,0.4);
-      --text:      #111111;
-      --text2:     #333333;
-      --muted:     #696969;
-      --faint:     #696969;
-      --vose:      #1a3a5c;
-      --vose-bg:   rgba(26,58,92,0.1);
-      --vose-edge: rgba(26,58,92,0.4);
+      --bg:        #0a0810;
+      --bg2:       #0f0c14;
+      --bg3:       #160f24;
+      --border:    #2a1f3d;
+      --border2:   #1e1630;
+      --gold:      #ffb432;
+      --gold-dim:  rgba(255,180,50,0.15);
+      --gold-edge: rgba(255,180,50,0.3);
+      --text:      #f0eae0;
+      --text2:     #c5b8d8;
+      --muted:     #9b8faa;
+      --faint:     #8a7e9a;
+      --vose:      #ffd84a;
+      --vose-bg:   rgba(255,220,80,0.12);
+      --vose-edge: rgba(255,220,80,0.35);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,15 +42,15 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: #f5f5f2;
-      color: #111111;
+      background: var(--bg);
+      color: var(--text);
       font-family: 'DM Sans', Helvetica, sans-serif;
       font-weight: 300;
       overflow-x: hidden;
     }
 
     /* ── GRAIN OVERLAY ── */
-    body::before-disabled {
+    body::before {
       content: '';
       position: fixed;
       inset: 0;
@@ -69,29 +69,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(4px);
-      border-bottom: 1px solid #e0e0da;
+      background: rgba(10,8,16,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border2);
     }
 
     .nav-logo {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 20px;
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
       text-decoration: none;
       letter-spacing: 0.5px;
     }
 
-    .nav-logo span { color: #c0392b; }
+    .nav-logo span { color: var(--gold); }
 
     .nav-right { display: flex; align-items: center; gap: 16px; }
 
     .lang-toggle {
       display: flex;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
-      border: 1px solid #cccccc;
+      border: 1px solid var(--border);
     }
 
     .lang-btn {
@@ -103,22 +103,22 @@
       cursor: pointer;
       border: none;
       background: transparent;
-      color: #696969;
+      color: var(--faint);
       font-family: 'DM Sans', sans-serif;
       transition: all .2s;
     }
 
-    .lang-btn.active { background: #f0f0ec; color: #111111; }
+    .lang-btn.active { background: var(--bg3); color: var(--text); }
 
     .nav-cta {
       padding: 8px 20px;
-      background: #c0392b;
-      color: #111111;
+      background: var(--gold);
+      color: var(--bg);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 1px;
       text-transform: uppercase;
-      border-radius: 4px;
+      border-radius: 6px;
       text-decoration: none;
       transition: opacity .2s;
     }
@@ -155,7 +155,7 @@
       height: 4px;
       background: repeating-linear-gradient(
         90deg,
-        #c0392b 0px, #c0392b 20px,
+        var(--gold) 0px, var(--gold) 20px,
         transparent 20px, transparent 30px
       );
       opacity: 0.4;
@@ -166,7 +166,7 @@
       font-weight: 500;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: #c0392b;
+      color: var(--gold);
       margin-bottom: 20px;
       opacity: 0;
       animation: fadeUp 0.8s ease 0.2s forwards;
@@ -177,22 +177,22 @@
       font-size: clamp(52px, 10vw, 100px);
       font-weight: 700;
       line-height: 0.95;
-      color: #111111;
+      color: var(--text);
       margin-bottom: 8px;
       opacity: 0;
       animation: fadeUp 0.8s ease 0.4s forwards;
     }
 
     .hero-title-sub {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
-      color: #c0392b;
+      color: var(--gold);
     }
 
     .hero-desc {
       font-size: 17px;
       font-weight: 300;
-      color: #696969;
+      color: var(--muted);
       max-width: 520px;
       line-height: 1.7;
       margin-bottom: 48px;
@@ -211,33 +211,33 @@
     .signup-form {
       display: flex;
       gap: 0;
-      background: #f0f0ec;
-      border: 1px solid #cccccc;
-      border-radius: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       overflow: hidden;
       transition: border-color .3s;
     }
 
-    .signup-form:focus-within { border-color: #c0392b; }
+    .signup-form:focus-within { border-color: var(--gold); }
 
     .signup-input {
       flex: 1;
       padding: 15px 20px;
       background: transparent;
       border: none;
-      color: #111111;
+      color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       font-weight: 300;
       outline: none;
     }
 
-    .signup-input::placeholder { color: #696969; }
+    .signup-input::placeholder { color: var(--faint); }
 
     .signup-btn {
       padding: 15px 24px;
-      background: #c0392b;
-      color: #111111;
+      background: var(--gold);
+      color: var(--bg);
       border: none;
       font-family: 'DM Sans', sans-serif;
       font-size: 12px;
@@ -254,7 +254,7 @@
 
     .signup-note {
       font-size: 12px;
-      color: #696969;
+      color: var(--faint);
       margin-top: 10px;
       text-align: center;
       letter-spacing: 0.3px;
@@ -263,10 +263,10 @@
     .signup-success {
       display: none;
       padding: 16px 24px;
-      background: rgba(26,107,58,0.1);
-      border: 1px solid rgba(26,107,58,0.4);
-      border-radius: 4px;
-      color: #1a6b3a;
+      background: rgba(80,200,140,0.1);
+      border: 1px solid rgba(80,200,140,0.3);
+      border-radius: 10px;
+      color: #50c88c;
       font-size: 14px;
       text-align: center;
       line-height: 1.5;
@@ -294,10 +294,10 @@
     }
 
     .stat-num {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 36px;
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
       line-height: 1;
       margin-bottom: 4px;
     }
@@ -306,12 +306,12 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #696969;
+      color: var(--faint);
     }
 
     .stat-divider {
       width: 1px;
-      background: #cccccc;
+      background: var(--border);
       align-self: stretch;
     }
 
@@ -333,13 +333,13 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #696969;
+      color: var(--faint);
     }
 
     .scroll-arrow {
       width: 1px;
       height: 40px;
-      background: linear-gradient(to bottom, #cccccc, transparent);
+      background: linear-gradient(to bottom, var(--border), transparent);
       animation: scrollPulse 2s ease infinite;
     }
 
@@ -358,15 +358,15 @@
       font-size: 10px;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: #c0392b;
+      color: var(--gold);
       margin-bottom: 16px;
     }
 
     .section-title {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(32px, 5vw, 52px);
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
       line-height: 1.1;
       margin-bottom: 56px;
     }
@@ -379,53 +379,53 @@
 
     .step {
       padding: 32px 28px;
-      background: #f0f0ec;
-      border: 1px solid #cccccc;
-      border-radius: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       position: relative;
       overflow: hidden;
       transition: border-color .3s;
     }
 
-    .step:hover { border-color: rgba(192,57,43,0.4); }
+    .step:hover { border-color: rgba(255,180,50,0.3); }
 
     .step::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, #c0392b, transparent);
+      background: linear-gradient(90deg, var(--gold), transparent);
       opacity: 0.5;
     }
 
     .step-num {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 52px;
       font-weight: 700;
-      color: #cccccc;
+      color: var(--border);
       line-height: 1;
       margin-bottom: 16px;
     }
 
     .step-title {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 22px;
       font-weight: 600;
-      color: #111111;
+      color: var(--text);
       margin-bottom: 10px;
     }
 
     .step-desc {
       font-size: 14px;
-      color: #696969;
+      color: var(--muted);
       line-height: 1.7;
     }
 
     /* ── PREVIEW ── */
     .preview-section {
-      background: #f0f0ec;
-      border-top: 1px solid #e0e0da;
-      border-bottom: 1px solid #e0e0da;
+      background: var(--bg3);
+      border-top: 1px solid var(--border2);
+      border-bottom: 1px solid var(--border2);
       padding: 100px 40px;
     }
 
@@ -455,9 +455,9 @@
       width: 40px;
       height: 40px;
       flex-shrink: 0;
-      background: rgba(192,57,43,0.08);
-      border: 1px solid rgba(192,57,43,0.4);
-      border-radius: 4px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-edge);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -467,57 +467,57 @@
     .preview-feature-title {
       font-size: 15px;
       font-weight: 500;
-      color: #333333;
+      color: var(--text2);
       margin-bottom: 4px;
     }
 
     .preview-feature-desc {
       font-size: 13px;
-      color: #696969;
+      color: var(--muted);
       line-height: 1.6;
     }
 
     /* Mock email card */
     .mock-email {
-      background: #f5f5f2;
-      border: 1px solid #cccccc;
-      border-radius: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 40px 80px rgba(0,0,0,0.4);
     }
 
     .mock-header {
-      background: linear-gradient(135deg, #1a0a2e, #f5f5f2);
+      background: linear-gradient(135deg, #1a0a2e, var(--bg));
       padding: 24px;
       text-align: center;
-      border-bottom: 1px solid #cccccc;
+      border-bottom: 1px solid var(--border);
     }
 
     .mock-header-eyebrow {
       font-size: 9px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: #c0392b;
+      color: var(--gold);
       margin-bottom: 6px;
     }
 
     .mock-header-title {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 28px;
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
     }
 
     .mock-stats {
       display: flex;
-      border-bottom: 1px solid #e0e0da;
+      border-bottom: 1px solid var(--border2);
     }
 
     .mock-stat {
       flex: 1;
       padding: 12px;
       text-align: center;
-      border-right: 1px solid #e0e0da;
+      border-right: 1px solid var(--border2);
     }
 
     .mock-stat:last-child { border-right: none; }
@@ -525,28 +525,28 @@
     .mock-stat-num {
       font-size: 20px;
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
     }
 
     .mock-stat-label {
       font-size: 9px;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #696969;
+      color: var(--faint);
     }
 
     .mock-film {
       display: flex;
       gap: 12px;
       padding: 14px 16px;
-      border-bottom: 1px solid #e0e0da;
+      border-bottom: 1px solid var(--border2);
       align-items: flex-start;
     }
 
     .mock-poster {
       width: 42px;
       height: 60px;
-      background: #f0f0ec;
+      background: var(--bg3);
       border-radius: 4px;
       flex-shrink: 0;
       display: flex;
@@ -556,16 +556,16 @@
     }
 
     .mock-film-title {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 15px;
       font-weight: 600;
-      color: #111111;
+      color: var(--text);
       margin-bottom: 3px;
     }
 
     .mock-film-meta {
       font-size: 10px;
-      color: #696969;
+      color: var(--faint);
       margin-bottom: 5px;
     }
 
@@ -576,23 +576,23 @@
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 1px;
-      background: rgba(26,58,92,0.1);
-      color: #1a3a5c;
-      border: 1px solid rgba(26,58,92,0.4);
+      background: var(--vose-bg);
+      color: var(--vose);
+      border: 1px solid var(--vose-edge);
     }
 
     .mock-btn {
       display: block;
       margin: 16px;
       padding: 12px;
-      background: #c0392b;
-      color: #111111;
+      background: var(--gold);
+      color: var(--bg);
       text-align: center;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 1px;
       text-transform: uppercase;
-      border-radius: 4px;
+      border-radius: 6px;
       text-decoration: none;
     }
     .mock-btn:hover { text-decoration: none; opacity: 0.9; }
@@ -613,23 +613,23 @@
 
     .cinema-pill {
       padding: 8px 18px;
-      background: #f0f0ec;
-      border: 1px solid #cccccc;
+      background: var(--bg3);
+      border: 1px solid var(--border);
       border-radius: 24px;
       font-size: 13px;
-      color: #333333;
+      color: var(--text2);
       transition: all .2s;
     }
 
     .cinema-pill:hover {
       border-color: rgba(255,180,50,0.4);
-      color: #111111;
+      color: var(--text);
     }
 
     .cinema-pill.arthouse {
-      border-color: rgba(26,58,92,0.4);
-      color: #1a3a5c;
-      background: rgba(26,58,92,0.1);
+      border-color: var(--vose-edge);
+      color: var(--vose);
+      background: var(--vose-bg);
     }
 
     /* ── CTA BOTTOM ── */
@@ -647,10 +647,10 @@
     }
 
     .cta-title {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(36px, 6vw, 64px);
       font-weight: 700;
-      color: #111111;
+      color: var(--text);
       line-height: 1.1;
       margin-bottom: 20px;
       position: relative;
@@ -658,7 +658,7 @@
 
     .cta-sub {
       font-size: 16px;
-      color: #696969;
+      color: var(--muted);
       max-width: 440px;
       margin: 0 auto 40px;
       line-height: 1.7;
@@ -673,7 +673,7 @@
 
     /* ── FOOTER ── */
     footer {
-      border-top: 1px solid #e0e0da;
+      border-top: 1px solid var(--border2);
       padding: 32px 40px;
       display: flex;
       align-items: center;
@@ -681,27 +681,27 @@
     }
 
     .footer-logo {
-      font-family: 'DM Sans', Helvetica, sans-serif;
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 18px;
       font-weight: 700;
-      color: #696969;
+      color: var(--faint);
     }
 
-    .footer-logo span { color: #c0392b; opacity: 0.6; }
+    .footer-logo span { color: var(--gold); opacity: 0.6; }
 
     .footer-note {
       font-size: 12px;
-      color: #696969;
+      color: var(--faint);
     }
 
     .footer-link {
       font-size: 12px;
-      color: #696969;
+      color: var(--faint);
       text-decoration: none;
       transition: color .2s;
     }
 
-    .footer-link:hover { color: #333333; }
+    .footer-link:hover { color: var(--text2); }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -787,8 +787,8 @@
       <div class="signup-success" id="hero-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#696969;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="hero-error"></div>
@@ -808,13 +808,13 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" style="color:#c0392b;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;" id="stat-tailored" data-es="a tu gusto" data-en="tailored">a tu gusto</div>
+        <div class="stat-num" style="color:#ffb432;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;" id="stat-tailored" data-es="a tu gusto" data-en="tailored">a tu gusto</div>
         <div class="stat-label" style="opacity:0;transition:opacity 0.6s ease 0.15s;" id="stat-tailored-label" data-es="a tu manera" data-en="your way">a tu manera</div>
       </div>
     </div>
 
-    <p id="browse-line" style="margin-top:20px;font-size:12px;color:#696969;text-align:center;">
-      <span data-es="¿No listo para suscribirte?" data-en="Not ready to subscribe?">¿No listo para suscribirte?</span> <a href="./listings/" style="color:#333333;text-decoration:underline;text-underline-offset:3px;"><span data-es="Explora la cartelera sin filtros primero →" data-en="Browse the unfiltered listings first →">Explora la cartelera sin filtros primero →</span></a>
+    <p id="browse-line" style="margin-top:20px;font-size:12px;color:#8a7e9a;text-align:center;">
+      <span data-es="¿No listo para suscribirte?" data-en="Not ready to subscribe?">¿No listo para suscribirte?</span> <a href="./listings/" style="color:#c5b8d8;text-decoration:underline;text-underline-offset:3px;"><span data-es="Explora la cartelera sin filtros primero →" data-en="Browse the unfiltered listings first →">Explora la cartelera sin filtros primero →</span></a>
     </p>
 
     <div class="scroll-hint">
@@ -863,7 +863,7 @@
             </div>
           </div>
           <div class="preview-feature">
-            <div class="preview-icon" style="background:rgba(26,58,92,0.1);border-color:rgba(26,58,92,0.4);">🌍</div>
+            <div class="preview-icon" style="background:var(--vose-bg);border-color:var(--vose-edge);">🌍</div>
             <div>
               <div class="preview-feature-title" data-es="Filtro VOSE (versión original)" data-en="VOSE filter (original language)">Filtro VOSE (versión original)</div>
               <div class="preview-feature-desc" data-es="Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres." data-en="Show only original-language screenings. Narrow it further to English-only if you prefer.">Muestra solo las sesiones en versión original. Filtra también por inglés si lo prefieres.</div>
@@ -911,7 +911,7 @@
               <div class="mock-film-title">Hoppers</div>
               <div class="mock-film-meta" data-es="Pixar · 105 min · Dir. Daniel Chong" data-en="Pixar · 105 min · Dir. Daniel Chong">Pixar · 105 min · Dir. Daniel Chong</div>
               <span class="mock-vose">VOSE</span>
-              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">TP</span>
+              <span class="mock-vose" style="background:rgba(180,100,100,.12);color:#c98a8a;border-color:rgba(180,100,100,.3);">TP</span>
             </div>
           </div>
           <div class="mock-film">
@@ -920,7 +920,7 @@
               <div class="mock-film-title">Scream 7</div>
               <div class="mock-film-meta" data-es="Terror · 114 min · Neve Campbell" data-en="Horror · 114 min · Neve Campbell">Terror · 114 min · Neve Campbell</div>
               <span class="mock-vose">VOSE</span>
-              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">+18</span>
+              <span class="mock-vose" style="background:rgba(180,100,100,.12);color:#c98a8a;border-color:rgba(180,100,100,.3);">+18</span>
             </div>
           </div>
           <div class="mock-film">
@@ -929,7 +929,7 @@
               <div class="mock-film-title">Den sidste viking</div>
               <div class="mock-film-meta" data-es="Comedia Negra · Mads Mikkelsen" data-en="Dark Comedy · Mads Mikkelsen">Comedia Negra · Mads Mikkelsen</div>
               <span class="mock-vose">VOSE</span>
-              <span class="mock-vose" style="background:rgba(0,0,0,0.04);color:#c98a8a;border-color:#cccccc;">+12</span>
+              <span class="mock-vose" style="background:rgba(180,100,100,.12);color:#c98a8a;border-color:rgba(180,100,100,.3);">+12</span>
             </div>
           </div>
           <a href="./listings/" class="mock-btn" data-es="Ver cartelera completa →" data-en="View full listings →">Ver cartelera completa →</a>
@@ -978,8 +978,8 @@
       <div class="signup-success" id="cta-success">
         <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#696969;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
+          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
+          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
         </div>
       </div>
       <div class="signup-error" id="cta-error"></div>
