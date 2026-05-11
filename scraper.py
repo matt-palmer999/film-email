@@ -573,53 +573,54 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}}
-.wrapper{{max-width:640px;margin:0 auto;background:#0f0c14}}
-.lang-bar{{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
-.lang-bar a{{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap}}
-.lang-bar a span{{color:#ffb432}}
-.lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
-.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;transition:all .2s}}
-.lang-btn.active{{background:#160f24;color:#f0eae0}}
-.back-bar{{padding:12px 20px;background:#0a0810;border-bottom:1px solid #1e1630}}
-.back-link{{font-size:12px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px}}
-.back-link:hover{{color:#c5b8d8}}
-.film-hero{{display:flex;gap:16px;padding:20px;background:#160f24;border-bottom:1px solid #2e2040}}
-.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#2a1f3d}}
+body{{background:#f5f5f2;font-family:'DM Sans',Helvetica,sans-serif;color:#111111;min-height:100vh}}
+.wrapper{{max-width:640px;margin:0 auto;background:#f5f5f2}}
+.lang-bar{{background:#ffffff;border-bottom:2px solid #111111;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
+.lang-bar a{{font-size:15px;font-weight:700;color:#111111;text-decoration:none;white-space:nowrap}}
+.lang-bar a span{{color:#c0392b}}
+.lang-toggle{{display:flex;border-radius:3px;overflow:hidden;border:1px solid #cccccc}}
+.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#696969;font-family:'DM Sans',sans-serif;transition:all .2s}}
+.lang-btn.active{{background:#111111;color:#ffffff}}
+.back-bar{{padding:12px 20px;background:#ffffff;border-bottom:1px solid #e0e0da}}
+.back-link{{font-size:12px;color:#1a3a5c;text-decoration:underline;text-underline-offset:2px;letter-spacing:0.5px}}
+.back-link:hover{{color:#c0392b}}
+.film-hero{{display:flex;gap:16px;padding:20px;background:#ffffff;border-bottom:1px solid #e0e0da}}
+.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:2px;overflow:hidden;background:#f0f0ec}}
 .hero-info{{flex:1;display:flex;flex-direction:column;justify-content:center}}
 .badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}}
-.film-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px}}
-.badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
-.vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
-.score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
-.rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
-.hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
-.orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
-.hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
-.hero-synopsis{{font-size:12px;color:#9d909e;line-height:1.6}}
-.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a3f5e;padding:20px 20px 10px}}
+.film-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}}
+.badge-new{{background:#c0392b;color:#ffffff}}
+.vose-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#1a3a5c;color:#ffffff}}
+.score-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}}
+.rating-badge{{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}}
+.hero-title{{font-size:22px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px}}
+.orig-title{{font-size:11px;color:#696969;margin-bottom:6px}}
+.hero-meta{{font-size:11px;color:#696969;line-height:1.55;margin-bottom:8px}}
+.hero-synopsis{{font-size:12px;color:#555555;line-height:1.6}}
+.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#696969;padding:20px 20px 10px;font-weight:700}}
 .day-tabs{{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}}
-.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
-.day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
-.day-tab.active.has-shows{{color:#ffb432;border-color:rgba(255,180,50,.4)}}
-.day-tab.has-shows{{color:#50c88c}}
+.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #cccccc;background:transparent;color:#555555;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
+.day-tab.active{{background:#c0392b;color:#ffffff;border-color:#c0392b}}
+.day-tab.active.has-shows{{background:#c0392b;color:#ffffff;border-color:#c0392b}}
+.day-tab.has-shows{{color:#1a6b3a;border-color:#1a6b3a;font-weight:600}}
 .day-panel{{display:none;padding:0 20px 20px}}
 .day-panel.active{{display:block}}
-.showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
+.showtime-row{{padding:14px 0;border-bottom:1px solid #e0e0da}}
 .showtime-row:last-child{{border-bottom:none}}
-.showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
-.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
+.showtime-cinema{{font-size:13px;font-weight:500;color:#111111;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
+.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:#1a3a5c;color:#ffffff;border-radius:2px}}
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
-.time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
-.time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
-.time-btn--match{{background:#0d2418;border-color:#1d6b3a;color:#50c88c}}
-.time-btn--match:hover{{background:#112e1e;border-color:#50c88c;color:#50c88c}}
-.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#6a5e7a;border-top:1px solid #1e1630}}
-.showtime-legend-dot{{width:10px;height:10px;border-radius:3px;background:#0d2418;border:1px solid #1d6b3a;flex-shrink:0}}
-.no-times{{font-size:13px;color:#4a3f5e;padding:20px 0;text-align:center}}
-.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
+.time-btn{{padding:6px 14px;background:#ffffff;border:1px solid #cccccc;border-radius:3px;font-size:13px;color:#111111;text-decoration:none;transition:all .2s;font-weight:500}}
+.time-btn:hover{{background:#f0f0ec;border-color:#c0392b;color:#c0392b}}
+.time-btn--match{{background:#e8f4ee;border-color:#1a6b3a;color:#1a6b3a}}
+.time-btn--match:hover{{background:#d0eadb;border-color:#1a6b3a;color:#1a6b3a}}
+.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#696969;border-top:1px solid #e0e0da}}
+.showtime-legend-dot{{width:10px;height:10px;border-radius:2px;background:#e8f4ee;border:1px solid #1a6b3a;flex-shrink:0}}
+.no-times{{font-size:13px;color:#696969;padding:20px 0;text-align:center}}
+.footer{{background:#111111;border-top:1px solid #333333;padding:20px;text-align:center;font-size:11px;color:#aaaaaa}}
+.footer a{{color:#cccccc;text-decoration:underline}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
 </style>
 </head>
@@ -660,11 +661,11 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     </div>
   </div>
 
-  <div id="gate-section" style="display:none;margin:20px;padding:24px 20px;background:rgba(255,180,50,0.06);border:1px solid rgba(255,180,50,0.2);border-radius:10px;text-align:center;">
+  <div id="gate-section" style="display:none;margin:20px;padding:24px 20px;background:#fff8f6;border:1px solid #f0d0c8;border-radius:3px;text-align:center;">
     <div style="font-size:24px;margin-bottom:12px;">🎬</div>
-    <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;margin-bottom:8px;" data-es="Los horarios son para suscriptores" data-en="Showtimes are for subscribers">Los horarios son para suscriptores</div>
-    <div style="font-size:13px;color:#9b8faa;line-height:1.6;margin-bottom:20px;" data-es="Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves." data-en="Subscribe to see showtimes across all cinemas, filtered exactly how you like it, plus get a tailored email every Thursday.">Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves.</div>
-    <a href="../../" style="display:inline-block;padding:11px 28px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:7px;text-decoration:none;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
+    <div style="font-size:17px;font-weight:700;color:#111111;margin-bottom:8px;" data-es="Los horarios son para suscriptores" data-en="Showtimes are for subscribers">Los horarios son para suscriptores</div>
+    <div style="font-size:13px;color:#555555;line-height:1.6;margin-bottom:20px;" data-es="Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves." data-en="Subscribe to see showtimes across all cinemas, filtered exactly how you like it, plus get a tailored email every Thursday.">Suscríbete para ver los horarios en todos los cines, filtrados exactamente como quieres, y recibe un email a tu medida cada jueves.</div>
+    <a href="../../" style="display:inline-block;padding:11px 28px;background:#c0392b;color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:3px;text-decoration:none;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
   </div>
 
   <div class="footer">
@@ -820,75 +821,77 @@ function hideComingSoon() {{
 # ─── HTML builder ─────────────────────────────────────────────────────────────
 
 CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
-.wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
-.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
-.lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
-.lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
-.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
-.lang-btn.active{background:#2e2040;color:#f0eae0}
-.header{background:linear-gradient(135deg,#1a0a2e 0%,#0f0c14 60%);border-bottom:1px solid #3a2a55;padding:40px 40px 32px;text-align:center;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
-.header::after{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(220,80,120,.12) 0%,transparent 70%);border-radius:50%}
-.header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
-.header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px;margin-top:0}
-.header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
-.header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
-.section-label{padding:28px 40px 12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#c5b8d8;font-weight:600}
-.section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
-.cinema-group-header{margin:0 24px 14px;padding:14px 18px;background:#160f24;border:1px solid #ffb432;border-left:4px solid #ffb432;border-radius:10px;display:flex;align-items:center;gap:10px}#section2-header{border-color:#ffb432;border-left-color:#ffb432}
-.cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0}
-.cinema-group-desc{font-size:12px;color:#7a6a8a}
-.cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
-.list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start;position:relative;cursor:pointer;transition:background .15s}.list-card:active{background:#221530}
-.list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
+body{background:#f5f5f2;font-family:'DM Sans',Helvetica,sans-serif;color:#111111}
+.wrapper{max-width:640px;margin:0 auto;background:#f5f5f2}
+.lang-bar{background:#ffffff;border-bottom:2px solid #111111;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
+.lang-toggle{display:flex;border-radius:3px;overflow:hidden;border:1px solid #cccccc}
+.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#696969;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn.active{background:#111111;color:#ffffff}
+.header{background:#ffffff;border-bottom:1px solid #e0e0da;padding:36px 24px 28px}
+.header-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:#c0392b;margin-bottom:12px}
+.header-title{font-size:42px;font-weight:700;color:#111111;line-height:0.95;margin-bottom:10px;margin-top:0;letter-spacing:-1.5px}
+.header-subtitle{font-size:14px;color:#696969;font-weight:300}
+.header-date{display:inline-block;margin-top:16px;padding:4px 14px;background:#111111;color:#ffffff;font-size:11px;letter-spacing:1px}
+.section-label{padding:24px 24px 10px;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#111111;font-weight:700;display:block}
+.section-divider{height:1px;background:#e0e0da;margin:0 24px 16px}
+.cinema-group-header{margin:0 24px 14px;padding:14px 18px;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;border-radius:3px;display:flex;align-items:center;gap:10px}
+#section2-header{border-left-color:#1a3a5c}
+.cinema-group-name{font-size:15px;font-weight:700;color:#111111}
+.cinema-group-desc{font-size:12px;color:#696969}
+.cinema-group-link{margin-left:auto;font-size:11px;color:#1a3a5c;text-decoration:none;white-space:nowrap}
+.list-card{margin:0 24px 10px;padding:14px 16px;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;border-radius:3px;display:flex;gap:14px;align-items:flex-start;position:relative;cursor:pointer;transition:border-color .15s}.list-card:hover{border-color:#c0392b}
+.list-poster{width:54px;height:78px;flex-shrink:0;background:#f0f0ec;border-radius:2px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
 .list-poster img{width:100%;height:100%;object-fit:cover;display:block}
 .list-body{flex:1}
-.list-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
-.list-meta{font-size:11px;color:#7a6d8a;margin-bottom:5px;line-height:1.5}
-.list-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.list-title{font-size:15px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}
+.list-title:hover{color:#c0392b}
+.list-meta{font-size:11px;color:#696969;margin-bottom:5px;line-height:1.5}
+.list-synopsis{font-size:11.5px;color:#555555;line-height:1.5;margin-bottom:8px}
 .badges{margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.film-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
-.badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
-.badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
-.vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
-.score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
-.rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
-.cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
+.film-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.badge-new{background:#c0392b;color:#ffffff}
+.badge-genre{background:#1a3a5c;color:#ffffff}
+.vose-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;background:#1a3a5c;color:#ffffff}
+.score-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}
+.rating-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:500;background:transparent;color:#555555;border:1px solid #cccccc}
+.cinema-links-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#aaaaaa;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
-.vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
+.cinema-tag{display:inline-block;font-size:11px;color:#1a3a5c;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#9abccc;line-height:1.4}
+.cinema-tag:hover{color:#c0392b;text-decoration-color:#c0392b}
+.vose-mini{display:inline-block;margin-left:3px;font-size:9px;font-weight:700;letter-spacing:1px;color:#1a3a5c;vertical-align:middle}
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
-.rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
-.featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px;position:relative;cursor:pointer;transition:background .15s}.featured-card:active{background:#221530}
-.featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
+.rating-TP{background:#2a7a4a}.rating-12{background:#1a3a5c}.rating-16{background:#c0622a}.rating-18{background:#c0392b}.rating-7{background:#2a7a4a}
+.featured-card{margin:0 24px 16px;border-radius:3px;overflow:hidden;background:#ffffff;border:1px solid #e0e0da;border-left:3px solid #c0392b;display:flex;min-height:200px;position:relative;cursor:pointer;transition:border-color .15s}.featured-card:hover{border-color:#c0392b}
+.featured-poster{width:120px;flex-shrink:0;background:#f0f0ec;display:flex;align-items:flex-start;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
-.film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
-.film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
-.grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
-.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:background .15s}.grid-card:active{background:#221530}
-.grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
-.grid-info{padding:12px 14px 14px}
-.grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
-.grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
-.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
-.footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
-.footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
-.footer a{color:#7a6a9a;text-decoration:none}
-.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
-.filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
-.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a3f5e;font-weight:500}
-.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
-.filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
-.filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
-.qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#6a5e7a;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
-@media(hover:hover){.qf-btn:hover{color:#c5b8d8;border-color:#4a3a60}}
-.qf-active{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}
+.film-title{font-size:20px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#c0392b}
+.film-meta{font-size:12px;color:#696969;margin-bottom:8px;line-height:1.55}
+.film-synopsis{font-size:13px;color:#555555;line-height:1.55;margin-bottom:11px}
+.grid-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 24px 12px}
+.grid-card{background:#ffffff;border:1px solid #e0e0da;border-top:3px solid #c0392b;border-radius:3px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}.grid-card:active{background:#f9f9f7}
+.grid-card[data-section="2"]{border-top-color:#1a3a5c}
+.grid-poster{width:100%;background:#f0f0ec;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
+.grid-info{padding:12px 12px 14px}
+.grid-title{font-size:14px;font-weight:700;color:#111111;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#c0392b}
+.grid-meta{font-size:10px;color:#696969;margin-bottom:6px;line-height:1.5}
+.grid-synopsis{font-size:11px;color:#555555;line-height:1.5;margin-bottom:8px}
+.footer{background:#111111;border-top:1px solid #333333;padding:28px 24px;text-align:center}
+.footer p{font-size:12px;color:#aaaaaa;line-height:1.7}
+.footer a{color:#cccccc;text-decoration:underline;text-underline-offset:2px}
+.footer-logo{font-size:18px;font-weight:700;color:#ffffff;margin-bottom:10px}
+.footer-logo span{color:#c0392b}
+.filter-bar{background:#ffffff;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #e0e0da;flex-wrap:wrap}
+.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#696969;font-weight:500}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #cccccc;background:transparent;color:#555555;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.filter-btn:hover{color:#111111;border-color:#111111}
+.filter-btn.active{background:#1a3a5c;color:#ffffff;border-color:#1a3a5c}
+.qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #cccccc;background:transparent;color:#555555;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
+@media(hover:hover){.qf-btn:hover{color:#111111;border-color:#111111}}
+.qf-active{background:#c0392b;color:#ffffff;border-color:#c0392b}
 .qf-hidden{display:none!important}
-.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
+.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#696969;font-size:14px;border:1px dashed #cccccc;border-radius:3px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
 """
 
@@ -1045,16 +1048,8 @@ async function loadUserPreferences() {
   }
 }
 
-function _anchorDate() {
-  if (window.DATA_ANCHOR) {
-    const p = window.DATA_ANCHOR.split('-');
-    return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
-  }
-  return new Date();
-}
-
 function updateHeaderDate() {
-  const today = _anchorDate();
+  const today = new Date(window.DATA_ANCHOR || new Date());
   const end   = new Date(today);
   end.setDate(today.getDate() + 6);
 
@@ -1622,23 +1617,23 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <div class="wrapper">
 
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <a href="../" style="font-size:15px;font-weight:700;color:#111111;text-decoration:none;white-space:nowrap;">whatson<span style="color:#c0392b;">.movie</span></a>
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:#c0392b;color:#ffffff;border-radius:3px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
   </div>
 
   <!-- ANONYMOUS BANNER — shown to non-subscribers -->
-  <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+  <div id="anon-banner" style="background:#fff8f6;border-bottom:1px solid #f0d0c8;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;gap:4px;">
-      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="🎬 Más de 30 películas. 10 cines. Cada semana." data-en="🎬 30+ films. 10 cinemas. Every week.">🎬 Más de 30 películas. 10 cines. Cada semana.</span>
-      <span style="font-size:12px;color:#9b8faa;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
+      <span style="font-size:15px;font-weight:500;color:#111111;" data-es="🎬 Más de 30 películas. 11 cines. Cada semana." data-en="🎬 30+ films. 11 cinemas. Every week.">🎬 Más de 30 películas. 11 cines. Cada semana.</span>
+      <span style="font-size:12px;color:#555555;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
     </div>
-    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#c0392b;color:#ffffff;border-radius:3px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
   <main>
@@ -1649,13 +1644,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
 
   <!-- QUICK FILTER — shown to subscribers only -->
-  <div id="quick-filter" style="display:block;background:#0f0c14;border-bottom:2px solid #2a1f3d;padding:14px 20px;position:relative;">
-    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(10,8,16,0.7);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffb432" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span style="font-size:12px;color:#ffb432;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
-      <a href="../" style="font-size:11px;color:#9b8faa;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
+  <div id="quick-filter" style="display:block;background:#ffffff;border-bottom:1px solid #e0e0da;padding:14px 20px;position:relative;">
+    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(245,245,242,0.85);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span style="font-size:12px;color:#c0392b;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
+      <a href="../" style="font-size:11px;color:#1a3a5c;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
     </div>
-    <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;margin-bottom:3px;">quick<em style="color:#ffb432;font-style:italic;">filter</em></div>
+    <div style="font-size:17px;font-weight:700;color:#111111;line-height:1;margin-bottom:3px;">quick<em style="color:#c0392b;font-style:italic;">filter</em></div>
     <a href="../preferences/" style="font-size:11px;color:#7a6a9a;text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:14px;" data-es="filtros avanzados →" data-en="advanced filters →">filtros avanzados →</a>
     <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
       <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
@@ -1700,9 +1695,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span data-es="Fuentes:" data-en="Sources:">Fuentes:</span>
       <a href="https://mabuse.es">Mabuse</a> · <a href="https://www.themoviedb.org">TMDB</a><br>
       <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
-      <em style="color:#7a6a9a;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
-      <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
-      <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <em style="color:#696969;" data-es="⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar." data-en="⚠️ VOSE sessions at multiplex cinemas may not be complete — check the cinema's website to confirm.">⚠️ Las sesiones VOSE en cines multiplex pueden no estar completas — consulta la web del cine para confirmar.</em><br>
+      <em style="color:#555555;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
+      <span style="color:#aaaaaa;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
@@ -1743,7 +1738,7 @@ window.addEventListener('DOMContentLoaded', () => {{
 (function() {{
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const today = _anchorDate();
+  const today = new Date(window.DATA_ANCHOR || new Date());
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
   const plus1   = new Date(today); plus1.setDate(today.getDate()+2);
 
