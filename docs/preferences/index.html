@@ -778,10 +778,10 @@
       document.querySelectorAll('[data-placeholder-es]').forEach(el => {
         el.placeholder = el.getAttribute('data-placeholder-' + lang);
       });
-      localStorage.setItem('lang', lang);
+      localStorage.setItem('cv_lang', lang);
     }
 
-    const savedLang = localStorage.getItem('lang') || 'es';
+    const savedLang = localStorage.getItem('cv_lang') || 'es';
     if (savedLang !== 'es') setLang(savedLang);
 
     // ── PANELS ──
