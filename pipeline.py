@@ -82,9 +82,19 @@ def tmdb_lookup(title: str) -> dict:
 
     # Strip regional language prefixes added by Spanish exhibitors (e.g. "CAT ", "VA ", "EUS ", "GAL ")
     search_title = _re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=_re.IGNORECASE)
-    # Strip anniversary / re-release suffixes, e.g. "(40 Aniversario)", "(40º Aniversario)", "(Reestreno)", "(1986)"
+    # Strip re-release/special-screening suffixes before TMDB search
+    _REISSUE_SUFFIXES = (
+        r'\d+[°ºo]?\s*(Aniversario|Aniversari|Anniversary)'  # 40 Aniversario / 40º Anniversary
+        r'|Reestreno|Re-estreno'                              # Reestreno
+        r'|Versi[oó]n\s+(Extendida|Restaurada|Remasterizada|Original|del\s+Director)'  # Versión extendida etc.
+        r'|Director\'?s?\s+Cut|Montaje\s+del\s+Director'     # Director's Cut
+        r'|Edici[oó]n\s+(Especial|Coleccionista|Definitiva)'  # Edición especial
+        r'|Pase\s+Especial'                                   # Pase especial
+        r'|4K(\s+Restaurad[ao])?'                             # 4K / 4K Restaurada
+        r'|\d{4}'                                             # bare year (1986)
+    )
     search_title = _re.sub(
-        r'\s*\(?\s*(\d+[°ºo]?\s*(Aniversario|Aniversari|Anniversary)|Reestreno|Re-estreno|\d{4})\s*\)?$',
+        r'\s*[\(\[]?\s*(' + _REISSUE_SUFFIXES + r')\s*[\)\]]?$',
         '', search_title, flags=_re.IGNORECASE
     ).strip()
     search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', search_title)[0].strip()
