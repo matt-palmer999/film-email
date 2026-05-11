@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="ESCAPE INÚTIL — Cartelera Valencia" data-en="ESCAPE INÚTIL — Cartelera Valencia">ESCAPE INÚTIL — Cartelera Valencia</title>
+<title data-es="ESCAPE INÚTIL — Cartelera Valencia" data-en="Escape inútil — Cartelera Valencia">ESCAPE INÚTIL — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/dbdbec1ef7b9454ab1ce0ec469501116.jpg" alt="ESCAPE INÚTIL" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/fcMXE0QoKFAVlFLNb6tCXMhOh77.jpg" alt="ESCAPE INÚTIL" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
       <div class="badges"></div>
-      <div class="hero-title" data-es="ESCAPE INÚTIL" data-en="ESCAPE INÚTIL">ESCAPE INÚTIL</div>
+      <div class="hero-title" data-es="ESCAPE INÚTIL" data-en="Escape inútil">ESCAPE INÚTIL</div>
       
-      <div class="hero-meta"><span data-es="" data-en=""></span></div>
-      <div class="hero-synopsis" data-es="En una remota cabaña en las montañas de Puerto Rico, Paula y Mario intentan reconstruir su familia, lidiando con las cicatrices de un pasado trágico. Su hija Vero, una adolescente con problemas emocionales, lucha por encontrar su lugar en este frágil entorno. Cuando Paula y Mario desaparecen misteriosamente, Vero se queda sola y desorientada. Jesús Méndez, un agente de policía local, se encarga de" data-en="En una remota cabaña en las montañas de Puerto Rico, Paula y Mario intentan reconstruir su familia, lidiando con las cicatrices de un pasado trágico. Su hija Vero, una adolescente con problemas emocionales, lucha por encontrar su lugar en este frágil entorno. Cuando Paula y Mario desaparecen misteriosamente, Vero se queda sola y desorientada. Jesús Méndez, un agente de policía local, se encarga de">En una remota cabaña en las montañas de Puerto Rico, Paula y Mario intentan reconstruir su familia, lidiando con las cicatrices de un pasado trágico. Su hija Vero, una adolescente con problemas emocionales, lucha por encontrar su lugar en este frágil entorno. Cuando Paula y Mario desaparecen misteriosamente, Vero se queda sola y desorientada. Jesús Méndez, un agente de policía local, se encarga de</div>
+      <div class="hero-meta"><span data-es="ES" data-en="ES">ES</span></div>
+      <div class="hero-synopsis" data-es="Enclavada en las montañas de Puerto Rico, esta intensa historia sigue a una familia española que viaja a la isla con la esperanza de recomponer un matrimonio al borde de la ruptura. Aislados en un entorno tan exuberante como inquietante, lo que comienza como una oportunidad de reconciliación pronto se ve enturbiado por una atmósfera opresiva y extrañamente hostil. En la región circula una perturba" data-en="En una remota cabaña en las montañas de Puerto Rico, Paula y Mario intentan reconstruir su familia, lidiando con las cicatrices de un pasado trágico. Su hija Vero, una adolescente con problemas emocionales, lucha por encontrar su lugar en este frágil entorno. Cuando Paula y Mario desaparecen misteriosamente, Vero se queda sola y desorientada. Jesús Méndez, un agente de policía local, se encarga de">Enclavada en las montañas de Puerto Rico, esta intensa historia sigue a una familia española que viaja a la isla con la esperanza de recomponer un matrimonio al borde de la ruptura. Aislados en un entorno tan exuberante como inquietante, lo que comienza como una oportunidad de reconciliación pronto se ve enturbiado por una atmósfera opresiva y extrañamente hostil. En la región circula una perturba</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'ESCAPE INÚTIL' : 'ESCAPE INÚTIL') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Escape inútil' : 'ESCAPE INÚTIL') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
