@@ -739,7 +739,13 @@
   </style>
   <script>
     // Redirect subscribers before page renders — avoids flash of subscribe page
+    // ?reset clears the cookie (escape hatch if redirect gets stuck)
     (function() {
+      if (new URLSearchParams(location.search).get('reset') !== null) {
+        document.cookie = 'cv_email=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+        window.location.replace('/');
+        return;
+      }
       if (document.cookie.match(/(^| )cv_email=([^;]+)/)) {
         window.location.replace('/listings/');
       }
