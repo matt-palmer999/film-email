@@ -1385,8 +1385,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 
 </div>
 <script>
-window.SUPABASE_URL  = "{SUPABASE_URL}";
-window.SUPABASE_ANON = "{SUPABASE_ANON}";
+window.SUPABASE_URL  = "__SUPABASE_URL__";
+window.SUPABASE_ANON = "__SUPABASE_ANON__";
 window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
@@ -1620,12 +1620,21 @@ def run() -> None:
             generated += 1
     log.info(f"Generated {generated} film detail pages")
 
-    # 10. Inject Supabase credentials into landing + preferences pages
+    # 10. Inject Supabase credentials into all pages that need them
     if SUPABASE_URL and SUPABASE_ANON:
-        for page_path in ["docs/index.html", "docs/preferences/index.html"]:
+        pages_to_inject = [
+            "docs/index.html",
+            "docs/preferences/index.html",
+            "docs/listings/index.html",
+        ]
+        for page_path in pages_to_inject:
             if os.path.exists(page_path):
                 with open(page_path, "r", encoding="utf-8") as fh:
                     page = fh.read()
+                # listings page uses __SUPABASE_URL__ placeholders (pipeline-generated)
+                page = page.replace("__SUPABASE_URL__",      SUPABASE_URL)
+                page = page.replace("__SUPABASE_ANON__",     SUPABASE_ANON)
+                # landing + preferences pages use YOUR_SUPABASE_* placeholders (static HTML)
                 page = page.replace("YOUR_SUPABASE_URL",      SUPABASE_URL)
                 page = page.replace("YOUR_SUPABASE_ANON_KEY", SUPABASE_ANON)
                 with open(page_path, "w", encoding="utf-8") as fh:
