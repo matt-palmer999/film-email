@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="LOS JUSTOS — Cartelera Valencia" data-en="LOS JUSTOS — Cartelera Valencia">LOS JUSTOS — Cartelera Valencia</title>
+<title data-es="Los justos — Cartelera Valencia" data-en="Los justos — Cartelera Valencia">Los justos — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/a3646e72c8267e15da5c6ea1efd2ed52.jpg" alt="LOS JUSTOS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/ffhjQteKw15YyacruxTaBgdR6nJ.jpg" alt="Los justos" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="LOS JUSTOS" data-en="LOS JUSTOS">LOS JUSTOS</div>
+      <div class="badges"><span class="score-badge">⭐ 7.5</span></div>
+      <div class="hero-title" data-es="Los justos" data-en="Los justos">Los justos</div>
       
-      <div class="hero-meta"><span data-es="89 min" data-en="89 min">89 min</span></div>
-      <div class="hero-synopsis" data-es="Nueve miembros de un jurado popular deliberan aislados un polémico caso de corrupción. Las pruebas son irrefutables, la opinión pública ya ha emitido su veredicto, nadie parece tener dudas... Hasta que reciben una oferta en secreto: cada integrante ganará un millón de euros si cambia su voto de culpable a inocente. Pero si quieren entrar en el juego, deberán alcanzar la unanimidad; algo que sacará" data-en="Nueve miembros de un jurado popular deliberan aislados un polémico caso de corrupción. Las pruebas son irrefutables, la opinión pública ya ha emitido su veredicto, nadie parece tener dudas... Hasta que reciben una oferta en secreto: cada integrante ganará un millón de euros si cambia su voto de culpable a inocente. Pero si quieren entrar en el juego, deberán alcanzar la unanimidad; algo que sacará">Nueve miembros de un jurado popular deliberan aislados un polémico caso de corrupción. Las pruebas son irrefutables, la opinión pública ya ha emitido su veredicto, nadie parece tener dudas... Hasta que reciben una oferta en secreto: cada integrante ganará un millón de euros si cambia su voto de culpable a inocente. Pero si quieren entrar en el juego, deberán alcanzar la unanimidad; algo que sacará</div>
+      <div class="hero-meta"><span data-es="AR · 2024" data-en="AR · 2024 · Comedy, Drama, Thriller">AR · 2024</span></div>
+      <div class="hero-synopsis" data-es="Atilio que comienza una nueva etapa de su vida cuando su hija Mónica toma la difícil decisión de ingresarlo en un geriátrico. Indiferente y deprimido, Atilio se muda sin expectativas. Allí conoce a Beto, un señor ocurrente y buscador, que le facilita la posibilidad de salir clandestinamente. Se escapan juntos del geriátrico para visitar la tumba de su difunta esposa. Durante el silencio de la medi" data-en="Atilio begins a new life when his daughter moves him to a nursing home, where he meets Beto, a clever and resourceful man. Together, they sneak out to visit Atilio’s late wife’s grave and accidentally witness a money laundering operation in the cemetery, involving hidden cash in a coffin. Inspired by the chance to change their lives, Atilio, Beto, and Doña Rosa—a sharp woman from the home—team up ">Atilio que comienza una nueva etapa de su vida cuando su hija Mónica toma la difícil decisión de ingresarlo en un geriátrico. Indiferente y deprimido, Atilio se muda sin expectativas. Allí conoce a Beto, un señor ocurrente y buscador, que le facilita la posibilidad de salir clandestinamente. Se escapan juntos del geriátrico para visitar la tumba de su difunta esposa. Durante el silencio de la medi</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'LOS JUSTOS' : 'LOS JUSTOS') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Los justos' : 'Los justos') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

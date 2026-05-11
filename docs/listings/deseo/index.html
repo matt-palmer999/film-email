@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="DESEO — Cartelera Valencia" data-en="DESEO — Cartelera Valencia">DESEO — Cartelera Valencia</title>
+<title data-es="Deseo — Cartelera Valencia" data-en="Deseo — Cartelera Valencia">Deseo — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/04e39d213a39dd83269a4db3ef5185ab.jpg" alt="DESEO" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/5nnco1q2lZ1uc06TcHrTU4JVElu.jpg" alt="Deseo" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="DESEO" data-en="DESEO">DESEO</div>
+      <div class="badges"><span class="score-badge">⭐ 6.5</span></div>
+      <div class="hero-title" data-es="Deseo" data-en="Deseo">Deseo</div>
       
-      <div class="hero-meta"><span data-es="98 min" data-en="98 min">98 min</span></div>
-      <div class="hero-synopsis" data-es="Lucero, una exitosa abogada, lo tiene todo: lujo, éxito, un marido devoto y dos hijos perfectos. Pero detrás de esa vida impecable, se esconde un vacío que la empuja a buscar riesgo y pasión. Todo cambia cuando Matías, el joven y atractivo entrenador de natación contratado por su esposo, irrumpe en su rutina y despierta en ella una obsesión. Lo que comienza como una atracción se convierte en una r" data-en="Lucero, una exitosa abogada, lo tiene todo: lujo, éxito, un marido devoto y dos hijos perfectos. Pero detrás de esa vida impecable, se esconde un vacío que la empuja a buscar riesgo y pasión. Todo cambia cuando Matías, el joven y atractivo entrenador de natación contratado por su esposo, irrumpe en su rutina y despierta en ella una obsesión. Lo que comienza como una atracción se convierte en una r">Lucero, una exitosa abogada, lo tiene todo: lujo, éxito, un marido devoto y dos hijos perfectos. Pero detrás de esa vida impecable, se esconde un vacío que la empuja a buscar riesgo y pasión. Todo cambia cuando Matías, el joven y atractivo entrenador de natación contratado por su esposo, irrumpe en su rutina y despierta en ella una obsesión. Lo que comienza como una atracción se convierte en una r</div>
+      <div class="hero-meta"><span data-es="MX · 2013 · 97 min" data-en="MX · 2013 · Drama · 97 min">MX · 2013 · 97 min</span></div>
+      <div class="hero-synopsis" data-es="Todo empieza cuando un marinero y una prostituta adolescente se encuentran por casualidad. Ese es el comienzo de Deseo, y a partir de ahí la cinta nos muestra a una serie de personajes típicos, propios todos de la sociedad mexicana.  La película en realidad es una crítica mordaz a la sociedad de México, que está llena de prejuicios raciales y de clase, aunque esto creo que es algo común a la mayor" data-en="Eight short stories of seduction and illicit encounters between lovers, filled with humor and eroticism, which use a circular structure located in the cosmopolitan atmosphere of a colonial city of Mexico.">Todo empieza cuando un marinero y una prostituta adolescente se encuentran por casualidad. Ese es el comienzo de Deseo, y a partir de ahí la cinta nos muestra a una serie de personajes típicos, propios todos de la sociedad mexicana.  La película en realidad es una crítica mordaz a la sociedad de México, que está llena de prejuicios raciales y de clase, aunque esto creo que es algo común a la mayor</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'DESEO' : 'DESEO') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Deseo' : 'Deseo') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
