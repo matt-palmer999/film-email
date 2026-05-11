@@ -1,8 +1,0 @@
-name: Valencia Cinema Dev Build
-
-# Netlify preview deploy — trigger manually only if needed.
-# The pipeline now runs locally (run_pipeline.ps1) and the live site
-# is served via GitHub Pages on main. Automatic deploys are disabled.
-
-on:
-  workflow_dispatch:
