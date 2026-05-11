@@ -1,8 +1,0 @@
-name: Valencia Cinema Weekly Newsletter
-
-# Pipeline now runs locally via run_pipeline.ps1 (Windows Task Scheduler).
-# GitHub Pages redeploys automatically on every push to main.
-# This workflow is kept as a manual hook for future use.
-
-on:
-  workflow_dispatch:
