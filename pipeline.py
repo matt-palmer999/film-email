@@ -80,7 +80,9 @@ def tmdb_lookup(title: str) -> dict:
     if not TMDB_API_KEY:
         return {}
 
-    search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', title)[0].strip()
+    # Strip regional language prefixes added by Spanish exhibitors (e.g. "CAT ", "VA ", "EUS ", "GAL ")
+    search_title = _re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=_re.IGNORECASE)
+    search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', search_title)[0].strip()
     _time.sleep(0.25)
 
     try:
