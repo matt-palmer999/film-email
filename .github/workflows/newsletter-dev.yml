@@ -1,25 +1,8 @@
 name: Valencia Cinema Dev Build
 
+# Netlify preview deploy — trigger manually only if needed.
+# The pipeline now runs locally (run_pipeline.ps1) and the live site
+# is served via GitHub Pages on main. Automatic deploys are disabled.
+
 on:
-  push:
-    branches: [ dev ]
   workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout dev branch
-        uses: actions/checkout@v3
-        with:
-          ref: dev
-
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3
-        with:
-          publish-dir: ./docs
-          production-deploy: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID:    ${{ secrets.NETLIFY_SITE_ID }}
