@@ -2177,9 +2177,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
     listings_url = (page_url.rstrip("/") + "/?" + urlencode(params)) if params else page_url
 
     # ── PERSONALISED SUBTITLE ──
-    if vose_only and new_only:
-        subtitle = "Tus estrenos VOSE esta semana" if is_es else "Your new VOSE releases this week"
-    elif vose_only:
+    if vose_only:
         subtitle = "Tus sesiones VOSE esta semana" if is_es else "Your VOSE sessions this week"
     elif new_only:
         subtitle = "Tus estrenos esta semana" if is_es else "Your new releases this week"
@@ -2259,8 +2257,8 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         cards = "".join(film_card(f) for f in film_list)
         return (
             f'<tr><td style="padding:20px 40px 0;">'
-            f'<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;'
-            f'padding-bottom:10px;border-bottom:1px solid #1e1630;">{label}</div>'
+            f'<div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#c5b8d8;font-weight:700;'
+            f'padding-bottom:10px;border-bottom:1px solid #2e2040;">{label}</div>'
             f'</td></tr>'
             f'<table width="100%" cellpadding="0" cellspacing="0" border="0">{cards}</table>'
         )
