@@ -2195,15 +2195,15 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         score    = film.get("rating_score")
         slug     = film.get("slug", "")
 
-        badge_parts = []
+        label_parts = []
         if is_new:
             nl = "ESTRENO" if is_es else "NEW"
-            badge_parts.append(f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);">{nl}</span>')
+            label_parts.append(f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);">{nl}</span>')
         if any_vose:
-            badge_parts.append('<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);">VOSE</span>')
-        if score:
-            badge_parts.append(f'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span>')
-        badges = '&nbsp;&nbsp;'.join(badge_parts)
+            label_parts.append('<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);">VOSE</span>')
+        label_row = '&nbsp;&nbsp;'.join(label_parts)
+        score_row = (f'<div style="margin-top:5px;"><span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span></div>' if score else '')
+        badges = label_row + score_row
 
         poster_html = (
             f'<img src="{poster}" alt="" width="100" style="width:100px;height:148px;object-fit:cover;border-radius:8px;display:block;border:1px solid #2a1f3d;">'
@@ -2227,7 +2227,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         synopsis_short = (synopsis[:220] + "…") if len(synopsis) > 220 else synopsis
 
         return (
-            f'<tr><td style="padding:20px 40px 20px;border-bottom:1px solid #1e1630;">'
+            f'<tr><td style="padding:16px 24px 16px;border-bottom:1px solid #1e1630;">'
             f'<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
             f'<td width="116" valign="top" style="padding-right:16px;">'
             f'<a href="{film_url}" target="_blank" style="text-decoration:none;">{poster_html}</a>'
@@ -2257,8 +2257,8 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
             return ""
         cards = "".join(film_card(f) for f in film_list)
         return (
-            f'<tr><td style="padding:20px 40px 0;">'
-            f'<div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#c5b8d8;font-weight:700;'
+            f'<tr><td style="padding:20px 24px 0;">'
+            f'<div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#f0eae0;font-weight:700;'
             f'padding-bottom:10px;border-bottom:1px solid #2e2040;">{label}</div>'
             f'</td></tr>'
             f'<table width="100%" cellpadding="0" cellspacing="0" border="0">{cards}</table>'
