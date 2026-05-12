@@ -699,7 +699,7 @@ async function loadUserPreferences() {
     if (prefs.evening_only)  newParams.set('evening',   'true');
     if (prefs.classics)      newParams.set('classics',  'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
-    const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor'];
+    const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
       newParams.set('cinemas', prefs.cinemas.join(','));
     }
