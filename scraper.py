@@ -2038,6 +2038,12 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>{"Cartelera Valencia" if is_es else "Valencia Cinema"} – {date_str}</title>
+<style>
+@media screen and (max-width:480px) {{
+  .film-poster-td {{ display:block !important; width:100% !important; padding-right:0 !important; padding-bottom:12px !important; }}
+  .film-content-td {{ display:block !important; width:100% !important; }}
+}}
+</style>
 </head>
 <body style="margin:0;padding:0;background:#070509;font-family:Helvetica,Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#070509;">
@@ -2228,26 +2234,19 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
 
         return (
             f'<tr><td style="padding:16px 24px 16px;border-bottom:1px solid #1e1630;">'
-            f'<table width="100%" cellpadding="0" cellspacing="0" border="0">'
-            f'<tr>'
-            f'<td width="116" valign="top" style="padding-right:16px;">'
+            f'<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+            f'<td class="film-poster-td" width="116" valign="top" style="padding-right:16px;">'
             f'<a href="{film_url}" target="_blank" style="text-decoration:none;">{poster_html}</a>'
             f'</td>'
-            f'<td valign="top">'
+            f'<td class="film-content-td" valign="top">'
             f'<div style="margin-bottom:7px;">{badges}</div>'
-            f'<div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1.2;">'
+            f'<div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:5px;">'
             f'<a href="{film_url}" target="_blank" style="color:#f0eae0;text-decoration:none;">{title}</a>'
             f'</div>'
-            f'</td>'
-            f'</tr>'
-            f'<tr>'
-            f'<td colspan="2" style="padding-top:12px;">'
             f'<div style="font-size:11px;color:#7a6d8a;margin-bottom:7px;">{meta[:90]}</div>'
             f'<div style="font-size:12px;color:#8c8090;line-height:1.5;margin-bottom:6px;">{synopsis_short}</div>'
             f'{showtimes_rows}'
-            f'</td>'
-            f'</tr>'
-            f'</table>'
+            f'</td></tr></table>'
             f'</td></tr>'
         )
 
