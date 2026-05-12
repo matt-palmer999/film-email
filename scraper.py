@@ -33,7 +33,7 @@ FROM_ADDRESS  = os.environ.get("FROM_ADDRESS", SMTP_USER)
 FROM_NAME     = os.environ.get("FROM_NAME", "Cartelera Valencia")
 
 # Comma-separated list of recipient emails stored as a single secret
-RECIPIENTS = [r.strip() for r in os.environ["RECIPIENTS"].split(",") if r.strip()]
+RECIPIENTS = [r.strip() for r in os.environ.get("RECIPIENTS", "").split(",") if r.strip()]
 
 # TMDB API key for English titles and synopses
 TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
@@ -1903,7 +1903,7 @@ def fetch_subscribers() -> list:
 
 def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
     """Filter films dict according to a subscriber's saved preferences."""
-    KNOWN_CINEMAS = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor']
+    KNOWN_CINEMAS = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor','cinesa']
     allowed_cinemas = set(prefs.get("cinemas") or KNOWN_CINEMAS)
     vose_only    = prefs.get("vose_only", False)
     vose_lang    = prefs.get("vose_lang", "all")
@@ -1913,38 +1913,54 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
     rating_filter = prefs.get("rating_filter", False)
     min_rating   = float(prefs.get("min_rating") or 7.0)
 
+    EN_ORIGINS = {"US", "GB", "AU", "CA", "IE", "NZ"}
+    current_year = datetime.now().year
     result = {}
     for title, film in films.items():
-        # Cinema filter — keep if any showtime is at an allowed cinema
-        film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
-        if not film_cinemas & allowed_cinemas:
-            continue
+        film_year = int(film.get("year") or 0)
+        is_classic = film_year > 0 and film_year <= current_year - 3
 
-        is_classic = not film.get("is_new", False)
-
-        # VOSE filter
-        if vose_only:
-            if not film.get("any_vose", False):
-                if not (classics and is_classic):
+        if classics and is_classic:
+            # Classics override: only VOSE + language filters apply, everything else
+            # (cinema, new_only, family_only, rating_filter, evening_only) is ignored —
+            # matching the frontend JS applyVisibility() classics branch exactly.
+            if vose_only:
+                if not film.get("any_vose", False):
                     continue
-
-        # New-only filter (classics can bypass if enabled)
-        if new_only and not film.get("is_new", False):
-            if not (classics and is_classic):
+                if vose_lang == "en":
+                    origins = set(film.get("origin_country") or [])
+                    if origins and not origins & EN_ORIGINS:
+                        continue
+        else:
+            # Normal path — all filters apply
+            # Cinema filter
+            film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
+            if not film_cinemas & allowed_cinemas:
                 continue
 
-        # Family filter
-        if family_only:
-            rating_str = str(film.get("rating", "")).upper()
-            if rating_str not in ("TP", "7", "TODOS", "ALL"):
-                if not (classics and is_classic):
+            # VOSE + language filter
+            if vose_only:
+                if not film.get("any_vose", False):
+                    continue
+                if vose_lang == "en":
+                    origins = set(film.get("origin_country") or [])
+                    if origins and not origins & EN_ORIGINS:
+                        continue
+
+            # New-only filter
+            if new_only and not film.get("is_new", False):
+                continue
+
+            # Family filter
+            if family_only:
+                rating_str = str(film.get("rating", "")).upper()
+                if rating_str not in ("TP", "7", "TODOS", "ALL"):
                     continue
 
-        # Min rating filter
-        if rating_filter:
-            score = float(film.get("rating_score") or 0)
-            if score and score < min_rating:
-                if not (classics and is_classic):
+            # Min rating filter
+            if rating_filter:
+                score = float(film.get("rating_score") or 0)
+                if score and score < min_rating:
                     continue
 
         result[title] = film
@@ -2110,6 +2126,220 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 </table>
 </body>
 </html>"""
+
+
+def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
+                     prefs_url: str = "", unsub_url: str = "",
+                     prefs: dict = None) -> tuple:
+    """Build a full personalised film listing email. Returns (html, subject)."""
+    from urllib.parse import urlencode
+
+    if prefs is None:
+        prefs = {}
+
+    lang      = prefs.get("lang", "en")
+    is_es     = (lang == "es")
+    date_str  = week_range_es(anchor) if is_es else week_range_en(anchor)
+
+    vose_only      = prefs.get("vose_only", False)
+    new_only       = prefs.get("new_only", False)
+    allowed_cinemas = set(prefs.get("cinemas") or [])
+    ALL_CINEMAS = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor']
+
+    films     = list(films_by_title.values())
+    total     = len(films)
+    new_count  = sum(1 for f in films if f.get("is_new"))
+    vose_count = sum(1 for f in films if f.get("any_vose"))
+
+    # ── SUBJECT LINE ──
+    if total == 0:
+        subject = f"🎬 {'Cartelera Valencia' if is_es else 'Valencia Cinema'} – {date_str}"
+    elif vose_only and vose_count > 0:
+        subject = f"🎬 {vose_count} {'películas VOSE esta semana' if is_es else 'VOSE films this week'} · {date_str}"
+    elif new_only and new_count > 0:
+        subject = f"🎬 {new_count} {'estrenos esta semana' if is_es else 'new releases this week'} · {date_str}"
+    elif total <= 5:
+        subject = f"🎬 {total} {'películas para ti esta semana' if is_es else 'films for you this week'} · {date_str}"
+    else:
+        subject = f"🎬 {'Esta semana en Valencia' if is_es else 'This week in Valencia'}: {total} {'películas' if is_es else 'films'} · {date_str}"
+
+    # ── PERSONALISED LISTINGS URL ──
+    params = {}
+    if prefs.get("vose_only"):     params["vose"]      = "true"
+    if prefs.get("vose_lang"):     params["vose_lang"] = prefs["vose_lang"]
+    if prefs.get("new_only"):      params["new"]       = "true"
+    if prefs.get("family_only"):   params["family"]    = "true"
+    if prefs.get("evening_only"):  params["evening"]   = "true"
+    if prefs.get("classics"):      params["classics"]  = "true"
+    if prefs.get("rating_filter"): params["min_rating"] = prefs.get("min_rating", 7)
+    if allowed_cinemas and allowed_cinemas != set(ALL_CINEMAS):
+        params["cinemas"] = ",".join(c for c in ALL_CINEMAS if c in allowed_cinemas)
+    listings_url = (page_url.rstrip("/") + "/?" + urlencode(params)) if params else page_url
+
+    # ── PERSONALISED SUBTITLE ──
+    if vose_only and new_only:
+        subtitle = "Tus estrenos VOSE esta semana" if is_es else "Your new VOSE releases this week"
+    elif vose_only:
+        subtitle = "Tus sesiones VOSE esta semana" if is_es else "Your VOSE sessions this week"
+    elif new_only:
+        subtitle = "Tus estrenos esta semana" if is_es else "Your new releases this week"
+    else:
+        subtitle = "Tu cartelera personalizada esta semana" if is_es else "Your personalised listings this week"
+
+    # ── FILM CARD ──
+    def film_card(film):
+        title    = film.get("title_es" if is_es else "title_en") or film.get("title", "")
+        meta     = (film.get("meta_es") if is_es else film.get("meta_en")) or film.get("meta", "")
+        synopsis = (film.get("synopsis_es") if is_es else film.get("synopsis_en")) or film.get("synopsis", "")
+        poster   = film.get("poster", "")
+        is_new   = film.get("is_new", False)
+        any_vose = film.get("any_vose", False)
+        score    = film.get("rating_score")
+        slug     = film.get("slug", "")
+
+        badges = ""
+        if is_new:
+            nl = "ESTRENO" if is_es else "NEW"
+            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);margin-right:4px;">{nl}</span>'
+        if any_vose:
+            badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);margin-right:4px;">VOSE</span>'
+        if score:
+            badges += f'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span>'
+
+        poster_html = (
+            f'<img src="{poster}" alt="" width="100" style="width:100px;height:148px;object-fit:cover;border-radius:8px;display:block;border:1px solid #2a1f3d;">'
+            if poster else
+            '<div style="width:100px;height:148px;border-radius:8px;background:#1a1228;text-align:center;line-height:148px;font-size:32px;">🎬</div>'
+        )
+
+        if slug:
+            qs = ("?" + urlencode(params)) if params else ""
+            film_url = f"https://whatson.movie/listings/{slug}/{qs}"
+        else:
+            film_url = listings_url
+        showtimes_label = "Horarios y detalles" if is_es else "Showtimes &amp; details"
+        showtimes_rows = (
+            f'<div style="margin-top:10px;padding-top:9px;border-top:1px solid #241a35;">'
+            f'<a href="{film_url}" target="_blank" style="font-size:12px;color:#a07840;text-decoration:none;">'
+            f'&#128336; {showtimes_label} &rarr;'
+            f'</a>'
+            f'</div>'
+        )
+        synopsis_short = (synopsis[:220] + "…") if len(synopsis) > 220 else synopsis
+
+        return (
+            f'<tr><td style="padding:20px 40px 20px;border-bottom:1px solid #1e1630;">'
+            f'<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+            f'<td width="116" valign="top" style="padding-right:16px;">'
+            f'<a href="{film_url}" target="_blank" style="text-decoration:none;">{poster_html}</a>'
+            f'</td>'
+            f'<td valign="top">'
+            f'<div style="margin-bottom:7px;">{badges}</div>'
+            f'<div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:5px;">'
+            f'<a href="{film_url}" target="_blank" style="color:#f0eae0;text-decoration:none;">{title}</a>'
+            f'</div>'
+            f'<div style="font-size:11px;color:#7a6d8a;margin-bottom:7px;">{meta[:90]}</div>'
+            f'<div style="font-size:12px;color:#8c8090;line-height:1.5;margin-bottom:6px;">{synopsis_short}</div>'
+            f'{showtimes_rows}'
+            f'</td></tr></table>'
+            f'</td></tr>'
+        )
+
+    # ── SECTIONS ──
+    # Use same year threshold as the listings page (current_year - 3)
+    _cy = datetime.now().year
+    sorted_films  = sorted(films, key=lambda f: (not f.get("is_new"), -(float(f.get("rating_score") or 0))))
+    new_films     = [f for f in sorted_films if f.get("is_new")]
+    current_films = [f for f in sorted_films if not f.get("is_new") and int(f.get("year") or 0) > _cy - 3]
+    classic_films = [f for f in sorted_films if not f.get("is_new") and int(f.get("year") or 0) <= _cy - 3]
+
+    def section(film_list, label):
+        if not film_list:
+            return ""
+        cards = "".join(film_card(f) for f in film_list)
+        return (
+            f'<tr><td style="padding:20px 40px 0;">'
+            f'<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;'
+            f'padding-bottom:10px;border-bottom:1px solid #1e1630;">{label}</div>'
+            f'</td></tr>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" border="0">{cards}</table>'
+        )
+
+    new_label     = "Estrenos de la semana" if is_es else "New this week"
+    current_label = "También en cartelera" if is_es else "Also on screen"
+    classic_label = "Clásicos y reestrenos" if is_es else "Classics & re-releases"
+    films_html    = section(new_films, new_label) + section(current_films, current_label) + section(classic_films, classic_label)
+
+    if not films_html:
+        no_match = "No hay películas que coincidan con tus filtros esta semana." if is_es else "No films match your filters this week."
+        films_html = f'<tr><td style="padding:40px;text-align:center;color:#7a6d8a;font-size:14px;">{no_match}</td></tr>'
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{"Cartelera Valencia" if is_es else "Valencia Cinema"} – {date_str}</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0810;font-family:Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a0810;">
+<tr><td align="center" style="padding:20px 10px;">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+  <!-- HEADER -->
+  <tr><td style="background:linear-gradient(135deg,#1a0a2e,#0f0c14);border:1px solid #2a1f3d;border-bottom:none;padding:36px 40px 28px;text-align:center;border-radius:12px 12px 0 0;">
+    <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 {"Cartelera Valencia" if is_es else "Valencia Cinema"}</div>
+    <div style="font-family:Georgia,serif;font-size:34px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">{"Tu cartelera<br>de esta semana" if is_es else "Your listings<br>this week"}</div>
+    <div style="font-size:13px;color:#9b8faa;margin-bottom:14px;">{subtitle}</div>
+    <div style="display:inline-block;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_str}</div>
+  </td></tr>
+
+  <!-- STATS -->
+  <tr><td style="background:#160f24;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;border-bottom:1px solid #2a1f3d;padding:14px 40px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="text-align:center;">
+        <div style="font-size:22px;font-weight:700;color:#f0eae0;">{total}</div>
+        <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Películas" if is_es else "Films"}</div>
+      </td>
+      <td style="text-align:center;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
+        <div style="font-size:22px;font-weight:700;color:#f0eae0;">{vose_count}</div>
+        <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">VOSE</div>
+      </td>
+      <td style="text-align:center;">
+        <div style="font-size:22px;font-weight:700;color:#f0eae0;">{new_count}</div>
+        <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#5a4e6a;">{"Estrenos" if is_es else "New"}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- FILMS -->
+  <tr><td style="background:#0f0c14;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">{films_html}</table>
+  </td></tr>
+
+  <!-- CTA -->
+  <tr><td style="background:#0f0c14;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;padding:24px 40px 32px;text-align:center;">
+    <a href="{listings_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0a0810;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">{"Ver cartelera completa →" if is_es else "View Full Listings →"}</a>
+    <div style="margin-top:10px;font-size:11px;color:#4a3f5e;">{"Horarios actualizados diariamente" if is_es else "Showtimes updated daily"}</div>
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background:#0a0810;border:1px solid #1e1630;border-top:none;padding:18px 40px 24px;text-align:center;border-radius:0 0 12px 12px;">
+    <div style="font-size:11px;color:#3a2e50;line-height:1.8;">
+      {"Los horarios pueden variar — consulta siempre la web del cine." if is_es else "Showtimes may vary — always check the cinema's website."}<br>
+      <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">{"⚙️ Gestionar preferencias" if is_es else "⚙️ Manage preferences"}</a>
+      {"&nbsp;·&nbsp;<a href='" + unsub_url + "' style='color:#5a4e6a;text-decoration:none;'>" + ("Darse de baja" if is_es else "Unsubscribe") + "</a>" if unsub_url else ""}
+      <br>© {anchor.year} Cartelera Valencia Weekly
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>"""
+
+    return html, subject
 
 
 def send_email(html: str, anchor: datetime, recipient: str, lang: str = "en") -> None:
@@ -2335,19 +2565,19 @@ def main():
                     continue
                 try:
                     filtered_films = apply_subscriber_filters(films, sub)
-                    teaser = build_teaser_email(filtered_films, anchor, page_url, prefs_url, unsub_url, lang=lang)
-                    if lang == "es":
-                        subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
-                        plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"
-                    else:
-                        subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
-                        plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
+                    html, subject  = build_full_email(filtered_films, anchor, page_url, prefs_url, unsub_url, prefs=sub)
+                    lang_plain = sub.get("lang") or "es"
+                    plain = (
+                        f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
+                        if lang_plain == "es" else
+                        f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
+                    )
                     msg = MIMEMultipart("alternative")
                     msg["Subject"] = subject
                     msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
                     msg["To"]      = email
-                    msg.attach(MIMEText(plain,  "plain", "utf-8"))
-                    msg.attach(MIMEText(teaser, "html",  "utf-8"))
+                    msg.attach(MIMEText(plain, "plain", "utf-8"))
+                    msg.attach(MIMEText(html,  "html",  "utf-8"))
                     server.sendmail(FROM_ADDRESS, [email], msg.as_string())
                     log.info(f"  Sent to {email} ({lang})")
                     sent += 1

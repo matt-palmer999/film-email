@@ -763,6 +763,7 @@
       { id: 'tivoli',     name: 'Cine Tívoli',         arthouse: false },
       { id: 'babel',      name: 'Cines Babel',         arthouse: true  },
       { id: 'dor',        name: "Cinestudio D'Or",     arthouse: true  },
+      { id: 'cinesa',     name: 'Cinesa Bonaire',      arthouse: false },
     ];
 
     // Current state
@@ -991,7 +992,7 @@
         if (prefs.evening_only)  p.set('evening',   'true');
         if (prefs.classics)      p.set('classics',  'true');
         if (prefs.rating_filter) p.set('min_rating', prefs.min_rating || 7);
-        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor'];
+        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor','cinesa'];
         const missing = allCinemas.filter(c => !prefs.cinemas.includes(c));
         if (missing.length > 0) p.set('cinemas', prefs.cinemas.join(','));
         p.set('v', Date.now()); // cache bust

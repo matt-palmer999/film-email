@@ -37,6 +37,7 @@ CINEMA_META = {
     "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex"},
     "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse"},
     "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse"},
+    "cinesa":     {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",   "type": "multiplex"},
 }
 
 
@@ -221,6 +222,7 @@ def aggregate_scrapers() -> dict:
     from scrapers.ocine_aqua import scrape_ocine_aqua
     from scrapers.lys        import scrape_lys
     from scrapers.mn4        import scrape_mn4
+    from scrapers.cinesa     import scrape_cinesa
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis"),
@@ -232,6 +234,7 @@ def aggregate_scrapers() -> dict:
         (scrape_ocine_aqua, "Ocine Aqua"),
         (scrape_lys,        "Lys"),
         (scrape_mn4,        "MN4"),
+        (scrape_cinesa,     "Cinesa Bonaire"),
     ]
 
     all_results: list[dict] = []
@@ -1624,12 +1627,15 @@ def run() -> None:
         fh.write(full_html)
     log.info("Wrote docs/listings/index.html")
 
-    # 7. Write stats.json
+    # 7. Write stats.json + films cache
     os.makedirs("docs/data", exist_ok=True)
     stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
     with open("docs/data/stats.json", "w", encoding="utf-8") as fh:
         json.dump(stats, fh)
     log.info(f"Wrote docs/data/stats.json: {stats}")
+    with open("docs/data/films_cache.json", "w", encoding="utf-8") as fh:
+        json.dump(films, fh, ensure_ascii=False, default=str)
+    log.info(f"Wrote docs/data/films_cache.json ({len(films)} films)")
 
     # 8. Clean up stale film detail dirs
     current_slugs = {film["slug"] for film in films.values() if film.get("slug")}
