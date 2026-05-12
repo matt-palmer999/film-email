@@ -1881,11 +1881,12 @@ if ('serviceWorker' in navigator) {{
 
 
 def fetch_subscribers() -> list:
-    """Fetch all active subscribers with their language preference from Supabase."""
+    """Fetch subscribers who have email_enabled=true, with all their preferences."""
     import urllib.request
     key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
     try:
-        url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,lang&order=email"
+        fields = "email,lang,email_enabled,vose_only,vose_lang,family_only,evening_only,new_only,classics,rating_filter,min_rating,cinemas"
+        url = f"{SUPABASE_URL}/rest/v1/subscribers?select={fields}&email_enabled=eq.true&active=eq.true&order=email"
         req = urllib.request.Request(url, headers={
             "apikey":        key,
             "Authorization": f"Bearer {key}",
@@ -1893,11 +1894,61 @@ def fetch_subscribers() -> list:
         with urllib.request.urlopen(req, timeout=15) as resp:
             import json as _json
             subscribers = _json.loads(resp.read().decode())
-            log.info(f"Fetched {len(subscribers)} subscribers from Supabase")
+            log.info(f"Fetched {len(subscribers)} email-enabled subscribers from Supabase")
             return subscribers
     except Exception as e:
         log.warning(f"Could not fetch subscribers from Supabase: {e} — falling back to RECIPIENTS env var")
         return [{"email": r, "lang": "es"} for r in RECIPIENTS]
+
+
+def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
+    """Filter films dict according to a subscriber's saved preferences."""
+    KNOWN_CINEMAS = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor']
+    allowed_cinemas = set(prefs.get("cinemas") or KNOWN_CINEMAS)
+    vose_only    = prefs.get("vose_only", False)
+    vose_lang    = prefs.get("vose_lang", "all")
+    new_only     = prefs.get("new_only", False)
+    family_only  = prefs.get("family_only", False)
+    classics     = prefs.get("classics", False)
+    rating_filter = prefs.get("rating_filter", False)
+    min_rating   = float(prefs.get("min_rating") or 7.0)
+
+    result = {}
+    for title, film in films.items():
+        # Cinema filter — keep if any showtime is at an allowed cinema
+        film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
+        if not film_cinemas & allowed_cinemas:
+            continue
+
+        is_classic = not film.get("is_new", False)
+
+        # VOSE filter
+        if vose_only:
+            if not film.get("any_vose", False):
+                if not (classics and is_classic):
+                    continue
+
+        # New-only filter (classics can bypass if enabled)
+        if new_only and not film.get("is_new", False):
+            if not (classics and is_classic):
+                continue
+
+        # Family filter
+        if family_only:
+            rating_str = str(film.get("rating", "")).upper()
+            if rating_str not in ("TP", "7", "TODOS", "ALL"):
+                if not (classics and is_classic):
+                    continue
+
+        # Min rating filter
+        if rating_filter:
+            score = float(film.get("rating_score") or 0)
+            if score and score < min_rating:
+                if not (classics and is_classic):
+                    continue
+
+        result[title] = film
+    return result
 
 
 def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, prefs_url: str = "", unsub_url: str = "", lang: str = "en") -> str:
@@ -2283,7 +2334,8 @@ def main():
                 if not email:
                     continue
                 try:
-                    teaser = build_teaser_email(films, anchor, page_url, prefs_url, unsub_url, lang=lang)
+                    filtered_films = apply_subscriber_filters(films, sub)
+                    teaser = build_teaser_email(filtered_films, anchor, page_url, prefs_url, unsub_url, lang=lang)
                     if lang == "es":
                         subject = f"🎬 Cartelera Valencia – {week_range_es(anchor)}"
                         plain   = f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML.\n\nFuente: mabuse.es"

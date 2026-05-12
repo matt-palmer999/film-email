@@ -568,12 +568,12 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
 .film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
 .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
-.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:background .15s}.grid-card:active{background:#221530}
+.grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s,background .15s}.grid-card:hover{border-color:rgba(255,180,50,.45)}.grid-card:active{background:#221530}
 .grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
 .grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
-.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:11px;font-weight:500;color:#a07840;letter-spacing:.3px}.grid-card:hover .showtimes-hint{color:#ffb432}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
@@ -673,7 +673,7 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating,email_enabled',
       { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
@@ -1278,6 +1278,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
           <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
           <div class="cinema-tags">{cinema_tags}</div>
         </div>
+        <div class="showtimes-hint"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-es="Horarios y detalles →" data-en="Showtimes &amp; details →">Horarios y detalles →</span></div>
       </div>
     </div>"""
 
@@ -1359,11 +1360,11 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span style="font-size:12px;color:#ffb432;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
       <a href="../" style="font-size:11px;color:#9b8faa;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
     </div>
-    <div style="display:flex;align-items:flex-end;padding:0 20px;">
-      <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;background:#0f0c14;border:2px solid #2a1f3d;border-bottom:2px solid #0f0c14;border-radius:8px 8px 0 0;padding:8px 16px 10px;position:relative;z-index:2;">quick<em style="color:#ffb432;font-style:italic;">filters</em></div>
-      <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #2a1f3d;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
+    <div style="display:flex;align-items:flex-end;padding:0;">
+      <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;background:#0f0c14;border:2px solid #5a4a7a;border-bottom:2px solid #0f0c14;border-radius:8px 8px 0 0;padding:8px 20px 10px;position:relative;z-index:2;margin-bottom:-2px;">quick<em style="color:#ffb432;font-style:italic;">filters</em></div>
+      <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #5a4a7a;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
     </div>
-    <div style="background:#0f0c14;border:2px solid #2a1f3d;border-top:none;border-bottom:2px solid #2a1f3d;padding:14px 20px;">
+    <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
         <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
         <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>

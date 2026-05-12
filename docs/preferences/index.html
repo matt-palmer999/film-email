@@ -696,6 +696,19 @@
         </div>
       </div>
 
+      <!-- EMAIL -->
+      <div class="prefs-section">
+        <div class="prefs-section-title" data-es="Email semanal" data-en="Weekly email">Email semanal</div>
+        <div class="toggle-row" id="toggle-email" onclick="togglePref('email_enabled')">
+          <div class="toggle-icon">📧</div>
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Recibir email semanal" data-en="Receive weekly email">Recibir email semanal</div>
+            <div class="toggle-desc" data-es="Recibe tu cartelera personalizada cada jueves" data-en="Get your personalised listings every Thursday">Recibe tu cartelera personalizada cada jueves</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+      </div>
+
       <!-- SAVE -->
       <div class="save-area">
         <button class="btn-save" id="save-btn" onclick="savePreferences()">
@@ -765,6 +778,7 @@
       min_rating:   7.0,
       cinemas:      CINEMAS.map(c => c.id),
       lang:         'es',
+      email_enabled: false,
     };
 
     // ── LANGUAGE TOGGLE ──
@@ -822,8 +836,9 @@
         prefs.classics     = sub.classics     || false;
         prefs.rating_filter = sub.rating_filter || false;
         prefs.min_rating   = sub.min_rating   || 7.0;
-        prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
-        prefs.lang      = sub.lang      || 'es';
+        prefs.cinemas      = sub.cinemas      || CINEMAS.map(c => c.id);
+        prefs.lang         = sub.lang         || 'es';
+        prefs.email_enabled = sub.email_enabled ?? false;
 
         renderPreferences();
         document.getElementById('prefs-email-display').textContent = currentEmail;
@@ -844,6 +859,7 @@
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
       document.getElementById('toggle-classics').classList.toggle('on', prefs.classics);
       document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
+      document.getElementById('toggle-email').classList.toggle('on', prefs.email_enabled);
 
       // Sub-options visibility
       document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
@@ -952,8 +968,9 @@
               classics:     prefs.classics,
               rating_filter: prefs.rating_filter,
               min_rating:   prefs.min_rating,
-              cinemas:      prefs.cinemas,
-              lang:         prefs.lang,
+              cinemas:       prefs.cinemas,
+              lang:          prefs.lang,
+              email_enabled: prefs.email_enabled,
               updated_at:   new Date().toISOString()
             })
           }
