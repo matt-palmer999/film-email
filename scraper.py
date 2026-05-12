@@ -2039,8 +2039,8 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>{"Cartelera Valencia" if is_es else "Valencia Cinema"} – {date_str}</title>
 </head>
-<body style="margin:0;padding:0;background:#0f0c14;font-family:Helvetica,Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f0c14;">
+<body style="margin:0;padding:0;background:#070509;font-family:Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#070509;">
   <tr>
     <td align="center" style="padding:20px 10px;">
       <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
@@ -2079,7 +2079,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 
         <!-- HIGHLIGHTS -->
         <tr>
-          <td style="background:#0f0c14;padding:20px 40px 10px;">
+          <td style="background:#070509;padding:20px 40px 10px;">
             <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#5a4e6a;margin-bottom:4px;">{"Destacados de esta semana" if is_es else "This week's highlights"}</div>
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               {highlights_html}
@@ -2089,7 +2089,7 @@ def build_teaser_email(films_by_title: dict, anchor: datetime, page_url: str, pr
 
         <!-- CTA BUTTON -->
         <tr>
-          <td style="background:#0f0c14;padding:24px 40px 32px;text-align:center;">
+          <td style="background:#070509;padding:24px 40px 32px;text-align:center;">
             <div style="font-size:13px;color:#7a6d8a;margin-bottom:18px;">{"Ver la programación completa — todos los cines, todas las películas, sesiones VOSE destacadas" if is_es else "See the full programme — all cinemas, all films, VOSE sessions highlighted"}</div>
             <a href="{page_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0f0c14;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">{"Ver cartelera completa →" if is_es else "View Full Listings →"}</a>
             <br><br>
@@ -2228,19 +2228,26 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
 
         return (
             f'<tr><td style="padding:16px 24px 16px;border-bottom:1px solid #1e1630;">'
-            f'<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" border="0">'
+            f'<tr>'
             f'<td width="116" valign="top" style="padding-right:16px;">'
             f'<a href="{film_url}" target="_blank" style="text-decoration:none;">{poster_html}</a>'
             f'</td>'
             f'<td valign="top">'
             f'<div style="margin-bottom:7px;">{badges}</div>'
-            f'<div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:5px;">'
+            f'<div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1.2;">'
             f'<a href="{film_url}" target="_blank" style="color:#f0eae0;text-decoration:none;">{title}</a>'
             f'</div>'
+            f'</td>'
+            f'</tr>'
+            f'<tr>'
+            f'<td colspan="2" style="padding-top:12px;">'
             f'<div style="font-size:11px;color:#7a6d8a;margin-bottom:7px;">{meta[:90]}</div>'
             f'<div style="font-size:12px;color:#8c8090;line-height:1.5;margin-bottom:6px;">{synopsis_short}</div>'
             f'{showtimes_rows}'
-            f'</td></tr></table>'
+            f'</td>'
+            f'</tr>'
+            f'</table>'
             f'</td></tr>'
         )
 
@@ -2312,12 +2319,12 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
   </td></tr>
 
   <!-- FILMS -->
-  <tr><td style="background:#0f0c14;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
+  <tr><td style="background:#070509;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0">{films_html}</table>
   </td></tr>
 
   <!-- CTA -->
-  <tr><td style="background:#0f0c14;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;padding:24px 40px 32px;text-align:center;">
+  <tr><td style="background:#070509;border-left:1px solid #2a1f3d;border-right:1px solid #2a1f3d;padding:24px 40px 32px;text-align:center;">
     <a href="{listings_url}" target="_blank" style="display:inline-block;padding:14px 36px;background:#ffb432;color:#0a0810;font-weight:700;font-size:14px;text-decoration:none;border-radius:8px;">{"Ver cartelera completa →" if is_es else "View Full Listings →"}</a>
     <div style="margin-top:10px;font-size:11px;color:#4a3f5e;">{"Horarios actualizados diariamente" if is_es else "Showtimes updated daily"}</div>
   </td></tr>
