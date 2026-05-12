@@ -2195,14 +2195,15 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         score    = film.get("rating_score")
         slug     = film.get("slug", "")
 
-        badges = ""
+        badge_parts = []
         if is_new:
             nl = "ESTRENO" if is_es else "NEW"
-            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);margin-right:8px;">{nl}</span>'
+            badge_parts.append(f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);">{nl}</span>')
         if any_vose:
-            badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);margin-right:4px;">VOSE</span>'
+            badge_parts.append('<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);">VOSE</span>')
         if score:
-            badges += f'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span>'
+            badge_parts.append(f'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span>')
+        badges = '&nbsp;&nbsp;'.join(badge_parts)
 
         poster_html = (
             f'<img src="{poster}" alt="" width="100" style="width:100px;height:148px;object-fit:cover;border-radius:8px;display:block;border:1px solid #2a1f3d;">'
