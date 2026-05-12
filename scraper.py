@@ -2198,7 +2198,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         badges = ""
         if is_new:
             nl = "ESTRENO" if is_es else "NEW"
-            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);margin-right:4px;">{nl}</span>'
+            badges += f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);margin-right:8px;">{nl}</span>'
         if any_vose:
             badges += '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);margin-right:4px;">VOSE</span>'
         if score:
