@@ -10,6 +10,7 @@ Edit TEST_PREFS below to simulate different subscriber preferences.
 """
 
 import json, os, sys, smtplib
+import urllib.request, urllib.parse
 from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -39,20 +40,32 @@ LISTINGS_URL   = "https://whatson.movie/listings/"
 PREFS_URL      = "https://whatson.movie/preferences/"
 UNSUB_URL      = ""
 
-# Edit these to test different preference scenarios
-TEST_PREFS = {
-    "lang":          "en",
-    "vose_only":     True,
-    "vose_lang":     "en",
-    "new_only":      True,
-    "family_only":   True,
-    "evening_only":  False,
-    "classics":      True,
-    "rating_filter": False,
-    "min_rating":    7.0,
-    "cinemas":       ["kinepolis", "yelmo", "babel"],
-    "email_enabled": True,
-}
+SUPABASE_URL         = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON        = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
+
+def fetch_prefs_from_supabase(email: str) -> dict:
+    """Fetch real subscriber preferences from Supabase for the given email."""
+    if not SUPABASE_URL or not (SUPABASE_SERVICE_KEY or SUPABASE_ANON):
+        print("ERROR: SUPABASE_URL / SUPABASE_SERVICE_KEY not set — cannot fetch prefs.")
+        sys.exit(1)
+    key = SUPABASE_SERVICE_KEY or SUPABASE_ANON   # service key bypasses RLS
+    fields = "lang,email_enabled,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating,cinemas"
+    url = f"{SUPABASE_URL}/rest/v1/subscribers?email=eq.{urllib.parse.quote(email)}&select={fields}"
+    req = urllib.request.Request(url, headers={
+        "apikey":        key,
+        "Authorization": f"Bearer {key}",
+    })
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        rows = json.loads(resp.read())
+    if not rows:
+        print(f"ERROR: No subscriber found in Supabase for {email}")
+        sys.exit(1)
+    prefs = rows[0]
+    print(f"Loaded prefs from Supabase for {email}:")
+    for k, v in prefs.items():
+        print(f"  {k}: {v}")
+    return prefs
 
 # ── Load cached films ──────────────────────────────────────────────────────────
 def main():
@@ -64,6 +77,8 @@ def main():
 
     films  = json.loads(cache.read_text(encoding="utf-8"))
     anchor = datetime.now(ZoneInfo("Europe/Madrid"))
+
+    TEST_PREFS = fetch_prefs_from_supabase(TEST_RECIPIENT)
 
     # Apply subscriber filters
     filtered = apply_subscriber_filters(films, TEST_PREFS)
