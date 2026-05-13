@@ -21,8 +21,9 @@ VALENCIA_TZ = ZoneInfo("Europe/Madrid")
 # ── Config ────────────────────────────────────────────────────────────────────
 TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
 TMDB_BASE     = "https://api.themoviedb.org/3"
-SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
-SUPABASE_ANON = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_URL         = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON        = os.environ.get("SUPABASE_ANON", "")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
@@ -1681,6 +1682,87 @@ def run() -> None:
         log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
 
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
+
+    # 11. Send admin confirmation email
+    send_pipeline_summary(films)
+
+
+def send_pipeline_summary(films: dict) -> None:
+    """Send a brief confirmation email to the admin after a successful pipeline run."""
+    import smtplib
+    from email.mime.text import MIMEText
+
+    smtp_host = os.environ.get("SMTP_HOST", "")
+    smtp_port = int(os.environ.get("SMTP_PORT", 587))
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
+    from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
+    from_name = os.environ.get("FROM_NAME", "whatson.movie")
+    admin_to  = "matt_palmer@outlook.com"
+
+    if not all([smtp_host, smtp_user, smtp_pass]):
+        log.warning("SMTP not configured — skipping pipeline summary email")
+        return
+
+    # Films per cinema
+    cinema_counts: dict[str, int] = {}
+    for film in films.values():
+        for c in film.get("cinemas", []):
+            cid = c.get("id", "unknown")
+            cinema_counts[cid] = cinema_counts.get(cid, 0) + 1
+
+    cinema_lines = "\n".join(
+        f"  {CINEMA_META.get(cid, {}).get('name', cid):<30} {count} films"
+        for cid, count in sorted(cinema_counts.items(), key=lambda x: -x[1])
+    )
+
+    # Subscriber counts from Supabase
+    total_subs = email_subs = 0
+    key = SUPABASE_SERVICE_KEY or SUPABASE_ANON
+    if SUPABASE_URL and key:
+        try:
+            import urllib.request
+            url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email_enabled,active&active=eq.true"
+            req = urllib.request.Request(url, headers={
+                "apikey": key, "Authorization": f"Bearer {key}"
+            })
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                rows = json.loads(resp.read())
+            total_subs = len(rows)
+            email_subs = sum(1 for r in rows if r.get("email_enabled"))
+        except Exception as exc:
+            log.warning(f"Could not fetch subscriber count: {exc}")
+
+    now_str = datetime.now(VALENCIA_TZ).strftime("%Y-%m-%d %H:%M")
+    body = f"""whatson.movie pipeline completed successfully at {now_str}
+
+FILMS: {len(films)} total
+
+Per cinema:
+{cinema_lines}
+
+SUBSCRIBERS (active):
+  Total signed up:      {total_subs}
+  Email enabled:        {email_subs}
+  Preferences only:     {total_subs - email_subs}
+
+Site: https://whatson.movie/listings/
+"""
+
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = f"✅ whatson.movie pipeline — {len(films)} films · {now_str}"
+    msg["From"]    = f"{from_name} <{from_addr}>"
+    msg["To"]      = admin_to
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(from_addr, [admin_to], msg.as_string())
+        log.info(f"Pipeline summary email sent to {admin_to}")
+    except Exception as exc:
+        log.warning(f"Could not send pipeline summary email: {exc}")
 
 
 if __name__ == "__main__":

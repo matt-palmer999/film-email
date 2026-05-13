@@ -21,7 +21,7 @@ $RepoDir = $PSScriptRoot          # directory where this script lives
 $LogDir  = Join-Path $RepoDir "logs"
 $LogFile = Join-Path $LogDir "pipeline.log"
 $EnvFile = Join-Path $RepoDir ".env"
-$Python  = "python3.12"
+$Python  = "C:\Users\TV-watchers\AppData\Local\Python\bin\python3.12.exe"
 
 # Logging
 if (-not (Test-Path $LogDir)) {
