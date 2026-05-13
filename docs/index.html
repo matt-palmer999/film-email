@@ -1086,13 +1086,13 @@
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
             const msgEl = document.getElementById(source + '-success-msg');
             if (msgEl) {
-              msgEl.setAttribute('data-es', '✅ ¡Te hemos reconocido! Redirigiendo a tus preferencias…');
-              msgEl.setAttribute('data-en', '✅ You\'re logged in! Taking you to your preferences…');
+              msgEl.setAttribute('data-es', '✅ ¡Te hemos reconocido! Redirigiendo a la cartelera…');
+              msgEl.setAttribute('data-en', '✅ You\'re logged in! Taking you to the listings…');
               msgEl.textContent = lang === 'es'
-                ? '✅ ¡Te hemos reconocido! Redirigiendo a tus preferencias…'
-                : '✅ You\'re logged in! Taking you to your preferences…';
+                ? '✅ ¡Te hemos reconocido! Redirigiendo a la cartelera…'
+                : '✅ You\'re logged in! Taking you to the listings…';
             }
-            setTimeout(() => { window.location.href = '/preferences/'; }, 3000);
+            setTimeout(() => { window.location.href = '/listings/'; }, 3000);
           } else if (existing.verified && !existing.active) {
             // Previously unsubscribed — re-activate and log them back in
             await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
@@ -1111,13 +1111,13 @@
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
             const msgEl = document.getElementById(source + '-success-msg');
             if (msgEl) {
-              msgEl.setAttribute('data-es', '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Redirigiendo…');
-              msgEl.setAttribute('data-en', '✅ Welcome back! Your subscription has been reactivated. Redirecting…');
+              msgEl.setAttribute('data-es', '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Llevándote a la cartelera…');
+              msgEl.setAttribute('data-en', '✅ Welcome back! Your subscription has been reactivated. Taking you to the listings…');
               msgEl.textContent = lang === 'es'
-                ? '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Redirigiendo…'
-                : '✅ Welcome back! Your subscription has been reactivated. Redirecting…';
+                ? '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Llevándote a la cartelera…'
+                : '✅ Welcome back! Your subscription has been reactivated. Taking you to the listings…';
             }
-            setTimeout(() => { window.location.href = '/preferences/'; }, 3000);
+            setTimeout(() => { window.location.href = '/listings/'; }, 3000);
           } else {
             // Not yet verified — issue a fresh token so a new verification email is sent
             await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
