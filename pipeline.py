@@ -208,11 +208,13 @@ def tmdb_lookup(title: str) -> dict:
 
 # ── Scraper aggregation ───────────────────────────────────────────────────────
 
-def aggregate_scrapers() -> dict:
+def aggregate_scrapers() -> tuple[dict, list]:
     """
-    Run all 9 scrapers and return films_by_title dict in old format:
-    { title_es: {title, meta, synopsis, is_new, rating, poster, any_vose,
-                 cinemas: [{id, name, website, type, vose, showtimes: {date:[times]}}]} }
+    Run all scrapers and return (films_by_title, scraper_status).
+
+    films_by_title: { title_es: {title, meta, synopsis, is_new, rating, poster, any_vose,
+                      cinemas: [{id, name, website, type, vose, showtimes: {date:[times]}}]} }
+    scraper_status: [ {"label": str, "count": int, "ok": bool, "error": str|None} ]
     """
     from scrapers.kinepolis  import scrape_kinepolis
     from scrapers.yelmo      import scrape_yelmo
@@ -239,13 +241,16 @@ def aggregate_scrapers() -> dict:
     ]
 
     all_results: list[dict] = []
+    scraper_status: list[dict] = []
     for fn, label in scrapers:
         try:
             results = fn()
             log.info(f"  {label}: {len(results)} films")
             all_results.extend(results)
+            scraper_status.append({"label": label, "count": len(results), "ok": True, "error": None})
         except Exception as exc:
             log.error(f"  {label} scraper failed: {exc}", exc_info=True)
+            scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc)})
 
     films_by_title: dict = {}
 
@@ -327,7 +332,7 @@ def aggregate_scrapers() -> dict:
         if is_vose:
             films_by_title[title]["any_vose"] = True
 
-    return films_by_title
+    return films_by_title, scraper_status
 
 
 # ── TMDB enrichment ───────────────────────────────────────────────────────────
@@ -1587,7 +1592,7 @@ def run() -> None:
 
     # 1. Scrape all cinemas
     log.info("Running scrapers …")
-    films = aggregate_scrapers()
+    films, scraper_status = aggregate_scrapers()
     log.info(f"Unique films before enrichment: {len(films)}")
 
     if len(films) < 10:
@@ -1684,10 +1689,10 @@ def run() -> None:
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
     # 11. Send admin confirmation email
-    send_pipeline_summary(films)
+    send_pipeline_summary(films, scraper_status)
 
 
-def send_pipeline_summary(films: dict) -> None:
+def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
     import smtplib
     from email.mime.text import MIMEText
@@ -1704,16 +1709,12 @@ def send_pipeline_summary(films: dict) -> None:
         log.warning("SMTP not configured — skipping pipeline summary email")
         return
 
-    # Films per cinema
-    cinema_counts: dict[str, int] = {}
-    for film in films.values():
-        for c in film.get("cinemas", []):
-            cid = c.get("id", "unknown")
-            cinema_counts[cid] = cinema_counts.get(cid, 0) + 1
-
-    cinema_lines = "\n".join(
-        f"  {CINEMA_META.get(cid, {}).get('name', cid):<30} {count} films"
-        for cid, count in sorted(cinema_counts.items(), key=lambda x: -x[1])
+    # Scraper status lines — always list every cinema with ✅ / ❌
+    failed = [s for s in scraper_status if not s["ok"]]
+    scraper_lines = "\n".join(
+        f"  {'✅' if s['ok'] else '❌'} {s['label']:<22} "
+        + (f"{s['count']} films" if s["ok"] else f"FAILED — {s['error'] or 'unknown error'}")
+        for s in scraper_status
     )
 
     # Subscriber counts from Supabase
@@ -1734,12 +1735,13 @@ def send_pipeline_summary(films: dict) -> None:
             log.warning(f"Could not fetch subscriber count: {exc}")
 
     now_str = datetime.now(VALENCIA_TZ).strftime("%Y-%m-%d %H:%M")
-    body = f"""whatson.movie pipeline completed successfully at {now_str}
+    status_icon = "⚠️" if failed else "✅"
+    body = f"""whatson.movie pipeline completed at {now_str}
 
-FILMS: {len(films)} total
+SCRAPERS ({len(scraper_status)} cinemas):
+{scraper_lines}
 
-Per cinema:
-{cinema_lines}
+FILMS: {len(films)} total (after deduplication & stale removal)
 
 SUBSCRIBERS (active):
   Total signed up:      {total_subs}
@@ -1750,7 +1752,8 @@ Site: https://whatson.movie/listings/
 """
 
     msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = f"✅ whatson.movie pipeline — {len(films)} films · {now_str}"
+    failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
+    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
     msg["To"]      = admin_to
 
