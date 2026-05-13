@@ -1253,7 +1253,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
         rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
         cinema_tags = "".join(
-            '<a href="' + c["website"] + '" class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</a>'
+            '<span class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</span>'
             for c in cinemas
         )
         where_es, where_en = "Dónde verla", "Where to see it"
