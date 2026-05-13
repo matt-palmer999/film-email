@@ -150,10 +150,10 @@ def main() -> None:
                 to_send.append(sub)
 
     if not to_send:
-        print("No pending verifications.")
+        print("No pending verifications.")  # ASCII only - safe
         return
 
-    print(f"Sending verification emails to {len(to_send)} subscriber(s)…")
+    print(f"Sending verification emails to {len(to_send)} subscriber(s)...")
 
     for sub in to_send:
         email = sub["email"]
@@ -165,9 +165,9 @@ def main() -> None:
                 f"subscribers?email=eq.{urllib.parse.quote(email)}",
                 {"verification_sent_at": datetime.now(timezone.utc).isoformat()}
             )
-            print(f"  ✅ Sent to {email}")
+            print(f"  [OK]  Sent to {email}")
         except Exception as exc:
-            print(f"  ❌ Failed for {email}: {exc}")
+            print(f"  [ERR] Failed for {email}: {exc}")
 
 
 if __name__ == "__main__":

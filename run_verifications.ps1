@@ -58,6 +58,9 @@ if (Test-Path $EnvFile) {
 
 Set-Location $RepoDir
 
+# Force UTF-8 output so emoji in print() doesn't crash on Windows cp1252
+$env:PYTHONIOENCODING = "utf-8"
+
 $output   = & $Python send_verifications.py 2>&1
 $exitCode = $LASTEXITCODE
 
