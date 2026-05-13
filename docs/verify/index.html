@@ -66,7 +66,7 @@
     <div class="icon">✅</div>
     <div class="title" id="success-title">¡Cuenta activada!</div>
     <div class="desc" id="success-desc">Tu email ha sido confirmado. Ahora puedes personalizar tu cartelera.</div>
-    <a href="/preferences/" class="btn" id="success-btn">Personalizar mis preferencias →</a>
+    <a href="/listings/" class="btn" id="success-btn">Ver la cartelera →</a>
   </div>
   <div id="state-error" style="display:none;">
     <div class="icon">❌</div>
@@ -87,7 +87,7 @@ const T = {
   successTitle:  { es: '¡Cuenta activada!',              en: 'Account confirmed!'                 },
   successDesc:   { es: 'Tu email ha sido confirmado. Ahora puedes personalizar tu cartelera.',
                    en: 'Your email has been confirmed. You can now customise your listings.'       },
-  successBtn:    { es: 'Personalizar mis preferencias →', en: 'Customise my preferences →'        },
+  successBtn:    { es: 'Ver la cartelera →',              en: 'View the listings →'               },
   errorTitle:    { es: 'Enlace no válido',               en: 'Invalid link'                      },
   errorDesc:     { es: 'Este enlace no es válido o ya ha caducado. Vuelve al inicio y suscríbete de nuevo para recibir un enlace nuevo.',
                    en: 'This link is invalid or has already been used. Go back to the homepage and sign up again to get a new link.' },
@@ -141,7 +141,7 @@ async function verify() {
       show('success');
 
       // Auto-redirect after 2.5 seconds
-      setTimeout(() => { window.location.href = '/preferences/'; }, 2500);
+      setTimeout(() => { window.location.href = '/listings/'; }, 2500);
     } else {
       document.getElementById('error-title').textContent = t('errorTitle');
       document.getElementById('error-desc').textContent  = t('errorDesc');
