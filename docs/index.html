@@ -1086,12 +1086,13 @@
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
             const msgEl = document.getElementById(source + '-success-msg');
             if (msgEl) {
-              msgEl.setAttribute('data-es', '✅ ¡Te hemos reconocido! Accede a tus preferencias para personalizar tu cartelera.');
-              msgEl.setAttribute('data-en', '✅ You\'re logged in! Head to preferences to customise your listings.');
+              msgEl.setAttribute('data-es', '✅ ¡Te hemos reconocido! Redirigiendo a tus preferencias…');
+              msgEl.setAttribute('data-en', '✅ You\'re logged in! Taking you to your preferences…');
               msgEl.textContent = lang === 'es'
-                ? '✅ ¡Te hemos reconocido! Accede a tus preferencias para personalizar tu cartelera.'
-                : '✅ You\'re logged in! Head to preferences to customise your listings.';
+                ? '✅ ¡Te hemos reconocido! Redirigiendo a tus preferencias…'
+                : '✅ You\'re logged in! Taking you to your preferences…';
             }
+            setTimeout(() => { window.location.href = '/preferences/'; }, 3000);
           } else if (existing.verified && !existing.active) {
             // Previously unsubscribed — re-activate and log them back in
             await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
@@ -1110,12 +1111,13 @@
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
             const msgEl = document.getElementById(source + '-success-msg');
             if (msgEl) {
-              msgEl.setAttribute('data-es', '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada.');
-              msgEl.setAttribute('data-en', '✅ Welcome back! Your subscription has been reactivated.');
+              msgEl.setAttribute('data-es', '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Redirigiendo…');
+              msgEl.setAttribute('data-en', '✅ Welcome back! Your subscription has been reactivated. Redirecting…');
               msgEl.textContent = lang === 'es'
-                ? '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada.'
-                : '✅ Welcome back! Your subscription has been reactivated.';
+                ? '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada. Redirigiendo…'
+                : '✅ Welcome back! Your subscription has been reactivated. Redirecting…';
             }
+            setTimeout(() => { window.location.href = '/preferences/'; }, 3000);
           } else {
             // Not yet verified — issue a fresh token so a new verification email is sent
             await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
