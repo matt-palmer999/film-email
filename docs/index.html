@@ -1086,11 +1086,11 @@
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
             const msgEl = document.getElementById(source + '-success-msg');
             if (msgEl) {
-              msgEl.setAttribute('data-es', '✅ ¡Ya estás suscrito! Accede a tus preferencias para personalizar tu cartelera.');
-              msgEl.setAttribute('data-en', '✅ You\'re already subscribed! Head to preferences to customise your listings.');
+              msgEl.setAttribute('data-es', '✅ ¡Te hemos reconocido! Accede a tus preferencias para personalizar tu cartelera.');
+              msgEl.setAttribute('data-en', '✅ You\'re logged in! Head to preferences to customise your listings.');
               msgEl.textContent = lang === 'es'
-                ? '✅ ¡Ya estás suscrito! Accede a tus preferencias para personalizar tu cartelera.'
-                : '✅ You\'re already subscribed! Head to preferences to customise your listings.';
+                ? '✅ ¡Te hemos reconocido! Accede a tus preferencias para personalizar tu cartelera.'
+                : '✅ You\'re logged in! Head to preferences to customise your listings.';
             }
           } else if (existing.verified && !existing.active) {
             // Previously unsubscribed — re-activate and log them back in
