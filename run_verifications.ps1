@@ -1,6 +1,6 @@
 # run_verifications.ps1
 # Finds unverified subscribers in Supabase and sends them a verification email.
-# Designed to run every 15 minutes via Windows Task Scheduler.
+# Designed to run every 2 minutes via Windows Task Scheduler.
 #
 # ONE-TIME TASK SCHEDULER SETUP
 # Open PowerShell as Administrator and run:
@@ -8,11 +8,11 @@
 #   $action  = New-ScheduledTaskAction `
 #                -Execute "powershell.exe" `
 #                -Argument "-NonInteractive -ExecutionPolicy Bypass -File `"C:\Users\TV-watchers\film-email\run_verifications.ps1`""
-#   $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 15) -Once -At (Get-Date)
+#   $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 2) -Once -At (Get-Date)
 #   $settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable
 #   Register-ScheduledTask -TaskName "WhatsonMovieVerifications" `
 #     -Action $action -Trigger $trigger -Settings $settings `
-#     -Description "Send verification emails to new whatson.movie subscribers every 15 min" `
+#     -Description "Send verification emails to new whatson.movie subscribers every 2 min" `
 #     -RunLevel Highest
 #
 # To run manually at any time: .\run_verifications.ps1

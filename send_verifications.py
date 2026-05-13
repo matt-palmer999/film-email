@@ -1,7 +1,7 @@
 """
 send_verifications.py
 Finds unverified subscribers in Supabase and sends them a verification email.
-Run every 15 minutes via Windows Task Scheduler.
+Run every 2 minutes via Windows Task Scheduler.
 
 Also handles resends: if verification_sent_at is older than 24 hours and the
 subscriber is still unverified, a fresh token is not needed — just resend.
