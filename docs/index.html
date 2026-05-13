@@ -1079,8 +1079,8 @@
           const rows = await checkRes.json();
           const existing = rows[0] || {};
 
-          if (existing.verified) {
-            // Already verified — just log them in
+          if (existing.verified && existing.active) {
+            // Already verified and active — just log them in
             const expires = new Date();
             expires.setFullYear(expires.getFullYear() + 1);
             document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
@@ -1091,6 +1091,30 @@
               msgEl.textContent = lang === 'es'
                 ? '✅ ¡Ya estás suscrito! Accede a tus preferencias para personalizar tu cartelera.'
                 : '✅ You\'re already subscribed! Head to preferences to customise your listings.';
+            }
+          } else if (existing.verified && !existing.active) {
+            // Previously unsubscribed — re-activate and log them back in
+            await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON,
+                'Authorization': `Bearer ${SUPABASE_ANON}`,
+                'Prefer': 'return=minimal',
+                'x-subscriber-email': email
+              },
+              body: JSON.stringify({ active: true, subscribed_at: new Date().toISOString() })
+            });
+            const expires = new Date();
+            expires.setFullYear(expires.getFullYear() + 1);
+            document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+            const msgEl = document.getElementById(source + '-success-msg');
+            if (msgEl) {
+              msgEl.setAttribute('data-es', '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada.');
+              msgEl.setAttribute('data-en', '✅ Welcome back! Your subscription has been reactivated.');
+              msgEl.textContent = lang === 'es'
+                ? '✅ ¡Bienvenido de vuelta! Tu suscripción ha sido reactivada.'
+                : '✅ Welcome back! Your subscription has been reactivated.';
             }
           } else {
             // Not yet verified — issue a fresh token so a new verification email is sent
