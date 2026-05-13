@@ -1669,6 +1669,7 @@ def run() -> None:
             "docs/index.html",
             "docs/preferences/index.html",
             "docs/listings/index.html",
+            "docs/verify/index.html",
         ]
         for page_path in pages_to_inject:
             if os.path.exists(page_path):

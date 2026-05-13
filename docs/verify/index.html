@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Verificando tu cuenta — whatson.movie</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+    background: #0a0810;
+    color: #f0eae0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    max-width: 440px;
+    width: 100%;
+    background: #13101e;
+    border: 1px solid #2a1f3d;
+    border-radius: 16px;
+    padding: 48px 40px;
+    text-align: center;
+  }
+  .logo { font-size: 18px; font-weight: 700; color: #f0eae0; margin-bottom: 32px; letter-spacing: -0.5px; }
+  .logo span { color: #ffb432; }
+  .icon { font-size: 48px; margin-bottom: 20px; }
+  .title { font-size: 22px; font-weight: 700; color: #f0eae0; margin-bottom: 12px; line-height: 1.3; }
+  .desc  { font-size: 14px; color: #9b8faa; line-height: 1.6; margin-bottom: 28px; }
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: #ffb432;
+    color: #0a0810;
+    font-weight: 700;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #2a1f3d;
+    border-top-color: #ffb432;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">whatson<span>.movie</span></div>
+  <div id="state-loading">
+    <div class="spinner"></div>
+    <div class="title" id="loading-title">Verificando tu cuenta…</div>
+  </div>
+  <div id="state-success" style="display:none;">
+    <div class="icon">✅</div>
+    <div class="title" id="success-title">¡Cuenta activada!</div>
+    <div class="desc" id="success-desc">Tu email ha sido confirmado. Ahora puedes personalizar tu cartelera.</div>
+    <a href="/preferences/" class="btn" id="success-btn">Personalizar mis preferencias →</a>
+  </div>
+  <div id="state-error" style="display:none;">
+    <div class="icon">❌</div>
+    <div class="title" id="error-title">Enlace no válido</div>
+    <div class="desc" id="error-desc">Este enlace de verificación no es válido o ya ha caducado. Vuelve a la página principal e introdúcelo de nuevo.</div>
+    <a href="/" class="btn" id="error-btn">Volver al inicio</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+
+const lang = navigator.language.startsWith('es') ? 'es' : 'en';
+
+const T = {
+  loadingTitle:  { es: 'Verificando tu cuenta…',         en: 'Verifying your account…'           },
+  successTitle:  { es: '¡Cuenta activada!',              en: 'Account confirmed!'                 },
+  successDesc:   { es: 'Tu email ha sido confirmado. Ahora puedes personalizar tu cartelera.',
+                   en: 'Your email has been confirmed. You can now customise your listings.'       },
+  successBtn:    { es: 'Personalizar mis preferencias →', en: 'Customise my preferences →'        },
+  errorTitle:    { es: 'Enlace no válido',               en: 'Invalid link'                      },
+  errorDesc:     { es: 'Este enlace no es válido o ya ha caducado. Vuelve al inicio y suscríbete de nuevo para recibir un enlace nuevo.',
+                   en: 'This link is invalid or has already been used. Go back to the homepage and sign up again to get a new link.' },
+  errorBtn:      { es: 'Volver al inicio',               en: 'Back to home'                      },
+};
+
+function t(key) { return T[key][lang] || T[key]['en']; }
+
+function show(state) {
+  ['loading','success','error'].forEach(s =>
+    document.getElementById('state-' + s).style.display = s === state ? '' : 'none'
+  );
+}
+
+async function verify() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+
+  document.getElementById('loading-title').textContent = t('loadingTitle');
+
+  if (!token) {
+    document.getElementById('error-title').textContent = t('errorTitle');
+    document.getElementById('error-desc').textContent  = t('errorDesc');
+    document.getElementById('error-btn').textContent   = t('errorBtn');
+    show('error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verify_subscriber`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+      },
+      body: JSON.stringify({ p_token: token })
+    });
+
+    const data = await res.json();
+
+    if (data && data.ok && data.email) {
+      // Set cv_email cookie (1 year)
+      const expires = new Date();
+      expires.setFullYear(expires.getFullYear() + 1);
+      document.cookie = `cv_email=${encodeURIComponent(data.email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+
+      document.getElementById('success-title').textContent = t('successTitle');
+      document.getElementById('success-desc').textContent  = t('successDesc');
+      document.getElementById('success-btn').textContent   = t('successBtn');
+      show('success');
+
+      // Auto-redirect after 2.5 seconds
+      setTimeout(() => { window.location.href = '/preferences/'; }, 2500);
+    } else {
+      document.getElementById('error-title').textContent = t('errorTitle');
+      document.getElementById('error-desc').textContent  = t('errorDesc');
+      document.getElementById('error-btn').textContent   = t('errorBtn');
+      show('error');
+    }
+  } catch (err) {
+    console.error('Verification error:', err);
+    document.getElementById('error-title').textContent = t('errorTitle');
+    document.getElementById('error-desc').textContent  = t('errorDesc');
+    document.getElementById('error-btn').textContent   = t('errorBtn');
+    show('error');
+  }
+}
+
+verify();
+</script>
+</body>
+</html>

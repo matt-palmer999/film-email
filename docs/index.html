@@ -791,11 +791,7 @@
         <button type="button" class="signup-btn" onclick="submitSignup('hero')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
       </div>
       <div class="signup-success" id="hero-success">
-        <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
-        </div>
+        <span id="hero-success-msg" data-es="📧 ¡Casi listo! Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta." data-en="📧 Almost there! We've sent you a confirmation email. Click the link inside to activate your account.">📧 ¡Casi listo! Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta.</span>
       </div>
       <div class="signup-error" id="hero-error"></div>
       <p class="signup-note" data-es="Sin spam. Sin compromiso. Cancela cuando quieras." data-en="No spam. No commitment. Unsubscribe anytime.">Sin spam. Sin compromiso. Cancela cuando quieras.</p>
@@ -982,11 +978,7 @@
         <button type="button" class="signup-btn" onclick="submitSignup('cta')" data-es="Apuntarme" data-en="Subscribe">Apuntarme</button>
       </div>
       <div class="signup-success" id="cta-success">
-        <span data-es="✅ ¡Apuntado! Te llegará la primera edición este jueves." data-en="✅ You're in! Your first edition arrives this Thursday.">✅ ¡Apuntado! Te llegará la primera edición este jueves.</span>
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <a href="./listings/" style="display:inline-block;padding:10px 24px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:6px;" data-es="Ver cartelera de esta semana →" data-en="View this week's listings →">Ver cartelera de esta semana →</a>
-          <a href="./preferences/" style="font-size:12px;color:#9b8faa;text-decoration:none;" data-es="⚙️ Personalizar mis preferencias" data-en="⚙️ Customise my preferences">⚙️ Personalizar mis preferencias</a>
-        </div>
+        <span id="cta-success-msg" data-es="📧 ¡Casi listo! Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta." data-en="📧 Almost there! We've sent you a confirmation email. Click the link inside to activate your account.">📧 ¡Casi listo! Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta.</span>
       </div>
       <div class="signup-error" id="cta-error"></div>
       <p class="signup-note" data-es="Sin spam. Sin compromiso. Cancela cuando quieras." data-en="No spam. No commitment. Unsubscribe anytime.">Sin spam. Sin compromiso. Cancela cuando quieras.</p>
@@ -1057,6 +1049,8 @@
       btn.textContent = lang === 'es' ? 'Enviando...' : 'Sending...';
 
       try {
+        const token = crypto.randomUUID();
+
         const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
           method: 'POST',
           headers: {
@@ -1069,41 +1063,60 @@
             email: email,
             lang: lang,
             source: source,
-            active: true,
+            active: false,
+            verified: false,
+            verification_token: token,
             subscribed_at: new Date().toISOString()
           })
         });
 
-        // If email already exists, reactivate the existing row
         if (res.status === 409) {
-          await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_ANON,
-              'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'Prefer': 'return=minimal',
-              'x-subscriber-email': email
-            },
-            body: JSON.stringify({ active: true, subscribed_at: new Date().toISOString() })
-          });
-        }
+          // Email already exists — check if already verified
+          const checkRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}&select=verified,active`,
+            { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`, 'x-subscriber-email': email } }
+          );
+          const rows = await checkRes.json();
+          const existing = rows[0] || {};
 
-        // 201 = created, 409 = already existed (now reactivated)
-        if (res.ok || res.status === 201 || res.status === 409) {
-          // Set a cookie so the preferences page knows who this is
-          const expires = new Date();
-          expires.setFullYear(expires.getFullYear() + 1);
-          document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-          formWrap.style.display = 'none';
-          successEl.style.display = 'block';
-          const browseLine = document.getElementById('browse-line');
-          if (browseLine) browseLine.style.display = 'none';
-        } else {
+          if (existing.verified) {
+            // Already verified — just log them in
+            const expires = new Date();
+            expires.setFullYear(expires.getFullYear() + 1);
+            document.cookie = `cv_email=${encodeURIComponent(email)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+            const msgEl = document.getElementById(source + '-success-msg');
+            if (msgEl) {
+              msgEl.setAttribute('data-es', '✅ ¡Ya estás suscrito! Accede a tus preferencias para personalizar tu cartelera.');
+              msgEl.setAttribute('data-en', '✅ You\'re already subscribed! Head to preferences to customise your listings.');
+              msgEl.textContent = lang === 'es'
+                ? '✅ ¡Ya estás suscrito! Accede a tus preferencias para personalizar tu cartelera.'
+                : '✅ You\'re already subscribed! Head to preferences to customise your listings.';
+            }
+          } else {
+            // Not yet verified — issue a fresh token so a new verification email is sent
+            await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${encodeURIComponent(email)}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON,
+                'Authorization': `Bearer ${SUPABASE_ANON}`,
+                'Prefer': 'return=minimal',
+                'x-subscriber-email': email
+              },
+              body: JSON.stringify({ verification_token: token, verification_sent_at: null })
+            });
+          }
+        } else if (!res.ok) {
           const body = await res.text();
           console.error('Signup failed:', res.status, body);
           throw new Error(`Status ${res.status}: ${body}`);
         }
+
+        formWrap.style.display = 'none';
+        successEl.style.display = 'block';
+        const browseLine = document.getElementById('browse-line');
+        if (browseLine) browseLine.style.display = 'none';
+
       } catch (err) {
         btn.disabled = false;
         btn.textContent = lang === 'es' ? 'Apuntarme' : 'Subscribe';
