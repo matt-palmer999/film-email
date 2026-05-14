@@ -1692,9 +1692,6 @@ def run() -> None:
     # 11. Send admin confirmation email
     send_pipeline_summary(films, scraper_status)
 
-    # 12. Send weekly subscriber emails (Thursdays only, or when FORCE_EMAIL=1)
-    send_weekly_emails(films)
-
 
 def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
