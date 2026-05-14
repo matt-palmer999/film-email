@@ -1692,6 +1692,9 @@ def run() -> None:
     # 11. Send admin confirmation email
     send_pipeline_summary(films, scraper_status)
 
+    # 12. Send weekly subscriber emails (Thursdays only, or when FORCE_EMAIL=1)
+    send_weekly_emails(films)
+
 
 def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
@@ -1767,6 +1770,88 @@ Site: https://whatson.movie/listings/
         log.info(f"Pipeline summary email sent to {admin_to}")
     except Exception as exc:
         log.warning(f"Could not send pipeline summary email: {exc}")
+
+
+def send_weekly_emails(films: dict) -> None:
+    """Send the weekly subscriber email on Thursdays (or when FORCE_EMAIL=1)."""
+    from datetime import datetime as _dt
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText as _MIMEText
+
+    is_thursday  = _dt.now().weekday() == 3   # 0=Mon … 3=Thu
+    force_email  = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
+
+    if not (is_thursday or force_email):
+        log.info(f"Not Thursday (weekday={_dt.now().weekday()}) — skipping weekly email send")
+        return
+
+    # Import email helpers from scraper.py (same repo)
+    try:
+        from scraper import fetch_subscribers, apply_subscriber_filters, build_full_email, week_range_en, week_range_es
+    except Exception as exc:
+        log.warning(f"Could not import email helpers from scraper.py: {exc} — skipping weekly send")
+        return
+
+    smtp_host = os.environ.get("SMTP_HOST", "")
+    smtp_port = int(os.environ.get("SMTP_PORT", 587))
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
+    from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
+    from_name = os.environ.get("FROM_NAME", "whatson.movie")
+
+    if not all([smtp_host, smtp_user, smtp_pass]):
+        log.warning("SMTP not configured — skipping weekly email send")
+        return
+
+    anchor    = _dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    page_url  = "https://whatson.movie/listings/"
+    prefs_url = "https://whatson.movie/preferences/"
+    unsub_url = "https://whatson.movie/preferences/"
+
+    subscribers = fetch_subscribers()
+    if not subscribers:
+        log.info("No email-enabled subscribers found — skipping weekly send")
+        return
+
+    log.info(f"Sending weekly email to {len(subscribers)} subscriber(s)...")
+    sent = 0
+    errors = 0
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            for sub in subscribers:
+                email = sub.get("email", "").strip()
+                if not email:
+                    continue
+                lang = sub.get("lang") or "es"
+                try:
+                    filtered = apply_subscriber_filters(films, sub)
+                    html, subject = build_full_email(filtered, anchor, page_url, prefs_url, unsub_url, prefs=sub)
+                    plain = (
+                        f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
+                        if lang == "es" else
+                        f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
+                    )
+                    msg = MIMEMultipart("alternative")
+                    msg["Subject"] = subject
+                    msg["From"]    = f"{from_name} <{from_addr}>"
+                    msg["To"]      = email
+                    msg.attach(_MIMEText(plain, "plain", "utf-8"))
+                    msg.attach(_MIMEText(html,  "html",  "utf-8"))
+                    server.sendmail(from_addr, [email], msg.as_string())
+                    log.info(f"  [OK]  Weekly email sent to {email}")
+                    sent += 1
+                except Exception as exc:
+                    log.warning(f"  [ERR] Failed to send to {email}: {exc}")
+                    errors += 1
+    except Exception as exc:
+        log.warning(f"SMTP connection failed: {exc}")
+        return
+
+    log.info(f"Weekly email send complete: {sent} sent, {errors} errors")
 
 
 if __name__ == "__main__":
