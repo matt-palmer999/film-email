@@ -63,10 +63,10 @@ if (Test-Path $EnvFile) {
 Set-Location $RepoDir
 Write-Log "Running pipeline.py ..."
 
-$output = & $Python pipeline.py 2>&1
+# Write pipeline output directly to log as it runs (not buffered)
+$pyLog = Join-Path $LogDir "pipeline_py.log"
+& $Python -u pipeline.py 2>&1 | Tee-Object -FilePath $pyLog -Append | ForEach-Object { Write-Log "  $_" }
 $exitCode = $LASTEXITCODE
-
-$output | ForEach-Object { Write-Log "  $_" }
 
 if ($exitCode -ne 0) {
     Write-Log "ERROR: pipeline.py exited with code $exitCode - aborting git push"
