@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="YO NO MORIRÉ DE AMOR — Cartelera Valencia" data-en="YO NO MORIRÉ DE AMOR — Cartelera Valencia">YO NO MORIRÉ DE AMOR — Cartelera Valencia</title>
+<title data-es="YO NO MORIRÉ DE AMOR — Cartelera Valencia" data-en="Yo no moriré de amor — Cartelera Valencia">YO NO MORIRÉ DE AMOR — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/fbb66dc23e02ccd809663d7e00992a7f.jpg" alt="YO NO MORIRÉ DE AMOR" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/f5O7hMhzug2qOCFIDwRCro4NqFL.jpg" alt="YO NO MORIRÉ DE AMOR" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="YO NO MORIRÉ DE AMOR" data-en="YO NO MORIRÉ DE AMOR">YO NO MORIRÉ DE AMOR</div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span></div>
+      <div class="hero-title" data-es="YO NO MORIRÉ DE AMOR" data-en="Yo no moriré de amor">YO NO MORIRÉ DE AMOR</div>
       
-      <div class="hero-meta"><span data-es="" data-en=""></span></div>
-      <div class="hero-synopsis" data-es="A sus 18 años, Claudia no quiere ser una heroína. La enfermedad de su madre irrumpe como una tormenta silenciosa que obliga a redefinir los roles en una familia que lleva tiempo desconectada. Entre el deber de cuidar y el deseo de vivir como cualquier chica de su edad, Claudia busca un modo de habitar esa nueva realidad, que transformará los vínculos entre toda la familia." data-en="A sus 18 años, Claudia no quiere ser una heroína. La enfermedad de su madre irrumpe como una tormenta silenciosa que obliga a redefinir los roles en una familia que lleva tiempo desconectada. Entre el deber de cuidar y el deseo de vivir como cualquier chica de su edad, Claudia busca un modo de habitar esa nueva realidad, que transformará los vínculos entre toda la familia.">A sus 18 años, Claudia no quiere ser una heroína. La enfermedad de su madre irrumpe como una tormenta silenciosa que obliga a redefinir los roles en una familia que lleva tiempo desconectada. Entre el deber de cuidar y el deseo de vivir como cualquier chica de su edad, Claudia busca un modo de habitar esa nueva realidad, que transformará los vínculos entre toda la familia.</div>
+      <div class="hero-meta"><span data-es="ES · 2026 · 91 min" data-en="ES · 2026 · Drama · 91 min">ES · 2026 · 91 min</span></div>
+      <div class="hero-synopsis" data-es="A sus 18 años, Claudia no quiere ser la heroína de su familia. La enfermedad de su madre irrumpe en su casa como una tormenta silenciosa. Sin embargo, Claudia solo quiere vivir como cualquier persona de su edad. Entre el deber familiar y el anhelo de explotar su juventud, Claudia tendrá que elegir cómo amar sin renunciar a sí misma." data-en="At 18, Claudia doesn&#39;t want to be a hero. Her mother&#39;s illness erupts like a silent storm, forcing a redefinition of roles in a family long estranged. Torn between the duty to care for her mother and the desire to live like any other girl her age, Claudia searches for a way to navigate this new reality, which will transform the bonds between the entire family.">A sus 18 años, Claudia no quiere ser la heroína de su familia. La enfermedad de su madre irrumpe en su casa como una tormenta silenciosa. Sin embargo, Claudia solo quiere vivir como cualquier persona de su edad. Entre el deber familiar y el anhelo de explotar su juventud, Claudia tendrá que elegir cómo amar sin renunciar a sí misma.</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'YO NO MORIRÉ DE AMOR' : 'YO NO MORIRÉ DE AMOR') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Yo no moriré de amor' : 'YO NO MORIRÉ DE AMOR') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

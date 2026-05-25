@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="CALLE MÁLAGA — Cartelera Valencia" data-en="CALLE MÁLAGA — Cartelera Valencia">CALLE MÁLAGA — Cartelera Valencia</title>
+<title data-es="CALLE MÁLAGA — Cartelera Valencia" data-en="Calle Malaga — Cartelera Valencia">CALLE MÁLAGA — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/2cfe1de46f38f84cf2cf62d1adfec7b8.jpg" alt="CALLE MÁLAGA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/fWagBXNDk44UaupYtwQOAvDwGiT.jpg" alt="CALLE MÁLAGA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="CALLE MÁLAGA" data-en="CALLE MÁLAGA">CALLE MÁLAGA</div>
-      
-      <div class="hero-meta"><span data-es="116 min" data-en="116 min">116 min</span></div>
-      <div class="hero-synopsis" data-es="María Ángeles (Carmen Maura) es una española de 79 años que vive sola en Tánger, en el norte de Marruecos, donde disfruta de su ciudad y de su vida diaria. Su vida da un giro cuando su hija Clara (Marta Etura) llega desde Madrid para vender el apartamento en el que siempre ha vivido. Decidida a quedarse en la ciudad que la vio crecer, hará todo lo posible para mantener su hogar y recuperar los obj" data-en="María Ángeles (Carmen Maura) es una española de 79 años que vive sola en Tánger, en el norte de Marruecos, donde disfruta de su ciudad y de su vida diaria. Su vida da un giro cuando su hija Clara (Marta Etura) llega desde Madrid para vender el apartamento en el que siempre ha vivido. Decidida a quedarse en la ciudad que la vio crecer, hará todo lo posible para mantener su hogar y recuperar los obj">María Ángeles (Carmen Maura) es una española de 79 años que vive sola en Tánger, en el norte de Marruecos, donde disfruta de su ciudad y de su vida diaria. Su vida da un giro cuando su hija Clara (Marta Etura) llega desde Madrid para vender el apartamento en el que siempre ha vivido. Decidida a quedarse en la ciudad que la vio crecer, hará todo lo posible para mantener su hogar y recuperar los obj</div>
+      <div class="badges"><span class="score-badge">⭐ 7.2</span><span class="rating-badge">+12</span></div>
+      <div class="hero-title" data-es="CALLE MÁLAGA" data-en="Calle Malaga">CALLE MÁLAGA</div>
+      <div class="orig-title" translate="no">Calle Málaga</div>
+      <div class="hero-meta"><span data-es="BE, FR, MA, DE, ES · 2025 · 116 min" data-en="BE, FR, MA, DE, ES · 2025 · Drama · 116 min">BE, FR, MA, DE, ES · 2025 · 116 min</span></div>
+      <div class="hero-synopsis" data-es="María Ángeles, una mujer de 79 años, vive sola en Tánger disfrutando de su rutina y la ciudad que la vio crecer. Cuando su hija llega desde Madrid para vender el apartamento familiar, ella se resiste a perder su hogar y lucha por recuperar sus pertenencias y recuerdos." data-en="Maria Angeles, a 79-year-old Spanish woman, lives alone in Tangier, Morocco, and enjoys her daily routine. However, her life is turned upside down when her daughter arrives from Madrid to sell the apartment in which she has always lived. Determined to stay, she does everything she can to get her home and her belongings back and, unexpectedly, rediscovers love and sensuality.">María Ángeles, una mujer de 79 años, vive sola en Tánger disfrutando de su rutina y la ciudad que la vio crecer. Cuando su hija llega desde Madrid para vender el apartamento familiar, ella se resiste a perder su hogar y lucha por recuperar sus pertenencias y recuerdos.</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'CALLE MÁLAGA' : 'CALLE MÁLAGA') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Calle Malaga' : 'CALLE MÁLAGA') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

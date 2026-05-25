@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="DOS DÍAS — Cartelera Valencia" data-en="DOS DÍAS — Cartelera Valencia">DOS DÍAS — Cartelera Valencia</title>
+<title data-es="DOS DÍAS — Cartelera Valencia" data-en="Dos días — Cartelera Valencia">DOS DÍAS — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/da1ad6893751648bf48e78e350179b5b.jpg" alt="DOS DÍAS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/A61TrD9ai6Wnqn2vCRPZamE2LPh.jpg" alt="DOS DÍAS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="DOS DÍAS" data-en="DOS DÍAS">DOS DÍAS</div>
+      <div class="badges"><span class="rating-badge">TP</span></div>
+      <div class="hero-title" data-es="DOS DÍAS" data-en="Dos días">DOS DÍAS</div>
       
-      <div class="hero-meta"><span data-es="88 min" data-en="88 min">88 min</span></div>
-      <div class="hero-synopsis" data-es="Jose Antonio tiene 89 años y está perdiendo la memoria, pero se resiste a depender de los demás y dejar de hacer lo que lleva toda una vida haciendo. Aunque su familia se lo prohíbe, convence a su amigo Mindo, al que hace años que no ve, para salir a pescar en la barca. La salida se complica cuando se quedan sin gasolina y, con la noche y la niebla cayendo, quedan a la deriva en medio del mar. Atr" data-en="Jose Antonio tiene 89 años y está perdiendo la memoria, pero se resiste a depender de los demás y dejar de hacer lo que lleva toda una vida haciendo. Aunque su familia se lo prohíbe, convence a su amigo Mindo, al que hace años que no ve, para salir a pescar en la barca. La salida se complica cuando se quedan sin gasolina y, con la noche y la niebla cayendo, quedan a la deriva en medio del mar. Atr">Jose Antonio tiene 89 años y está perdiendo la memoria, pero se resiste a depender de los demás y dejar de hacer lo que lleva toda una vida haciendo. Aunque su familia se lo prohíbe, convence a su amigo Mindo, al que hace años que no ve, para salir a pescar en la barca. La salida se complica cuando se quedan sin gasolina y, con la noche y la niebla cayendo, quedan a la deriva en medio del mar. Atr</div>
+      <div class="hero-meta"><span data-es="ES · 2026" data-en="ES · 2026">ES · 2026</span></div>
+      <div class="hero-synopsis" data-es="Jose Antonio, 89 años, está perdiendo la memoria. Aunque su familia se lo prohíbe convence a su amigo Mindo para salir a pescar en la barca. Juntos quedan a la deriva en el mar, lo que les obliga a lidiar con la vejez y el paso del tiempo." data-en="Jose Antonio tiene 89 años y está perdiendo la memoria, pero se resiste a depender de los demás y dejar de hacer lo que lleva toda una vida haciendo. Aunque su familia se lo prohíbe, convence a su amigo Mindo, al que hace años que no ve, para salir a pescar en la barca. La salida se complica cuando se quedan sin gasolina y, con la noche y la niebla cayendo, quedan a la deriva en medio del mar. Atr">Jose Antonio, 89 años, está perdiendo la memoria. Aunque su familia se lo prohíbe convence a su amigo Mindo para salir a pescar en la barca. Juntos quedan a la deriva en el mar, lo que les obliga a lidiar con la vejez y el paso del tiempo.</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'DOS DÍAS' : 'DOS DÍAS') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Dos días' : 'DOS DÍAS') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="HUGO 24 — Cartelera Valencia" data-en="HUGO 24 — Cartelera Valencia">HUGO 24 — Cartelera Valencia</title>
+<title data-es="HUGO 24 — Cartelera Valencia" data-en="Hugo 24 — Cartelera Valencia">HUGO 24 — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cineslys.reservaentradas.com/cineslys/obj/LCinesD_dat/eventos/JPg003y1.jpg" alt="HUGO 24" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/5zRjTzZEd8yrC7crED3WOHr6mF6.jpg" alt="HUGO 24" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="HUGO 24" data-en="HUGO 24">HUGO 24</div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 6.0</span></div>
+      <div class="hero-title" data-es="HUGO 24" data-en="Hugo 24">HUGO 24</div>
       
-      <div class="hero-meta"><span data-es="93 min" data-en="93 min">93 min</span></div>
-      <div class="hero-synopsis" data-es="" data-en=""></div>
+      <div class="hero-meta"><span data-es="ES · 2026 · 91 min" data-en="ES · 2026 · Drama, Thriller · 91 min">ES · 2026 · 91 min</span></div>
+      <div class="hero-synopsis" data-es="En las 24 horas previas a su cumpleaños, Hugo, un joven perdido entre la inmadurez y el vértigo a crecer, se enfrenta a un inminente deshaucio y a la sensación constante de abandono. Con la ayuda de su mejor amigo, emprende una carrera contrarreloj para salvar su hogar y, sin saberlo, dar el primer paso hacia la madurez." data-en="Hugo is 23 and still hasn&#39;t grown up. On the eve of his 24th birthday, he faces adulthood: he&#39;s unemployed, but goes to an interview at a real estate agency, a dream job that would allow him to wear a suit, something that reminds him of his absent father. He carries a deep fear of abandonment: his mother is in prison, his girlfriend is leaving, and his family is falling apart. When his landlord th">En las 24 horas previas a su cumpleaños, Hugo, un joven perdido entre la inmadurez y el vértigo a crecer, se enfrenta a un inminente deshaucio y a la sensación constante de abandono. Con la ayuda de su mejor amigo, emprende una carrera contrarreloj para salvar su hogar y, sin saberlo, dar el primer paso hacia la madurez.</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'HUGO 24' : 'HUGO 24') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Hugo 24' : 'HUGO 24') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

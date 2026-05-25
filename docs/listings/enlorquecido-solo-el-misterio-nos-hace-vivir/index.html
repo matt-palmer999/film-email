@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR — Cartelera Valencia" data-en="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR — Cartelera Valencia">ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR — Cartelera Valencia</title>
+<title data-es="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR — Cartelera Valencia" data-en="Enlorquecido: Solo el misterio nos hace vivir — Cartelera Valencia">ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -82,13 +82,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/c927f95eb312e4ccd6771624479389f8.jpg" alt="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/7TFCQFpmcKaoOXfa98oL84rTMea.jpg" alt="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR" data-en="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR">ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR</div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="rating-badge">TP</span></div>
+      <div class="hero-title" data-es="ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR" data-en="Enlorquecido: Solo el misterio nos hace vivir">ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR</div>
       
-      <div class="hero-meta"><span data-es="" data-en=""></span></div>
-      <div class="hero-synopsis" data-es="Miguel Poveda emprende un viaje real y profundo tras los pasos de Federico García Lorca. No como un homenaje distante, sino como una búsqueda vital: la necesidad de iluminar los lugares que el poeta habitó, de poner placas donde no las hay, de nombrar lo que ha sido olvidado. Pero también  y sobre todo  de entenderse a sí mismo a través de la figura que lo ha marcado desde siempre. A lo largo de v" data-en="Miguel Poveda emprende un viaje real y profundo tras los pasos de Federico García Lorca. No como un homenaje distante, sino como una búsqueda vital: la necesidad de iluminar los lugares que el poeta habitó, de poner placas donde no las hay, de nombrar lo que ha sido olvidado. Pero también  y sobre todo  de entenderse a sí mismo a través de la figura que lo ha marcado desde siempre. A lo largo de v">Miguel Poveda emprende un viaje real y profundo tras los pasos de Federico García Lorca. No como un homenaje distante, sino como una búsqueda vital: la necesidad de iluminar los lugares que el poeta habitó, de poner placas donde no las hay, de nombrar lo que ha sido olvidado. Pero también  y sobre todo  de entenderse a sí mismo a través de la figura que lo ha marcado desde siempre. A lo largo de v</div>
+      <div class="hero-meta"><span data-es="ES · 2026 · 87 min" data-en="ES · 2026 · Documentary · 87 min">ES · 2026 · 87 min</span></div>
+      <div class="hero-synopsis" data-es="Miguel Poveda emprende un viaje real y profundo tras los pasos de Federico García Lorca. No como un homenaje distante, sino como una búsqueda vital: la necesidad de iluminar los lugares que el poeta habitó, de poner placas donde no las hay, de nombrar lo que ha sido olvidado. Pero también —y sobre todo— de entenderse a sí mismo a través de la figura que lo ha marcado desde siempre. A lo largo de v" data-en="Miguel Poveda embarks on an intimate and personal journey following the footsteps of Federico García Lorca. Rather than a standard tribute, the film is a quest to illuminate forgotten places—from Granada and Madrid to Montevideo and Havana—and understand the artist&#39;s own connection to the poet&#39;s legacy. Through music, memory, and poetry, Enlorquecido explores the bond between two artists united by">Miguel Poveda emprende un viaje real y profundo tras los pasos de Federico García Lorca. No como un homenaje distante, sino como una búsqueda vital: la necesidad de iluminar los lugares que el poeta habitó, de poner placas donde no las hay, de nombrar lo que ha sido olvidado. Pero también —y sobre todo— de entenderse a sí mismo a través de la figura que lo ha marcado desde siempre. A lo largo de v</div>
     </div>
   </div>
 
@@ -130,7 +130,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR' : 'ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Enlorquecido: Solo el misterio nos hace vivir' : 'ENLORQUECIDO: SOLO EL MISTERIO NOS HACE VIVIR') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
