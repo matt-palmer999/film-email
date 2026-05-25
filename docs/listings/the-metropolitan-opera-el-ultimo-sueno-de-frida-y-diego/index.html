@@ -185,6 +185,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
   const params  = new URLSearchParams(window.location.search);
+  const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
   const isClassicFilm = params.get('classic') === 'true';
   const alwaysClassics = params.get('classics') === 'true';
@@ -207,7 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
           msg.className = 'no-times';
           msg.setAttribute('data-es', 'Sin sesiones este día');
           msg.setAttribute('data-en', 'No screenings this day');
-          msg.textContent = 'Sin sesiones este día';
+          msg.textContent = _uiLang() === 'en' ? 'No screenings this day' : 'Sin sesiones este día';
           panel.appendChild(msg);
         } else {
           noTimesEl.style.display = '';
@@ -243,7 +244,7 @@ window.addEventListener('DOMContentLoaded', () => {
           msg.className = 'no-times';
           msg.setAttribute('data-es', 'Sin sesiones VOSE este día');
           msg.setAttribute('data-en', 'No VOSE screenings this day');
-          msg.textContent = 'Sin sesiones VOSE este día';
+          msg.textContent = _uiLang() === 'en' ? 'No VOSE screenings this day' : 'Sin sesiones VOSE este día';
           panel.appendChild(msg);
         } else {
           noTimesEl.style.display = '';
