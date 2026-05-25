@@ -309,25 +309,35 @@ def aggregate_scrapers() -> tuple[dict, list]:
                     f["meta"] = f"{duration} min"
 
         # Add or merge cinema entry
+        # VOSE and dubbed showtimes are kept in separate buckets so the
+        # detail page can show per-button data-vose attributes and filter
+        # individual time slots rather than whole cinema rows.
         existing = next((c for c in films_by_title[title]["cinemas"] if c["id"] == cinema_id), None)
         if existing:
+            target_bucket_key = "vose_showtimes" if is_vose else "showtimes"
             for d, times in showtimes_by_date.items():
-                bucket = existing["showtimes"].setdefault(d, [])
+                bucket = existing[target_bucket_key].setdefault(d, [])
                 for t in times:
                     if t not in bucket:
                         bucket.append(t)
-                existing["showtimes"][d].sort()
+                existing[target_bucket_key][d].sort()
             if is_vose:
                 existing["vose"] = True
         else:
-            films_by_title[title]["cinemas"].append({
-                "id":        cinema_id,
-                "name":      meta_info.get("name", cinema_id),
-                "website":   meta_info.get("website", ""),
-                "type":      meta_info.get("type", "multiplex"),
-                "vose":      is_vose,
-                "showtimes": showtimes_by_date,
-            })
+            entry = {
+                "id":             cinema_id,
+                "name":           meta_info.get("name", cinema_id),
+                "website":        meta_info.get("website", ""),
+                "type":           meta_info.get("type", "multiplex"),
+                "vose":           is_vose,
+                "showtimes":      {},
+                "vose_showtimes": {},
+            }
+            if is_vose:
+                entry["vose_showtimes"] = showtimes_by_date
+            else:
+                entry["showtimes"] = showtimes_by_date
+            films_by_title[title]["cinemas"].append(entry)
 
         if is_vose:
             films_by_title[title]["any_vose"] = True
@@ -945,21 +955,31 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     for i, day in enumerate(days):
         active = "active" if i == 0 else ""
         dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
-        has_shows = any(c.get("showtimes", {}).get(dk) for c in film["cinemas"])
+        has_shows = any(
+            c.get("showtimes", {}).get(dk) or c.get("vose_showtimes", {}).get(dk)
+            for c in film["cinemas"]
+        )
         show_class = "has-shows" if has_shows else ""
         tab_btns += f'<button class="day-tab {active} {show_class}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
         cinema_rows = ""
         for c in film["cinemas"]:
-            times = c.get("showtimes", {}).get(day["key"], [])
-            if not times:
+            dubbed = c.get("showtimes", {}).get(day["key"], [])
+            vose   = c.get("vose_showtimes", {}).get(day["key"], [])
+            # Merge into sorted list of (time, is_vose) tuples
+            all_times = sorted(
+                [(t, False) for t in dubbed] + [(t, True) for t in vose],
+                key=lambda x: x[0]
+            )
+            if not all_times:
                 continue
             vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
             time_btns  = "".join(
-                f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}">{t}</button>'
-                for t in times
+                f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{"true" if iv else "false"}">{t}</button>'
+                for t, iv in all_times
             )
-            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
+            vose_attr    = "true" if c["vose"] else "false"
+            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
 
         if not cinema_rows:
             cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
@@ -1183,6 +1203,42 @@ window.addEventListener('DOMContentLoaded', () => {{
           msg.setAttribute('data-es', 'Sin sesiones este día');
           msg.setAttribute('data-en', 'No screenings this day');
           msg.textContent = 'Sin sesiones este día';
+          panel.appendChild(msg);
+        }} else {{
+          noTimesEl.style.display = '';
+        }}
+        const tab = document.querySelector(`.day-tab[data-day="${{dayKey}}"]`);
+        if (tab) tab.classList.remove('has-shows');
+      }} else {{
+        if (noTimesEl) noTimesEl.style.display = 'none';
+      }}
+    }});
+  }}
+  const voseFilter = params.get('vose') === 'true';
+  if (voseFilter) {{
+    document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
+      if (row.style.display === 'none') return; // already hidden by cinemas filter
+      const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
+      btns.forEach(btn => {{
+        if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
+      }});
+      if (btns.filter(b => b.style.display !== 'none').length === 0) {{
+        row.style.display = 'none';
+      }}
+    }});
+    // Update no-times messages and tab indicators
+    document.querySelectorAll('.day-panel').forEach(panel => {{
+      const dayKey = panel.id.replace('day-', '');
+      const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
+                               .filter(r => r.style.display !== 'none');
+      const noTimesEl = panel.querySelector('.no-times');
+      if (visibleRows.length === 0) {{
+        if (!noTimesEl) {{
+          const msg = document.createElement('div');
+          msg.className = 'no-times';
+          msg.setAttribute('data-es', 'Sin sesiones VOSE este día');
+          msg.setAttribute('data-en', 'No VOSE screenings this day');
+          msg.textContent = 'Sin sesiones VOSE este día';
           panel.appendChild(msg);
         }} else {{
           noTimesEl.style.display = '';
