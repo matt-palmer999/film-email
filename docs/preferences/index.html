@@ -643,16 +643,6 @@
           <div class="toggle-switch"></div>
         </div>
 
-        <!-- ALWAYS SHOW CLASSICS -->
-        <div class="toggle-row" id="toggle-classics" onclick="togglePref('classics')">
-          <div class="toggle-icon">🎭</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Mostrar siempre clásicos" data-en="Always show classics">Mostrar siempre clásicos</div>
-            <div class="toggle-desc" data-es="Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos" data-en="Show arthouse and classic re-releases regardless of other filters">Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
-
         <!-- MIN RATING -->
         <div class="toggle-row" id="toggle-rating" onclick="togglePref('rating_filter')">
           <div class="toggle-icon">⭐</div>
@@ -774,7 +764,6 @@
       family_only:  false,
       evening_only: false,
       new_only:     false,
-      classics:     false,
       rating_filter: false,
       min_rating:   7.0,
       cinemas:      CINEMAS.map(c => c.id),
@@ -834,7 +823,6 @@
         prefs.family_only  = sub.family_only  || false;
         prefs.evening_only = sub.evening_only || false;
         prefs.new_only     = sub.new_only     || false;
-        prefs.classics     = sub.classics     || false;
         prefs.rating_filter = sub.rating_filter || false;
         prefs.min_rating   = sub.min_rating   || 7.0;
         prefs.cinemas      = sub.cinemas      || CINEMAS.map(c => c.id);
@@ -858,7 +846,6 @@
       document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
       document.getElementById('toggle-evening').classList.toggle('on', prefs.evening_only);
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
-      document.getElementById('toggle-classics').classList.toggle('on', prefs.classics);
       document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
       document.getElementById('toggle-email').classList.toggle('on', prefs.email_enabled);
 
@@ -966,7 +953,6 @@
               family_only:  prefs.family_only,
               evening_only: prefs.evening_only,
               new_only:     prefs.new_only,
-              classics:     prefs.classics,
               rating_filter: prefs.rating_filter,
               min_rating:   prefs.min_rating,
               cinemas:       prefs.cinemas,
@@ -990,7 +976,6 @@
         if (prefs.new_only)      p.set('new',       'true');
         if (prefs.family_only)   p.set('family',    'true');
         if (prefs.evening_only)  p.set('evening',   'true');
-        if (prefs.classics)      p.set('classics',  'true');
         if (prefs.rating_filter) p.set('min_rating', prefs.min_rating || 7);
         const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor','cinesa'];
         const missing = allCinemas.filter(c => !prefs.cinemas.includes(c));
