@@ -44,6 +44,20 @@ if ((Test-Path $LogFile) -and (Get-Item $LogFile).Length -gt 5MB) {
 
 Write-Log "=== Pipeline starting ==="
 
+# Wait for DNS to be available (the task may fire before the network stack is fully ready
+# when the laptop wakes up or turns on after missing the 8am scheduled trigger).
+$dnsReady = $false
+for ($i = 0; $i -lt 24; $i++) {
+    try { [System.Net.Dns]::GetHostEntry("www.kinepolis.es") | Out-Null; $dnsReady = $true; break }
+    catch { }
+    Start-Sleep -Seconds 5
+}
+if (-not $dnsReady) {
+    Write-Log "ERROR: DNS not ready after 2 minutes - aborting"
+    exit 1
+}
+Write-Log "Network ready."
+
 # Load .env
 if (Test-Path $EnvFile) {
     Get-Content $EnvFile | Where-Object { $_ -match '^\s*[^#\s]' -and $_ -match '=' } | ForEach-Object {
@@ -64,8 +78,13 @@ Set-Location $RepoDir
 Write-Log "Running pipeline.py ..."
 
 # Write pipeline output directly to log as it runs (not buffered)
-$pyLog = Join-Path $LogDir "pipeline_py.log"
-& $Python -u pipeline.py 2>&1 | Tee-Object -FilePath $pyLog -Append | ForEach-Object { Write-Log "  $_" }
+# Use UTF-8 (no BOM) so the monitoring routine can read the log with standard tools.
+$pyLog  = Join-Path $LogDir "pipeline_py.log"
+$utf8nb = New-Object System.Text.UTF8Encoding $false
+& $Python -u pipeline.py 2>&1 | ForEach-Object {
+    [System.IO.File]::AppendAllText($pyLog, "$_`r`n", $utf8nb)
+    Write-Log "  $_"
+}
 $exitCode = $LASTEXITCODE
 
 if ($exitCode -ne 0) {
@@ -76,7 +95,7 @@ if ($exitCode -ne 0) {
 Write-Log "Pipeline succeeded."
 
 # Commit and push docs/
-git -C $RepoDir add docs/listings/ docs/data/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
+git -C $RepoDir add docs/listings/ docs/data/ docs/preferences/ docs/index.html docs/verify/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
 
 # Check if there are staged changes
 $staged = git -C $RepoDir diff --cached --name-only
