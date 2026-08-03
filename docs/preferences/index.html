@@ -783,6 +783,7 @@
         el.placeholder = el.getAttribute('data-placeholder-' + lang);
       });
       localStorage.setItem('cv_lang', lang);
+      prefs.lang = lang;
     }
 
     const savedLang = localStorage.getItem('cv_lang') || 'es';
@@ -841,6 +842,14 @@
 
     // ── RENDER PREFERENCES UI ──
     function renderPreferences() {
+      // Sync top-bar language toggle with saved preference
+      document.getElementById('btn-es').classList.toggle('active', prefs.lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', prefs.lang === 'en');
+      document.getElementById('html-root').setAttribute('lang', prefs.lang || 'es');
+      document.querySelectorAll('[data-es][data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + (prefs.lang || 'es'));
+      });
+
       // Toggles
       document.getElementById('toggle-vose').classList.toggle('on', prefs.vose_only);
       document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
