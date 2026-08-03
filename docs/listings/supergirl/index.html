@@ -87,7 +87,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/1QCWdqzTfh2x9UylVpspIU6QTuM.jpg" alt="Supergirl" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 6.8</span><span class="rating-badge">+12</span></div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 6.7</span><span class="rating-badge">+12</span></div>
       <div class="hero-title" data-es="Supergirl" data-en="Supergirl">Supergirl</div>
       
       <div class="hero-meta"><span data-es="US · 2026 · 108 min" data-en="US · 2026 · Action, Adventure, Science Fiction · 108 min">US · 2026 · 108 min</span></div>
@@ -188,9 +188,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const params  = new URLSearchParams(window.location.search);
   const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
-  const isClassicFilm = params.get('classic') === 'true';
-  const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !(alwaysClassics && isClassicFilm)) {
+  const isClassicFilm = false;
+  if (cinemas && !isClassicFilm) {
     const allowed = cinemas.split(',');
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
       const cid = row.getAttribute('data-cinema-id');

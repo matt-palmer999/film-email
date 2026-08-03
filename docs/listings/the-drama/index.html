@@ -188,9 +188,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const params  = new URLSearchParams(window.location.search);
   const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
-  const isClassicFilm = params.get('classic') === 'true';
-  const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !(alwaysClassics && isClassicFilm)) {
+  const isClassicFilm = false;
+  if (cinemas && !isClassicFilm) {
     const allowed = cinemas.split(',');
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
       const cid = row.getAttribute('data-cinema-id');
