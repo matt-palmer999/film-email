@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="MOTOR CITY — Cartelera Valencia" data-en="Motor City — Cartelera Valencia">MOTOR CITY — Cartelera Valencia</title>
+<title data-es="Preestreno a ciegas 13  agosto 2026 — Cartelera Valencia" data-en="Preestreno a ciegas 13  agosto 2026 — Cartelera Valencia">Preestreno a ciegas 13  agosto 2026 — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,20 +85,20 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/lGovcOtxugJPhfJjFKud9EbWtOA.jpg" alt="MOTOR CITY" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><div style="font-size:64px;text-align:center;padding:40px;">🎬</div></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 5.6</span><span class="rating-badge">+16</span></div>
-      <div class="hero-title" data-es="MOTOR CITY" data-en="Motor City">MOTOR CITY</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="Preestreno a ciegas 13  agosto 2026" data-en="Preestreno a ciegas 13  agosto 2026">Preestreno a ciegas 13  agosto 2026</div>
       
-      <div class="hero-meta"><span data-es="US · 2026 · 103 min" data-en="US · 2026 · Action, Thriller, Crime · 103 min">US · 2026 · 103 min</span></div>
-      <div class="hero-synopsis" data-es="In 1970s Detroit, John Miller falls for a local gangster&#39;s girl and lands in prison for a crime he didn&#39;t commit. With his life ruined, Miller plots revenge against the man who took his girl away." data-en="In 1970s Detroit, John Miller falls for a local gangster&#39;s girl and lands in prison for a crime he didn&#39;t commit. With his life ruined, Miller plots revenge against the man who took his girl away.">In 1970s Detroit, John Miller falls for a local gangster's girl and lands in prison for a crime he didn't commit. With his life ruined, Miller plots revenge against the man who took his girl away.</div>
+      <div class="hero-meta"><span data-es="110 min" data-en="110 min">110 min</span></div>
+      <div class="hero-synopsis" data-es="" data-en=""></div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-06" data-es="Hoy 6" data-en="Today 6" onclick="showDay('2026-08-06')">Hoy 6</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-08-06"><div class="showtime-row" data-cinema-id="elsaler" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC El Saler</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="22:45" data-vose="false">22:45</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-13" data-es="Jueves 13" data-en="Thursday 13" onclick="showDay('2026-08-13')">Jueves 13</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-08-13"><div class="showtime-row" data-cinema-id="cinesa" data-vose="false"><div class="showtime-cinema"><span translate="no">Cinesa LUXE Bonaire</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:45" data-vose="false">19:45</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Motor City' : 'MOTOR CITY') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Preestreno a ciegas 13  agosto 2026' : 'Preestreno a ciegas 13  agosto 2026') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
