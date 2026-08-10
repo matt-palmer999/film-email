@@ -85,18 +85,18 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/zdUA4FNHbXPadzVOJiU0Rgn6cHR.jpg" alt="Mamma Mia!" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><div style="font-size:64px;text-align:center;padding:40px;">🎬</div></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 7.0</span><span class="rating-badge">TP</span></div>
+      <div class="badges"></div>
       <div class="hero-title" data-es="Mamma Mia!" data-en="Mamma Mia!">Mamma Mia!</div>
       
-      <div class="hero-meta"><span data-es="US, GB · 2008 · 108 min" data-en="US, GB · 2008 · Comedy, Romance · 108 min">US, GB · 2008 · 108 min</span></div>
-      <div class="hero-synopsis" data-es="Versión cinematográfica del popular musical de ABBA. Una joven que ha crecido en una pequeña isla griega, ha sido educada por una madre rebelde y poco convencional, que siempre se ha negado a revelarle la identidad de su padre. Cuando, por fin, parece que la joven está a punto de saberlo, aparecen tres posibles candidatos." data-en="A spirited young bride-to-be living with her single mother on a small Greek island secretly invites three of her mother&#39;s ex-boyfriends in hope of finding her biological father to walk her down the aisle.">Versión cinematográfica del popular musical de ABBA. Una joven que ha crecido en una pequeña isla griega, ha sido educada por una madre rebelde y poco convencional, que siempre se ha negado a revelarle la identidad de su padre. Cuando, por fin, parece que la joven está a punto de saberlo, aparecen tres posibles candidatos.</div>
+      <div class="hero-meta"><span data-es="109 min" data-en="109 min">109 min</span></div>
+      <div class="hero-synopsis" data-es="La historia de una futura novia tratando de encontrar a su verdadero padre contada a través de las exitosas canciones del popular grupo de los 70 ABBA." data-en="La historia de una futura novia tratando de encontrar a su verdadero padre contada a través de las exitosas canciones del popular grupo de los 70 ABBA.">La historia de una futura novia tratando de encontrar a su verdadero padre contada a través de las exitosas canciones del popular grupo de los 70 ABBA.</div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
-    <div class="section-title" data-es="🕖 HORARIOS — próximas fechas" data-en="🕖 SHOWTIMES — upcoming dates">🕖 HORARIOS — próximas fechas</div>
+    <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
     <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-14" data-es="Viernes 14" data-en="Friday 14" onclick="showDay('2026-08-14')">Viernes 14</button></div>
     <div id="day-panels"><div class="day-panel active" id="day-2026-08-14"><div class="showtime-row" data-cinema-id="cinesa" data-vose="false"><div class="showtime-cinema"><span translate="no">Cinesa LUXE Bonaire</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:35" data-vose="false">19:35</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
@@ -188,7 +188,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const params  = new URLSearchParams(window.location.search);
   const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
-  const isClassicFilm = true;
+  const isClassicFilm = false;
   if (cinemas && !isClassicFilm) {
     const allowed = cinemas.split(',');
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {

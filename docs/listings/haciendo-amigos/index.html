@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="HACIENDO AMIGOS — Cartelera Valencia" data-en="Haciendo amigos — Cartelera Valencia">HACIENDO AMIGOS — Cartelera Valencia</title>
+<title data-es="HACIENDO AMIGOS — Cartelera Valencia" data-en="HACIENDO AMIGOS — Cartelera Valencia">HACIENDO AMIGOS — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,13 +85,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/wE8Fud4W5Eqyaqu05JxdCIXdKsN.jpg" alt="HACIENDO AMIGOS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cdn.cinesabc.com/1c870d6713c3d9b6d5e33f6c289020c3.jpg" alt="HACIENDO AMIGOS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 7.5</span></div>
-      <div class="hero-title" data-es="HACIENDO AMIGOS" data-en="Haciendo amigos">HACIENDO AMIGOS</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="HACIENDO AMIGOS" data-en="HACIENDO AMIGOS">HACIENDO AMIGOS</div>
       
-      <div class="hero-meta"><span data-es="ES · 2026 · 110 min" data-en="ES · 2026 · Comedy · 110 min">ES · 2026 · 110 min</span></div>
-      <div class="hero-synopsis" data-es="Antonio y Félix son una pareja de atracadores de poca monta que, huyendo de la policía tras atracar una joyería, se cruzan con Eva, monitora de un grupo de teatro formado por personas con discapacidad, que confunde a Félix con Ángel, un nuevo miembro del grupo al cual no conoce y al que están esperando. Aprovechando la confusión, Félix y Antonio consiguen escabullirse. Sin saber que les espera un " data-en="Antonio and Félix, small-time thieves fleeing police after a jewelry heist, meet Eva, a theater group monitor. She mistakes Félix for Ángel, a new member. They use the confusion to hide, unaware they&#39;ll spend a week with the group.">Antonio y Félix son una pareja de atracadores de poca monta que, huyendo de la policía tras atracar una joyería, se cruzan con Eva, monitora de un grupo de teatro formado por personas con discapacidad, que confunde a Félix con Ángel, un nuevo miembro del grupo al cual no conoce y al que están esperando. Aprovechando la confusión, Félix y Antonio consiguen escabullirse. Sin saber que les espera un </div>
+      <div class="hero-meta"><span data-es="100 min" data-en="100 min">100 min</span></div>
+      <div class="hero-synopsis" data-es="Antonio y Félix son una pareja de atracadores de poca monta que, huyendo de la policía tras atracar una joyería, se cruzan con Eva, monitora de un grupo de teatro formado por personas con discapacidad, que confunde a Félix con Ángel, un nuevo miembro del grupo al cual no conoce y al que están esperando. Aprovechando la confusión, Félix y Antonio consiguen escabullirse sin saber que les espera un r" data-en="Antonio y Félix son una pareja de atracadores de poca monta que, huyendo de la policía tras atracar una joyería, se cruzan con Eva, monitora de un grupo de teatro formado por personas con discapacidad, que confunde a Félix con Ángel, un nuevo miembro del grupo al cual no conoce y al que están esperando. Aprovechando la confusión, Félix y Antonio consiguen escabullirse sin saber que les espera un r">Antonio y Félix son una pareja de atracadores de poca monta que, huyendo de la policía tras atracar una joyería, se cruzan con Eva, monitora de un grupo de teatro formado por personas con discapacidad, que confunde a Félix con Ángel, un nuevo miembro del grupo al cual no conoce y al que están esperando. Aprovechando la confusión, Félix y Antonio consiguen escabullirse sin saber que les espera un r</div>
     </div>
   </div>
 
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Haciendo amigos' : 'HACIENDO AMIGOS') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'HACIENDO AMIGOS' : 'HACIENDO AMIGOS') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {

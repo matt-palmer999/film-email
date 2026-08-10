@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="VALENCIANA — Cartelera Valencia" data-en="Valenciana — Cartelera Valencia">VALENCIANA — Cartelera Valencia</title>
+<title data-es="VALENCIANA — Cartelera Valencia" data-en="VALENCIANA — Cartelera Valencia">VALENCIANA — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,13 +85,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/qzORge4LKHpwZ9Mv8TiNa3vNUSL.jpg" alt="VALENCIANA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cinesmn4.reservaentradas.com/cinesmn4/obj/LCinesD_dat/eventos/JPG0016n.jpg" alt="VALENCIANA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 5.5</span><span class="rating-badge">+16</span></div>
-      <div class="hero-title" data-es="VALENCIANA" data-en="Valenciana">VALENCIANA</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="VALENCIANA" data-en="VALENCIANA">VALENCIANA</div>
       
-      <div class="hero-meta"><span data-es="ES · 2024" data-en="ES · 2024 · Drama">ES · 2024</span></div>
-      <div class="hero-synopsis" data-es="Tres jóvenes amigas periodistas tratan de encontrar su lugar en una España en constante cambio, la España del progreso y las Olimpiadas. A pesar de su ilusión por formar parte de la nueva modernidad renovadora, las tres protagonistas descubrirán a la fuerza la parte oculta y más oscura del nuevo mundo que el progreso les ofrece." data-en="">Tres jóvenes amigas periodistas tratan de encontrar su lugar en una España en constante cambio, la España del progreso y las Olimpiadas. A pesar de su ilusión por formar parte de la nueva modernidad renovadora, las tres protagonistas descubrirán a la fuerza la parte oculta y más oscura del nuevo mundo que el progreso les ofrece.</div>
+      <div class="hero-meta"><span data-es="101 min" data-en="101 min">101 min</span></div>
+      <div class="hero-synopsis" data-es="" data-en=""></div>
     </div>
   </div>
 
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Valenciana' : 'VALENCIANA') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'VALENCIANA' : 'VALENCIANA') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
