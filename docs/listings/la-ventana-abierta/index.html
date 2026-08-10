@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="LA VENTANA ABIERTA — Cartelera Valencia" data-en="LA VENTANA ABIERTA — Cartelera Valencia">LA VENTANA ABIERTA — Cartelera Valencia</title>
+<title data-es="LA VENTANA ABIERTA — Cartelera Valencia" data-en="La ventana abierta — Cartelera Valencia">LA VENTANA ABIERTA — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,13 +85,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://cdn.cinesabc.com/eb7450d2a28634c72aebacfc2495e75c.jpg" alt="LA VENTANA ABIERTA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/uVPZReQrhSdPEvvQUeKgUQpB1NL.jpg" alt="LA VENTANA ABIERTA" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"></div>
-      <div class="hero-title" data-es="LA VENTANA ABIERTA" data-en="LA VENTANA ABIERTA">LA VENTANA ABIERTA</div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span></div>
+      <div class="hero-title" data-es="LA VENTANA ABIERTA" data-en="La ventana abierta">LA VENTANA ABIERTA</div>
       
-      <div class="hero-meta"><span data-es="" data-en=""></span></div>
-      <div class="hero-synopsis" data-es="Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas  y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más" data-en="Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas  y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más">Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas  y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más</div>
+      <div class="hero-meta"><span data-es="ES · 2026" data-en="ES · 2026 · Drama, Thriller">ES · 2026</span></div>
+      <div class="hero-synopsis" data-es="Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas… y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más" data-en="Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas  y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más">Cuando Rubén llega hasta un remoto pueblo costero andaluz arrastrado por el viento del levante y por el recuerdo de Merche, la mujer con la que ha construido una relación online durante meses, se topa con un paisaje hostil: puertas cerradas, miradas esquivas… y una única ventana abierta. Y detrás de esa ventana solo encuentra a Vera, la hija adolescente de su pareja. Cuanto más habla con ella, más</div>
     </div>
   </div>
 
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'LA VENTANA ABIERTA' : 'LA VENTANA ABIERTA') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'La ventana abierta' : 'LA VENTANA ABIERTA') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
