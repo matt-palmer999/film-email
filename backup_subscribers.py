@@ -12,6 +12,8 @@ import os
 import urllib.request
 from datetime import datetime, timezone
 
+import requests  # pip install requests — better TLS behaviour than urllib
+
 # ── Config from environment ───────────────────────────────────────────────────
 SUPABASE_URL         = os.environ["SUPABASE_URL"].rstrip("/")
 SUPABASE_SERVICE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
@@ -58,7 +60,7 @@ def send_backup(csv_bytes: bytes, row_count: int) -> None:
         f"<p>CSV attached.</p>"
     )
 
-    payload = json.dumps({
+    payload = {
         "from":        f"{FROM_NAME} <{FROM_ADDRESS}>",
         "to":          [BACKUP_TO],
         "subject":     subject,
@@ -67,27 +69,22 @@ def send_backup(csv_bytes: bytes, row_count: int) -> None:
             "filename": filename,
             "content":  base64.b64encode(csv_bytes).decode("ascii"),
         }],
-    }).encode("utf-8")
+    }
 
-    req = urllib.request.Request(
+    resp = requests.post(
         "https://api.resend.com/emails",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type":  "application/json",
-        },
-        method="POST",
+        json=payload,
+        headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+        timeout=30,
     )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            result = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="replace")
-        print(f"Resend API error {e.code}: {error_body}")
+
+    if not resp.ok:
+        print(f"Resend API error {resp.status_code}: {resp.text}")
         print(f"  FROM_ADDRESS={FROM_ADDRESS}")
         print(f"  RESEND_API_KEY starts with: {RESEND_API_KEY[:8]}...")
-        raise
+        resp.raise_for_status()
 
+    result = resp.json()
     print(f"Backup sent to {BACKUP_TO} via Resend (id={result.get('id')}, {row_count} rows, {len(csv_bytes):,} bytes)")
 
 
