@@ -78,8 +78,15 @@ def send_backup(csv_bytes: bytes, row_count: int) -> None:
         },
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        result = json.loads(resp.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8", errors="replace")
+        print(f"Resend API error {e.code}: {error_body}")
+        print(f"  FROM_ADDRESS={FROM_ADDRESS}")
+        print(f"  RESEND_API_KEY starts with: {RESEND_API_KEY[:8]}...")
+        raise
 
     print(f"Backup sent to {BACKUP_TO} via Resend (id={result.get('id')}, {row_count} rows, {len(csv_bytes):,} bytes)")
 
