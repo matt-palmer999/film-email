@@ -4,25 +4,18 @@ Fetches all rows from the Supabase subscribers table, writes a CSV,
 and emails it to the backup address. Runs weekly via GitHub Actions.
 """
 
+import base64
 import csv
 import io
 import json
 import os
-import smtplib
 import urllib.request
 from datetime import datetime, timezone
-from email import encoders
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 # ── Config from environment ───────────────────────────────────────────────────
 SUPABASE_URL         = os.environ["SUPABASE_URL"].rstrip("/")
 SUPABASE_SERVICE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
-SMTP_HOST            = os.environ["SMTP_HOST"]
-SMTP_PORT            = int(os.environ.get("SMTP_PORT", 587))
-SMTP_USER            = os.environ["SMTP_USER"]
-SMTP_PASSWORD        = os.environ["SMTP_PASSWORD"]
+RESEND_API_KEY       = os.environ["RESEND_API_KEY"]
 FROM_ADDRESS         = os.environ["FROM_ADDRESS"]
 FROM_NAME            = os.environ.get("FROM_NAME", "Cartelera Valencia")
 BACKUP_TO            = os.environ["BACKUP_TO"]
@@ -51,39 +44,44 @@ def to_csv(rows: list[dict]) -> bytes:
 
 
 def send_backup(csv_bytes: bytes, row_count: int) -> None:
-    """Email the CSV as an attachment."""
-    now        = datetime.now(timezone.utc)
-    date_str   = now.strftime("%Y-%m-%d")
-    filename   = f"subscribers_backup_{date_str}.csv"
-    subject    = f"📦 Subscriber backup {date_str} — {row_count} rows"
+    """Email the CSV as an attachment via Resend API."""
+    now      = datetime.now(timezone.utc)
+    date_str = now.strftime("%Y-%m-%d")
+    filename = f"subscribers_backup_{date_str}.csv"
+    subject  = f"📦 Subscriber backup {date_str} — {row_count} rows"
 
-    body = (
-        f"Weekly subscriber backup — {date_str}\n\n"
-        f"Total rows: {row_count}\n"
-        f"Active subscribers: {sum(1 for r in rows if r.get('active'))}\n"
-        f"Email-enabled: {sum(1 for r in rows if r.get('email_enabled') and r.get('active'))}\n\n"
-        f"CSV attached.\n"
+    body_html = (
+        f"<p><strong>Weekly subscriber backup — {date_str}</strong></p>"
+        f"<p>Total rows: {row_count}<br>"
+        f"Active subscribers: {sum(1 for r in rows if r.get('active'))}<br>"
+        f"Email-enabled: {sum(1 for r in rows if r.get('email_enabled') and r.get('active'))}</p>"
+        f"<p>CSV attached.</p>"
     )
 
-    msg = MIMEMultipart()
-    msg["Subject"] = subject
-    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-    msg["To"]      = BACKUP_TO
-    msg.attach(MIMEText(body, "plain", "utf-8"))
+    payload = json.dumps({
+        "from":        f"{FROM_NAME} <{FROM_ADDRESS}>",
+        "to":          [BACKUP_TO],
+        "subject":     subject,
+        "html":        body_html,
+        "attachments": [{
+            "filename": filename,
+            "content":  base64.b64encode(csv_bytes).decode("ascii"),
+        }],
+    }).encode("utf-8")
 
-    attachment = MIMEBase("text", "csv")
-    attachment.set_payload(csv_bytes)
-    encoders.encode_base64(attachment)
-    attachment.add_header("Content-Disposition", "attachment", filename=filename)
-    msg.attach(attachment)
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type":  "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        result = json.loads(resp.read().decode())
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        server.ehlo()
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_ADDRESS, [BACKUP_TO], msg.as_string())
-
-    print(f"Backup sent to {BACKUP_TO} ({row_count} rows, {len(csv_bytes):,} bytes)")
+    print(f"Backup sent to {BACKUP_TO} via Resend (id={result.get('id')}, {row_count} rows, {len(csv_bytes):,} bytes)")
 
 
 if __name__ == "__main__":
