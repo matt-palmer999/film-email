@@ -44,6 +44,23 @@ if ((Test-Path $LogFile) -and (Get-Item $LogFile).Length -gt 5MB) {
 
 Write-Log "=== Pipeline starting ==="
 
+# Guard: skip if the pipeline already completed successfully today (avoids duplicate emails).
+# Pass -Force to override (e.g. when a scraper genuinely failed and you want a retry).
+$Force = $args -contains "-Force"
+if (-not $Force) {
+    $today = Get-Date -Format "yyyy-MM-dd"
+    $alreadyRan = $false
+    if (Test-Path $LogFile) {
+        $alreadyRan = (Select-String -Path $LogFile -Pattern "Pipeline complete\." -SimpleMatch |
+            Where-Object { $_.Line -match $today }) -ne $null
+    }
+    if ($alreadyRan) {
+        Write-Log "Pipeline already completed successfully today ($today). Use -Force to override."
+        Write-Log "=== Skipped (already ran today) ==="
+        exit 0
+    }
+}
+
 # Wait for DNS to be available (the task may fire before the network stack is fully ready
 # when the laptop wakes up or turns on after missing the 8am scheduled trigger).
 $dnsReady = $false

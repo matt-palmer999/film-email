@@ -1745,7 +1745,7 @@ if ('serviceWorker' in navigator) {{
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
-def run(skip_email: bool = False) -> None:
+def run() -> None:
     anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
     log.info(f"Pipeline starting for {anchor.date()} …")
 
@@ -1852,11 +1852,8 @@ def run(skip_email: bool = False) -> None:
 
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
-    # 11. Send admin confirmation email (skipped if --no-email flag passed)
-    if not skip_email:
-        send_pipeline_summary(films, scraper_status)
-    else:
-        log.info("Skipping pipeline summary email (--no-email)")
+    # 11. Send admin confirmation email
+    send_pipeline_summary(films, scraper_status)
 
 
 def send_pipeline_summary(films: dict, scraper_status: list) -> None:
@@ -2086,6 +2083,4 @@ def send_weekly_emails(films: dict) -> None:
 
 
 if __name__ == "__main__":
-    import sys
-    skip_email = "--no-email" in sys.argv
-    run(skip_email=skip_email)
+    run()
