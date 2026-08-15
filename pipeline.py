@@ -74,13 +74,76 @@ def esc(s: str) -> str:
 
 # ── TMDB lookup ───────────────────────────────────────────────────────────────
 
-def tmdb_lookup(title: str) -> dict:
+def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
     import requests as req
     import time as _time
     import re as _re
 
     if not TMDB_API_KEY:
         return {}
+
+    headers = {
+        "Authorization": f"Bearer {TMDB_API_KEY}",
+        "accept": "application/json",
+    }
+
+    # If a valid IMDB ID is provided, use /find/ endpoint for an exact match
+    if imdb_id and imdb_id.startswith("tt"):
+        _time.sleep(0.25)
+        try:
+            find_res = req.get(
+                f"{TMDB_BASE}/find/{imdb_id}?external_source=imdb_id&language=es-ES",
+                headers=headers, timeout=10,
+            )
+            find_res.raise_for_status()
+            movie_results = find_res.json().get("movie_results", [])
+            if movie_results:
+                movie_id = movie_results[0]["id"]
+                detail_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=en-US", headers=headers, timeout=10)
+                detail_res.raise_for_status()
+                detail = detail_res.json()
+                detail_es_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=es-ES", headers=headers, timeout=10)
+                detail_es_res.raise_for_status()
+                detail_es = detail_es_res.json()
+
+                cert_es = "?"
+                try:
+                    rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
+                    rel_res.raise_for_status()
+                    rel_results = rel_res.json().get("results", [])
+                    for entry in rel_results:
+                        if entry.get("iso_3166_1") == "ES":
+                            for rd in entry.get("release_dates", []):
+                                cert = rd.get("certification", "").strip()
+                                if cert:
+                                    cert_es = cert
+                                    break
+                            break
+                except Exception:
+                    pass
+
+                synopsis_es = detail_es.get("overview") or detail.get("overview", "")
+                poster_path = detail.get("poster_path") or movie_results[0].get("poster_path")
+                poster_url  = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
+                vote = detail.get("vote_average", 0)
+                log.info(f"  TMDB /find/{imdb_id} → {detail.get('title','?')} (for '{title}')")
+                return {
+                    "title_en":       detail.get("title", ""),
+                    "title_original": detail.get("original_title", ""),
+                    "synopsis_en":    detail.get("overview", ""),
+                    "synopsis_es":    synopsis_es,
+                    "poster_url":     poster_url,
+                    "year":           (detail.get("release_date") or "")[:4],
+                    "release_date":   detail.get("release_date", ""),
+                    "tmdb_id":        movie_id,
+                    "rating_score":   round(vote, 1) if vote else None,
+                    "genres_en":      [g["name"] for g in detail.get("genres", [])],
+                    "runtime":        detail.get("runtime"),
+                    "origin_country": detail.get("origin_country", []),
+                    "cert_es":        cert_es,
+                }
+        except Exception as e:
+            log.warning(f"  TMDB /find/{imdb_id} failed: {e}")
 
     # Strip regional language prefixes added by Spanish exhibitors (e.g. "CAT ", "VA ", "EUS ", "GAL ")
     search_title = _re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=_re.IGNORECASE)
@@ -103,11 +166,6 @@ def tmdb_lookup(title: str) -> dict:
     _time.sleep(0.25)
 
     try:
-        headers = {
-            "Authorization": f"Bearer {TMDB_API_KEY}",
-            "accept": "application/json",
-        }
-
         search_url = (
             f"{TMDB_BASE}/search/movie"
             f"?query={req.utils.quote(search_title)}"
@@ -262,11 +320,17 @@ def aggregate_scrapers() -> tuple[dict, list]:
         cinema_id = film["cinema"]
         meta_info = CINEMA_META.get(cinema_id, {})
 
-        # Flat showtimes → {date: [time_str]}
+        # Flat showtimes → {date: [time_str]}, split into dubbed vs VOSE.
         # Handles two formats:
         #   {"date": "YYYY-MM-DD", "time": "HH:MM"}          (most scrapers)
         #   {"datetime_local": "YYYY-MM-DDTHH:MM:SS", ...}   (Kinepolis, Yelmo)
-        showtimes_by_date: dict = {}
+        # Scrapers like Yelmo bundle mixed-language showtimes in one film result
+        # and include a per-showtime "is_vose" flag. Kinépolis emits separate
+        # film results per language; those have no per-showtime flag so we fall
+        # back to the film-level "is_vose".
+        film_is_vose = bool(film.get("is_vose", False))
+        showtimes_by_date: dict = {}      # dubbed / language-agnostic
+        vose_showtimes_by_date: dict = {} # VOSE / subtitled
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
@@ -277,13 +341,18 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 if len(dl) >= 16 and not t:
                     t = dl[11:16]
             if d and t:
-                bucket = showtimes_by_date.setdefault(d, [])
+                # Use per-showtime flag if present, else film-level flag
+                st_is_vose = st.get("is_vose", film_is_vose)
+                target = vose_showtimes_by_date if st_is_vose else showtimes_by_date
+                bucket = target.setdefault(d, [])
                 if t not in bucket:
                     bucket.append(t)
         for d in showtimes_by_date:
             showtimes_by_date[d].sort()
+        for d in vose_showtimes_by_date:
+            vose_showtimes_by_date[d].sort()
 
-        is_vose = bool(film.get("is_vose", False))
+        is_vose = bool(vose_showtimes_by_date)  # True if this result has any VOSE times
 
         if title not in films_by_title:
             duration = film.get("duration_mins", 0)
@@ -296,6 +365,7 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 "poster":   film.get("poster_url", ""),
                 "any_vose": False,
                 "cinemas":  [],
+                "imdb_id":  film.get("imdb_id", ""),
             }
         else:
             f = films_by_title[title]
@@ -307,6 +377,8 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 duration = film.get("duration_mins", 0)
                 if duration:
                     f["meta"] = f"{duration} min"
+            if not f.get("imdb_id") and film.get("imdb_id"):
+                f["imdb_id"] = film["imdb_id"]
 
         # Add or merge cinema entry
         # VOSE and dubbed showtimes are kept in separate buckets so the
@@ -314,30 +386,25 @@ def aggregate_scrapers() -> tuple[dict, list]:
         # individual time slots rather than whole cinema rows.
         existing = next((c for c in films_by_title[title]["cinemas"] if c["id"] == cinema_id), None)
         if existing:
-            target_bucket_key = "vose_showtimes" if is_vose else "showtimes"
-            for d, times in showtimes_by_date.items():
-                bucket = existing[target_bucket_key].setdefault(d, [])
-                for t in times:
-                    if t not in bucket:
-                        bucket.append(t)
-                existing[target_bucket_key][d].sort()
+            for bucket_key, src in (("showtimes", showtimes_by_date), ("vose_showtimes", vose_showtimes_by_date)):
+                for d, times in src.items():
+                    bucket = existing[bucket_key].setdefault(d, [])
+                    for t in times:
+                        if t not in bucket:
+                            bucket.append(t)
+                    existing[bucket_key][d].sort()
             if is_vose:
                 existing["vose"] = True
         else:
-            entry = {
+            films_by_title[title]["cinemas"].append({
                 "id":             cinema_id,
                 "name":           meta_info.get("name", cinema_id),
                 "website":        meta_info.get("website", ""),
                 "type":           meta_info.get("type", "multiplex"),
                 "vose":           is_vose,
-                "showtimes":      {},
-                "vose_showtimes": {},
-            }
-            if is_vose:
-                entry["vose_showtimes"] = showtimes_by_date
-            else:
-                entry["showtimes"] = showtimes_by_date
-            films_by_title[title]["cinemas"].append(entry)
+                "showtimes":      showtimes_by_date,
+                "vose_showtimes": vose_showtimes_by_date,
+            })
 
         if is_vose:
             films_by_title[title]["any_vose"] = True
@@ -354,7 +421,7 @@ def enrich_with_tmdb(films: dict) -> None:
     if TMDB_API_KEY:
         log.info("Enriching films with TMDB data …")
         for title, film in films.items():
-            tmdb = tmdb_lookup(title)
+            tmdb = tmdb_lookup(title, imdb_id=film.get("imdb_id", ""))
             if tmdb:
                 if tmdb.get("poster_url"):
                     film["poster"] = tmdb["poster_url"]
@@ -457,22 +524,28 @@ def deduplicate_by_tmdb_id(films: dict) -> None:
 
 # ── HTML helpers ──────────────────────────────────────────────────────────────
 
+def _is_classic(film: dict) -> bool:
+    year = film.get("year", "")
+    return bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
+
+
 def cinemas_in_window(film: dict) -> list:
-    today      = datetime.now(VALENCIA_TZ).date()
-    week_ahead = (today + timedelta(days=6)).strftime("%Y-%m-%d")
-    today_str  = today.strftime("%Y-%m-%d")
+    today     = datetime.now(VALENCIA_TZ).date()
+    days      = 29 if _is_classic(film) else 6
+    cutoff    = (today + timedelta(days=days)).strftime("%Y-%m-%d")
+    today_str = today.strftime("%Y-%m-%d")
     return [
         c for c in film.get("cinemas", [])
-        if any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
+        if any(today_str <= dk <= cutoff for dk in c.get("showtimes", {}).keys())
+        or any(today_str <= dk <= cutoff for dk in c.get("vose_showtimes", {}).keys())
     ]
 
 
 def compute_card_data(film: dict) -> dict:
     year         = film.get("year", "")
     cinemas_set  = set(c["id"] for c in film["cinemas"])
-    arthouse_only = cinemas_set.issubset({"babel", "dor"})
     is_old       = bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
-    section      = "2" if (arthouse_only or is_old) else "1"
+    section      = "2" if is_old else "1"
     origin       = ",".join(film.get("origin_country", []))
     score_val    = str(film.get("rating_score") or "")
     rating_val   = film.get("rating", "?").replace("+", "")
@@ -480,7 +553,11 @@ def compute_card_data(film: dict) -> dict:
 
     has_eve = False
     for _c in film.get("cinemas", []):
-        for _dk, _times in _c.get("showtimes", {}).items():
+        all_st = {**_c.get("showtimes", {})}
+        for _dk, _times in _c.get("vose_showtimes", {}).items():
+            all_st.setdefault(_dk, [])
+            all_st[_dk] = sorted(set(all_st[_dk]) | set(_times))
+        for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
                 if _d.weekday() < 5:
@@ -501,12 +578,16 @@ def compute_card_data(film: dict) -> dict:
     hasevening = "true" if has_eve else "false"
 
     today_qf   = datetime.now(VALENCIA_TZ).date()
-    window_end = today_qf + timedelta(days=6)
+    window_end = today_qf + timedelta(days=29 if _is_classic(film) else 6)
     showdays: set = set()
     showtimes_by_cinema_day: dict = {}
     for _c in film.get("cinemas", []):
         _cid = _c.get("id", "")
-        for _dk, _times in _c.get("showtimes", {}).items():
+        all_st = {**_c.get("showtimes", {})}
+        for _dk, _times in _c.get("vose_showtimes", {}).items():
+            all_st.setdefault(_dk, [])
+            all_st[_dk] = sorted(set(all_st[_dk]) | set(_times))
+        for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
                 if today_qf <= _d <= window_end:
@@ -558,7 +639,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
 .cinema-group-header{margin:0 24px 14px;padding:14px 18px;background:#160f24;border:1px solid #ffb432;border-left:4px solid #ffb432;border-radius:10px;display:flex;align-items:center;gap:10px}#section2-header{border-color:#ffb432;border-left-color:#ffb432}
 .cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0}
-.cinema-group-desc{font-size:12px;color:#7a6a8a}
+.cinema-group-desc{font-size:14px;color:#c5b8d8}
 .cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
 .list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start;position:relative;cursor:pointer;transition:background .15s}.list-card:active{background:#221530}
 .list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
@@ -592,7 +673,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
 .grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
-.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:11px;font-weight:500;color:#a07840;letter-spacing:.3px}.grid-card:hover .showtimes-hint{color:#ffb432}
+.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:13px;font-weight:600;color:#d4913a;letter-spacing:.3px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(212,145,58,.45)}.grid-card:hover .showtimes-hint{color:#ffb432;text-decoration-color:rgba(255,180,50,.6)}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
 .footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
 .footer a{color:#7a6a9a;text-decoration:none}
@@ -635,14 +716,13 @@ function getCookie(name) {
 function applyPreferencesFromURL() {
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
-  const alwaysClassics = params.get('classics') === 'true';
   if (cinemas) {
     document.querySelectorAll('.cinema-tag').forEach(tag => {
       const cid = tag.dataset.cinema;
       if (cid && !cinemas.includes(cid)) {
         const card = tag.closest('[data-section]');
         const isClassic = card && card.dataset.section === '2';
-        if (!(alwaysClassics && isClassic)) {
+        if (!isClassic) {
           tag.style.display = 'none';
         }
       }
@@ -674,11 +754,7 @@ async function loadUserPreferences() {
     const currentParams = new URLSearchParams(window.location.search);
     document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
       const base = a.getAttribute('href').split('?')[0];
-      const card = a.closest('[data-section]');
       const linkParams = new URLSearchParams(currentParams);
-      if (card && card.dataset.section === '2') {
-        linkParams.set('classic', 'true');
-      }
       a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
     });
     return;
@@ -692,7 +768,7 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating,email_enabled',
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,rating_filter,min_rating,email_enabled',
       { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
@@ -707,13 +783,20 @@ async function loadUserPreferences() {
     setSubscriberUI(true);
     if (prefs.lang) setLang(prefs.lang);
 
+    if (!sessionStorage.getItem('cv_visit')) {
+      fetch(window.SUPABASE_URL + '/rest/v1/rpc/track_subscriber_visit', {
+        method: 'POST',
+        headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_email: email })
+      }).then(() => sessionStorage.setItem('cv_visit', '1')).catch(() => {});
+    }
+
     const newParams = new URLSearchParams();
     if (prefs.vose_only)     newParams.set('vose',      'true');
     if (prefs.vose_lang)     newParams.set('vose_lang',  prefs.vose_lang);
     if (prefs.new_only)      newParams.set('new',       'true');
     if (prefs.family_only)   newParams.set('family',    'true');
     if (prefs.evening_only)  newParams.set('evening',   'true');
-    if (prefs.classics)      newParams.set('classics',  'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
@@ -729,11 +812,7 @@ async function loadUserPreferences() {
     const finalParams = new URLSearchParams(window.location.search);
     document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
       const base = a.getAttribute('href').split('?')[0];
-      const card = a.closest('[data-section]');
       const linkParams = new URLSearchParams(finalParams);
-      if (card && card.dataset.section === '2') {
-        linkParams.set('classic', 'true');
-      }
       a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
     });
 
@@ -843,7 +922,6 @@ function applyVisibility() {
   const newOnly       = params.get('new')         === 'true';
   const familyOnly    = params.get('family')      === 'true';
   const eveningOnly   = params.get('evening')     === 'true';
-  const alwaysClassics= params.get('classics')    === 'true';
   const minRating     = params.has('min_rating')  ? parseFloat(params.get('min_rating')) : null;
   const cinemas       = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
@@ -856,15 +934,14 @@ function applyVisibility() {
   document.querySelectorAll('[data-vose]').forEach(card => {
     const isClassic = card.dataset.section === '2';
 
-    if (alwaysClassics && isClassic) {
+    if (isClassic) {
+      // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.
       let show = true;
-      if (voseOnly || filter === 'vose') {
-        if (card.dataset.vose !== 'true') show = false;
-        if (show && voseLang === 'en') {
-          const origins = (card.dataset.origin || '').split(',');
-          const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-          if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
-        }
+      if (show && (voseOnly || filter === 'vose') && card.dataset.vose !== 'true') show = false;
+      if (show && voseLang === 'en') {
+        const origins = (card.dataset.origin || '').split(',');
+        const engOrigins = ['US','GB','AU','CA','IE','NZ'];
+        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
       }
       card.style.display = show ? '' : 'none';
       if (show) visible++;
@@ -877,7 +954,7 @@ function applyVisibility() {
       if (show && voseLang === 'en') {
         const origins = (card.dataset.origin || '').split(',');
         const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-        if (origins.filter(o => o.trim()).length > 0 && !origins.some(o => engOrigins.includes(o.trim()))) show = false;
+        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
       }
     }
     if (show && newOnly && card.dataset.isnew !== 'true') show = false;
@@ -940,15 +1017,44 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     today = datetime.now(VALENCIA_TZ).date()
     DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
+    MONTHS_ES_SHORT = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
+    MONTHS_EN_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+    is_classic_film = _is_classic(film)
+    window_days = 29 if is_classic_film else 6
+    today_str_d = today.strftime("%Y-%m-%d")
+    cutoff_str  = (today + timedelta(days=window_days)).strftime("%Y-%m-%d")
+
+    # Collect only dates that have actual showtimes within the window, sorted
+    dates_with_shows = sorted({
+        dk
+        for c in film.get("cinemas", [])
+        for dk in list(c.get("showtimes", {}).keys()) + list(c.get("vose_showtimes", {}).keys())
+        if today_str_d <= dk <= cutoff_str
+    })
+    # Fallback: if nothing found (shouldn't happen after stale removal), show today
+    if not dates_with_shows:
+        dates_with_shows = [today_str_d]
+
+    def _day_labels(dk: str) -> tuple[str, str]:
+        d = date.fromisoformat(dk)
+        delta = (d - today).days
+        if delta == 0:
+            return f"Hoy {d.day}", f"Today {d.day}"
+        if delta == 1:
+            return f"Mañana {d.day}", f"Tomorrow {d.day}"
+        day_es = DAYS_ES[d.weekday()]
+        day_en = DAYS_EN[d.weekday()]
+        if delta <= 6:
+            return f"{day_es} {d.day}", f"{day_en} {d.day}"
+        m_es = MONTHS_ES_SHORT[d.month - 1]
+        m_en = MONTHS_EN_SHORT[d.month - 1]
+        return f"{day_es} {d.day} {m_es}", f"{day_en} {d.day} {m_en}"
 
     days = []
-    for i in range(7):
-        d = today + timedelta(days=i)
-        days.append({
-            "key":      d.strftime("%Y-%m-%d"),
-            "label_en": ("Today" if i==0 else "Tomorrow" if i==1 else DAYS_EN[d.weekday()]) + f" {d.day}",
-            "label_es": ("Hoy" if i==0 else "Mañana" if i==1 else DAYS_ES[d.weekday()]) + f" {d.day}",
-        })
+    for dk in dates_with_shows:
+        label_es, label_en = _day_labels(dk)
+        days.append({"key": dk, "label_es": label_es, "label_en": label_en})
 
     tab_btns  = ""
     tab_panels = ""
@@ -1053,6 +1159,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
+.time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
+.time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
 .time-btn--match{{background:#0d2418;border-color:#1d6b3a;color:#50c88c}}
 .time-btn--match:hover{{background:#112e1e;border-color:#50c88c;color:#50c88c}}
 .showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#6a5e7a;border-top:1px solid #1e1630}}
@@ -1061,6 +1169,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
 </style>
+<script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -1090,7 +1199,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div id="showtimes-section" style="display:none;">
-    <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
+    <div class="section-title" data-es="🕖 HORARIOS — {'próximas fechas' if is_classic_film else 'próximos 7 días'}" data-en="🕖 SHOWTIMES — {'upcoming dates' if is_classic_film else 'next 7 days'}">🕖 HORARIOS — {'próximas fechas' if is_classic_film else 'próximos 7 días'}</div>
     <div class="day-tabs">{tab_btns}</div>
     <div id="day-panels">{tab_panels}</div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
@@ -1180,10 +1289,10 @@ window.addEventListener('DOMContentLoaded', () => {{
   document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
   const params  = new URLSearchParams(window.location.search);
+  const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
-  const isClassicFilm = params.get('classic') === 'true';
-  const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
+  const isClassicFilm = {'true' if is_classic_film else 'false'};
+  if (cinemas && !isClassicFilm) {{
     const allowed = cinemas.split(',');
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
       const cid = row.getAttribute('data-cinema-id');
@@ -1202,7 +1311,7 @@ window.addEventListener('DOMContentLoaded', () => {{
           msg.className = 'no-times';
           msg.setAttribute('data-es', 'Sin sesiones este día');
           msg.setAttribute('data-en', 'No screenings this day');
-          msg.textContent = 'Sin sesiones este día';
+          msg.textContent = _uiLang() === 'en' ? 'No screenings this day' : 'Sin sesiones este día';
           panel.appendChild(msg);
         }} else {{
           noTimesEl.style.display = '';
@@ -1238,7 +1347,7 @@ window.addEventListener('DOMContentLoaded', () => {{
           msg.className = 'no-times';
           msg.setAttribute('data-es', 'Sin sesiones VOSE este día');
           msg.setAttribute('data-en', 'No VOSE screenings this day');
-          msg.textContent = 'Sin sesiones VOSE este día';
+          msg.textContent = _uiLang() === 'en' ? 'No VOSE screenings this day' : 'Sin sesiones VOSE este día';
           panel.appendChild(msg);
         }} else {{
           noTimesEl.style.display = '';
@@ -1313,19 +1422,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
         rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
         rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
-        cinema_tags = "".join(
-            '<span class="cinema-tag" data-cinema="' + c["id"] + '">' + c["name"] + ('<span class="vose-mini">VOSE</span>' if c["vose"] else "") + '</span>'
-            for c in cinemas
-        )
-        where_es, where_en = "Dónde verla", "Where to see it"
         cd = compute_card_data(film)
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
         slug     = film.get("slug")
         section  = cd["section"]
         if slug:
-            classic_param = '?classic=true' if section == '2' else ''
-            title_html = f'<a href="./{slug}/{classic_param}" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            title_html = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         syn_es = (film.get("synopsis_es") or synopsis)[:140]
@@ -1339,11 +1442,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         {title_html}
         <div class="grid-meta"><span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
-        <div class="cinema-links">
-          <div class="cinema-links-label" data-es="{where_es}" data-en="{where_en}">{where_es}</div>
-          <div class="cinema-tags">{cinema_tags}</div>
-        </div>
-        <div class="showtimes-hint"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-es="Horarios y detalles →" data-en="Showtimes &amp; details →">Horarios y detalles →</span></div>
+        <div class="showtimes-hint"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-es="Cines y horarios →" data-en="Cinemas &amp; showtimes →">Cines y horarios →</span></div>
       </div>
     </div>"""
 
@@ -1389,6 +1488,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>Cartelera Valencia – {date_en}</title>
 <style>{CSS}</style>
+<script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -1448,8 +1548,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
   <div class="cinema-group-header">
     <div>
-      <div class="cinema-group-name">Kinépolis · Yelmo · Ocine Aqua · ABC · MN4 · Lys · Tívoli</div>
-      <div class="cinema-group-desc" data-es="Los grandes multiplex de Valencia y área metropolitana" data-en="Valencia's main multiplexes across the city and metropolitan area">Los grandes multiplex de Valencia y área metropolitana</div>
+      <div class="cinema-group-desc" data-es="Los próximos 7 días de películas en los grandes multiplex de Valencia y área metropolitana — mostrando tus resultados filtrados" data-en="The next 7 days of movies showing at Valencia's main multiplexes across the city and metropolitan area — showing your filtered results">Los próximos 7 días de películas en los grandes multiplex de Valencia y área metropolitana — mostrando tus resultados filtrados</div>
     </div>
   </div>
   <div id="section1-cards">
@@ -1460,8 +1559,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
   <div class="cinema-group-header" id="section2-header">
     <div>
-      <div class="cinema-group-name">Cines Babel · Cinestudio D'Or</div>
-      <div class="cinema-group-desc" data-es="Cine de autor, sesiones VOSE especializadas y reposiciones clásicas" data-en="Arthouse cinema, specialist VOSE screenings and classic re-releases">Cine de autor, sesiones VOSE especializadas y reposiciones clásicas</div>
+      <div class="cinema-group-desc" data-es="Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de Valencia — todos los cines, filtrado solo por tus preferencias de idioma" data-en="The next 30 days of classic films currently screening at Valencia's cinemas — all cinemas, only filtered by your language choices">Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de Valencia — todos los cines, filtrado solo por tus preferencias de idioma</div>
     </div>
   </div>
   <div id="section2-cards"></div>
@@ -1564,6 +1662,11 @@ window.addEventListener('DOMContentLoaded', () => {{
     const dayKey = qfDay === 'today' ? todayKey : qfDay === 'tomorrow' ? tomorrowKey : qfDay === 'plus1' ? plus1Key : null;
 
     document.querySelectorAll('[data-showdays]').forEach(card => {{
+      // Classics bypass day/time filters entirely — they're always shown.
+      if (card.dataset.section === '2') {{
+        card.classList.remove('qf-hidden');
+        return;
+      }}
       if (!dayKey && qfTime === 'anytime') {{
         card.classList.remove('qf-hidden');
         return;
@@ -1642,7 +1745,7 @@ if ('serviceWorker' in navigator) {{
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
-def run() -> None:
+def run(skip_email: bool = False) -> None:
     anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
     log.info(f"Pipeline starting for {anchor.date()} …")
 
@@ -1662,14 +1765,18 @@ def run() -> None:
     deduplicate_by_tmdb_id(films)
     log.info(f"Films after deduplication: {len(films)}")
 
-    # 4. Remove films with no showtimes in the next 7 days
+    # 4. Remove films with no showtimes in the relevant window
+    #    Classics (3+ years old) use a 30-day window; everything else uses 7 days.
     today_local = datetime.now(VALENCIA_TZ).date()
     today_str   = today_local.strftime("%Y-%m-%d")
-    week_ahead  = (today_local + timedelta(days=6)).strftime("%Y-%m-%d")
+    def _cutoff(film):
+        return (today_local + timedelta(days=29 if _is_classic(film) else 6)).strftime("%Y-%m-%d")
+
     stale = [
         title for title, film in films.items()
         if not any(
-            any(today_str <= dk <= week_ahead for dk in c.get("showtimes", {}).keys())
+            any(today_str <= dk <= _cutoff(film) for dk in c.get("showtimes", {}).keys())
+            or any(today_str <= dk <= _cutoff(film) for dk in c.get("vose_showtimes", {}).keys())
             for c in film.get("cinemas", [])
         )
     ]
@@ -1745,8 +1852,11 @@ def run() -> None:
 
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
-    # 11. Send admin confirmation email
-    send_pipeline_summary(films, scraper_status)
+    # 11. Send admin confirmation email (skipped if --no-email flag passed)
+    if not skip_email:
+        send_pipeline_summary(films, scraper_status)
+    else:
+        log.info("Skipping pipeline summary email (--no-email)")
 
 
 def send_pipeline_summary(films: dict, scraper_status: list) -> None:
@@ -1760,7 +1870,7 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     smtp_pass = os.environ.get("SMTP_PASSWORD", "")
     from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
     from_name = os.environ.get("FROM_NAME", "whatson.movie")
-    admin_to  = "matt_palmer@outlook.com"
+    admin_to  = ["matt_palmer@outlook.com", "clare_noeken@outlook.com"]
 
     if not all([smtp_host, smtp_user, smtp_pass]):
         log.warning("SMTP not configured — skipping pipeline summary email")
@@ -1775,24 +1885,92 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     )
 
     # Subscriber counts from Supabase
-    total_subs = email_subs = 0
+    total_subs = email_subs = new_subs = 0
+    active_7d = active_30d = never_visited = None
+    new_sub_emails: list = []
     key = SUPABASE_SERVICE_KEY or SUPABASE_ANON
     if SUPABASE_URL and key:
         try:
             import urllib.request
-            url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email_enabled,active&active=eq.true"
-            req = urllib.request.Request(url, headers={
-                "apikey": key, "Authorization": f"Bearer {key}"
-            })
+            now_valencia   = datetime.now(VALENCIA_TZ)
+            yesterday_date = (now_valencia - timedelta(days=1)).strftime("%Y-%m-%d")
+            days7_ago      = (now_valencia - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            days30_ago     = (now_valencia - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+
+            url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email_enabled,active,last_seen_at"
+            req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=10) as resp:
                 rows = json.loads(resp.read())
-            total_subs = len(rows)
-            email_subs = sum(1 for r in rows if r.get("email_enabled"))
+            total_subs    = len(rows)
+            email_subs    = sum(1 for r in rows if r.get("email_enabled") and r.get("active"))
+            active_7d     = sum(1 for r in rows if r.get("last_seen_at") and r["last_seen_at"] >= days7_ago)
+            active_30d    = sum(1 for r in rows if r.get("last_seen_at") and r["last_seen_at"] >= days30_ago)
+            never_visited = sum(1 for r in rows if not r.get("last_seen_at"))
+
+            new_url = f"{SUPABASE_URL}/rest/v1/subscribers?select=email,subscribed_at&subscribed_at=gte.{yesterday_date}"
+            req2 = urllib.request.Request(new_url, headers=headers)
+            with urllib.request.urlopen(req2, timeout=10) as resp2:
+                new_sub_rows = json.loads(resp2.read())
+            new_subs = len(new_sub_rows)
+            new_sub_emails = [r["email"] for r in new_sub_rows]
         except Exception as exc:
             log.warning(f"Could not fetch subscriber count: {exc}")
 
+    # GoatCounter stats
+    gc_yesterday = gc_week = None
+    gc_key = os.environ.get("GOATCOUNTER_API_KEY", "")
+    if gc_key:
+        import urllib.request as _ur
+        import urllib.error as _ue
+        import time as _time
+
+        def _gc_fetch(url: str, retries: int = 3) -> dict:
+            """Fetch a GoatCounter stats URL, retrying on 404/5xx (intermittent server issues)."""
+            for attempt in range(retries):
+                try:
+                    req = _ur.Request(url, headers={"Authorization": f"Bearer {gc_key}"})
+                    with _ur.urlopen(req, timeout=10) as resp:
+                        return json.loads(resp.read())
+                except _ue.HTTPError as exc:
+                    if attempt < retries - 1 and exc.code in (404, 500, 502, 503):
+                        _time.sleep(3)
+                        continue
+                    raise
+            return {}
+
+        try:
+            now_v         = datetime.now(VALENCIA_TZ)
+            yesterday_start = (now_v - timedelta(days=1)).strftime("%Y-%m-%dT00:00:00Z")
+            yesterday_end   = (now_v - timedelta(days=1)).strftime("%Y-%m-%dT23:00:00Z")
+            week_ago_start  = (now_v - timedelta(days=7)).strftime("%Y-%m-%dT00:00:00Z")
+
+            gc_data  = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}")
+            gc_yesterday = gc_data.get("total", 0)
+
+            gc_data7 = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={week_ago_start}&end={yesterday_end}")
+            gc_week  = gc_data7.get("total", 0)
+        except Exception as exc:
+            log.warning(f"Could not fetch GoatCounter stats: {exc}")
+
     now_str = datetime.now(VALENCIA_TZ).strftime("%Y-%m-%d %H:%M")
     status_icon = "⚠️" if failed else "✅"
+    new_subs_str = f"+{new_subs} new in last 24h" if new_subs else "no new in last 24h"
+    new_subs_detail = ("\n" + "\n".join(f"    {e}" for e in new_sub_emails)) if new_sub_emails else ""
+    active_lines = ""
+    if active_7d is not None:
+        active_lines = (
+            f"\n  Active last 7 days:    {active_7d}"
+            f"\n  Active last 30 days:   {active_30d}"
+            f"\n  Never visited:         {never_visited}"
+        )
+    gc_lines = ""
+    if gc_yesterday is not None:
+        gc_lines = f"""
+TRAFFIC (GoatCounter):
+  Yesterday:            {gc_yesterday} pageviews
+  Last 7 days:          {gc_week} pageviews
+"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
 SCRAPERS ({len(scraper_status)} cinemas):
@@ -1800,11 +1978,11 @@ SCRAPERS ({len(scraper_status)} cinemas):
 
 FILMS: {len(films)} total (after deduplication & stale removal)
 
-SUBSCRIBERS (active):
+SUBSCRIBERS:
   Total signed up:      {total_subs}
-  Email enabled:        {email_subs}
-  Preferences only:     {total_subs - email_subs}
-
+  Active (email on):    {email_subs}
+  New (last 24h):       {new_subs_str}{new_subs_detail}{active_lines}
+{gc_lines}
 Site: https://whatson.movie/listings/
 """
 
@@ -1812,15 +1990,15 @@ Site: https://whatson.movie/listings/
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
     msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
-    msg["To"]      = admin_to
+    msg["To"]      = ", ".join(admin_to)
 
     try:
         with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.ehlo()
             server.starttls()
             server.login(smtp_user, smtp_pass)
-            server.sendmail(from_addr, [admin_to], msg.as_string())
-        log.info(f"Pipeline summary email sent to {admin_to}")
+            server.sendmail(from_addr, admin_to, msg.as_string())
+        log.info(f"Pipeline summary email sent to {', '.join(admin_to)}")
     except Exception as exc:
         log.warning(f"Could not send pipeline summary email: {exc}")
 
@@ -1908,4 +2086,6 @@ def send_weekly_emails(films: dict) -> None:
 
 
 if __name__ == "__main__":
-    run()
+    import sys
+    skip_email = "--no-email" in sys.argv
+    run(skip_email=skip_email)
