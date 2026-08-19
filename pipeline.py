@@ -624,9 +624,9 @@ CSS = """
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
 .wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
 .lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap}
-.lang-label{font-size:11px;color:#4a3f5e;letter-spacing:1px;text-transform:uppercase}
+.lang-label{font-size:12px;color:#8a7e9a;letter-spacing:1px;text-transform:uppercase}
 .lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
-.lang-btn{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn{padding:5px 14px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#8a7e9a;font-family:'DM Sans',Helvetica,sans-serif}
 .lang-btn.active{background:#2e2040;color:#f0eae0}
 .header{background:linear-gradient(135deg,#1a0a2e 0%,#0f0c14 60%);border-bottom:1px solid #3a2a55;padding:40px 40px 32px;text-align:center;position:relative;overflow:hidden}
 .header::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,180,50,.15) 0%,transparent 70%);border-radius:50%}
@@ -640,14 +640,14 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .cinema-group-header{margin:0 24px 14px;padding:14px 18px;background:#160f24;border:1px solid #ffb432;border-left:4px solid #ffb432;border-radius:10px;display:flex;align-items:center;gap:10px}#section2-header{border-color:#ffb432;border-left-color:#ffb432}
 .cinema-group-name{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0}
 .cinema-group-desc{font-size:14px;color:#c5b8d8}
-.cinema-group-link{margin-left:auto;font-size:11px;color:#7a6a9a;text-decoration:none;white-space:nowrap}
+.cinema-group-link{margin-left:auto;font-size:12px;color:#9a8fb5;text-decoration:none;white-space:nowrap}
 .list-card{margin:0 24px 10px;padding:14px 16px;background:#1a1228;border:1px solid #2e2040;border-radius:12px;display:flex;gap:14px;align-items:flex-start;position:relative;cursor:pointer;transition:background .15s}.list-card:active{background:#221530}
 .list-poster{width:54px;height:78px;flex-shrink:0;background:#2a1f3d;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
 .list-poster img{width:100%;height:100%;object-fit:cover;display:block}
 .list-body{flex:1}
 .list-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
-.list-meta{font-size:11px;color:#7a6d8a;margin-bottom:5px;line-height:1.5}
-.list-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}
+.list-meta{font-size:12px;color:#9a8faa;margin-bottom:5px;line-height:1.5}
+.list-synopsis{font-size:13px;color:#a09aa8;line-height:1.5;margin-bottom:8px}
 .badges{margin-bottom:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .film-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
@@ -655,40 +655,40 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
-.cinema-links-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4a4060;font-weight:500;margin-bottom:5px}
+.cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
-.vose-mini{display:inline-block;margin-left:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
+.vose-mini{display:inline-block;margin-left:4px;font-size:11px;font-weight:700;letter-spacing:1px;color:#ffd84a;vertical-align:middle}
 .rating{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle}
 .rating-TP{background:#50c88c}.rating-12{background:#7aa0e0}.rating-16{background:#e08040}.rating-18{background:#e05050}.rating-7{background:#80cc80}
 .featured-card{margin:0 24px 16px;border-radius:16px;overflow:hidden;background:#1a1228;border:1px solid #2e2040;display:flex;min-height:200px;position:relative;cursor:pointer;transition:background .15s}.featured-card:active{background:#221530}
 .featured-poster{width:120px;flex-shrink:0;background:#2a1f3d;display:flex;align-items:flex-start;justify-content:center}
 .featured-info{padding:18px 20px 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
 .film-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:7px;text-decoration:none;display:block}.film-title:hover{color:#ffb432}
-.film-meta{font-size:12px;color:#7a6d8a;margin-bottom:8px;line-height:1.55}
-.film-synopsis{font-size:13px;color:#9d909e;line-height:1.55;margin-bottom:11px}
+.film-meta{font-size:13px;color:#9a8faa;margin-bottom:8px;line-height:1.55}
+.film-synopsis{font-size:13px;color:#a09aa8;line-height:1.55;margin-bottom:11px}
 .grid-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px 14px}
 .grid-card{background:#1a1228;border:1px solid #2e2040;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:border-color .2s,background .15s}.grid-card:hover{border-color:rgba(255,180,50,.45)}.grid-card:active{background:#221530}
 .grid-poster{width:100%;background:#2a1f3d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px}
 .grid-info{padding:12px 14px 14px}
 .grid-title{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px;text-decoration:none;display:block}.grid-title:hover{color:#ffb432}
-.grid-meta{font-size:11px;color:#7a6d8a;margin-bottom:6px;line-height:1.5}
-.grid-synopsis{font-size:11.5px;color:#8c8090;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:13px;font-weight:600;color:#d4913a;letter-spacing:.3px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(212,145,58,.45)}.grid-card:hover .showtimes-hint{color:#ffb432;text-decoration-color:rgba(255,180,50,.6)}
+.grid-meta{font-size:12px;color:#9a8faa;margin-bottom:6px;line-height:1.5}
+.grid-synopsis{font-size:13px;color:#a09aa8;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:13px;font-weight:600;color:#d4913a;letter-spacing:.3px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(212,145,58,.45)}.grid-card:hover .showtimes-hint{color:#ffb432;text-decoration-color:rgba(255,180,50,.6)}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
-.footer p{font-size:12px;color:#4a3f5e;line-height:1.7}
-.footer a{color:#7a6a9a;text-decoration:none}
-.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#3a2e50;margin-bottom:10px}
+.footer p{font-size:13px;color:#8a7e9a;line-height:1.7}
+.footer a{color:#9a8fb5;text-decoration:none}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#7a6a9a;margin-bottom:10px}
 .filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
-.filter-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4a3f5e;font-weight:500}
-.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
+.filter-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;font-weight:500}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#9a8fb5;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
 .filter-btn:hover{color:#c5b8d8;border-color:#4a3a60}
 .filter-btn.active{background:rgba(255,220,80,.15);color:#ffd84a;border-color:rgba(255,220,80,.4)}
-.qf-btn{padding:7px 0;border-radius:20px;font-size:11px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#6a5e7a;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.qf-btn{padding:7px 0;border-radius:20px;font-size:12px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#9a8fb5;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
 @media(hover:hover){.qf-btn:hover{color:#c5b8d8;border-color:#4a3a60}}
 .qf-active{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}
 .qf-hidden{display:none!important}
-.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#5a4e6a;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
-@media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:10px}}
+.filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#9a8faa;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
+@media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:11px}}
 """
 
 JS = """
@@ -1127,10 +1127,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .lang-bar a{{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap}}
 .lang-bar a span{{color:#ffb432}}
 .lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
-.lang-btn{{padding:5px 14px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;transition:all .2s}}
+.lang-btn{{padding:5px 14px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#8a7e9a;font-family:'DM Sans',sans-serif;transition:all .2s}}
 .lang-btn.active{{background:#160f24;color:#f0eae0}}
 .back-bar{{padding:12px 20px;background:#0a0810;border-bottom:1px solid #1e1630}}
-.back-link{{font-size:12px;color:#7a6a9a;text-decoration:none;letter-spacing:0.5px}}
+.back-link{{font-size:13px;color:#9a8fb5;text-decoration:none;letter-spacing:0.5px}}
 .back-link:hover{{color:#c5b8d8}}
 .film-hero{{display:flex;gap:16px;padding:20px;background:#160f24;border-bottom:1px solid #2e2040}}
 .hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#2a1f3d}}
@@ -1142,12 +1142,12 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
 .rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
 .hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
-.orig-title{{font-size:11px;color:#5a4e6a;margin-bottom:6px}}
-.hero-meta{{font-size:11px;color:#7a6d8a;line-height:1.55;margin-bottom:8px}}
-.hero-synopsis{{font-size:12px;color:#9d909e;line-height:1.6}}
-.section-title{{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#4a3f5e;padding:20px 20px 10px}}
+.orig-title{{font-size:12px;color:#8a7e9a;margin-bottom:6px}}
+.hero-meta{{font-size:12px;color:#9a8faa;line-height:1.55;margin-bottom:8px}}
+.hero-synopsis{{font-size:13px;color:#a09aa8;line-height:1.6}}
+.section-title{{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a7e9a;padding:20px 20px 10px}}
 .day-tabs{{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}}
-.day-tab{{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#6a5e7a;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
+.day-tab{{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#9a8fb5;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
 .day-tab.active{{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}}
 .day-tab.has-shows{{color:#50c88c}}
 .day-panel{{display:none;padding:0 20px 20px}}
@@ -1155,7 +1155,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-row{{padding:14px 0;border-bottom:1px solid #1e1630}}
 .showtime-row:last-child{{border-bottom:none}}
 .showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
-.vose-mini{{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
+.vose-mini{{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
@@ -1163,11 +1163,11 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
 .time-btn--match{{background:#0d2418;border-color:#1d6b3a;color:#50c88c}}
 .time-btn--match:hover{{background:#112e1e;border-color:#50c88c;color:#50c88c}}
-.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:11px;color:#6a5e7a;border-top:1px solid #1e1630}}
+.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:12px;color:#8a7e9a;border-top:1px solid #1e1630}}
 .showtime-legend-dot{{width:10px;height:10px;border-radius:3px;background:#0d2418;border:1px solid #1d6b3a;flex-shrink:0}}
-.no-times{{font-size:13px;color:#4a3f5e;padding:20px 0;text-align:center}}
-.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:11px;color:#3a2e50}}
-@media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:10px}}}}
+.no-times{{font-size:13px;color:#8a7e9a;padding:20px 0;text-align:center}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}}
+@media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -1572,8 +1572,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
       <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
-      <em style="color:#3a2050;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
-      <span style="color:#3a2e50;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <em style="color:#7a6a9a;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
+      <span style="color:#7a6a9a;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
