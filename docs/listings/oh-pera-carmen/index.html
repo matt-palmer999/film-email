@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="DÍAS DE AGOSTO — Cartelera Valencia" data-en="Summer Days — Cartelera Valencia">DÍAS DE AGOSTO — Cartelera Valencia</title>
+<title data-es="óh!pera – Carmen — Cartelera Valencia" data-en="óh!pera – Carmen — Cartelera Valencia">óh!pera – Carmen — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,20 +85,20 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/uFgbJ2MdkYM7efgt8y2rvgoTJHh.jpg" alt="DÍAS DE AGOSTO" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cinesbabel.com/wp-content/uploads/2026/06/JPg002ah-369x526.jpg" alt="óh!pera – Carmen" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 4.0</span></div>
-      <div class="hero-title" data-es="DÍAS DE AGOSTO" data-en="Summer Days">DÍAS DE AGOSTO</div>
-      <div class="orig-title" translate="no">Días de agosto</div>
-      <div class="hero-meta"><span data-es="ES · 2026" data-en="ES · 2026 · Drama, Romance, Thriller">ES · 2026</span></div>
-      <div class="hero-synopsis" data-es="Juan y Gabriela, una pareja de universitarios, planean disfrutar de un verano idílico en el chalé familiar en la costa. Sin embargo, sus planes se tuercen cuando Fernando, el padre de Juan, aparece sin previo aviso acompañado de Mónica, su joven pareja." data-en="Summer is promising for Juan and Gabriela, who plan to have a beach house. However, their plans are disrupted when Juan&#39;s father arrives with his new, younger girlfriend, Mónica, causing tension and a challenging coexistence.">Juan y Gabriela, una pareja de universitarios, planean disfrutar de un verano idílico en el chalé familiar en la costa. Sin embargo, sus planes se tuercen cuando Fernando, el padre de Juan, aparece sin previo aviso acompañado de Mónica, su joven pareja.</div>
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="hero-title" data-es="óh!pera – Carmen" data-en="óh!pera – Carmen">óh!pera – Carmen</div>
+      
+      <div class="hero-meta"><span data-es="150 min" data-en="150 min">150 min</span></div>
+      <div class="hero-synopsis" data-es="" data-en=""></div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-27" data-es="Hoy 27" data-en="Today 27" onclick="showDay('2026-08-27')">Hoy 27</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-08-27"><div class="showtime-row" data-cinema-id="park" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC Park</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="16:00" data-vose="false">16:00</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-03" data-es="Jueves 3" data-en="Thursday 3" onclick="showDay('2026-09-03')">Jueves 3</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-03"><div class="showtime-row" data-cinema-id="babel" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Babel</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:00" data-vose="true">19:00</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Summer Days' : 'DÍAS DE AGOSTO') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'óh!pera – Carmen' : 'óh!pera – Carmen') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
