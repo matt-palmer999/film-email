@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="TRES DE MÁS — Cartelera Valencia" data-en="Tres de más — Cartelera Valencia">TRES DE MÁS — Cartelera Valencia</title>
+<title data-es="EIXAM (ENJAMBRE), PREESTRENO — Cartelera Valencia" data-en="EIXAM (ENJAMBRE), PREESTRENO — Cartelera Valencia">EIXAM (ENJAMBRE), PREESTRENO — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -85,20 +85,20 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/bG87VicPzkGtlrl9v2oXS56oeIL.jpg" alt="TRES DE MÁS" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cineslys.reservaentradas.com/cineslys/obj/LCinesD_dat/eventos/JPg0042p.jpg" alt="EIXAM (ENJAMBRE), PREESTRENO" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="score-badge">⭐ 10.0</span></div>
-      <div class="hero-title" data-es="TRES DE MÁS" data-en="Tres de más">TRES DE MÁS</div>
+      <div class="badges"><span class="vose-badge">VOSE</span></div>
+      <div class="hero-title" data-es="EIXAM (ENJAMBRE), PREESTRENO" data-en="EIXAM (ENJAMBRE), PREESTRENO">EIXAM (ENJAMBRE), PREESTRENO</div>
       
-      <div class="hero-meta"><span data-es="ES · 2026" data-en="ES · 2026 · Comedy">ES · 2026</span></div>
-      <div class="hero-synopsis" data-es="Julia y Ernesto lo tienen todo: una relación envidiable, carreras de éxito y, sobre todo, una vida ideal sin hijos. Sin embargo, un día despiertan y se encuentran con tres niños que insisten en llamarlos mamá y papá. Su vida perfecta se ha esfumado. De la noche a la mañana tendrán que aprender a ser padres mientras tratan de descubrir de dónde han salido esos niños y cómo pueden librarse de ellos." data-en="Julia y Ernesto lo tienen todo: una relación envidiable, carreras de éxito y, sobre todo, una vida ideal sin hijos. Sin embargo, un día despiertan y se encuentran con tres niños que insisten en llamarlos mamá y papá. Su vida perfecta se ha esfumado. De la noche a la mañana tendrán que aprender a ser padres mientras tratan de descubrir de dónde han salido esos niños y cómo pueden librarse de ellos.">Julia y Ernesto lo tienen todo: una relación envidiable, carreras de éxito y, sobre todo, una vida ideal sin hijos. Sin embargo, un día despiertan y se encuentran con tres niños que insisten en llamarlos mamá y papá. Su vida perfecta se ha esfumado. De la noche a la mañana tendrán que aprender a ser padres mientras tratan de descubrir de dónde han salido esos niños y cómo pueden librarse de ellos.</div>
+      <div class="hero-meta"><span data-es="100 min" data-en="100 min">100 min</span></div>
+      <div class="hero-synopsis" data-es="" data-en=""></div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-30" data-es="Hoy 30" data-en="Today 30" onclick="showDay('2026-08-30')">Hoy 30</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-08-30"><div class="showtime-row" data-cinema-id="park" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC Park</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="12:15" data-vose="false">12:15</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-08-31" data-es="Hoy 31" data-en="Today 31" onclick="showDay('2026-08-31')">Hoy 31</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-08-31"><div class="showtime-row" data-cinema-id="lys" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Lys</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:15" data-vose="true">19:15</button><button onclick="showComingSoon()" class="time-btn" data-time="19:35" data-vose="true">19:35</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -133,7 +133,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Tres de más' : 'TRES DE MÁS') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'EIXAM (ENJAMBRE), PREESTRENO' : 'EIXAM (ENJAMBRE), PREESTRENO') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
