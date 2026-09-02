@@ -1873,13 +1873,36 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
         log.warning("SMTP not configured — skipping pipeline summary email")
         return
 
+    # Load previous scraper counts for regression detection
+    counts_path = "docs/data/scraper_counts.json"
+    prev_counts: dict = {}
+    try:
+        with open(counts_path, "r", encoding="utf-8") as fh:
+            prev_counts = json.load(fh)
+    except Exception:
+        pass  # first run or missing file — no history yet
+
     # Scraper status lines — always list every cinema with ✅ / ❌
+    # Flag a ⚠️ drop if a cinema loses >40% of its films vs last run
+    DROP_THRESHOLD = 0.40
     failed = [s for s in scraper_status if not s["ok"]]
-    scraper_lines = "\n".join(
-        f"  {'✅' if s['ok'] else '❌'} {s['label']:<22} "
-        + (f"{s['count']} films" if s["ok"] else f"FAILED — {s['error'] or 'unknown error'}")
-        for s in scraper_status
-    )
+    regressions = []
+    scraper_line_parts = []
+    for s in scraper_status:
+        icon = '✅' if s['ok'] else '❌'
+        if s["ok"]:
+            prev = prev_counts.get(s["label"])
+            if prev and prev > 0 and s["count"] < prev * (1 - DROP_THRESHOLD):
+                drop_pct = round((1 - s["count"] / prev) * 100)
+                note = f"⚠️  {s['count']} films (was {prev} — down {drop_pct}%)"
+                regressions.append(s["label"])
+            else:
+                prev_note = f" (was {prev})" if prev else ""
+                note = f"{s['count']} films{prev_note}"
+        else:
+            note = f"FAILED — {s['error'] or 'unknown error'}"
+        scraper_line_parts.append(f"  {icon} {s['label']:<22} {note}")
+    scraper_lines = "\n".join(scraper_line_parts)
 
     # Subscriber counts from Supabase
     total_subs = email_subs = new_subs = 0
@@ -1985,7 +2008,8 @@ Site: https://whatson.movie/listings/
 
     msg = MIMEText(body, "plain", "utf-8")
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
-    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note} · {now_str}"
+    regression_note = f" — ⚠️ {len(regressions)} drop(s)" if regressions else ""
+    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
     msg["To"]      = ", ".join(admin_to)
 
@@ -1998,6 +2022,16 @@ Site: https://whatson.movie/listings/
         log.info(f"Pipeline summary email sent to {', '.join(admin_to)}")
     except Exception as exc:
         log.warning(f"Could not send pipeline summary email: {exc}")
+
+    # Save today's per-cinema counts for tomorrow's regression comparison
+    try:
+        new_counts = {s["label"]: s["count"] for s in scraper_status if s["ok"]}
+        os.makedirs(os.path.dirname(counts_path), exist_ok=True)
+        with open(counts_path, "w", encoding="utf-8") as fh:
+            json.dump(new_counts, fh, indent=2, ensure_ascii=False)
+        log.info("Scraper counts saved to %s", counts_path)
+    except Exception as exc:
+        log.warning("Could not save scraper counts: %s", exc)
 
 
 def send_weekly_emails(films: dict) -> None:
