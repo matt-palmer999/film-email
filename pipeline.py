@@ -619,7 +619,6 @@ def compute_card_data(film: dict) -> dict:
 # ── CSS / JS constants (copied from scraper.py, allCinemas updated) ───────────
 
 CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0}
 .wrapper{max-width:640px;margin:0 auto;background:#0f0c14}
@@ -1118,8 +1117,10 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}}
 .wrapper{{max-width:640px;margin:0 auto;background:#0f0c14}}
@@ -1487,6 +1488,9 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>Cartelera Valencia – {date_en}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
 <style>{CSS}</style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
