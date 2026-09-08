@@ -134,7 +134,7 @@ function setLang(lang) {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
   document.title = (lang === 'en' ? 'Tad and The Magic Lamp' : 'CAT Tadeo Jones y la lámpara maravillosa') + ' — Cartelera Valencia';
-  localStorage.setItem('cv_lang', lang);
+  localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
   const d = new Date(dateKey);
@@ -168,7 +168,7 @@ function showDay(key) {
 }
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
+  const lang = urlParams.get('lang') || localStorage.getItem('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
   const tabParam = urlParams.get('tab');
   if (tabParam) {

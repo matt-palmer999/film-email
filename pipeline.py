@@ -699,7 +699,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  localStorage.setItem('cv_lang', lang);
+  localStorage.setItem('lang', lang);
   const url = new URL(window.location);
   url.searchParams.set('lang', lang);
   window.history.replaceState({}, '', url);
@@ -742,7 +742,7 @@ function setSubscriberUI(isSubscriber) {
 }
 
 async function loadUserPreferences() {
-  const savedLang = localStorage.getItem('cv_lang');
+  const savedLang = localStorage.getItem('cv_lang') || localStorage.getItem('lang');
   if (savedLang) setLang(savedLang);
 
   const params = new URLSearchParams(window.location.search);
@@ -1237,7 +1237,7 @@ function setLang(lang) {{
     el.innerHTML = el.getAttribute('data-' + lang);
   }});
   document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
-  localStorage.setItem('cv_lang', lang);
+  localStorage.setItem('lang', lang);
 }}
 function isWeekend(dateKey) {{
   const d = new Date(dateKey);
@@ -1271,7 +1271,7 @@ function showDay(key) {{
 }}
 window.addEventListener('DOMContentLoaded', () => {{
   const urlParams = new URLSearchParams(window.location.search);
-  const lang = urlParams.get('lang') || localStorage.getItem('cv_lang') || 'es';
+  const lang = urlParams.get('lang') || localStorage.getItem('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
   const tabParam = urlParams.get('tab');
   if (tabParam) {{

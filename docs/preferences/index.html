@@ -782,11 +782,11 @@
       document.querySelectorAll('[data-placeholder-es]').forEach(el => {
         el.placeholder = el.getAttribute('data-placeholder-' + lang);
       });
-      localStorage.setItem('cv_lang', lang);
+      localStorage.setItem('lang', lang);
       prefs.lang = lang;
     }
 
-    const savedLang = localStorage.getItem('cv_lang') || 'es';
+    const savedLang = localStorage.getItem('lang') || localStorage.getItem('cv_lang') || 'es';
     if (savedLang !== 'es') setLang(savedLang);
 
     // ── PANELS ──
