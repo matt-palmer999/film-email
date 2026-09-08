@@ -1097,7 +1097,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
     rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
     rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
-    poster_html  = f'<img src="{poster}" alt="{esc(title_es)}" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
+    poster_html  = f'<img src="{poster}" alt="{esc(title_es)}" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
     return f"""<!DOCTYPE html>
@@ -1414,7 +1414,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         rating   = film.get("rating", "?")
 
         poster_html = (
-            f'<img src="{poster}" alt="{film["title"]}" style="width:100%;height:auto;object-fit:contain;display:block;">'
+            f'<img src="{poster}" alt="{film["title"]}" width="500" height="750" loading="lazy" style="width:100%;height:auto;object-fit:contain;display:block;">'
             if poster else '<div style="font-size:34px;">🎬</div>'
         )
         new_badge   = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span>' if is_new else ""
