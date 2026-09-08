@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="SECRET FLASHBACK (7 septiembre) — Cartelera Valencia" data-en="SECRET FLASHBACK (7 septiembre) — Cartelera Valencia">SECRET FLASHBACK (7 septiembre) — Cartelera Valencia</title>
+<title data-es="Prácticamente magia 2 CINEMA &amp; CROCHET — Cartelera Valencia" data-en="Prácticamente magia 2 CINEMA &amp; CROCHET — Cartelera Valencia">Prácticamente magia 2 CINEMA &amp; CROCHET — Cartelera Valencia</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -87,39 +87,24 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="film-hero">
     <div class="hero-poster"><div style="font-size:64px;text-align:center;padding:40px;">🎬</div></div>
     <div class="hero-info">
-      <div class="badges"><span class="vose-badge">VOSE</span></div>
-      <div class="hero-title" data-es="SECRET FLASHBACK (7 septiembre)" data-en="SECRET FLASHBACK (7 septiembre)">SECRET FLASHBACK (7 septiembre)</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="Prácticamente magia 2 CINEMA &amp; CROCHET" data-en="Prácticamente magia 2 CINEMA &amp; CROCHET">Prácticamente magia 2 CINEMA & CROCHET</div>
       
       <div class="hero-meta"><span data-es="129 min" data-en="129 min">129 min</span></div>
-      <div class="hero-synopsis" data-es="
-
-Traemos de vuelta grandes clásicos del cine de todos los tiempos a precio reducido.
- 
-
-Cada dos semanas, los lunes a las 21:00h, tienes una cita en Cinesa para disfrutar de nuestros Secret Flashback en VOSE*.
+      <div class="hero-synopsis" data-es="Vive el cine de una forma totalmente diferente con Crochet &amp; Cinema. Disfruta de Prácticamente Mágia 2  mientras te relajas haciendo crochet, en un ambiente único, creativo y acogedor como es nuestra sala. Una experiencia perfecta para desconectar, compartir y dejar volar tu creatividad. Incluye kit de crochet de regalo. Reserva ya tu entrada y no te quedes sin plaza. 
 
-*VOSE: Versión Original Subtitulada al Español" data-en="
-
-Traemos de vuelta grandes clásicos del cine de todos los tiempos a precio reducido.
- 
-
-Cada dos semanas, los lunes a las 21:00h, tienes una cita en Cinesa para disfrutar de nuestros Secret Flashback en VOSE*.
+*El Kit DIY de la sesión " data-en="Vive el cine de una forma totalmente diferente con Crochet &amp; Cinema. Disfruta de Prácticamente Mágia 2  mientras te relajas haciendo crochet, en un ambiente único, creativo y acogedor como es nuestra sala. Una experiencia perfecta para desconectar, compartir y dejar volar tu creatividad. Incluye kit de crochet de regalo. Reserva ya tu entrada y no te quedes sin plaza. 
 
-*VOSE: Versión Original Subtitulada al Español">
-
-Traemos de vuelta grandes clásicos del cine de todos los tiempos a precio reducido.
- 
-
-Cada dos semanas, los lunes a las 21:00h, tienes una cita en Cinesa para disfrutar de nuestros Secret Flashback en VOSE*.
+*El Kit DIY de la sesión ">Vive el cine de una forma totalmente diferente con Crochet & Cinema. Disfruta de Prácticamente Mágia 2  mientras te relajas haciendo crochet, en un ambiente único, creativo y acogedor como es nuestra sala. Una experiencia perfecta para desconectar, compartir y dejar volar tu creatividad. Incluye kit de crochet de regalo. Reserva ya tu entrada y no te quedes sin plaza. 
 
-*VOSE: Versión Original Subtitulada al Español</div>
+*El Kit DIY de la sesión </div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-07" data-es="Hoy 7" data-en="Today 7" onclick="showDay('2026-09-07')">Hoy 7</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-07"><div class="showtime-row" data-cinema-id="cinesa" data-vose="true"><div class="showtime-cinema"><span translate="no">Cinesa LUXE Bonaire</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:40" data-vose="true">20:40</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-13" data-es="Domingo 13" data-en="Sunday 13" onclick="showDay('2026-09-13')">Domingo 13</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-13"><div class="showtime-row" data-cinema-id="ocine_aqua" data-vose="false"><div class="showtime-cinema"><span translate="no">Ocine Premium Aqua</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="15:45" data-vose="false">15:45</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -154,7 +139,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'SECRET FLASHBACK (7 septiembre)' : 'SECRET FLASHBACK (7 septiembre)') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Prácticamente magia 2 CINEMA &amp; CROCHET' : 'Prácticamente magia 2 CINEMA &amp; CROCHET') + ' — Cartelera Valencia';
   localStorage.setItem('cv_lang', lang);
 }
 function isWeekend(dateKey) {
