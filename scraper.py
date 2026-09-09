@@ -498,6 +498,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 
     # Build day tabs for today + 6 days
     today = datetime.now(ZoneInfo("Europe/Madrid")).date()
+    is_classic_film = bool(film.get("year")) and int(film.get("year", 0)) <= today.year - 3
     DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     DAYS_ES = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 
@@ -750,12 +751,11 @@ window.addEventListener('DOMContentLoaded', () => {{
   document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
 
   // Apply cinema filter from URL params (set by preferences)
-  // Skip if this is a classic film and the classics override is on
+  // Classic films always bypass the cinema filter.
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas');
-  const isClassicFilm = params.get('classic') === 'true';
-  const alwaysClassics = params.get('classics') === 'true';
-  if (cinemas && !(alwaysClassics && isClassicFilm)) {{
+  const isClassicFilm = {{'true' if is_classic_film else 'false'}};
+  if (cinemas && !isClassicFilm) {{
     const allowed = cinemas.split(',');
     // Hide showtime rows not in preferences
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
@@ -922,15 +922,14 @@ function applyPreferencesFromURL() {
   const params  = new URLSearchParams(window.location.search);
   const cinemas = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
-  // Hide cinema tags for excluded cinemas (but not on classics cards when classics override is on)
-  const alwaysClassics = params.get('classics') === 'true';
+  // Hide cinema tags for excluded cinemas (classics always bypass)
   if (cinemas) {
     document.querySelectorAll('.cinema-tag').forEach(tag => {
       const cid = tag.dataset.cinema;
       if (cid && !cinemas.includes(cid)) {
         const card = tag.closest('[data-section]');
         const isClassic = card && card.dataset.section === '2';
-        if (!(alwaysClassics && isClassic)) {
+        if (!isClassic) {
           tag.style.display = 'none';
         }
       }
@@ -991,7 +990,7 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,classics,rating_filter,min_rating',
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,rating_filter,min_rating',
       { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
@@ -1018,7 +1017,6 @@ async function loadUserPreferences() {
     if (prefs.new_only)      newParams.set('new',       'true');
     if (prefs.family_only)   newParams.set('family',    'true');
     if (prefs.evening_only)  newParams.set('evening',   'true');
-    if (prefs.classics)      newParams.set('classics',  'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','babel','dor'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
@@ -1153,7 +1151,6 @@ function applyVisibility() {{
   const newOnly       = params.get('new')         === 'true';
   const familyOnly    = params.get('family')      === 'true';
   const eveningOnly   = params.get('evening')     === 'true';
-  const alwaysClassics= params.get('classics')    === 'true';
   const minRating     = params.has('min_rating')  ? parseFloat(params.get('min_rating')) : null;
   const cinemas       = params.get('cinemas') ? params.get('cinemas').split(',') : null;
 
@@ -1166,8 +1163,8 @@ function applyVisibility() {{
   document.querySelectorAll('[data-vose]').forEach(card => {{
     const isClassic = card.dataset.section === '2';
 
-    // Classics override: only apply VOSE filter, skip all others
-    if (alwaysClassics && isClassic) {{
+    // Classics are always shown — only VOSE filter applies
+    if (isClassic) {{
       let show = true;
       if (voseOnly || filter === 'vose') {{
         if (card.dataset.vose !== 'true') show = false;
@@ -1885,7 +1882,7 @@ def fetch_subscribers() -> list:
     import urllib.request
     key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
     try:
-        fields = "email,lang,email_enabled,vose_only,vose_lang,family_only,evening_only,new_only,classics,rating_filter,min_rating,cinemas"
+        fields = "email,lang,email_enabled,vose_only,vose_lang,family_only,evening_only,new_only,rating_filter,min_rating,cinemas,unsubscribe_token"
         url = f"{SUPABASE_URL}/rest/v1/subscribers?select={fields}&email_enabled=eq.true&active=eq.true&order=email"
         req = urllib.request.Request(url, headers={
             "apikey":        key,
@@ -1909,7 +1906,6 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
     vose_lang    = prefs.get("vose_lang", "all")
     new_only     = prefs.get("new_only", False)
     family_only  = prefs.get("family_only", False)
-    classics     = prefs.get("classics", False)
     rating_filter = prefs.get("rating_filter", False)
     min_rating   = float(prefs.get("min_rating") or 7.0)
 
@@ -1920,10 +1916,9 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
         film_year = int(film.get("year") or 0)
         is_classic = film_year > 0 and film_year <= current_year - 3
 
-        if classics and is_classic:
-            # Classics override: only VOSE + language filters apply, everything else
-            # (cinema, new_only, family_only, rating_filter, evening_only) is ignored —
-            # matching the frontend JS applyVisibility() classics branch exactly.
+        if is_classic:
+            # Classics always shown — only VOSE + language filters apply, everything else
+            # (cinema, new_only, family_only, rating_filter, evening_only) is ignored.
             if vose_only:
                 if not film.get("any_vose", False):
                     continue
@@ -2176,7 +2171,6 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
     if prefs.get("new_only"):      params["new"]       = "true"
     if prefs.get("family_only"):   params["family"]    = "true"
     if prefs.get("evening_only"):  params["evening"]   = "true"
-    if prefs.get("classics"):      params["classics"]  = "true"
     if prefs.get("rating_filter"): params["min_rating"] = prefs.get("min_rating", 7)
     if allowed_cinemas and allowed_cinemas != set(ALL_CINEMAS):
         params["cinemas"] = ",".join(c for c in ALL_CINEMAS if c in allowed_cinemas)

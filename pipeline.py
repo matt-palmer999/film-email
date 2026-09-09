@@ -1965,6 +1965,7 @@ def run() -> None:
             "docs/preferences/index.html",
             "docs/listings/index.html",
             "docs/verify/index.html",
+            "docs/unsubscribe/index.html",
         ]
         for page_path in pages_to_inject:
             if os.path.exists(page_path):
@@ -2201,7 +2202,6 @@ def send_weekly_emails(films: dict) -> None:
     anchor    = _dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
     page_url  = "https://whatson.movie/listings/"
     prefs_url = "https://whatson.movie/preferences/"
-    unsub_url = "https://whatson.movie/preferences/"
 
     subscribers = fetch_subscribers()
     if not subscribers:
@@ -2221,6 +2221,9 @@ def send_weekly_emails(films: dict) -> None:
                 if not email:
                     continue
                 lang = sub.get("lang") or "es"
+                token = sub.get("unsubscribe_token", "")
+                unsub_url = (f"https://whatson.movie/unsubscribe/?token={token}"
+                             if token else "https://whatson.movie/preferences/")
                 try:
                     filtered = apply_subscriber_filters(films, sub)
                     html, subject = build_full_email(filtered, anchor, page_url, prefs_url, unsub_url, prefs=sub)
