@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="LOS 400 GOLPES - Wilder Cinema — Cartelera Valencia" data-en="The 400 Blows — Cartelera Valencia">LOS 400 GOLPES - Wilder Cinema — Cartelera Valencia</title>
+<title data-es="Apuntes de cine 2. Reserva de plaza — Cartelera Valencia" data-en="Apuntes de cine 2. Reserva de plaza — Cartelera Valencia">Apuntes de cine 2. Reserva de plaza — Cartelera Valencia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
@@ -87,20 +87,20 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/12PuU23kkDLvTd0nb8hMlE3oShB.jpg" alt="LOS 400 GOLPES - Wilder Cinema" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://cinesbabel.com/wp-content/uploads/2026/07/apuntes-2-babel-421x526.jpg" alt="Apuntes de cine 2. Reserva de plaza" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 8.0</span><span class="rating-badge">TP</span></div>
-      <div class="hero-title" data-es="LOS 400 GOLPES - Wilder Cinema" data-en="The 400 Blows">LOS 400 GOLPES - Wilder Cinema</div>
-      <div class="orig-title" translate="no">Les Quatre Cents Coups</div>
-      <div class="hero-meta"><span data-es="FR · 1959 · 99 min" data-en="FR · 1959 · Drama · 99 min">FR · 1959 · 99 min</span></div>
-      <div class="hero-synopsis" data-es="A sus doce años, Antoine Doinel se ve obligado no sólo a convivir con los problemas conyugales que sus padres no se atreven a afrontar, sino también a soportar las exigencias de un severo profesor. Un día, asustado porque no ha cumplido un castigo que el maestro le ha impuesto, decide hacer novillos con su amigo René. Inesperadamente, ve a su madre en compañía de otro hombre; la culpa y el miedo l" data-en="For young Parisian boy Antoine Doinel, life is one difficult situation after another. Surrounded by inconsiderate adults, including his neglectful parents, Antoine spends his days with his best friend, Rene, trying to plan for a better life. When one of their schemes goes awry, Antoine ends up in trouble with the law, leading to even more conflicts with unsympathetic authority figures.">A sus doce años, Antoine Doinel se ve obligado no sólo a convivir con los problemas conyugales que sus padres no se atreven a afrontar, sino también a soportar las exigencias de un severo profesor. Un día, asustado porque no ha cumplido un castigo que el maestro le ha impuesto, decide hacer novillos con su amigo René. Inesperadamente, ve a su madre en compañía de otro hombre; la culpa y el miedo l</div>
+      <div class="badges"></div>
+      <div class="hero-title" data-es="Apuntes de cine 2. Reserva de plaza" data-en="Apuntes de cine 2. Reserva de plaza">Apuntes de cine 2. Reserva de plaza</div>
+      
+      <div class="hero-meta"><span data-es="" data-en=""></span></div>
+      <div class="hero-synopsis" data-es="" data-en=""></div>
     </div>
   </div>
 
   <div id="showtimes-section" style="display:none;">
-    <div class="section-title" data-es="🕖 HORARIOS — próximas fechas" data-en="🕖 SHOWTIMES — upcoming dates">🕖 HORARIOS — próximas fechas</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-08" data-es="Hoy 8" data-en="Today 8" onclick="showDay('2026-09-08')">Hoy 8</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-08"><div class="showtime-row" data-cinema-id="park" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines ABC Park</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:00" data-vose="true">20:00</button></div></div></div></div>
+    <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-15" data-es="Martes 15" data-en="Tuesday 15" onclick="showDay('2026-09-15')">Martes 15</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-15"><div class="showtime-row" data-cinema-id="babel" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Babel</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="15:00" data-vose="false">15:00</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -135,7 +135,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'The 400 Blows' : 'LOS 400 GOLPES - Wilder Cinema') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Apuntes de cine 2. Reserva de plaza' : 'Apuntes de cine 2. Reserva de plaza') + ' — Cartelera Valencia';
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
@@ -190,7 +190,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const params  = new URLSearchParams(window.location.search);
   const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
-  const isClassicFilm = true;
+  const isClassicFilm = false;
   if (cinemas && !isClassicFilm) {
     const allowed = cinemas.split(',');
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
