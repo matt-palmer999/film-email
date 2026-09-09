@@ -245,8 +245,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   const isSubscriber = !!(document.cookie.match(/(^| )cv_email=([^;]+)/));
   window._isSubscriber = isSubscriber;
-  document.getElementById('showtimes-section').style.display = isSubscriber ? 'block' : 'none';
-  document.getElementById('gate-section').style.display     = isSubscriber ? 'none'  : 'block';
+  document.getElementById('showtimes-section').style.display = 'block';
+  document.getElementById('gate-section').style.display     = 'none';
   const params  = new URLSearchParams(window.location.search);
   const _uiLang = () => document.getElementById('html-root').getAttribute('lang') || 'es';
   const cinemas = params.get('cinemas');
