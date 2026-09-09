@@ -1117,6 +1117,15 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<link rel="canonical" href="https://whatson.movie/listings/{film.get('slug', '')}/">
+<meta name="description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta property="og:type" content="video.movie">
+<meta property="og:title" content="{esc(title_es)} — Cartelera Valencia">
+<meta property="og:description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta property="og:url" content="https://whatson.movie/listings/{film.get('slug', '')}/">
+<meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
+<meta property="og:site_name" content="whatson.movie">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
@@ -1386,6 +1395,8 @@ function hideComingSoon() {{
 def build_html(films_by_title: dict, anchor: datetime) -> str:
     date_es = week_range_es(anchor)
     date_en = week_range_en(anchor)
+    film_count   = len(films_by_title)
+    cinema_count = len({c["id"] for film in films_by_title.values() for c in film.get("cinemas", [])})
 
     multiplex_films = []
     arthouse_films: dict = {}
@@ -1488,6 +1499,15 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>Cartelera Valencia – {date_en}</title>
+<link rel="canonical" href="https://whatson.movie/listings/">
+<meta name="description" content="Todas las películas en todos los cines de Valencia, con sesiones VOSE destacadas. Filtra por cine, idioma y horario.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cartelera de cine en Valencia · VOSE y versión original">
+<meta property="og:description" content="{film_count} películas en {cinema_count} cines esta semana. Sesiones VOSE destacadas. Gratis.">
+<meta property="og:url" content="https://whatson.movie/listings/">
+<meta property="og:image" content="https://whatson.movie/og-image.png">
+<meta property="og:site_name" content="whatson.movie">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
@@ -1830,7 +1850,35 @@ def run() -> None:
             generated += 1
     log.info(f"Generated {generated} film detail pages")
 
-    # 10. Inject Supabase credentials into all pages that need them
+    # 10. Generate sitemap.xml
+    today_str = anchor.strftime("%Y-%m-%d")
+    sitemap_urls = [
+        f"  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>{today_str}</lastmod></url>",
+        f"  <url><loc>https://whatson.movie/listings/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>{today_str}</lastmod></url>",
+    ]
+    for title, film in films.items():
+        slug = film.get("slug")
+        if slug:
+            sitemap_urls.append(
+                f"  <url><loc>https://whatson.movie/listings/{slug}/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>{today_str}</lastmod></url>"
+            )
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    sitemap_xml += "\n".join(sitemap_urls)
+    sitemap_xml += "\n</urlset>\n"
+    with open("docs/sitemap.xml", "w", encoding="utf-8") as fh:
+        fh.write(sitemap_xml)
+    log.info(f"Wrote docs/sitemap.xml ({len(sitemap_urls)} URLs)")
+
+    # 10a. Ensure robots.txt points to the sitemap
+    robots_path = "docs/robots.txt"
+    robots = open(robots_path, encoding="utf-8").read() if os.path.exists(robots_path) else "User-agent: *\nDisallow: /data/\n"
+    if "Sitemap:" not in robots:
+        robots = robots.rstrip() + "\nSitemap: https://whatson.movie/sitemap.xml\n"
+        with open(robots_path, "w", encoding="utf-8") as fh:
+            fh.write(robots)
+        log.info("Added Sitemap: line to robots.txt")
+
+    # 11. Inject Supabase credentials into all pages that need them
     if SUPABASE_URL and SUPABASE_ANON:
         pages_to_inject = [
             "docs/index.html",
