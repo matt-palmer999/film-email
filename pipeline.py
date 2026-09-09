@@ -999,6 +999,81 @@ function applyVisibility() {
 
 # ── HTML page builders ────────────────────────────────────────────────────────
 
+def _build_jsonld(film: dict, slug: str) -> str:
+    """Return a <script type="application/ld+json"> block for a film detail page.
+
+    Uses @graph so the Movie entity is declared once and each ScreeningEvent
+    references it by @id — avoids repeating poster/synopsis for every showtime.
+    aggregateRating is intentionally omitted: we have no vote-count data, and
+    Google penalises inflated ratings.
+    """
+    import json as _json
+
+    title    = film.get("title_en") or film["title"]
+    synopsis = (film.get("synopsis_en") or film.get("synopsis_es") or film.get("synopsis", ""))[:500]
+    poster   = film.get("poster", "")
+    year     = film.get("year", "")
+    countries = film.get("origin_country", [])
+    page_url  = f"https://whatson.movie/listings/{slug}/"
+    movie_id  = f"{page_url}#movie"
+
+    movie: dict = {
+        "@type": "Movie",
+        "@id":   movie_id,
+        "name":  title,
+        "url":   page_url,
+    }
+    if poster:
+        movie["image"] = poster
+    if synopsis:
+        movie["description"] = synopsis
+    if year:
+        movie["datePublished"] = year
+    if countries:
+        movie["countryOfOrigin"] = [{"@type": "Country", "name": c} for c in countries[:3]]
+
+    events: list[dict] = []
+    for cinema in film.get("cinemas", []):
+        cinema_name = cinema.get("name", "")
+        location: dict = {
+            "@type": "MovieTheater",
+            "name":  cinema_name,
+            "address": {
+                "@type":           "PostalAddress",
+                "addressLocality": "Valencia",
+                "addressCountry":  "ES",
+            },
+        }
+        if cinema.get("website"):
+            location["url"] = cinema["website"]
+
+        def _events_for(showtimes_dict: dict, is_vose: bool) -> None:
+            fmt = "VOSE" if is_vose else "dubbed"
+            event_name = f"{title} (VOSE)" if is_vose else title
+            for date_str, times in showtimes_dict.items():
+                for time_str in (times or []):
+                    try:
+                        naive = datetime.fromisoformat(f"{date_str}T{time_str}:00")
+                        aware = naive.replace(tzinfo=VALENCIA_TZ)
+                        events.append({
+                            "@type":          "ScreeningEvent",
+                            "name":           event_name,
+                            "startDate":      aware.isoformat(),
+                            "videoFormat":    fmt,
+                            "workPresented":  {"@id": movie_id},
+                            "location":       location,
+                        })
+                    except Exception:
+                        pass
+
+        _events_for(cinema.get("showtimes", {}),      is_vose=False)
+        _events_for(cinema.get("vose_showtimes", {}), is_vose=True)
+
+    graph: list[dict] = [movie] + events
+    payload = {"@context": "https://schema.org", "@graph": graph}
+    return f'<script type="application/ld+json">\n{_json.dumps(payload, ensure_ascii=False, indent=2)}\n</script>'
+
+
 def build_film_detail_page(film: dict, anchor: datetime) -> str:
     title_es   = film["title"]
     title_en   = film.get("title_en", title_es)
@@ -1180,6 +1255,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+{_build_jsonld(film, film.get('slug', ''))}
 </head>
 <body>
 <div class="wrapper">
