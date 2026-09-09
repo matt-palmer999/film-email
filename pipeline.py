@@ -1498,12 +1498,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title>Cartelera Valencia – {date_en}</title>
+<title>Valencia Cinema Listings – {date_en}</title>
 <link rel="canonical" href="https://whatson.movie/listings/">
-<meta name="description" content="Todas las películas en todos los cines de Valencia, con sesiones VOSE destacadas. Filtra por cine, idioma y horario.">
+<meta name="description" content="Every film showing in Valencia this week, with VOSE (original language) screenings highlighted. Filter by cinema, language and time.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Cartelera de cine en Valencia · VOSE y versión original">
-<meta property="og:description" content="{film_count} películas en {cinema_count} cines esta semana. Sesiones VOSE destacadas. Gratis.">
+<meta property="og:title" content="Valencia cinema listings · VOSE &amp; original language screenings">
+<meta property="og:description" content="{film_count} films across {cinema_count} cinemas this week. VOSE screenings highlighted. Free every Thursday.">
 <meta property="og:url" content="https://whatson.movie/listings/">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
 <meta property="og:site_name" content="whatson.movie">
