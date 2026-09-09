@@ -1306,12 +1306,13 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 </div>
 
-<div id="coming-soon-overlay" onclick="hideComingSoon()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:#ffffff;border-radius:4px;padding:28px 32px;text-align:center;max-width:280px;margin:0 20px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-    <div style="font-size:28px;margin-bottom:12px;">🎬</div>
-    <div style="font-size:16px;font-weight:700;color:#111111;margin-bottom:8px;" data-es="Próximamente" data-en="Coming soon">Próximamente</div>
-    <div style="font-size:13px;color:#555555;line-height:1.5;" data-es="La compra de entradas estará disponible muy pronto." data-en="Ticket purchasing will be available very soon.">La compra de entradas estará disponible muy pronto.</div>
-    <button onclick="hideComingSoon()" style="margin-top:20px;padding:8px 24px;background:#c0392b;color:#ffffff;border:none;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">OK</button>
+<div id="coming-soon-overlay" onclick="hideComingSoon()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#160f24;border:1px solid #2e2545;border-radius:12px;padding:28px 32px;text-align:center;max-width:300px;margin:0 20px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <div style="font-size:28px;margin-bottom:12px;">🎟️</div>
+    <div style="font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:8px;" data-es="Reserva de entradas — próximamente" data-en="Direct booking — coming soon">Direct booking — coming soon</div>
+    <div style="font-size:13px;color:#9b8faa;line-height:1.6;margin-bottom:20px;" data-es="Pronto podrás comprar entradas directamente desde aquí. Suscríbete gratis para ser el primero en saberlo." data-en="Soon you'll be able to book tickets directly from here. Subscribe free to be the first to know.">Soon you'll be able to book tickets directly from here. Subscribe free to be the first to know.</div>
+    <a href="/" style="display:block;padding:9px 20px;background:#ffb432;color:#0a0810;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:10px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Subscribe free →</a>
+    <button onclick="hideComingSoon()" style="background:none;border:none;color:#6a5e7a;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;" data-es="Cerrar" data-en="Close">Close</button>
   </div>
 </div>
 <script>
@@ -1606,8 +1607,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 
   <div id="anon-banner" style="background:linear-gradient(135deg,rgba(255,180,50,0.12),rgba(180,80,120,0.08));border-bottom:1px solid rgba(255,180,50,0.25);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div style="display:flex;flex-direction:column;gap:4px;">
-      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="🎬 Más de 30 películas. 11 cines. Cada semana." data-en="🎬 30+ films. 11 cinemas. Every week.">🎬 Más de 30 películas. 11 cines. Cada semana.</span>
-      <span style="font-size:12px;color:#9b8faa;" data-es="Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana." data-en="Subscribe free to filter by VOSE, choose your favourite cinemas and receive a curated weekly email.">Suscríbete gratis para filtrar por VOSE, elegir tus cines favoritos y recibir un email curado cada semana.</span>
+      <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="📧 Recibe esto cada jueves, filtrado a tu gusto." data-en="📧 Get this delivered every Thursday, filtered your way.">📧 Recibe esto cada jueves, filtrado a tu gusto.</span>
+      <span style="font-size:12px;color:#9b8faa;" data-es="Elige tus cines y sesiones VOSE favoritas — te enviamos la cartelera personalizada cada semana. Gratis." data-en="Choose your cinemas and VOSE preferences — we send you a personalised listing every week. Free.">Elige tus cines y sesiones VOSE favoritas — te enviamos la cartelera personalizada cada semana. Gratis.</span>
     </div>
     <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
@@ -1620,11 +1621,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </div>
 
   <div id="quick-filter" style="display:block;position:relative;">
-    <div id="qf-lock-overlay" style="display:none;position:absolute;inset:0;background:rgba(10,8,16,0.7);z-index:10;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;" onclick="window.location.href='../'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffb432" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span style="font-size:12px;color:#ffb432;" data-es="Solo suscriptores" data-en="Subscribers only">Solo suscriptores</span>
-      <a href="../" style="font-size:11px;color:#9b8faa;text-decoration:underline;text-underline-offset:3px;" data-es="Suscribirse →" data-en="Subscribe →">Suscribirse →</a>
-    </div>
     <div style="display:flex;align-items:flex-end;padding:0;">
       <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;background:#0f0c14;border:2px solid #5a4a7a;border-bottom:2px solid #0f0c14;border-radius:8px 8px 0 0;padding:8px 20px 10px;position:relative;z-index:2;margin-bottom:-2px;">quick<em style="color:#ffb432;font-style:italic;">filters</em></div>
       <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #5a4a7a;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
