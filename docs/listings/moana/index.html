@@ -403,7 +403,17 @@ function isWeekend(dateKey) {
   return d.getDay() === 0 || d.getDay() === 6;
 }
 function applyEveningHighlights(eveningFilter) {
+  // Reset everything this filter previously changed
+  document.querySelectorAll('.time-btn--evening-hidden').forEach(b => {
+    b.classList.remove('time-btn--evening-hidden'); b.style.display = '';
+  });
+  document.querySelectorAll('.showtime-row--evening-hidden').forEach(r => {
+    r.classList.remove('showtime-row--evening-hidden'); r.style.display = '';
+  });
+  document.querySelectorAll('.time-btn--match').forEach(b => b.classList.remove('time-btn--match'));
+  document.querySelectorAll('.no-evening-times').forEach(el => el.remove());
   if (!eveningFilter) return;
+  // Mark & hide non-qualifying buttons; highlight qualifying ones
   document.querySelectorAll('.time-btn[data-time]').forEach(btn => {
     const panel = btn.closest('.day-panel');
     const dayKey = panel ? panel.id.replace('day-', '') : '';
@@ -414,7 +424,33 @@ function applyEveningHighlights(eveningFilter) {
     if (weekend || mins >= 17 * 60 + 30) {
       btn.classList.add('time-btn--match');
     } else {
-      btn.classList.remove('time-btn--match');
+      btn.classList.add('time-btn--evening-hidden');
+      btn.style.display = 'none';
+    }
+  });
+  // Hide whole cinema row if no buttons remain visible
+  document.querySelectorAll('.showtime-row').forEach(row => {
+    const btns = row.querySelectorAll('.time-btn[data-time]');
+    if (!btns.length) return;
+    const anyVisible = Array.from(btns).some(b => b.style.display !== 'none');
+    if (!anyVisible) {
+      row.classList.add('showtime-row--evening-hidden');
+      row.style.display = 'none';
+    }
+  });
+  // Show per-panel message if every row is hidden
+  const _lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+  document.querySelectorAll('.day-panel').forEach(panel => {
+    const rows = panel.querySelectorAll('.showtime-row');
+    if (!rows.length) return;
+    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none');
+    if (!anyVisible) {
+      const msg = document.createElement('div');
+      msg.className = 'no-times no-evening-times';
+      msg.setAttribute('data-es', 'Sin sesiones de tarde o fin de semana');
+      msg.setAttribute('data-en', 'No evening or weekend screenings');
+      msg.textContent = _lang === 'en' ? 'No evening or weekend screenings' : 'Sin sesiones de tarde o fin de semana';
+      panel.appendChild(msg);
     }
   });
 }
