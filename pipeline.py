@@ -1252,10 +1252,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
 .time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
-.time-btn--match{{background:#0d2418;border-color:#1d6b3a;color:#50c88c}}
-.time-btn--match:hover{{background:#112e1e;border-color:#50c88c;color:#50c88c}}
-.showtime-legend{{display:flex;align-items:center;gap:8px;padding:10px 20px 16px;font-size:12px;color:#8a7e9a;border-top:1px solid #1e1630}}
-.showtime-legend-dot{{width:10px;height:10px;border-radius:3px;background:#0d2418;border:1px solid #1d6b3a;flex-shrink:0}}
+.time-btn--match{{background:#0d2c18;border-color:#2d8a50;color:#5dda8a;font-weight:700;box-shadow:0 0 0 1px #2d8a50}}
+.time-btn--match:hover{{background:#113621;border-color:#5dda8a;color:#5dda8a}}
+.showtime-legend{{display:flex;align-items:center;gap:8px;padding:12px 20px 18px;font-size:13px;color:#9ed4b0;border-top:1px solid #1e1630}}
+.showtime-legend-dot{{width:12px;height:12px;border-radius:3px;background:#0d2c18;border:2px solid #2d8a50;flex-shrink:0}}
 .no-times{{font-size:13px;color:#8a7e9a;padding:20px 0;text-align:center}}
 .footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
