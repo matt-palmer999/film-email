@@ -1643,7 +1643,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="qf-btn" id="qf-vose" data-es="Todo VOSE" data-en="All VOSE" onclick="setQFVose()">Todo VOSE</button>
         <button class="qf-btn" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()" style="opacity:0.4;pointer-events:none;">Solo inglés</button>
-        <button class="qf-btn" id="qf-family" data-es="Familiar" data-en="Family" onclick="setQFFamily()">Familiar</button>
+        <button class="qf-btn" id="qf-family" data-es="Familiar (≤ 12)" data-en="Family (≤ 12)" onclick="setQFFamily()">Familiar (≤ 12)</button>
       </div>
     </div>
   </div>
