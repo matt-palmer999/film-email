@@ -1308,7 +1308,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="footer">
-    <span data-es="Horarios sujetos a cambios — verifica siempre en la web del cine." data-en="Showtimes subject to change — always verify on the cinema's website.">Horarios sujetos a cambios — verifica siempre en la web del cine.</span>
+    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
   </div>
 </div>
 
@@ -1701,7 +1701,6 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
     <p>
       <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
-      <span data-es="Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine." data-en="Showtimes and VOSE availability may vary — always check the cinema's website before you go.">Horarios y disponibilidad VOSE pueden variar — verifica siempre en la web de cada cine.</span><br>
       <em style="color:#7a6a9a;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
       <span style="color:#7a6a9a;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
