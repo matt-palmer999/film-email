@@ -138,17 +138,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #5a4a7a;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
     </div>
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
-      <div id="qf-days" style="display:flex;gap:8px;margin-bottom:10px;">
-        <button class="qf-btn qf-active" id="qf-all" data-es="Próximos 7 días" data-en="Next 7 days" onclick="setQFDay('all')">Próximos 7 días</button>
-        <button class="qf-btn" id="qf-today" data-es="Hoy" data-en="Today" onclick="setQFDay('today')">Hoy</button>
-        <button class="qf-btn" id="qf-tomorrow" data-es="Mañana" data-en="Tomorrow" onclick="setQFDay('tomorrow')">Mañana</button>
-        <button class="qf-btn" id="qf-plus1" onclick="setQFDay('plus1')"></button>
-      </div>
-      <div id="qf-times" style="display:flex;gap:8px;">
-        <button class="qf-btn qf-active" id="qf-anytime" data-es="Cualquier hora" data-en="Any time" onclick="setQFTime('anytime')">Cualquier hora</button>
-        <button class="qf-btn" id="qf-morning" data-es="Mañana" data-en="Morning" onclick="setQFTime('morning')">Mañana</button>
-        <button class="qf-btn" id="qf-afternoon" data-es="Tarde" data-en="Afternoon" onclick="setQFTime('afternoon')">Tarde</button>
-        <button class="qf-btn" id="qf-evening" data-es="Noche" data-en="Evening" onclick="setQFTime('evening')">Noche</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="qf-btn" id="qf-vose" data-es="VOSE" data-en="VOSE" onclick="setQFVose()">VOSE</button>
+        <button class="qf-btn" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()" style="opacity:0.4;pointer-events:none;">Solo inglés</button>
+        <button class="qf-btn" id="qf-family" data-es="Familiar" data-en="Family friendly" onclick="setQFFamily()">Familiar</button>
       </div>
     </div>
   </div>
@@ -1133,8 +1126,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 
 </div>
 <script>
-window.SUPABASE_URL  = "https://xhvbvggbrmlloefsgofy.supabase.co";
-window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc";
+window.SUPABASE_URL  = "__SUPABASE_URL__";
+window.SUPABASE_ANON = "__SUPABASE_ANON__";
 window.DATA_ANCHOR   = "2026-09-10";
 
 function setLang(lang) {
@@ -1484,97 +1477,55 @@ window.addEventListener('DOMContentLoaded', () => {
     plus1Btn.textContent = days[plus1.getDay()] + ' ' + plus1.getDate();
   }
 
-  let qfDay  = null;
-  window._qfDay = null;
-  let qfTime = 'anytime';
 
-  window.setQFDay = function(day) {
-    qfDay = (day === 'all') ? null : day;
-    window._qfDay = qfDay;
-    const currentParams = new URLSearchParams(window.location.search);
-    if (qfDay) currentParams.set('tab', qfDay);
-    else currentParams.delete('tab');
-    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-      const base = a.getAttribute('href').split('?')[0];
-      const lp = new URLSearchParams(currentParams);
-      const card = a.closest('[data-section]');
-      if (card && card.dataset.section === '2') lp.set('classic', 'true');
-      a.href = base + (lp.toString() ? '?' + lp.toString() : '');
-    });
-    ['all','today','tomorrow','plus1'].forEach(d => {
-      const active = (d === 'all' && !qfDay) || (d === qfDay);
-      document.getElementById('qf-'+d)?.classList.toggle('qf-active', active);
-    });
-    applyQF();
-  };
-
-  window.setQFTime = function(time) {
-    qfTime = time;
-    ['morning','afternoon','evening','anytime'].forEach(t => {
-      document.getElementById('qf-'+t)?.classList.toggle('qf-active', qfTime === t);
-    });
-    applyQF();
-  };
-
-  function applyQF() {
-    const dayKey = qfDay === 'today' ? todayKey : qfDay === 'tomorrow' ? tomorrowKey : qfDay === 'plus1' ? plus1Key : null;
-
-    document.querySelectorAll('[data-showdays]').forEach(card => {
-      // Classics bypass day/time filters entirely — they're always shown.
-      if (card.dataset.section === '2') {
-        card.classList.remove('qf-hidden');
-        return;
-      }
-      if (!dayKey && qfTime === 'anytime') {
-        card.classList.remove('qf-hidden');
-        return;
-      }
-      if (dayKey) {
-        const showdays = (card.dataset.showdays || '').split(',');
-        if (!showdays.includes(dayKey)) {
-          card.classList.add('qf-hidden');
-          return;
-        }
-        if (qfTime !== 'anytime') {
-          const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
-          const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
-          const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dayKey));
-          const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
-          const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
-          const matches = times.some(t => {
-            const h = parseInt(t.split(':')[0]);
-            if (qfTime === 'morning')   return h < 12;
-            if (qfTime === 'afternoon') return h >= 12 && h < 18;
-            if (qfTime === 'evening')   return h >= 18;
-            return true;
-          });
-          if (matches) card.classList.remove('qf-hidden');
-          else card.classList.add('qf-hidden');
-          return;
-        }
-        card.classList.remove('qf-hidden');
-        return;
-      }
-      const selectedCinemas = new URLSearchParams(window.location.search).get('cinemas');
-      const cinemaList = selectedCinemas ? selectedCinemas.split(',') : null;
-      const showdays = (card.dataset.showdays || '').split(',').filter(Boolean);
-      const matches = showdays.some(dk => {
-        const allAttrs = Array.from(card.attributes).filter(a => a.name.startsWith('data-t-') && a.name.endsWith('_'+dk));
-        const relevantAttrs = cinemaList ? allAttrs.filter(a => cinemaList.some(c => a.name.includes('data-t-'+c+'_'))) : allAttrs;
-        const times = relevantAttrs.flatMap(a => a.value.split('|').filter(Boolean));
-        return times.some(t => {
-          const h = parseInt(t.split(':')[0]);
-          if (qfTime === 'morning')   return h < 12;
-          if (qfTime === 'afternoon') return h >= 12 && h < 18;
-          if (qfTime === 'evening')   return h >= 18;
-          return true;
-        });
-      });
-      if (matches) card.classList.remove('qf-hidden');
-      else card.classList.add('qf-hidden');
-    });
-    applyVisibility();
+  // ── Quick filters: VOSE, English only, Family friendly ────────────────────
+  function syncQFButtons() {
+    const params = new URLSearchParams(window.location.search);
+    const voseOn   = params.get('vose') === 'true';
+    const englishOn = params.get('vose_lang') === 'en';
+    const familyOn = params.get('family') === 'true';
+    document.getElementById('qf-vose')?.classList.toggle('qf-active', voseOn);
+    document.getElementById('qf-family')?.classList.toggle('qf-active', familyOn);
+    const enBtn = document.getElementById('qf-enlang');
+    if (enBtn) {
+      enBtn.style.opacity = voseOn ? '1' : '0.4';
+      enBtn.style.pointerEvents = voseOn ? 'auto' : 'none';
+      enBtn.classList.toggle('qf-active', englishOn);
+    }
   }
+
+  window.setQFVose = function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('vose') === 'true') {
+      params.delete('vose');
+      params.delete('vose_lang');
+    } else {
+      params.set('vose', 'true');
+    }
+    window.history.replaceState({}, '', '?' + params.toString());
+    syncQFButtons();
+    applyVisibility();
+  };
+
+  window.setQFEnglish = function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('vose_lang') === 'en') params.delete('vose_lang');
+    else params.set('vose_lang', 'en');
+    window.history.replaceState({}, '', '?' + params.toString());
+    syncQFButtons();
+    applyVisibility();
+  };
+
+  window.setQFFamily = function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('family') === 'true') params.delete('family');
+    else params.set('family', 'true');
+    window.history.replaceState({}, '', '?' + params.toString());
+    syncQFButtons();
+    applyVisibility();
+  };
+
+  syncQFButtons();
 })();
 
 function attachCardClicks() {
