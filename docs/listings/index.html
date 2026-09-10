@@ -1246,6 +1246,11 @@ async function loadUserPreferences() {
       applyVisibility();
       applyPreferencesFromURL();
       if (window.syncQFButtons) window.syncQFButtons();
+      if (newParams.get('evening') === 'true' && window.applyEveningHighlights) {
+        applyEveningHighlights(true);
+        const legend = document.getElementById('showtime-legend');
+        if (legend) legend.style.display = 'flex';
+      }
     }
 
     const finalParams = new URLSearchParams(window.location.search);

@@ -807,6 +807,11 @@ async function loadUserPreferences() {
       applyVisibility();
       applyPreferencesFromURL();
       if (window.syncQFButtons) window.syncQFButtons();
+      if (newParams.get('evening') === 'true' && window.applyEveningHighlights) {
+        applyEveningHighlights(true);
+        const legend = document.getElementById('showtime-legend');
+        if (legend) legend.style.display = 'flex';
+      }
     }
 
     const finalParams = new URLSearchParams(window.location.search);
@@ -1478,6 +1483,28 @@ function showComingSoon() {{
 function hideComingSoon() {{
   document.getElementById('coming-soon-overlay').style.display = 'none';
 }}
+// Load evening_only pref from Supabase for direct-navigation case
+window.SUPABASE_URL  = '__SUPABASE_URL__';
+window.SUPABASE_ANON = '__SUPABASE_ANON__';
+(async function loadDetailEveningPref() {{
+  const _p = new URLSearchParams(window.location.search);
+  if (_p.get('evening') === 'true') return; // already applied synchronously
+  const _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  const _email = _m ? decodeURIComponent(_m[2]) : null;
+  if (!_email || !window.SUPABASE_URL || !window.SUPABASE_ANON) return;
+  try {{
+    const _res = await fetch(
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=evening_only',
+      {{ headers: {{ 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON }} }}
+    );
+    const _rows = await _res.json();
+    if (_rows.length && _rows[0].evening_only) {{
+      applyEveningHighlights(true);
+      const _legend = document.getElementById('showtime-legend');
+      if (_legend) _legend.style.display = 'flex';
+    }}
+  }} catch(e) {{ /* silent */ }}
+}})();
 </script>
 </body>
 </html>"""

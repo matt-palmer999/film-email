@@ -3770,10 +3770,37 @@ function showComingSoon() {
   overlay.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
+  // Track booking intent in GoatCounter
+  if (window.goatcounter && window.goatcounter.count) {
+    const slug = window.location.pathname.replace(/\/\$/, '').split('/').pop() || 'unknown';
+    window.goatcounter.count({ path: 'book-intent/' + slug, title: 'Booking intent', event: true });
+  }
 }
 function hideComingSoon() {
   document.getElementById('coming-soon-overlay').style.display = 'none';
 }
+// Load evening_only pref from Supabase for direct-navigation case
+window.SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
+window.SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+(async function loadDetailEveningPref() {
+  const _p = new URLSearchParams(window.location.search);
+  if (_p.get('evening') === 'true') return; // already applied synchronously
+  const _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  const _email = _m ? decodeURIComponent(_m[2]) : null;
+  if (!_email || !window.SUPABASE_URL || !window.SUPABASE_ANON) return;
+  try {
+    const _res = await fetch(
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=evening_only',
+      { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON } }
+    );
+    const _rows = await _res.json();
+    if (_rows.length && _rows[0].evening_only) {
+      applyEveningHighlights(true);
+      const _legend = document.getElementById('showtime-legend');
+      if (_legend) _legend.style.display = 'flex';
+    }
+  } catch(e) { /* silent */ }
+})();
 </script>
 </body>
 </html>
