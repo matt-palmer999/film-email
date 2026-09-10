@@ -596,33 +596,6 @@
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Filtros de contenido" data-en="Content filters">Filtros de contenido</div>
 
-        <!-- VOSE -->
-        <div class="toggle-row vose-row" id="toggle-vose" onclick="togglePref('vose_only')">
-          <div class="toggle-icon">🎬</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo sesiones VOSE" data-en="VOSE sessions only">Solo sesiones VOSE</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas con versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con versión original subtitulada</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
-        <div class="sub-option" id="sub-vose" style="display:none;">
-          <div class="sub-option-label" data-es="Idioma VOSE" data-en="VOSE language">Idioma VOSE</div>
-          <div class="sub-option-pills">
-            <div class="sub-pill selected" id="vose-lang-en" onclick="selectVoseLang('en')" data-es="Solo inglés" data-en="English only">Solo inglés</div>
-            <div class="sub-pill" id="vose-lang-all" onclick="selectVoseLang('all')" data-es="Todos los idiomas" data-en="All languages">Todos los idiomas</div>
-          </div>
-        </div>
-
-        <!-- FAMILY FRIENDLY -->
-        <div class="toggle-row" id="toggle-family" onclick="togglePref('family_only')">
-          <div class="toggle-icon">👨‍👩‍👧</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo apto para familias" data-en="Family friendly only">Solo apto para familias</div>
-            <div class="toggle-desc" data-es="Solo películas con clasificación 12 o inferior" data-en="Only films rated 12 and under">Solo películas con clasificación 12 o inferior</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
-
         <!-- EVENING & WEEKENDS -->
         <div class="toggle-row" id="toggle-evening" onclick="togglePref('evening_only')">
           <div class="toggle-icon">🌙</div>
@@ -957,9 +930,6 @@
               'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({
-              vose_only:    prefs.vose_only,
-              vose_lang:    prefs.vose_lang,
-              family_only:  prefs.family_only,
               evening_only: prefs.evening_only,
               new_only:     prefs.new_only,
               rating_filter: prefs.rating_filter,

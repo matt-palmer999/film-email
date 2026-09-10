@@ -792,7 +792,7 @@ async function loadUserPreferences() {
 
     const newParams = new URLSearchParams();
     if (prefs.vose_only)     newParams.set('vose',      'true');
-    if (prefs.vose_lang)     newParams.set('vose_lang',  prefs.vose_lang);
+    if (prefs.vose_lang)     newParams.set('vose_lang',  prefs.vose_lang.toLowerCase());
     if (prefs.new_only)      newParams.set('new',       'true');
     if (prefs.family_only)   newParams.set('family',    'true');
     if (prefs.evening_only)  newParams.set('evening',   'true');
@@ -806,6 +806,7 @@ async function loadUserPreferences() {
       window.history.replaceState({}, '', '?' + newParams.toString());
       applyVisibility();
       applyPreferencesFromURL();
+      if (window.syncQFButtons) window.syncQFButtons();
     }
 
     const finalParams = new URLSearchParams(window.location.search);
@@ -1745,6 +1746,38 @@ window.addEventListener('DOMContentLoaded', () => {{
     }}
   }}
 
+  // Save VOSE/English/Family prefs to Supabase for signed-in subscribers
+  async function saveQFPrefs() {{
+    const email = getCookie('cv_email');
+    if (!email || !window.SUPABASE_URL) return;
+    const params = new URLSearchParams(window.location.search);
+    const voseOn = params.get('vose') === 'true';
+    try {{
+      await fetch(
+        window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email),
+        {{
+          method: 'PATCH',
+          headers: {{
+            'apikey': window.SUPABASE_ANON,
+            'Authorization': 'Bearer ' + window.SUPABASE_ANON,
+            'Content-Type': 'application/json',
+            'x-subscriber-email': email,
+            'Prefer': 'return=minimal'
+          }},
+          body: JSON.stringify({{
+            vose_only:   voseOn,
+            vose_lang:   voseOn ? (params.get('vose_lang') || 'all') : null,
+            family_only: params.get('family') === 'true'
+          }})
+        }}
+      );
+    }} catch(e) {{
+      console.warn('Could not save quick filter prefs:', e);
+    }}
+  }}
+
+  window.syncQFButtons = syncQFButtons;
+
   window.setQFVose = function() {{
     const params = new URLSearchParams(window.location.search);
     if (params.get('vose') === 'true') {{
@@ -1756,6 +1789,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    saveQFPrefs();
   }};
 
   window.setQFEnglish = function() {{
@@ -1765,6 +1799,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    saveQFPrefs();
   }};
 
   window.setQFFamily = function() {{
@@ -1774,6 +1809,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    saveQFPrefs();
   }};
 
   syncQFButtons();
