@@ -646,26 +646,8 @@
           </div>
         </div>
 
-      </div>
 
-      <!-- LANGUAGE -->
-      <div class="prefs-section">
-        <div class="prefs-section-title" data-es="Idioma del newsletter" data-en="Newsletter language">Idioma del newsletter</div>
-        <div class="lang-choice">
-          <div class="lang-option" id="lang-es" onclick="selectLangPref('es')">
-            <div class="lang-option-flag">🇪🇸</div>
-            <div class="lang-option-label">Español</div>
-          </div>
-          <div class="lang-option" id="lang-en" onclick="selectLangPref('en')">
-            <div class="lang-option-flag">🇬🇧</div>
-            <div class="lang-option-label">English</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EMAIL -->
-      <div class="prefs-section">
-        <div class="prefs-section-title" data-es="Email semanal" data-en="Weekly email">Email semanal</div>
+        <!-- WEEKLY EMAIL -->
         <div class="toggle-row" id="toggle-email" onclick="togglePref('email_enabled')">
           <div class="toggle-icon">📧</div>
           <div class="toggle-info">
@@ -674,6 +656,20 @@
           </div>
           <div class="toggle-switch"></div>
         </div>
+        <div class="sub-option" id="sub-email" style="display:none;">
+          <div class="sub-option-label" data-es="Idioma del email" data-en="Email language">Idioma del email</div>
+          <div class="lang-choice">
+            <div class="lang-option" id="lang-es" onclick="selectLangPref('es')">
+              <div class="lang-option-flag">🇪🇸</div>
+              <div class="lang-option-label">Español</div>
+            </div>
+            <div class="lang-option" id="lang-en" onclick="selectLangPref('en')">
+              <div class="lang-option-flag">🇬🇧</div>
+              <div class="lang-option-label">English</div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- SAVE -->
@@ -832,6 +828,9 @@
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
       document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
       document.getElementById('toggle-email').classList.toggle('on', prefs.email_enabled);
+      document.getElementById('sub-email').style.display = prefs.email_enabled ? 'block' : 'none';
+      if (prefs.email_enabled) document.getElementById('toggle-email').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-email').style.borderRadius = '';
 
       // Sub-options visibility
       document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
@@ -862,6 +861,11 @@
     function togglePref(key) {
       prefs[key] = !prefs[key];
       // Show/hide sub-options
+      if (key === 'email_enabled') {
+        document.getElementById('sub-email').style.display = prefs.email_enabled ? 'block' : 'none';
+        if (prefs.email_enabled) document.getElementById('toggle-email').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-email').style.borderRadius = '';
+      }
       if (key === 'rating_filter') {
         document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
         if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
