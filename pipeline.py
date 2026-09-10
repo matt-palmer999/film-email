@@ -1468,6 +1468,11 @@ function showComingSoon() {{
   overlay.querySelectorAll('[data-es][data-en]').forEach(el => {{
     el.innerHTML = el.getAttribute('data-' + lang);
   }});
+  // Track booking intent in GoatCounter
+  if (window.goatcounter && window.goatcounter.count) {{
+    const slug = window.location.pathname.replace(/\/\$/, '').split('/').pop() || 'unknown';
+    window.goatcounter.count({{ path: 'book-intent/' + slug, title: 'Booking intent', event: true }});
+  }}
 }}
 function hideComingSoon() {{
   document.getElementById('coming-soon-overlay').style.display = 'none';
@@ -2071,7 +2076,9 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             log.warning(f"Could not fetch subscriber count: {exc}")
 
     # GoatCounter stats
-    gc_yesterday = gc_week = None
+    gc_yesterday = gc_week = gc_book_intents = None
+    gc_book_films = []
+    gc_ref_rows = []
     gc_key = os.environ.get("GOATCOUNTER_API_KEY", "")
     if gc_key:
         import urllib.request as _ur
@@ -2103,6 +2110,15 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
 
             gc_data7 = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={week_ago_start}&end={yesterday_end}")
             gc_week  = gc_data7.get("total", 0)
+
+            # Booking intent events yesterday
+            gc_events = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}&filter=book-intent")
+            gc_book_intents = gc_events.get("total", 0)
+            gc_book_films   = [h["path"].replace("book-intent/", "") for h in gc_events.get("hits", []) if h.get("count", 0) > 0]
+
+            # Top referrers yesterday
+            gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/refs?start={yesterday_start}&end={yesterday_end}")
+            gc_ref_rows = gc_refs.get("refs", [])[:5]
         except Exception as exc:
             log.warning(f"Could not fetch GoatCounter stats: {exc}")
 
@@ -2119,11 +2135,16 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
         )
     gc_lines = ""
     if gc_yesterday is not None:
+        book_line = f"  Booking intent clicks: {gc_book_intents}\n" if gc_book_intents else ""
+        film_lines = ("".join(f"    - {f}\n" for f in gc_book_films)) if gc_book_films else ""
+        ref_lines = ("".join(f"    {r.get('name','?')} ({r.get('count',0)})\n" for r in gc_ref_rows)) if gc_ref_rows else "    (none)\n"
         gc_lines = f"""
 TRAFFIC (GoatCounter):
   Yesterday:            {gc_yesterday} pageviews
   Last 7 days:          {gc_week} pageviews
-"""
+{book_line}{film_lines}
+TOP REFERRERS (yesterday):
+{ref_lines}"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
 SCRAPERS ({len(scraper_status)} cinemas):
