@@ -824,25 +824,15 @@
       });
 
       // Toggles
-      document.getElementById('toggle-vose').classList.toggle('on', prefs.vose_only);
-      document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
       document.getElementById('toggle-evening').classList.toggle('on', prefs.evening_only);
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
       document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
       document.getElementById('toggle-email').classList.toggle('on', prefs.email_enabled);
 
       // Sub-options visibility
-      document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
-      if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
-      else document.getElementById('toggle-vose').style.borderRadius = '';
-
       document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
       if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
       else document.getElementById('toggle-rating').style.borderRadius = '';
-
-      // VOSE language pills
-      document.getElementById('vose-lang-en').classList.toggle('selected', prefs.vose_lang === 'en');
-      document.getElementById('vose-lang-all').classList.toggle('selected', prefs.vose_lang === 'all');
 
       // Rating slider
       const slider = document.getElementById('rating-slider');
@@ -868,23 +858,12 @@
     function togglePref(key) {
       prefs[key] = !prefs[key];
       // Show/hide sub-options
-      if (key === 'vose_only') {
-        document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
-        if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
-        else document.getElementById('toggle-vose').style.borderRadius = '';
-      }
       if (key === 'rating_filter') {
         document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
         if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
         else document.getElementById('toggle-rating').style.borderRadius = '';
       }
       renderPreferences();
-    }
-
-    function selectVoseLang(lang) {
-      prefs.vose_lang = lang;
-      document.getElementById('vose-lang-en').classList.toggle('selected', lang === 'en');
-      document.getElementById('vose-lang-all').classList.toggle('selected', lang === 'all');
     }
 
     function updateRatingLabel(val) {
