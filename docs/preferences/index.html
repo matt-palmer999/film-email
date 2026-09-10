@@ -555,8 +555,12 @@
     @media (max-width: 500px) {
       nav { padding: 14px 20px; }
       .container { padding: 40px 16px 80px; }
-      .cinema-grid { grid-template-columns: 1fr; }
       .page-title { font-size: 30px; }
+      /* keep 2-col grid but tighten pills so names fit */
+      .cinema-grid { gap: 6px; }
+      .cinema-pill { padding: 8px 10px; gap: 6px; }
+      .cinema-name { font-size: 13px; }
+      .cinema-check { width: 16px; height: 16px; font-size: 10px; }
     }
   </style>
 </head>
