@@ -99,9 +99,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     },
     {
       "@type": "ScreeningEvent",
-      "name": "60 Años, Cine Club UACh",
+      "name": "60 Años, Cine Club UACh (VOSE)",
       "startDate": "2026-09-17T19:00:00+02:00",
-      "videoFormat": "dubbed",
+      "videoFormat": "VOSE",
       "workPresented": {
         "@id": "https://whatson.movie/listings/60-anos-cine-club-uach/#movie"
       },
@@ -139,7 +139,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/yXISvUbneq3e9Vxvr1TRAX1d08G.jpg" alt="Cine Club – Sus hijos" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 2.0</span></div>
+      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 2.0</span></div>
       <div class="hero-title" data-es="Cine Club – Sus hijos" data-en="60 Años, Cine Club UACh">Cine Club – Sus hijos</div>
       
       <div class="hero-meta"><span data-es="CL · 2023 · 2 min" data-en="CL · 2023 · Animation, Comedy · 2 min">CL · 2023 · 2 min</span></div>
@@ -149,8 +149,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximas fechas" data-en="🕖 SHOWTIMES — upcoming dates">🕖 HORARIOS — próximas fechas</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-17" data-es="Jueves 17 sep" data-en="Thursday 17 Sep" onclick="showDay('2026-09-17')">Jueves 17 sep</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-17"><div class="showtime-row" data-cinema-id="babel" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Babel</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:00" data-vose="false">19:00</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-17" data-es="Jueves 17" data-en="Thursday 17" onclick="showDay('2026-09-17')">Jueves 17</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-17"><div class="showtime-row" data-cinema-id="babel" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Babel</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:00" data-vose="true">19:00</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -377,8 +377,8 @@ function hideComingSoon() {
   document.getElementById('coming-soon-overlay').style.display = 'none';
 }
 // Load evening_only pref from Supabase for direct-navigation case
-window.SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-window.SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+window.SUPABASE_URL  = '__SUPABASE_URL__';
+window.SUPABASE_ANON = '__SUPABASE_ANON__';
 (async function loadDetailEveningPref() {
   const _p = new URLSearchParams(window.location.search);
   if (_p.get('evening') === 'true') return; // already applied synchronously

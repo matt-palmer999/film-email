@@ -375,8 +375,8 @@ function hideComingSoon() {
   document.getElementById('coming-soon-overlay').style.display = 'none';
 }
 // Load evening_only pref from Supabase for direct-navigation case
-window.SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-window.SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+window.SUPABASE_URL  = '__SUPABASE_URL__';
+window.SUPABASE_ANON = '__SUPABASE_ANON__';
 (async function loadDetailEveningPref() {
   const _p = new URLSearchParams(window.location.search);
   if (_p.get('evening') === 'true') return; // already applied synchronously

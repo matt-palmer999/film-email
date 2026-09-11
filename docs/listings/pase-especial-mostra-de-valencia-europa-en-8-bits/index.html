@@ -141,7 +141,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-11" data-es="Mañana 11" data-en="Tomorrow 11" onclick="showDay('2026-09-11')">Mañana 11</button></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-11" data-es="Hoy 11" data-en="Today 11" onclick="showDay('2026-09-11')">Hoy 11</button></div>
     <div id="day-panels"><div class="day-panel active" id="day-2026-09-11"><div class="showtime-row" data-cinema-id="babel" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Babel</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:00" data-vose="false">20:00</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
@@ -369,8 +369,8 @@ function hideComingSoon() {
   document.getElementById('coming-soon-overlay').style.display = 'none';
 }
 // Load evening_only pref from Supabase for direct-navigation case
-window.SUPABASE_URL  = 'https://xhvbvggbrmlloefsgofy.supabase.co';
-window.SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc';
+window.SUPABASE_URL  = '__SUPABASE_URL__';
+window.SUPABASE_ANON = '__SUPABASE_ANON__';
 (async function loadDetailEveningPref() {
   const _p = new URLSearchParams(window.location.search);
   if (_p.get('evening') === 'true') return; // already applied synchronously
