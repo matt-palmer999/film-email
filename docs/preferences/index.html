@@ -1036,6 +1036,24 @@
 
       if (cookieEmail) {
         loadFromEmail(cookieEmail);
+      } else {
+        // No subscriber cookie — show a clear 'not subscribed' state immediately
+        const lang = document.getElementById('html-root').getAttribute('lang');
+        const titleEl = document.querySelector('#panel-request .page-title');
+        const descEl  = document.querySelector('#panel-request .page-desc');
+        if (titleEl) {
+          titleEl.setAttribute('data-es', 'Preferencias de suscriptor');
+          titleEl.setAttribute('data-en', 'Subscriber preferences');
+          titleEl.textContent = lang === 'en' ? 'Subscriber preferences' : 'Preferencias de suscriptor';
+        }
+        if (descEl) {
+          descEl.setAttribute('data-es', 'Las preferencias avanzadas son para suscriptores. Suscríbete gratis en la página de inicio para personalizar tu cartelera.');
+          descEl.setAttribute('data-en', 'Advanced preferences are for subscribers. Subscribe free on the home page to personalise your listings.');
+          descEl.textContent = lang === 'en'
+            ? 'Advanced preferences are for subscribers. Subscribe free on the home page to personalise your listings.'
+            : 'Las preferencias avanzadas son para suscriptores. Suscríbete gratis en la página de inicio para personalizar tu cartelera.';
+        }
+        showPanel('panel-request');
       }
     });
   </script>
