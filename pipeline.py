@@ -1080,6 +1080,149 @@ def _build_jsonld(film: dict, slug: str) -> str:
     return f'<script type="application/ld+json">\n{_json.dumps(payload, ensure_ascii=False, indent=2)}\n</script>'
 
 
+
+ARCHIVE_MAX_DAYS = 180  # keep archive pages for 6 months
+
+
+def build_film_archive_page(film: dict, anchor: datetime) -> str:
+    """Generate a minimal 'no longer showing' page preserving the film's URL."""
+    title_es   = film["title"]
+    title_en   = film.get("title_en", title_es)
+    title_orig = film.get("title_original", title_es)
+    syn_es     = (film.get("synopsis_es") or film.get("synopsis", ""))[:400]
+    syn_en     = (film.get("synopsis_en") or film.get("synopsis", ""))[:400]
+    poster     = film.get("poster", "")
+    meta       = film.get("meta", "")
+    meta_en    = film.get("meta_en", meta)
+    score      = film.get("rating_score")
+    rating     = film.get("rating", "?")
+    vose       = film.get("any_vose", False)
+    slug       = film.get("slug", "")
+
+    vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
+    score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
+    rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
+    rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
+    poster_html  = f'<img src="{poster}" alt="{esc(title_es)}" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
+    orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
+
+    return f"""<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="whatson.movie">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<link rel="canonical" href="https://whatson.movie/listings/{slug}/">
+<meta name="description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — Valencia cinemas'}">
+<meta property="og:type" content="video.movie">
+<meta property="og:title" content="{esc(title_es)} — Cartelera Valencia">
+<meta property="og:description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta property="og:url" content="https://whatson.movie/listings/{slug}/">
+<meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
+<meta property="og:site_name" content="whatson.movie">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}}
+.wrapper{{max-width:640px;margin:0 auto;background:#0f0c14}}
+.lang-bar{{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
+.lang-bar a{{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap}}
+.lang-bar a span{{color:#ffb432}}
+.lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
+.lang-btn{{padding:5px 14px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#8a7e9a;font-family:'DM Sans',sans-serif;transition:all .2s}}
+.lang-btn.active{{background:#160f24;color:#f0eae0}}
+.back-bar{{padding:12px 20px;background:#0a0810;border-bottom:1px solid #1e1630}}
+.back-link{{font-size:13px;color:#9a8fb5;text-decoration:none;letter-spacing:0.5px}}
+.back-link:hover{{color:#c5b8d8}}
+.film-hero{{display:flex;gap:16px;padding:20px;background:#160f24;border-bottom:1px solid #2e2040}}
+.hero-poster{{width:90px;height:130px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#2a1f3d}}
+.hero-info{{flex:1;display:flex;flex-direction:column;justify-content:center}}
+.badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}}
+.vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
+.score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
+.rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
+.hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
+.orig-title{{font-size:12px;color:#8a7e9a;margin-bottom:6px}}
+.hero-meta{{font-size:12px;color:#9a8faa;line-height:1.55;margin-bottom:8px}}
+.hero-synopsis{{font-size:13px;color:#a09aa8;line-height:1.6}}
+.archive-notice{{margin:20px;padding:16px 20px;background:rgba(138,126,154,.08);border:1px solid rgba(138,126,154,.25);border-radius:10px;text-align:center}}
+.archive-notice-label{{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;margin-bottom:6px}}
+.archive-notice-text{{font-size:13px;color:#9a8faa;line-height:1.6}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}}
+@media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
+</style>
+<script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+{_build_jsonld(film, slug)}
+</head>
+<body>
+<div class="wrapper">
+  <div class="lang-bar">
+    <a href="../../">whatson<span>.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-bar">
+    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+  </div>
+
+  <div class="film-hero">
+    <div class="hero-poster">{poster_html}</div>
+    <div class="hero-info">
+      <div class="badges">{vose_badge}{score_badge}{rating_badge}</div>
+      <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+      {orig_label}
+      <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
+      <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
+    </div>
+  </div>
+
+  <div class="archive-notice">
+    <div class="archive-notice-label" data-es="Fuera de cartelera" data-en="No longer showing">Fuera de cartelera</div>
+    <div class="archive-notice-text" data-es="Esta película ya no está en cartelera en Valencia. Consulta la cartelera actual para ver qué películas están disponibles ahora." data-en="This film is no longer showing at Valencia cinemas. Check the current listings to see what's on now.">Esta película ya no está en cartelera en Valencia. Consulta la cartelera actual para ver qué películas están disponibles ahora.</div>
+    <a href="/listings/" style="display:inline-block;margin-top:14px;padding:9px 22px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:7px;text-decoration:none;" data-es="Ver cartelera →" data-en="See listings →">Ver cartelera →</a>
+  </div>
+
+  <div class="footer">
+    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
+  </div>
+</div>
+<script>
+function setLang(lang) {{
+  document.getElementById('html-root').lang = lang;
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.querySelectorAll('[data-es][data-en]').forEach(el => {{
+    el.innerHTML = el.getAttribute('data-' + lang);
+  }});
+  document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
+  localStorage.setItem('lang', lang);
+}}
+const saved = localStorage.getItem('lang');
+if (saved) setLang(saved);
+</script>
+</body>
+</html>"""
+
+
 def build_film_detail_page(film: dict, anchor: datetime) -> str:
     title_es   = film["title"]
     title_en   = film.get("title_en", title_es)
@@ -1954,7 +2097,19 @@ def run() -> None:
         fh.write(full_html)
     log.info("Wrote docs/listings/index.html")
 
-    # 7. Write stats.json + films cache
+    # Load previous films cache before step 7 overwrites it (needed by step 8)
+    _prev_cache_path = "docs/data/films_cache.json"
+    _prev_films_by_slug: dict = {}
+    if os.path.exists(_prev_cache_path):
+        try:
+            with open(_prev_cache_path, encoding="utf-8") as _fh:
+                for _pf in json.load(_fh).values():
+                    if _pf.get("slug"):
+                        _prev_films_by_slug[_pf["slug"]] = _pf
+        except Exception:
+            pass
+
+        # 7. Write stats.json + films cache
     os.makedirs("docs/data", exist_ok=True)
     stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
     with open("docs/data/stats.json", "w", encoding="utf-8") as fh:
@@ -1964,12 +2119,38 @@ def run() -> None:
         json.dump(films, fh, ensure_ascii=False, default=str)
     log.info(f"Wrote docs/data/films_cache.json ({len(films)} films)")
 
-    # 8. Clean up stale film detail dirs
+    # 8. Archive or clean up stale film detail dirs
     current_slugs = {film["slug"] for film in films.values() if film.get("slug")}
+    archived_slugs: list[tuple[str, str]] = []  # (slug, archived_on_date)
     for entry in os.scandir("docs/listings"):
-        if entry.is_dir() and entry.name not in current_slugs:
-            shutil.rmtree(entry.path)
-            log.info(f"  Deleted stale detail dir: {entry.name}")
+        if not entry.is_dir() or entry.name in current_slugs:
+            continue
+        archived_on_path = os.path.join(entry.path, "archived_on.txt")
+        if os.path.exists(archived_on_path):
+            try:
+                archived_date = date.fromisoformat(open(archived_on_path, encoding="utf-8").read().strip())
+            except Exception:
+                archived_date = today_local
+            age_days = (today_local - archived_date).days
+            if age_days >= ARCHIVE_MAX_DAYS:
+                shutil.rmtree(entry.path)
+                log.info(f"  Deleted expired archive: {entry.name} ({age_days}d old)")
+            else:
+                archived_slugs.append((entry.name, archived_date.isoformat()))
+                log.debug(f"  Keeping archive: {entry.name} ({age_days}d old)")
+        else:
+            prev_film = _prev_films_by_slug.get(entry.name)
+            if prev_film:
+                archive_html = build_film_archive_page(prev_film, anchor)
+                with open(os.path.join(entry.path, "index.html"), "w", encoding="utf-8") as fh:
+                    fh.write(archive_html)
+                with open(archived_on_path, "w", encoding="utf-8") as fh:
+                    fh.write(today_local.isoformat())
+                archived_slugs.append((entry.name, today_local.isoformat()))
+                log.info(f"  Archived stale: {entry.name}")
+            else:
+                shutil.rmtree(entry.path)
+                log.info(f"  Deleted stale (no cache data): {entry.name}")
 
     # 9. Generate film detail pages
     generated = 0
@@ -1996,6 +2177,12 @@ def run() -> None:
             sitemap_urls.append(
                 f"  <url><loc>https://whatson.movie/listings/{slug}/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>{today_str}</lastmod></url>"
             )
+    for _slug, _arc_date in archived_slugs:
+        sitemap_urls.append(
+            f'  <url><loc>https://whatson.movie/listings/{_slug}/</loc>'
+            f'<changefreq>yearly</changefreq><priority>0.3</priority>'
+            f'<lastmod>{_arc_date}</lastmod></url>'
+        )
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sitemap_xml += "\n".join(sitemap_urls)
     sitemap_xml += "\n</urlset>\n"
