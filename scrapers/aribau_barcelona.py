@@ -3,11 +3,11 @@ Aribau Multicines (MOOBY ARIBAU) Barcelona scraper.
 
 moobycinemas.com server-renders a window.shops JSON blob that contains
 all current and upcoming performances for each Mooby venue.  The site
-requires a real browser (Cloudflare protection), so Playwright is used
-to fetch the initial HTML.
+blocks plain requests and Playwright (TLS fingerprinting), so curl_cffi
+is used to impersonate Chrome's exact TLS/HTTP2 fingerprint.
 
 Strategy:
-1. Playwright → load https://www.moobycinemas.com/aribau, get page.content()
+1. curl_cffi GET https://moobycinemas.com, impersonate="chrome"
 2. Extract the window.shops JSON literal from the page's inline <script>
 3. Find the Aribau venue by slug "/aribau" (theater_id 28)
 4. Parse events → showtimes
@@ -25,13 +25,13 @@ import logging
 import re
 
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright
+from curl_cffi import requests as cffi_requests
 
 log = logging.getLogger(__name__)
 
 CINEMA_KEY  = "aribau_barcelona"
 CINEMA_NAME = "Aribau Multicines"
-PAGE_URL    = "https://www.moobycinemas.com/aribau"
+PAGE_URL    = "https://moobycinemas.com"
 VENUE_SLUG  = "/aribau"
 
 _VERSION_SUFFIX = re.compile(r"\s*\([^)]+\)\s*$")
@@ -46,42 +46,22 @@ def _title_clean(locale_title: str) -> str:
     return _VERSION_SUFFIX.sub("", locale_title).strip()
 
 
-def _fetch_html(playwright=None) -> str:
-    """Use Playwright to load the page and return the HTML content."""
-    own_pw = playwright is None
-    if own_pw:
-        p = sync_playwright().start()
-    else:
-        p = playwright
-    try:
-        browser = p.chromium.launch(
-            headless=False,
-            args=["--disable-blink-features=AutomationControlled"],
-        )
-        ctx = browser.new_context(
-            locale="es-ES",
-            timezone_id="Europe/Madrid",
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/124.0.0.0 Safari/537.36"
-            ),
-        )
-        page = ctx.new_page()
-        page.goto(PAGE_URL, timeout=60_000, wait_until="domcontentloaded")
-        page.wait_for_timeout(3000)
-        html = page.content()
-        browser.close()
-        return html
-    finally:
-        if own_pw:
-            p.stop()
+def _fetch_html() -> str:
+    """Fetch page HTML using curl_cffi to impersonate Chrome's TLS fingerprint."""
+    r = cffi_requests.get(
+        PAGE_URL,
+        impersonate="chrome",
+        headers={"Accept-Language": "es-ES,es;q=0.9"},
+        timeout=20,
+    )
+    r.raise_for_status()
+    return r.text
 
 
-def scrape_aribau_barcelona(playwright=None) -> list[dict]:
-    log.info("Fetching Aribau Multicines (moobycinemas.com/aribau) …")
+def scrape_aribau_barcelona(playwright=None) -> list[dict]:  # playwright ignored
+    log.info("Fetching Aribau Multicines (moobycinemas.com) …")
     try:
-        html = _fetch_html(playwright)
+        html = _fetch_html()
     except Exception as exc:
         log.error("Could not fetch Aribau page via Playwright: %s", exc)
         return []
