@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<title>Elige tu ciudad · whatson.movie</title>
+<link rel="canonical" href="https://whatson.movie/listings/">
+<meta name="description" content="Cartelera de cine en Valencia y Barcelona. Elige tu ciudad para ver las películas de esta semana.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="whatson.movie — elige tu ciudad">
+<meta property="og:url" content="https://whatson.movie/listings/">
+<meta property="og:image" content="https://whatson.movie/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh;display:flex;flex-direction:column}
+.wrapper{max-width:640px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column}
+.lang-bar{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lang-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}
+.lang-btn{padding:5px 14px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#8a7e9a;font-family:'DM Sans',Helvetica,sans-serif}
+.lang-btn.active{background:#2e2040;color:#f0eae0}
+.hero{padding:48px 24px 32px;text-align:center}
+.hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:14px}
+.hero-title{font-family:'Playfair Display',Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}
+.hero-title span{color:#ffb432}
+.hero-sub{font-size:14px;color:#9b8faa;font-weight:300}
+.city-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 40px}
+.city-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 20px;background:#160f24;border:1px solid #2e2040;border-radius:16px;text-decoration:none;color:inherit;transition:background .15s,border-color .2s;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.city-card:hover{background:#1e1433}
+.city-emoji{font-size:36px;line-height:1}
+.city-name{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700}
+.city-desc{font-size:13px;color:#9b8faa;text-align:center;line-height:1.4}
+.city-count{font-size:12px;color:#7a6a9a}
+.city-arrow{font-size:20px;font-weight:700;margin-top:4px}
+.footer{background:#0a0810;border-top:1px solid #1e1630;padding:20px 24px;text-align:center}
+.footer p{font-size:13px;color:#8a7e9a;line-height:1.7}
+.footer a{color:#9a8fb5;text-decoration:none}
+@media(max-width:380px){.city-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="lang-bar">
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="../" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow" data-es="CARTELERA DE CINE" data-en="CINEMA LISTINGS">CARTELERA DE CINE</div>
+    <h1 class="hero-title">Elige tu <span>ciudad</span></h1>
+    <div class="hero-sub" data-es="Películas de esta semana, filtradas por tus cines favoritos" data-en="This week's films, filtered by your favourite cinemas">Películas de esta semana, filtradas por tus cines favoritos</div>
+  </div>
+
+  <div class="city-grid">
+
+    <a href="./barcelona/" class="city-card" style="border-color:#c084fc33;">
+      <div class="city-emoji">🏛️</div>
+      <div class="city-name" style="color:#c084fc;">Barcelona</div>
+      <div class="city-desc" data-es="La cartelera completa de Barcelona" data-en="Barcelona's complete cinema listings">La cartelera completa de Barcelona</div>
+      <div class="city-count" data-es="60 películas esta semana" data-en="60 films this week">60 películas esta semana</div>
+      <div class="city-arrow" style="color:#c084fc;">→</div>
+    </a>
+    <a href="./valencia/" class="city-card" style="border-color:#c9a84c33;">
+      <div class="city-emoji">🌊</div>
+      <div class="city-name" style="color:#c9a84c;">Valencia</div>
+      <div class="city-desc" data-es="La cartelera completa de Valencia" data-en="Valencia's complete cinema listings">La cartelera completa de Valencia</div>
+      <div class="city-count" data-es="126 películas esta semana" data-en="126 films this week">126 películas esta semana</div>
+      <div class="city-arrow" style="color:#c9a84c;">→</div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <p>
+      <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
+      <a href="https://www.themoviedb.org">TMDB</a> ·
+      <span style="color:#7a6a9a;">© 2026 · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+    </p>
+  </div>
+</div>
+<script>
+window.SUPABASE_URL  = "https://xhvbvggbrmlloefsgofy.supabase.co";
+window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc";
+function setLang(lang) {
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.querySelectorAll('[data-es]').forEach(el => {
+    el.textContent = lang === 'en' ? el.dataset.en : el.dataset.es;
+  });
+  localStorage.setItem('lang', lang);
+}
+(function() {
+  var _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  if (_m) {
+    var _email = decodeURIComponent(_m[2]);
+    fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=city,cinemas', {
+      headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': _email }
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      var sub = data[0];
+      var city = ((sub && sub.city) || 'valencia').toLowerCase();
+      if (city === 'valencia' && sub && sub.cinemas && sub.cinemas.length) {
+        var bcn = ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
+        if (sub.cinemas.every(function(c) { return bcn.indexOf(c) !== -1; })) city = 'barcelona';
+      }
+      localStorage.setItem('whatson_city', city);
+      window.location.replace('./' + city + '/');
+    }).catch(function() {
+      var cached = localStorage.getItem('whatson_city') || 'valencia';
+      window.location.replace('./' + cached + '/');
+    });
+    return;
+  }
+  const saved = localStorage.getItem('lang');
+  if (saved === 'en') setLang('en');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unsubscribe — whatson.movie</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0810;color:#f0eae0;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+  .card{background:#13101e;border:1px solid #2a1f3d;border-radius:14px;padding:40px 36px;max-width:440px;width:100%;text-align:center;}
+  .logo{font-size:17px;font-weight:700;color:#f0eae0;letter-spacing:-0.5px;margin-bottom:32px;display:block;}
+  .logo span{color:#ffb432;}
+  .icon{font-size:36px;margin-bottom:16px;}
+  h1{font-size:20px;font-weight:700;color:#f0eae0;margin-bottom:10px;line-height:1.3;}
+  p{font-size:14px;color:#9b8faa;line-height:1.7;margin-bottom:24px;}
+  .btn{display:inline-block;padding:11px 24px;background:#ffb432;color:#0a0810;font-weight:700;font-size:13px;text-decoration:none;border-radius:8px;letter-spacing:0.3px;}
+  .spinner{width:32px;height:32px;border:3px solid #2a1f3d;border-top-color:#ffb432;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .error{color:#e06c75;}
+</style>
+</head>
+<body>
+<div class="card">
+  <a href="https://whatson.movie" class="logo">whatson<span>.movie</span></a>
+  <div id="state-loading">
+    <div class="spinner"></div>
+    <p>Unsubscribing…</p>
+  </div>
+  <div id="state-success" hidden>
+    <div class="icon">✅</div>
+    <h1 data-es="Te has dado de baja" data-en="You've been unsubscribed">You've been unsubscribed</h1>
+    <p data-es="Ya no recibirás el email semanal. Tus preferencias y horarios siguen disponibles en el sitio." data-en="You won't receive the weekly email any more. Your preferences and showtimes are still available on the site.">You won't receive the weekly email any more. Your preferences and showtimes are still available on the site.</p>
+    <a href="https://whatson.movie/listings/" class="btn" data-es="Ver cartelera" data-en="Browse listings">Browse listings</a>
+  </div>
+  <div id="state-already" hidden>
+    <div class="icon">👍</div>
+    <h1 data-es="Ya estabas dado de baja" data-en="Already unsubscribed">Already unsubscribed</h1>
+    <p data-es="Tu dirección ya estaba desactivada. No recibirás más emails." data-en="Your address was already unsubscribed. You won't receive any emails.">Your address was already unsubscribed. You won't receive any emails.</p>
+    <a href="https://whatson.movie/listings/" class="btn" data-es="Ver cartelera" data-en="Browse listings">Browse listings</a>
+  </div>
+  <div id="state-error" hidden>
+    <div class="icon">❌</div>
+    <h1 class="error" data-es="Algo fue mal" data-en="Something went wrong">Something went wrong</h1>
+    <p data-es="Este enlace no es válido o ya ha caducado. Si sigues recibiendo emails, escríbenos a <a href='mailto:hello@whatson.movie' style='color:#ffb432;'>hello@whatson.movie</a>." data-en="This link isn't valid or has expired. If you're still receiving emails, contact us at <a href='mailto:hello@whatson.movie' style='color:#ffb432;'>hello@whatson.movie</a>.">This link isn't valid or has expired. If you're still receiving emails, contact us at <a href="mailto:hello@whatson.movie" style="color:#ffb432;">hello@whatson.movie</a>.</p>
+    <a href="https://whatson.movie/listings/" class="btn" data-es="Ir al sitio" data-en="Go to site">Go to site</a>
+  </div>
+</div>
+<script>
+(async () => {
+  // Detect language from cookie
+  const langMatch = document.cookie.match(/(^| )cv_lang=([^;]+)/);
+  const lang = (langMatch ? langMatch[2] : null) || navigator.language.startsWith('es') ? 'es' : 'en';
+  document.getElementById('html-root').lang = lang;
+
+  // Apply language to all data-es/data-en elements
+  function applyLang() {
+    document.querySelectorAll('[data-es][data-en]').forEach(el => {
+      el.innerHTML = el.getAttribute('data-' + lang);
+    });
+  }
+
+  function show(id) {
+    ['state-loading','state-success','state-already','state-error'].forEach(s => {
+      document.getElementById(s).hidden = (s !== id);
+    });
+    applyLang();
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+
+  if (!token) {
+    show('state-error');
+    return;
+  }
+
+  try {
+    // Call the Supabase Edge Function
+    const SUPABASE_URL      = 'https://xhvbvggbrmlloefsgofy.supabase.co';
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/unsubscribe?token=${encodeURIComponent(token)}`);
+    const data = await res.json();
+
+    if (res.ok && data.status === 'unsubscribed') {
+      show('state-success');
+    } else if (res.ok && data.status === 'already_unsubscribed') {
+      show('state-already');
+    } else {
+      show('state-error');
+    }
+  } catch (e) {
+    show('state-error');
+  }
+})();
+</script>
+</body>
+</html>
