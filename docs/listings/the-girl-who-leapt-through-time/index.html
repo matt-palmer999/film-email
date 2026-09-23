@@ -169,7 +169,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximas fechas" data-en="🕖 SHOWTIMES — upcoming dates">🕖 HORARIOS — próximas fechas</div>
     <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-28" data-es="Lunes 28" data-en="Monday 28" onclick="showDay('2026-09-28')">Lunes 28</button><button class="day-tab  has-shows" data-day="2026-10-02" data-es="Viernes 2 oct" data-en="Friday 2 Oct" onclick="showDay('2026-10-02')">Viernes 2 oct</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-28"><div class="showtime-row" data-cinema-id="lys" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Lys</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:30" data-vose="true">19:30</button></div></div></div><div class="day-panel " id="day-2026-10-02"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Verdi</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="22:30" data-vose="true">22:30</button></div></div></div></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-28"><div class="showtime-row" data-cinema-id="lys" data-city="Valencia" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Lys</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="19:30" data-vose="true">19:30</button></div></div></div><div class="day-panel " id="day-2026-10-02"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-city="Barcelona" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Verdi</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="22:30" data-vose="true">22:30</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -416,6 +416,22 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
       if (_legend) _legend.style.display = 'flex';
     }
   } catch(e) { /* silent */ }
+})();
+(function() {
+  const city = (localStorage.getItem('whatson_city') || '').toLowerCase();
+  if (!city) return;
+  document.querySelectorAll('.showtime-row[data-city]').forEach(function(row) {
+    const rowCity = (row.dataset.city || '').toLowerCase();
+    if (rowCity && rowCity !== city) row.style.display = 'none';
+  });
+  document.querySelectorAll('.day-panel').forEach(function(panel) {
+    const visible = panel.querySelectorAll('.showtime-row:not([style*="display: none"])').length;
+    if (visible === 0) {
+      const dk = panel.id.replace('day-', '');
+      const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
+      if (tab) tab.style.display = 'none';
+    }
+  });
 })();
 </script>
 </body>
