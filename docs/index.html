@@ -773,8 +773,7 @@
         return;
       }
       if (document.cookie.match(/(^| )cv_email=([^;]+)/)) {
-        var _city = localStorage.getItem('whatson_city') || 'valencia';
-        window.location.replace('/listings/' + _city + '/');
+        window.location.replace('/listings/');
       }
     })();
   </script>

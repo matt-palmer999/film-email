@@ -102,8 +102,17 @@ function setLang(lang) {
 }
 (function() {
   var _city = localStorage.getItem('whatson_city');
-  if (_city && document.cookie.match(/(^| )cv_email=/)) {
-    window.location.replace('./' + _city + '/');
+  if (_city) { window.location.replace('./' + _city + '/'); return; }
+  var _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  if (_m) {
+    var _email = decodeURIComponent(_m[2]);
+    fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=city', {
+      headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON }
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      var city = ((data[0] && data[0].city) || 'valencia').toLowerCase();
+      localStorage.setItem('whatson_city', city);
+      window.location.replace('./' + city + '/');
+    }).catch(function() {});
     return;
   }
   const saved = localStorage.getItem('lang');
