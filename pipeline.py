@@ -1,4 +1,4 @@
-﻿"""
+"""
 pipeline.py — Valencia cinema listings pipeline.
 
 Calls all 9 scrapers → aggregates → TMDB enrichment → generates docs/ HTML.
@@ -1845,7 +1845,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         _city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
         films_by_title = {
             t: f for t, f in films_by_title.items()
-            if any(c["id"] in _city_ids for c in f.get("cinemas", []))
+            if any(c["id"] in _city_ids for c in cinemas_in_window(f))
         }
     city_name     = city or "Valencia"
     city_slug     = city.lower() if city else ""
