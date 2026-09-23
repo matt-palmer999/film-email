@@ -1928,8 +1928,11 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         syn_es = (film.get("synopsis_es") or synopsis)[:140]
         syn_en = (film.get("synopsis_en") or synopsis)[:140]
 
+        _cinema_ids_attr = cd['cinema_ids']
+        if city and _city_ids and _cinema_ids_attr:
+            _cinema_ids_attr = ','.join(c for c in _cinema_ids_attr.split(',') if c in _city_ids)
         return f"""
-    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{cd['cinema_ids']}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
+    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
