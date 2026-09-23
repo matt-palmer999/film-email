@@ -38,7 +38,12 @@ CINEMA_META = {
     "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex"},
     "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse"},
     "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse"},
-    "cinesa":     {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",   "type": "multiplex"},
+    "cinesa":              {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",       "type": "multiplex"},
+    "verdi_barcelona":     {"name": "Cines Verdi",          "website": "https://barcelona.cines-verdi.com",           "type": "arthouse",  "city": "Barcelona"},
+    "renoir_barcelona":    {"name": "Renoir Floridablanca", "website": "https://www.cinesrenoir.com/cine/renoir-floridablanca/", "type": "arthouse", "city": "Barcelona"},
+    "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona"},
+    "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona"},
+    "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona"},
 }
 
 
@@ -274,16 +279,20 @@ def aggregate_scrapers() -> tuple[dict, list]:
                       cinemas: [{id, name, website, type, vose, showtimes: {date:[times]}}]} }
     scraper_status: [ {"label": str, "count": int, "ok": bool, "error": str|None} ]
     """
-    from scrapers.kinepolis  import scrape_kinepolis
-    from scrapers.yelmo      import scrape_yelmo
-    from scrapers.babel      import scrape_babel
-    from scrapers.abc        import scrape_abc
-    from scrapers.dor        import scrape_dor
-    from scrapers.tivoli     import scrape_tivoli
-    from scrapers.ocine_aqua import scrape_ocine_aqua
-    from scrapers.lys        import scrape_lys
-    from scrapers.mn4        import scrape_mn4
-    from scrapers.cinesa     import scrape_cinesa
+    from scrapers.kinepolis         import scrape_kinepolis
+    from scrapers.yelmo             import scrape_yelmo
+    from scrapers.babel             import scrape_babel
+    from scrapers.abc               import scrape_abc
+    from scrapers.dor               import scrape_dor
+    from scrapers.tivoli            import scrape_tivoli
+    from scrapers.ocine_aqua        import scrape_ocine_aqua
+    from scrapers.lys               import scrape_lys
+    from scrapers.mn4               import scrape_mn4
+    from scrapers.cinesa            import scrape_cinesa
+    from scrapers.verdi_barcelona   import scrape_verdi_barcelona
+    from scrapers.renoir_barcelona  import scrape_renoir_barcelona
+    from scrapers.aribau_barcelona  import scrape_aribau_barcelona
+    from scrapers.cinesa_barcelona  import scrape_cinesa_barcelona
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis"),
@@ -294,8 +303,12 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_tivoli,     "Tívoli"),
         (scrape_ocine_aqua, "Ocine Aqua"),
         (scrape_lys,        "Lys"),
-        (scrape_mn4,        "MN4"),
-        (scrape_cinesa,     "Cinesa Bonaire"),
+        (scrape_mn4,             "MN4"),
+        (scrape_cinesa,          "Cinesa Bonaire"),
+        (scrape_verdi_barcelona, "Cines Verdi"),
+        (scrape_renoir_barcelona,"Renoir Floridablanca"),
+        (scrape_aribau_barcelona,"Aribau Multicines"),
+        (scrape_cinesa_barcelona,"Cinesa Barcelona"),
     ]
 
     all_results: list[dict] = []
@@ -797,7 +810,7 @@ async function loadUserPreferences() {
     if (prefs.family_only)   newParams.set('family',    'true');
     if (prefs.evening_only)  newParams.set('evening',   'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
-    const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa'];
+    const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa','verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
       newParams.set('cinemas', prefs.cinemas.join(','));
     }
@@ -1705,7 +1718,8 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         cinema_types = {c["type"] for c in film["cinemas"]}
         cinema_ids   = {c["id"]   for c in film["cinemas"]}
 
-        if "multiplex" in cinema_types or cinema_ids.issubset({"babel", "dor"}):
+        _arthouse_only = {"babel", "dor", "verdi_barcelona", "renoir_barcelona", "aribau_barcelona"}
+        if "multiplex" in cinema_types or cinema_ids.issubset(_arthouse_only):
             multiplex_films.append(film)
 
         for cid in ["babel", "dor"]:
@@ -2510,3 +2524,4 @@ def send_weekly_emails(films: dict) -> None:
 
 if __name__ == "__main__":
     run()
+
