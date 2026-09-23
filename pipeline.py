@@ -1,4 +1,4 @@
-﻿"""
+"""
 pipeline.py — Valencia cinema listings pipeline.
 
 Calls all 9 scrapers → aggregates → TMDB enrichment → generates docs/ HTML.
@@ -2524,3 +2524,4 @@ def send_weekly_emails(films: dict) -> None:
 
 if __name__ == "__main__":
     run()
+

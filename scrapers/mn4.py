@@ -38,7 +38,7 @@ _HEADERS = {
 
 _TITLE_SUFFIX = re.compile(r"\s+en\s+CINES MN4\b.*$", re.IGNORECASE)
 _SES_URL_RE   = re.compile(
-    r"https://www\.reservaentradas\.com/sesiones/[^/]+/cinesmn4/[^/\"']+/\d+/"
+    r"https://www\.reservaentradas\.com/sesiones/[^/]+/cinesmn4/[^/\"']+/\d+[/?][^\"']*"
 )
 
 
@@ -167,13 +167,13 @@ def scrape_mn4() -> list[dict]:
             r.raise_for_status()
         except Exception as exc:
             log.error("Could not fetch Cines MN4 film list: %s", exc)
-            return []
+            raise
 
-        # Unique /sesiones/ links — skip upcoming (proximamente)
-        ses_urls = list(dict.fromkeys(
-            u for u in _SES_URL_RE.findall(r.text)
-            if "proximamente" not in u
-        ))
+        # Unique /sesiones/ links — include ?proximamente=true URLs too;
+        # MN4 uses that flag for classics with real scheduled dates.
+        # _scrape_film returns None when no actual sessions are found,
+        # so truly dateless upcoming films are dropped automatically.
+        ses_urls = list(dict.fromkeys(_SES_URL_RE.findall(r.text)))
         log.info("Found %d film session pages", len(ses_urls))
 
         results: list[dict] = []

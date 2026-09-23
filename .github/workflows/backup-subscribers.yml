@@ -1,0 +1,29 @@
+name: Weekly subscriber backup
+
+on:
+  schedule:
+    - cron: '0 8 * * 0'   # Every Sunday at 08:00 UTC
+  workflow_dispatch:        # Allow manual trigger from GitHub UI
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run backup
+        env:
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RESEND_API_KEY:       ${{ secrets.RESEND_API_KEY }}
+          FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
+          FROM_NAME:            ${{ secrets.FROM_NAME }}
+          BACKUP_TO:            matt_palmer@outlook.com
+        run: python backup_subscribers.py

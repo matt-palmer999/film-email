@@ -555,8 +555,12 @@
     @media (max-width: 500px) {
       nav { padding: 14px 20px; }
       .container { padding: 40px 16px 80px; }
-      .cinema-grid { grid-template-columns: 1fr; }
       .page-title { font-size: 30px; }
+      /* keep 2-col grid but tighten pills so names fit */
+      .cinema-grid { gap: 6px; }
+      .cinema-pill { padding: 8px 10px; gap: 6px; }
+      .cinema-name { font-size: 13px; }
+      .cinema-check { width: 16px; height: 16px; font-size: 10px; }
     }
   </style>
 </head>
@@ -578,7 +582,7 @@
       <h1 class="page-title" data-es="Cargando preferencias..." data-en="Loading preferences...">Cargando preferencias...</h1>
       <p class="page-desc" data-es="Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder." data-en="If you see this for more than a few seconds, you may be on a different device to the one you subscribed on. Go back to the homepage and sign up again to get access.">Si ves este mensaje durante más de unos segundos, puede que estés en un dispositivo diferente al que usaste para suscribirte. Vuelve a la página principal y suscríbete de nuevo para acceder.</p>
       <div id="request-alert" style="display:none;"></div>
-      <a href="../" style="color:var(--gold);font-size:14px;text-decoration:none;" data-es="← Volver al inicio" data-en="← Back to home">← Volver al inicio</a>
+      <a href="../listings/" style="color:var(--gold);font-size:14px;text-decoration:none;" data-es="← Volver a la cartelera" data-en="← Back to listings">← Volver a la cartelera</a>
     </div>
 
     <!-- ── PANEL 2: PREFERENCES ── -->
@@ -586,49 +590,30 @@
 
       <div class="prefs-header">
         <p class="page-eyebrow" data-es="⚙️ Mis preferencias" data-en="⚙️ My preferences">⚙️ Mis preferencias</p>
-        <h1 class="page-title" data-es="Tu newsletter, a tu medida" data-en="Your newsletter, your way">Tu newsletter,<br>a tu medida</h1>
+        <h1 class="page-title" data-es="Tu cartelera, a tu medida" data-en="Your listings, your way">Tu cartelera,<br>a tu medida</h1>
         <div class="prefs-email" id="prefs-email-display"></div>
       </div>
 
       <div id="prefs-alert" style="display:none;"></div>
 
+      <!-- CINEMAS -->
+      <div class="prefs-section">
+        <div class="prefs-section-title" data-es="Cines a incluir" data-en="Cinemas to include">Cines a incluir</div>
+        <div class="cinema-grid" id="cinema-grid" translate="no">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
       <!-- FILTERS -->
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Filtros de contenido" data-en="Content filters">Filtros de contenido</div>
-
-        <!-- VOSE -->
-        <div class="toggle-row vose-row" id="toggle-vose" onclick="togglePref('vose_only')">
-          <div class="toggle-icon">🎬</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo sesiones VOSE" data-en="VOSE sessions only">Solo sesiones VOSE</div>
-            <div class="toggle-desc" data-es="Muestra únicamente películas con versión original subtitulada" data-en="Only show films with original language subtitled screenings">Muestra únicamente películas con versión original subtitulada</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
-        <div class="sub-option" id="sub-vose" style="display:none;">
-          <div class="sub-option-label" data-es="Idioma VOSE" data-en="VOSE language">Idioma VOSE</div>
-          <div class="sub-option-pills">
-            <div class="sub-pill selected" id="vose-lang-en" onclick="selectVoseLang('en')" data-es="Solo inglés" data-en="English only">Solo inglés</div>
-            <div class="sub-pill" id="vose-lang-all" onclick="selectVoseLang('all')" data-es="Todos los idiomas" data-en="All languages">Todos los idiomas</div>
-          </div>
-        </div>
-
-        <!-- FAMILY FRIENDLY -->
-        <div class="toggle-row" id="toggle-family" onclick="togglePref('family_only')">
-          <div class="toggle-icon">👨‍👩‍👧</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Solo apto para familias" data-en="Family friendly only">Solo apto para familias</div>
-            <div class="toggle-desc" data-es="Solo películas con clasificación 12 o inferior" data-en="Only films rated 12 and under">Solo películas con clasificación 12 o inferior</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
 
         <!-- EVENING & WEEKENDS -->
         <div class="toggle-row" id="toggle-evening" onclick="togglePref('evening_only')">
           <div class="toggle-icon">🌙</div>
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo tardes y fines de semana" data-en="Evenings &amp; weekends only">Solo tardes y fines de semana</div>
-            <div class="toggle-desc" data-es="Solo sesiones a partir de las 17:30 en días laborables" data-en="Only screenings from 17:30 on weekdays">Solo sesiones a partir de las 17:30 en días laborables</div>
+            <div class="toggle-desc" data-es="Solo sesiones en fin de semana y a partir de las 17:30 en días laborables" data-en="Only screenings on weekends and from 5.30pm on weekdays">Solo sesiones en fin de semana y a partir de las 17:30 en días laborables</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
@@ -639,16 +624,6 @@
           <div class="toggle-info">
             <div class="toggle-title" data-es="Solo estrenos recientes" data-en="New releases only">Solo estrenos recientes</div>
             <div class="toggle-desc" data-es="Solo películas estrenadas en las últimas 2 semanas" data-en="Only films released in the last 2 weeks">Solo películas estrenadas en las últimas 2 semanas</div>
-          </div>
-          <div class="toggle-switch"></div>
-        </div>
-
-        <!-- ALWAYS SHOW CLASSICS -->
-        <div class="toggle-row" id="toggle-classics" onclick="togglePref('classics')">
-          <div class="toggle-icon">🎭</div>
-          <div class="toggle-info">
-            <div class="toggle-title" data-es="Mostrar siempre clásicos" data-en="Always show classics">Mostrar siempre clásicos</div>
-            <div class="toggle-desc" data-es="Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos" data-en="Show arthouse and classic re-releases regardless of other filters">Muestra películas de cine de autor y reposiciones aunque otros filtros estén activos</div>
           </div>
           <div class="toggle-switch"></div>
         </div>
@@ -671,29 +646,30 @@
           </div>
         </div>
 
-      </div>
 
-      <!-- CINEMAS -->
-      <div class="prefs-section">
-        <div class="prefs-section-title" data-es="Cines a incluir" data-en="Cinemas to include">Cines a incluir</div>
-        <div class="cinema-grid" id="cinema-grid" translate="no">
-          <!-- populated by JS -->
+        <!-- WEEKLY EMAIL -->
+        <div class="toggle-row" id="toggle-email" onclick="togglePref('email_enabled')">
+          <div class="toggle-icon">📧</div>
+          <div class="toggle-info">
+            <div class="toggle-title" data-es="Recibir email semanal" data-en="Receive weekly email">Recibir email semanal</div>
+            <div class="toggle-desc" data-es="Recibe tu cartelera personalizada cada jueves" data-en="Get your personalised listings every Thursday">Recibe tu cartelera personalizada cada jueves</div>
+          </div>
+          <div class="toggle-switch"></div>
         </div>
-      </div>
+        <div class="sub-option" id="sub-email" style="display:none;">
+          <div class="sub-option-label" data-es="Idioma del email" data-en="Email language">Idioma del email</div>
+          <div class="lang-choice">
+            <div class="lang-option" id="lang-es" onclick="selectLangPref('es')">
+              <div class="lang-option-flag">🇪🇸</div>
+              <div class="lang-option-label">Español</div>
+            </div>
+            <div class="lang-option" id="lang-en" onclick="selectLangPref('en')">
+              <div class="lang-option-flag">🇬🇧</div>
+              <div class="lang-option-label">English</div>
+            </div>
+          </div>
+        </div>
 
-      <!-- LANGUAGE -->
-      <div class="prefs-section">
-        <div class="prefs-section-title" data-es="Idioma del newsletter" data-en="Newsletter language">Idioma del newsletter</div>
-        <div class="lang-choice">
-          <div class="lang-option" id="lang-es" onclick="selectLangPref('es')">
-            <div class="lang-option-flag">🇪🇸</div>
-            <div class="lang-option-label">Español</div>
-          </div>
-          <div class="lang-option" id="lang-en" onclick="selectLangPref('en')">
-            <div class="lang-option-flag">🇬🇧</div>
-            <div class="lang-option-label">English</div>
-          </div>
-        </div>
       </div>
 
       <!-- SAVE -->
@@ -750,6 +726,7 @@
       { id: 'tivoli',     name: 'Cine Tívoli',         arthouse: false },
       { id: 'babel',      name: 'Cines Babel',         arthouse: true  },
       { id: 'dor',        name: "Cinestudio D'Or",     arthouse: true  },
+      { id: 'cinesa',     name: 'Cinesa Bonaire',      arthouse: false },
     ];
 
     // Current state
@@ -760,11 +737,11 @@
       family_only:  false,
       evening_only: false,
       new_only:     false,
-      classics:     false,
       rating_filter: false,
       min_rating:   7.0,
       cinemas:      CINEMAS.map(c => c.id),
       lang:         'es',
+      email_enabled: true,
     };
 
     // ── LANGUAGE TOGGLE ──
@@ -779,9 +756,10 @@
         el.placeholder = el.getAttribute('data-placeholder-' + lang);
       });
       localStorage.setItem('lang', lang);
+      prefs.lang = lang;
     }
 
-    const savedLang = localStorage.getItem('lang') || 'es';
+    const savedLang = localStorage.getItem('lang') || localStorage.getItem('cv_lang') || 'es';
     if (savedLang !== 'es') setLang(savedLang);
 
     // ── PANELS ──
@@ -819,11 +797,11 @@
         prefs.family_only  = sub.family_only  || false;
         prefs.evening_only = sub.evening_only || false;
         prefs.new_only     = sub.new_only     || false;
-        prefs.classics     = sub.classics     || false;
         prefs.rating_filter = sub.rating_filter || false;
         prefs.min_rating   = sub.min_rating   || 7.0;
-        prefs.cinemas   = sub.cinemas   || CINEMAS.map(c => c.id);
-        prefs.lang      = sub.lang      || 'es';
+        prefs.cinemas      = sub.cinemas      || CINEMAS.map(c => c.id);
+        prefs.lang         = sub.lang         || 'es';
+        prefs.email_enabled = sub.email_enabled ?? false;
 
         renderPreferences();
         document.getElementById('prefs-email-display').textContent = currentEmail;
@@ -837,26 +815,27 @@
 
     // ── RENDER PREFERENCES UI ──
     function renderPreferences() {
+      // Sync top-bar language toggle with saved preference
+      document.getElementById('btn-es').classList.toggle('active', prefs.lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', prefs.lang === 'en');
+      document.getElementById('html-root').setAttribute('lang', prefs.lang || 'es');
+      document.querySelectorAll('[data-es][data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + (prefs.lang || 'es'));
+      });
+
       // Toggles
-      document.getElementById('toggle-vose').classList.toggle('on', prefs.vose_only);
-      document.getElementById('toggle-family').classList.toggle('on', prefs.family_only);
       document.getElementById('toggle-evening').classList.toggle('on', prefs.evening_only);
       document.getElementById('toggle-new').classList.toggle('on', prefs.new_only);
-      document.getElementById('toggle-classics').classList.toggle('on', prefs.classics);
       document.getElementById('toggle-rating').classList.toggle('on', prefs.rating_filter);
+      document.getElementById('toggle-email').classList.toggle('on', prefs.email_enabled);
+      document.getElementById('sub-email').style.display = prefs.email_enabled ? 'block' : 'none';
+      if (prefs.email_enabled) document.getElementById('toggle-email').style.borderRadius = '10px 10px 0 0';
+      else document.getElementById('toggle-email').style.borderRadius = '';
 
       // Sub-options visibility
-      document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
-      if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
-      else document.getElementById('toggle-vose').style.borderRadius = '';
-
       document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
       if (prefs.rating_filter) document.getElementById('toggle-rating').style.borderRadius = '10px 10px 0 0';
       else document.getElementById('toggle-rating').style.borderRadius = '';
-
-      // VOSE language pills
-      document.getElementById('vose-lang-en').classList.toggle('selected', prefs.vose_lang === 'en');
-      document.getElementById('vose-lang-all').classList.toggle('selected', prefs.vose_lang === 'all');
 
       // Rating slider
       const slider = document.getElementById('rating-slider');
@@ -882,10 +861,10 @@
     function togglePref(key) {
       prefs[key] = !prefs[key];
       // Show/hide sub-options
-      if (key === 'vose_only') {
-        document.getElementById('sub-vose').style.display = prefs.vose_only ? 'block' : 'none';
-        if (prefs.vose_only) document.getElementById('toggle-vose').style.borderRadius = '10px 10px 0 0';
-        else document.getElementById('toggle-vose').style.borderRadius = '';
+      if (key === 'email_enabled') {
+        document.getElementById('sub-email').style.display = prefs.email_enabled ? 'block' : 'none';
+        if (prefs.email_enabled) document.getElementById('toggle-email').style.borderRadius = '10px 10px 0 0';
+        else document.getElementById('toggle-email').style.borderRadius = '';
       }
       if (key === 'rating_filter') {
         document.getElementById('sub-rating').style.display = prefs.rating_filter ? 'block' : 'none';
@@ -893,12 +872,6 @@
         else document.getElementById('toggle-rating').style.borderRadius = '';
       }
       renderPreferences();
-    }
-
-    function selectVoseLang(lang) {
-      prefs.vose_lang = lang;
-      document.getElementById('vose-lang-en').classList.toggle('selected', lang === 'en');
-      document.getElementById('vose-lang-all').classList.toggle('selected', lang === 'all');
     }
 
     function updateRatingLabel(val) {
@@ -944,16 +917,13 @@
               'x-subscriber-email': currentEmail
             },
             body: JSON.stringify({
-              vose_only:    prefs.vose_only,
-              vose_lang:    prefs.vose_lang,
-              family_only:  prefs.family_only,
               evening_only: prefs.evening_only,
               new_only:     prefs.new_only,
-              classics:     prefs.classics,
               rating_filter: prefs.rating_filter,
               min_rating:   prefs.min_rating,
-              cinemas:      prefs.cinemas,
-              lang:         prefs.lang,
+              cinemas:       prefs.cinemas,
+              lang:          prefs.lang,
+              email_enabled: prefs.email_enabled,
               updated_at:   new Date().toISOString()
             })
           }
@@ -972,9 +942,8 @@
         if (prefs.new_only)      p.set('new',       'true');
         if (prefs.family_only)   p.set('family',    'true');
         if (prefs.evening_only)  p.set('evening',   'true');
-        if (prefs.classics)      p.set('classics',  'true');
         if (prefs.rating_filter) p.set('min_rating', prefs.min_rating || 7);
-        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor'];
+        const allCinemas = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor','cinesa'];
         const missing = allCinemas.filter(c => !prefs.cinemas.includes(c));
         if (missing.length > 0) p.set('cinemas', prefs.cinemas.join(','));
         p.set('v', Date.now()); // cache bust
@@ -1067,6 +1036,24 @@
 
       if (cookieEmail) {
         loadFromEmail(cookieEmail);
+      } else {
+        // No subscriber cookie — show a clear 'not subscribed' state immediately
+        const lang = document.getElementById('html-root').getAttribute('lang');
+        const titleEl = document.querySelector('#panel-request .page-title');
+        const descEl  = document.querySelector('#panel-request .page-desc');
+        if (titleEl) {
+          titleEl.setAttribute('data-es', 'Preferencias de suscriptor');
+          titleEl.setAttribute('data-en', 'Subscriber preferences');
+          titleEl.textContent = lang === 'en' ? 'Subscriber preferences' : 'Preferencias de suscriptor';
+        }
+        if (descEl) {
+          descEl.setAttribute('data-es', 'Las preferencias avanzadas son para suscriptores. Suscríbete gratis en la página de inicio para personalizar tu cartelera.');
+          descEl.setAttribute('data-en', 'Advanced preferences are for subscribers. Subscribe free on the home page to personalise your listings.');
+          descEl.textContent = lang === 'en'
+            ? 'Advanced preferences are for subscribers. Subscribe free on the home page to personalise your listings.'
+            : 'Las preferencias avanzadas son para suscriptores. Suscríbete gratis en la página de inicio para personalizar tu cartelera.';
+        }
+        showPanel('panel-request');
       }
     });
   </script>

@@ -1,8 +1,8 @@
 # run_pipeline.ps1
-# Valencia cinema listings — daily update script.
+# Valencia cinema listings - daily update script.
 # Runs pipeline.py, then commits and pushes the updated docs/ to GitHub.
 #
-# ── ONE-TIME TASK SCHEDULER SETUP ────────────────────────────────────────────
+# ONE-TIME TASK SCHEDULER SETUP
 # Open PowerShell as Administrator and run:
 #
 #   $action  = New-ScheduledTaskAction `
@@ -16,15 +16,14 @@
 #     -RunLevel Highest
 #
 # To run manually at any time: .\run_pipeline.ps1
-# ─────────────────────────────────────────────────────────────────────────────
 
 $RepoDir = $PSScriptRoot          # directory where this script lives
 $LogDir  = Join-Path $RepoDir "logs"
 $LogFile = Join-Path $LogDir "pipeline.log"
 $EnvFile = Join-Path $RepoDir ".env"
-$Python  = "python3.12"
+$Python  = "C:\Users\TV-watchers\AppData\Local\Python\bin\python3.12.exe"
 
-# ── Logging ───────────────────────────────────────────────────────────────────
+# Logging
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir | Out-Null
 }
@@ -45,7 +44,38 @@ if ((Test-Path $LogFile) -and (Get-Item $LogFile).Length -gt 5MB) {
 
 Write-Log "=== Pipeline starting ==="
 
-# ── Load .env ─────────────────────────────────────────────────────────────────
+# Guard: skip if the pipeline already completed successfully today (avoids duplicate emails).
+# Pass -Force to override (e.g. when a scraper genuinely failed and you want a retry).
+$Force = $args -contains "-Force"
+if (-not $Force) {
+    $today = Get-Date -Format "yyyy-MM-dd"
+    $alreadyRan = $false
+    if (Test-Path $LogFile) {
+        $alreadyRan = (Select-String -Path $LogFile -Pattern "Pipeline complete\." -SimpleMatch |
+            Where-Object { $_.Line -match $today }) -ne $null
+    }
+    if ($alreadyRan) {
+        Write-Log "Pipeline already completed successfully today ($today). Use -Force to override."
+        Write-Log "=== Skipped (already ran today) ==="
+        exit 0
+    }
+}
+
+# Wait for DNS to be available (the task may fire before the network stack is fully ready
+# when the laptop wakes up or turns on after missing the 8am scheduled trigger).
+$dnsReady = $false
+for ($i = 0; $i -lt 24; $i++) {
+    try { [System.Net.Dns]::GetHostEntry("www.kinepolis.es") | Out-Null; $dnsReady = $true; break }
+    catch { }
+    Start-Sleep -Seconds 5
+}
+if (-not $dnsReady) {
+    Write-Log "ERROR: DNS not ready after 2 minutes - aborting"
+    exit 1
+}
+Write-Log "Network ready."
+
+# Load .env
 if (Test-Path $EnvFile) {
     Get-Content $EnvFile | Where-Object { $_ -match '^\s*[^#\s]' -and $_ -match '=' } | ForEach-Object {
         $key, $val = $_ -split '=', 2
@@ -57,32 +87,37 @@ if (Test-Path $EnvFile) {
     }
     Write-Log "Loaded secrets from .env"
 } else {
-    Write-Log "WARNING: No .env file found at $EnvFile — API keys may be missing"
+    Write-Log "WARNING: No .env file found at $EnvFile - API keys may be missing"
 }
 
-# ── Run pipeline ──────────────────────────────────────────────────────────────
+# Run pipeline
 Set-Location $RepoDir
 Write-Log "Running pipeline.py ..."
 
-$output = & $Python pipeline.py 2>&1
+# Write pipeline output directly to log as it runs (not buffered)
+# Use UTF-8 (no BOM) so the monitoring routine can read the log with standard tools.
+$pyLog  = Join-Path $LogDir "pipeline_py.log"
+$utf8nb = New-Object System.Text.UTF8Encoding $false
+& $Python -u pipeline.py 2>&1 | ForEach-Object {
+    [System.IO.File]::AppendAllText($pyLog, "$_`r`n", $utf8nb)
+    Write-Log "  $_"
+}
 $exitCode = $LASTEXITCODE
 
-$output | ForEach-Object { Write-Log "  $_" }
-
 if ($exitCode -ne 0) {
-    Write-Log "ERROR: pipeline.py exited with code $exitCode — aborting git push"
+    Write-Log "ERROR: pipeline.py exited with code $exitCode - aborting git push"
     exit $exitCode
 }
 
 Write-Log "Pipeline succeeded."
 
-# ── Commit and push docs/ ─────────────────────────────────────────────────────
-git -C $RepoDir add docs/listings/ docs/data/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
+# Commit and push docs/
+git -C $RepoDir add docs/listings/ docs/data/ docs/preferences/ docs/index.html docs/verify/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
 
 # Check if there are staged changes
 $staged = git -C $RepoDir diff --cached --name-only
 if (-not $staged) {
-    Write-Log "No changes in docs/ — nothing to commit."
+    Write-Log "No changes in docs/ - nothing to commit."
     Write-Log "=== Done (no-op) ==="
     exit 0
 }
@@ -103,5 +138,5 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Log "Pushed to GitHub — Pages will redeploy automatically."
+Write-Log "Pushed to GitHub - Pages will redeploy automatically."
 Write-Log "=== Pipeline complete ==="

@@ -164,12 +164,12 @@ def scrape_lys() -> list[dict]:
             r.raise_for_status()
         except Exception as exc:
             log.error("Could not fetch Cines Lys film list: %s", exc)
-            return []
+            raise
 
         # Unique /sesiones/ links for this cinema
         ses_urls = list(dict.fromkeys(
             re.findall(
-                r"https://www\.reservaentradas\.com/sesiones/valencia/cineslys/[^/\"']+/\d+/",
+                r"https://www\.reservaentradas\.com/sesiones/valencia/cineslys/[^/\"'\s<>]+/\d+/?",
                 r.text,
             )
         ))
