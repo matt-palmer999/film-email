@@ -836,7 +836,9 @@
         prefs.new_only     = sub.new_only     || false;
         prefs.rating_filter = sub.rating_filter || false;
         prefs.min_rating   = sub.min_rating   || 7.0;
-        prefs.city         = sub.city         || 'Valencia';
+        const _rawCity = (sub.city || 'Valencia');
+        const _cityKeys = Object.keys(CINEMAS_BY_CITY);
+        prefs.city = _cityKeys.find(function(k) { return k.toLowerCase() === _rawCity.toLowerCase(); }) || 'Valencia';
         const _defaultCinemas = (CINEMAS_BY_CITY[prefs.city] || CINEMAS_BY_CITY.Valencia).map(c => c.id);
         prefs.cinemas      = sub.cinemas      || _defaultCinemas;
         prefs.lang         = sub.lang         || 'es';
