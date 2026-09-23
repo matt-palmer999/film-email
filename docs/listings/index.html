@@ -101,8 +101,6 @@ function setLang(lang) {
   localStorage.setItem('lang', lang);
 }
 (function() {
-  var _city = localStorage.getItem('whatson_city');
-  if (_city) { window.location.replace('./' + _city + '/'); return; }
   var _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
   if (_m) {
     var _email = decodeURIComponent(_m[2]);
@@ -112,7 +110,10 @@ function setLang(lang) {
       var city = ((data[0] && data[0].city) || 'valencia').toLowerCase();
       localStorage.setItem('whatson_city', city);
       window.location.replace('./' + city + '/');
-    }).catch(function() {});
+    }).catch(function() {
+      var cached = localStorage.getItem('whatson_city') || 'valencia';
+      window.location.replace('./' + cached + '/');
+    });
     return;
   }
   const saved = localStorage.getItem('lang');
