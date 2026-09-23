@@ -1,13 +1,13 @@
 """
 Cine Tívoli scraper.
 
-Small neighbourhood cinema in Burjassot run by Exhicine, using the
-Kinetike ticketing plugin for WordPress. All showtime data is
-server-rendered into the cartelera page — no AJAX or browser needed.
+Small neighbourhood cinema in Burjassot run by Exhicine. The site switched
+from server-rendered HTML to a JavaScript/REST approach in mid-2026. Film and
+session data now comes from the custom doo/v1 REST API:
 
-VOSE is indicated by "(V.O.)" in the film title.
-Dates and times come from hidden form inputs (m_date = YYYY-MM-DD,
-m_hour = HH:MM), so no Spanish-date parsing is required.
+  GET https://exhicine.es/wp-json/doo/v1/cinema/8447
+
+VOSE is still indicated by "(V.O.)" in the API title field when present.
 
 Run directly for a quick test summary.
 """
@@ -16,13 +16,12 @@ import logging
 import re
 
 import requests
-from bs4 import BeautifulSoup
 
 log = logging.getLogger(__name__)
 
 CINEMA_KEY   = "tivoli"
 CINEMA_NAME  = "Cine Tívoli"
-CARTELERA_URL = "https://exhicine.es/cine/cine-tivoli/"
+API_URL      = "https://exhicine.es/wp-json/doo/v1/cinema/8447"
 
 _HEADERS = {
     "User-Agent": (
@@ -40,43 +39,31 @@ def scrape_tivoli() -> list[dict]:
     """Scrape Cine Tívoli and return a list of film dicts."""
     log.info("Fetching Cine Tívoli cartelera …")
     try:
-        r = requests.get(CARTELERA_URL, headers=_HEADERS, timeout=20)
+        r = requests.get(API_URL, headers=_HEADERS, timeout=20)
         r.raise_for_status()
     except Exception as exc:
-        log.error("Could not fetch Tívoli cartelera: %s", exc)
-        return []
+        log.error("Could not fetch Tívoli API: %s", exc)
+        raise
 
-    soup = BeautifulSoup(r.text, "lxml")
+    data = r.json()
+    movies = data.get("movies", [])
+
     results: list[dict] = []
-
-    for movie in soup.select(".grid-movies .movie"):
-        title_el = movie.select_one("h2.title, .title")
-        if not title_el:
+    for movie in movies:
+        raw_title = movie.get("title", "").strip()
+        if not raw_title:
             continue
-        raw_title = title_el.get_text(strip=True)
 
-        # VOSE if title contains (V.O.) or (V.O.S.)
         is_film_vose = bool(_VO_RE.search(raw_title))
         title_es = _VO_RE.sub("", raw_title).strip()
-
-        synopsis_el = movie.select_one(".description")
-        synopsis = synopsis_el.get_text(strip=True) if synopsis_el else ""
-
-        img_el = movie.select_one(".image img")
-        poster = img_el.get("src", "") if img_el else ""
+        poster = movie.get("image", "")
 
         showtimes: list[dict] = []
-        for form in movie.select(".content-date form"):
-            def _val(name: str) -> str:
-                inp = form.find("input", {"name": name})
-                return inp["value"].strip() if inp and inp.get("value") else ""
-
-            date_str = _val("m_date")    # YYYY-MM-DD
-            time_str = _val("m_hour")    # HH:MM
-
+        for session in movie.get("sessions", []):
+            date_str = session.get("date", "")
+            time_str = session.get("hour", "")
             if not date_str or not time_str:
                 continue
-
             showtimes.append({
                 "datetime_local": f"{date_str}T{time_str}:00",
                 "date":           date_str,
@@ -87,7 +74,7 @@ def scrape_tivoli() -> list[dict]:
                 "is_3d":          False,
                 "is_imax":        False,
                 "is_4dx":         False,
-                "booking_url":    "",   # POST-only form; no stable GET URL
+                "booking_url":    "",
             })
 
         if not showtimes:
@@ -104,7 +91,7 @@ def scrape_tivoli() -> list[dict]:
             "is_film":        True,
             "duration_mins":  0,
             "poster_url":     poster,
-            "synopsis_es":    synopsis,
+            "synopsis_es":    "",
             "showtimes":      showtimes,
         })
 

@@ -45,7 +45,28 @@ def _to_local(iso_utc: str) -> str:
     return dt.astimezone(VALENCIA_TZ).strftime("%Y-%m-%dT%H:%M:%S")
 
 
-def _parse_session(session: dict) -> dict:
+def _session_is_vose(attrs: str, film_is_vose: bool) -> bool:
+    """
+    Kinépolis bundles VOSE and dubbed sessions under a single film entry
+    (titled "VOSE ...") with audioLanguage="EN". The rawSessionAttributes
+    string distinguishes them:
+      VOSE:   "2D,English,es"       — English audio, Spanish subtitles
+      Dubbed: "2D,nosubt,Spanish"   — Spanish audio, no subtitles
+
+    "nosubt" means no subtitles → Spanish dubbed.  If "nosubt" is absent
+    and a foreign-language attribute is present → VOSE.  Fall back to the
+    film-level flag for sessions with minimal attribute strings.
+    """
+    parts_upper = {p.strip().upper() for p in attrs.split(",")}
+    if "NOSUBT" in parts_upper:
+        return False   # Spanish dubbed
+    foreign = {"ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "JAPANESE", "PORTUGUESE"}
+    if parts_upper & foreign:
+        return True    # Foreign-language audio with subtitles → VOSE
+    return film_is_vose  # fall back to film-level flag
+
+
+def _parse_session(session: dict, film_is_vose: bool = False) -> dict:
     attrs = session.get("rawSessionAttributes", "")
     parts = [p.strip() for p in attrs.split(",")]
     fmt = session.get("film", {}).get("format", {}).get("name", "2D")
@@ -53,6 +74,7 @@ def _parse_session(session: dict) -> dict:
         "datetime_utc":   session["showtime"],
         "datetime_local": _to_local(session["showtime"]),
         "format":         fmt,
+        "is_vose":        _session_is_vose(attrs, film_is_vose),
         "is_3d":          any("3D" in p for p in parts),
         "is_imax":        any("IMAX" in p for p in parts),
         "is_4dx":         any("4DX" in p for p in parts),
@@ -63,7 +85,8 @@ def _parse_session(session: dict) -> dict:
 
 def _build_film(film: dict, sessions: list[dict]) -> dict:
     audio_lang   = film.get("audioLanguage", "ES")
-    spoken_lang  = film.get("spokenLanguage", {}).get("code", "")
+    sl = film.get("spokenLanguage", {})
+    spoken_lang  = (sl[0].get("code", "") if isinstance(sl, list) else sl.get("code", "")) if sl else ""
     is_vose      = audio_lang != "ES"
     raw_title    = film.get("title", "")
     imdb_id      = film.get("imdbCode", "")
@@ -77,19 +100,22 @@ def _build_film(film: dict, sessions: list[dict]) -> dict:
     if not poster_url and film.get("images"):
         poster_url = IMAGE_BASE + film["images"][0]["url"]
 
+    parsed_sessions = [_parse_session(s, film_is_vose=is_vose) for s in sessions]
+    any_vose = any(s["is_vose"] for s in parsed_sessions)
+
     return {
         "cinema":       "kinepolis",
         "cinema_name":  CINEMA_NAME,
         "title_es":     _clean_title(raw_title),
         "title_raw":    raw_title,
-        "is_vose":      is_vose,
+        "is_vose":      any_vose,
         "audio_lang":   audio_lang,
         "spoken_lang":  spoken_lang,
         "imdb_id":      imdb_id,
         "is_film":      is_film,
         "duration_mins": film.get("duration", 0),
         "poster_url":   poster_url,
-        "showtimes":    [_parse_session(s) for s in sessions],
+        "showtimes":    parsed_sessions,
     }
 
 
@@ -136,8 +162,7 @@ def scrape_kinepolis(playwright=None) -> list[dict]:
             p.stop()
 
     if not raw:
-        log.error("Drupal.settings.variables not found on page")
-        return []
+        raise RuntimeError("Drupal.settings.variables not found on page")
 
     variables = json.loads(raw)
     current   = variables.get("current_movies", {})

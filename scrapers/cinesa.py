@@ -110,7 +110,10 @@ def scrape_cinesa(playwright=None) -> list[dict]:
             pass
 
     try:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=False,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
         ctx = browser.new_context(
             locale="es-ES",
             timezone_id="Europe/Madrid",
@@ -126,7 +129,8 @@ def scrape_cinesa(playwright=None) -> list[dict]:
 
         log.info("Loading Cinesa Bonaire page ...")
         page.goto(PAGE_URL, timeout=60_000, wait_until="networkidle")
-        page.wait_for_timeout(4000)
+        # Extra wait to let deferred JS API calls complete
+        page.wait_for_timeout(6000)
         log.info("Page loaded | films=%d  dates=%d",
                  len(films_data.get("films", [])),
                  len(dates_data.get("filmScreeningDates", [])))

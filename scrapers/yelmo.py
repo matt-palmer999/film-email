@@ -77,17 +77,24 @@ def scrape_yelmo() -> list[dict]:
     cinemas = payload["d"]["Cinemas"]
     cinema  = next((c for c in cinemas if c["Key"] == CINEMA_KEY), None)
     if cinema is None:
-        log.error("Cinema %r not found in response (available: %s)",
-                  CINEMA_KEY, [c["Key"] for c in cinemas])
-        return []
+        raise RuntimeError(f"Cinema {CINEMA_KEY!r} not found in Yelmo API response")
 
     log.info("Found cinema: %s (id=%s)", cinema["Name"], cinema["Id"])
 
     # Aggregate films across all dates
     # Structure: Dates > Movies > Formats > Showtimes
+    # NOTE: The date for each batch of showtimes comes from date_entry["FilterDate"]
+    # (a .NET /Date(ms)/ UTC timestamp representing the cinema business day start).
+    # Individual showtime "TimeFilter" timestamps are unreliable for extracting the
+    # correct local date/time — use date_entry for the date and showtime "Time" for
+    # the display time (e.g. "17:00").
     films_map: dict[int, dict] = {}
 
     for date_entry in cinema["Dates"]:
+        # Extract the calendar date for this batch from FilterDate
+        filter_date_raw = date_entry.get("FilterDate", "")
+        date_str = _parse_dotnet_ts(filter_date_raw)[:10] if filter_date_raw else ""
+
         for movie in date_entry["Movies"]:
             fid = movie["Id"]
             if fid not in films_map:
@@ -109,13 +116,15 @@ def scrape_yelmo() -> list[dict]:
                 audio_lang = _lang_code(language)
 
                 for st in fmt.get("Showtimes", []):
-                    ts_str    = st.get("TimeFilter", "")
-                    time_str  = st.get("Time", "")
-                    local_dt  = _parse_dotnet_ts(ts_str) if ts_str else ""
+                    time_str = st.get("Time", "")
+                    if not time_str or not date_str:
+                        continue
+                    local_dt = f"{date_str}T{time_str}:00"
 
                     films_map[fid]["showtimes"].append({
-                        "datetime_local": local_dt,
+                        "date":           date_str,
                         "time":           time_str,
+                        "datetime_local": local_dt,
                         "format":         fmt_name,
                         "language":       language,
                         "is_vose":        is_vose,

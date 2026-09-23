@@ -169,7 +169,7 @@ def scrape_dor() -> list[dict]:
             r.raise_for_status()
         except Exception as exc:
             log.error("Could not fetch D'Or film list: %s", exc)
-            return []
+            raise
 
         soup = BeautifulSoup(r.text, "lxml")
 
