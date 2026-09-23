@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" id="html-root">
 <head>
   <meta charset="UTF-8">
@@ -773,7 +773,8 @@
         return;
       }
       if (document.cookie.match(/(^| )cv_email=([^;]+)/)) {
-        window.location.replace('/listings/');
+        var _city = localStorage.getItem('whatson_city') || 'valencia';
+        window.location.replace('/listings/' + _city + '/');
       }
     })();
   </script>

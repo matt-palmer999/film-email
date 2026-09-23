@@ -1,4 +1,4 @@
-"""
+﻿"""
 pipeline.py — Valencia cinema listings pipeline.
 
 Calls all 9 scrapers → aggregates → TMDB enrichment → generates docs/ HTML.
@@ -1831,6 +1831,7 @@ function setLang(lang) {{
   localStorage.setItem('lang', lang);
 }}
 (function() {{
+  localStorage.setItem('whatson_city', '{city_slug}');
   const saved = localStorage.getItem('lang');
   if (saved === 'en') setLang('en');
 }})();

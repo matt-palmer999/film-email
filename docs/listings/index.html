@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" id="html-root">
 <head>
 <meta charset="UTF-8">
@@ -101,6 +101,11 @@ function setLang(lang) {
   localStorage.setItem('lang', lang);
 }
 (function() {
+  var _city = localStorage.getItem('whatson_city');
+  if (_city && document.cookie.match(/(^| )cv_email=/)) {
+    window.location.replace('./' + _city + '/');
+    return;
+  }
   const saved = localStorage.getItem('lang');
   if (saved === 'en') setLang('en');
 })();
