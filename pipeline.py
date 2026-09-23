@@ -1322,7 +1322,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                 for t, iv in all_times
             )
             vose_attr    = "true" if c["vose"] else "false"
-            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
+            cinema_city  = CINEMA_META.get(c["id"], {}).get("city", "")
+            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
 
         if not cinema_rows:
             cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
@@ -1697,6 +1698,22 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
       if (_legend) _legend.style.display = 'flex';
     }}
   }} catch(e) {{ /* silent */ }}
+}})();
+(function() {{
+  const city = (localStorage.getItem('whatson_city') || '').toLowerCase();
+  if (!city) return;
+  document.querySelectorAll('.showtime-row[data-city]').forEach(function(row) {{
+    const rowCity = (row.dataset.city || '').toLowerCase();
+    if (rowCity && rowCity !== city) row.style.display = 'none';
+  }});
+  document.querySelectorAll('.day-panel').forEach(function(panel) {{
+    const visible = panel.querySelectorAll('.showtime-row:not([style*="display: none"])').length;
+    if (visible === 0) {{
+      const dk = panel.id.replace('day-', '');
+      const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
+      if (tab) tab.style.display = 'none';
+    }}
+  }});
 }})();
 </script>
 </body>
