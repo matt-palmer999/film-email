@@ -105,7 +105,7 @@ function setLang(lang) {
   if (_m) {
     var _email = decodeURIComponent(_m[2]);
     fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=city,cinemas', {
-      headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON }
+      headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': _email }
     }).then(function(r) { return r.json(); }).then(function(data) {
       var sub = data[0];
       var city = ((sub && sub.city) || 'valencia').toLowerCase();
