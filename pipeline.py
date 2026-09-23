@@ -811,8 +811,9 @@ async function loadUserPreferences() {
     if (prefs.evening_only)  newParams.set('evening',   'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = __ALL_CINEMAS__;
-    if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
-      newParams.set('cinemas', prefs.cinemas.join(','));
+    const cityPrefs = (prefs.cinemas || []).filter(c => allCinemas.includes(c));
+    if (cityPrefs.length > 0 && cityPrefs.length < allCinemas.length) {
+      newParams.set('cinemas', cityPrefs.join(','));
     }
 
     if (newParams.toString()) {
