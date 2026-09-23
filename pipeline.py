@@ -27,18 +27,18 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
-    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex"},
-    "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex"},
-    "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex"},
-    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex"},
-    "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://elsaler.cinesabc.com",           "type": "multiplex"},
-    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://granturia.cinesabc.com",         "type": "multiplex"},
-    "lys":        {"name": "Cines Lys",             "website": "https://cineslys.com",                   "type": "multiplex"},
-    "mn4":        {"name": "Cines MN4",             "website": "https://www.cinesmn4.com",               "type": "multiplex"},
-    "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex"},
-    "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse"},
-    "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse"},
-    "cinesa":              {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",       "type": "multiplex"},
+    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia"},
+    "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex", "city": "Valencia"},
+    "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia"},
+    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia"},
+    "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://elsaler.cinesabc.com",           "type": "multiplex", "city": "Valencia"},
+    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://granturia.cinesabc.com",         "type": "multiplex", "city": "Valencia"},
+    "lys":        {"name": "Cines Lys",             "website": "https://cineslys.com",                   "type": "multiplex", "city": "Valencia"},
+    "mn4":        {"name": "Cines MN4",             "website": "https://www.cinesmn4.com",               "type": "multiplex", "city": "Valencia"},
+    "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex", "city": "Valencia"},
+    "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse",  "city": "Valencia"},
+    "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse",  "city": "Valencia"},
+    "cinesa":              {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",       "type": "multiplex", "city": "Valencia"},
     "verdi_barcelona":     {"name": "Cines Verdi",          "website": "https://barcelona.cines-verdi.com",           "type": "arthouse",  "city": "Barcelona"},
     "renoir_barcelona":    {"name": "Renoir Floridablanca", "website": "https://www.cinesrenoir.com/cine/renoir-floridablanca/", "type": "arthouse", "city": "Barcelona"},
     "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona"},
@@ -810,7 +810,7 @@ async function loadUserPreferences() {
     if (prefs.family_only)   newParams.set('family',    'true');
     if (prefs.evening_only)  newParams.set('evening',   'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
-    const allCinemas = ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa','verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
+    const allCinemas = __ALL_CINEMAS__;
     if (prefs.cinemas && prefs.cinemas.length < allCinemas.length) {
       newParams.set('cinemas', prefs.cinemas.join(','));
     }
@@ -1702,7 +1702,158 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
 </html>"""
 
 
-def build_html(films_by_title: dict, anchor: datetime) -> str:
+def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) -> str:
+    """Generate the /listings/ city-chooser landing page."""
+    date_str = anchor.strftime("%Y-%m-%d")
+    city_film_counts = {}
+    for city in cities:
+        city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
+        city_film_counts[city] = sum(
+            1 for f in films.values()
+            if any(c["id"] in city_ids for c in f.get("cinemas", []))
+        )
+
+    CITY_META = {
+        "Valencia": {
+            "es": "La cartelera completa de Valencia",
+            "en": "Valencia's complete cinema listings",
+            "emoji": "🌊",
+            "color": "#c9a84c",
+        },
+        "Barcelona": {
+            "es": "La cartelera completa de Barcelona",
+            "en": "Barcelona's complete cinema listings",
+            "emoji": "🏛️",
+            "color": "#c084fc",
+        },
+    }
+
+    cards_html = ""
+    for city in sorted(cities):
+        slug  = city.lower()
+        meta  = CITY_META.get(city, {"es": city, "en": city, "emoji": "🎬", "color": "#c9a84c"})
+        count = city_film_counts.get(city, 0)
+        cards_html += f"""
+    <a href="./{slug}/" class="city-card" style="border-color:{meta['color']}33;">
+      <div class="city-emoji">{meta['emoji']}</div>
+      <div class="city-name" style="color:{meta['color']};">{city}</div>
+      <div class="city-desc" data-es="{meta['es']}" data-en="{meta['en']}">{meta['es']}</div>
+      <div class="city-count" data-es="{count} películas esta semana" data-en="{count} films this week">{count} películas esta semana</div>
+      <div class="city-arrow" style="color:{meta['color']};">→</div>
+    </a>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="es" id="html-root">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0810">
+<title>Elige tu ciudad · whatson.movie</title>
+<link rel="canonical" href="https://whatson.movie/listings/">
+<meta name="description" content="Cartelera de cine en Valencia y Barcelona. Elige tu ciudad para ver las películas de esta semana.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="whatson.movie — elige tu ciudad">
+<meta property="og:url" content="https://whatson.movie/listings/">
+<meta property="og:image" content="https://whatson.movie/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh;display:flex;flex-direction:column}}
+.wrapper{{max-width:640px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column}}
+.lang-bar{{background:#0a0810;border-bottom:1px solid #1e1630;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}}
+.lang-toggle{{display:flex;border-radius:6px;overflow:hidden;border:1px solid #2e2545}}
+.lang-btn{{padding:5px 14px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#8a7e9a;font-family:'DM Sans',Helvetica,sans-serif}}
+.lang-btn.active{{background:#2e2040;color:#f0eae0}}
+.hero{{padding:48px 24px 32px;text-align:center}}
+.hero-eyebrow{{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:14px}}
+.hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:38px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px}}
+.hero-title span{{color:#ffb432}}
+.hero-sub{{font-size:14px;color:#9b8faa;font-weight:300}}
+.city-grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 40px}}
+.city-card{{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 20px;background:#160f24;border:1px solid #2e2040;border-radius:16px;text-decoration:none;color:inherit;transition:background .15s,border-color .2s;cursor:pointer;-webkit-tap-highlight-color:transparent}}
+.city-card:hover{{background:#1e1433}}
+.city-emoji{{font-size:36px;line-height:1}}
+.city-name{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700}}
+.city-desc{{font-size:13px;color:#9b8faa;text-align:center;line-height:1.4}}
+.city-count{{font-size:12px;color:#7a6a9a}}
+.city-arrow{{font-size:20px;font-weight:700;margin-top:4px}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px 24px;text-align:center}}
+.footer p{{font-size:13px;color:#8a7e9a;line-height:1.7}}
+.footer a{{color:#9a8fb5;text-decoration:none}}
+@media(max-width:380px){{.city-grid{{grid-template-columns:1fr}}}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="lang-bar">
+    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="../" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow" data-es="CARTELERA DE CINE" data-en="CINEMA LISTINGS">CARTELERA DE CINE</div>
+    <h1 class="hero-title">Elige tu <span>ciudad</span></h1>
+    <div class="hero-sub" data-es="Películas de esta semana, filtradas por tus cines favoritos" data-en="This week's films, filtered by your favourite cinemas">Películas de esta semana, filtradas por tus cines favoritos</div>
+  </div>
+
+  <div class="city-grid">
+{cards_html}
+  </div>
+
+  <div class="footer">
+    <p>
+      <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
+      <a href="https://www.themoviedb.org">TMDB</a> ·
+      <span style="color:#7a6a9a;">© {anchor.year} · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+    </p>
+  </div>
+</div>
+<script>
+window.SUPABASE_URL  = "__SUPABASE_URL__";
+window.SUPABASE_ANON = "__SUPABASE_ANON__";
+function setLang(lang) {{
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.querySelectorAll('[data-es]').forEach(el => {{
+    el.textContent = lang === 'en' ? el.dataset.en : el.dataset.es;
+  }});
+  localStorage.setItem('lang', lang);
+}}
+(function() {{
+  const saved = localStorage.getItem('lang');
+  if (saved === 'en') setLang('en');
+}})();
+</script>
+</body>
+</html>"""
+
+
+def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) -> str:
+    if city:
+        _city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
+        films_by_title = {
+            t: f for t, f in films_by_title.items()
+            if any(c["id"] in _city_ids for c in f.get("cinemas", []))
+        }
+    city_name     = city or "Valencia"
+    city_slug     = city.lower() if city else ""
+    root_href     = "../../" if city else "../"
+    slug_prefix   = "../" if city else "./"
+    canonical_url = f"https://whatson.movie/listings/{city_slug}/" if city else "https://whatson.movie/listings/"
+    _all_cinemas      = [k for k, v in CINEMA_META.items() if not city or v.get("city") == city]
+    _all_cinemas_json = json.dumps(_all_cinemas)
+
     date_es = week_range_es(anchor)
     date_en = week_range_en(anchor)
     film_count   = len(films_by_title)
@@ -1751,7 +1902,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
         slug     = film.get("slug")
         section  = cd["section"]
         if slug:
-            title_html = f'<a href="./{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
+            title_html = f'<a href="{slug_prefix}{slug}/" class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</a>'
         else:
             title_html = f'<div class="grid-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>'
         syn_es = (film.get("synopsis_es") or synopsis)[:140]
@@ -1790,7 +1941,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
             inner = "".join(grid_card_html(f) for f in pair)
             dor_cards += f'\n  <div class="grid-row">{inner}\n  </div>'
 
-    return f"""<!DOCTYPE html>
+    _html = f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
 <head>
 <meta charset="UTF-8">
@@ -1809,13 +1960,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title>Valencia Cinema Listings – {date_en}</title>
-<link rel="canonical" href="https://whatson.movie/listings/">
-<meta name="description" content="Every film showing in Valencia this week, with VOSE (original language) screenings highlighted. Filter by cinema, language and time.">
+<title>{city_name} Cinema Listings – {date_en}</title>
+<link rel="canonical" href="{canonical_url}">
+<meta name="description" content="Every film showing in {city_name} this week, with VOSE (original language) screenings highlighted. Filter by cinema, language and time.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Valencia cinema listings · VOSE &amp; original language screenings">
+<meta property="og:title" content="{city_name} cinema listings · VOSE &amp; original language screenings">
 <meta property="og:description" content="{film_count} films across {cinema_count} cinemas this week. VOSE screenings highlighted. Free every Thursday.">
-<meta property="og:url" content="https://whatson.movie/listings/">
+<meta property="og:url" content="{canonical_url}">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
@@ -1829,13 +1980,13 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
 <div class="wrapper">
 
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <a href="{root_href}" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;white-space:nowrap;">whatson<span style="color:#ffb432;">.movie</span></a>
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+      <a href="{root_href}" id="nav-subscribe" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;white-space:nowrap;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
   </div>
 
@@ -1844,20 +1995,20 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
       <span style="font-size:15px;font-weight:500;color:#f0eae0;" data-es="📧 Recibe esto cada jueves, filtrado a tu gusto." data-en="📧 Get this delivered every Thursday, filtered your way.">📧 Recibe esto cada jueves, filtrado a tu gusto.</span>
       <span style="font-size:12px;color:#9b8faa;" data-es="Elige tus cines y sesiones VOSE favoritas — te enviamos la cartelera personalizada cada semana. Gratis." data-en="Choose your cinemas and VOSE preferences — we send you a personalised listing every week. Free.">Elige tus cines y sesiones VOSE favoritas — te enviamos la cartelera personalizada cada semana. Gratis.</span>
     </div>
-    <a href="../" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
+    <a href="{root_href}" style="flex-shrink:0;font-size:13px;font-weight:700;padding:10px 22px;background:#ffb432;color:#0a0810;border-radius:8px;text-decoration:none;white-space:nowrap;letter-spacing:0.5px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Suscribirse gratis →</a>
   </div>
 
   <main>
   <div class="header">
-    <h1 class="header-title" id="header-title">Cartelera<br>Valencia</h1>
-    <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
+    <h1 class="header-title" id="header-title">Cartelera<br>{city_name}</h1>
+    <div class="header-subtitle" data-es="La guía completa del cine en {city_name} esta semana" data-en="Your complete guide to cinema in {city_name} this week">La guía completa del cine en {city_name} esta semana</div>
     <div class="header-date" id="header-date"></div>
   </div>
 
   <div id="quick-filter" style="display:block;position:relative;">
     <div style="display:flex;align-items:flex-end;padding:0;">
       <div style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#f0eae0;line-height:1;background:#0f0c14;border:2px solid #5a4a7a;border-bottom:2px solid #0f0c14;border-radius:8px 8px 0 0;padding:8px 20px 10px;position:relative;z-index:2;margin-bottom:-2px;">quick<em style="color:#ffb432;font-style:italic;">filters</em></div>
-      <a href="../preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #5a4a7a;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
+      <a href="{root_href}preferences/" style="font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:700;color:#c5b8d8;line-height:1;text-decoration:none;padding:8px 16px 10px;border-bottom:2px solid #5a4a7a;flex:1;white-space:nowrap;" data-es="filtros <em style='color:#ffb432;font-style:italic;'>avanzados</em> →" data-en="advanced <em style='color:#ffb432;font-style:italic;'>filters</em> →">advanced <em style="color:#ffb432;font-style:italic;">filters</em> →</a>
     </div>
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1871,7 +2022,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" data-es="🎬 Cines Multiplex — Grandes Estrenos" data-en="🎬 Multiplex Cinemas — Major Releases">🎬 Cines Multiplex — Grandes Estrenos</div>
   <div class="cinema-group-header">
     <div>
-      <div class="cinema-group-desc" data-es="Los próximos 7 días de películas en los grandes multiplex de Valencia y área metropolitana — mostrando tus resultados filtrados" data-en="The next 7 days of movies showing at Valencia's main multiplexes across the city and metropolitan area — showing your filtered results">Los próximos 7 días de películas en los grandes multiplex de Valencia y área metropolitana — mostrando tus resultados filtrados</div>
+      <div class="cinema-group-desc" data-es="Los próximos 7 días de películas en los grandes cines de {city_name} — mostrando tus resultados filtrados" data-en="The next 7 days of movies showing at {city_name}'s cinemas — showing your filtered results">Los próximos 7 días de películas en los grandes cines de {city_name} — mostrando tus resultados filtrados</div>
     </div>
   </div>
   <div id="section1-cards">
@@ -1882,7 +2033,7 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   <div class="section-label" id="section2-label" data-es="🎭 Arthouse &amp; Clásicos" data-en="🎭 Arthouse &amp; Classics">🎭 Arthouse &amp; Clásicos</div>
   <div class="cinema-group-header" id="section2-header">
     <div>
-      <div class="cinema-group-desc" data-es="Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de Valencia — todos los cines, filtrado solo por tus preferencias de idioma" data-en="The next 30 days of classic films currently screening at Valencia's cinemas — all cinemas, only filtered by your language choices">Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de Valencia — todos los cines, filtrado solo por tus preferencias de idioma</div>
+      <div class="cinema-group-desc" data-es="Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de {city_name} — filtrado solo por tus preferencias de idioma" data-en="The next 30 days of classic films currently screening at {city_name}'s cinemas — only filtered by your language choices">Los próximos 30 días de películas clásicas actualmente en cartelera en los cines de {city_name} — filtrado solo por tus preferencias de idioma</div>
     </div>
   </div>
   <div id="section2-cards"></div>
@@ -1890,12 +2041,12 @@ def build_html(films_by_title: dict, anchor: datetime) -> str:
   </main>
 
   <div class="footer">
-    <div class="footer-logo">Cartelera Valencia</div>
+    <div class="footer-logo">Cartelera {city_name}</div>
     <p>
       <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
-      <em style="color:#7a6a9a;" data-es="🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D'Or are Valencia's homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>
-      <span style="color:#7a6a9a;">© {anchor.year} · Cartelera Valencia Weekly</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      {'<em style="color:#7a6a9a;" data-es="🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D\'Or are Valencia\'s homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>' if city_name == "Valencia" else ""}
+      <span style="color:#7a6a9a;">© {anchor.year} · Cartelera {city_name} Weekly</span> · <a href="{root_href}privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
@@ -2056,6 +2207,7 @@ if ('serviceWorker' in navigator) {{
 </script>
 </body>
 </html>"""
+    return _html.replace('__ALL_CINEMAS__', _all_cinemas_json)
 
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
@@ -2104,12 +2256,22 @@ def run() -> None:
     for title, film in films.items():
         film["slug"] = slugify(film.get("title_en", title) or title)
 
-    # 6. Build listings page
-    full_html = build_html(films, anchor)
+    # 6. Build city-specific listings pages + chooser
     os.makedirs("docs/listings", exist_ok=True)
+    _cities = [k for k in {v.get("city") for v in CINEMA_META.values() if v.get("city")}]
+    _cities.sort()
+    for _city in _cities:
+        _city_html = build_html(films, anchor, city=_city)
+        _city_dir  = f"docs/listings/{_city.lower()}"
+        os.makedirs(_city_dir, exist_ok=True)
+        with open(f"{_city_dir}/index.html", "w", encoding="utf-8") as fh:
+            fh.write(_city_html)
+        log.info(f"Wrote {_city_dir}/index.html")
+    _city_slugs = {c.lower() for c in _cities}
+    _chooser_html = build_city_chooser_html(_cities, films, anchor)
     with open("docs/listings/index.html", "w", encoding="utf-8") as fh:
-        fh.write(full_html)
-    log.info("Wrote docs/listings/index.html")
+        fh.write(_chooser_html)
+    log.info("Wrote docs/listings/index.html (city chooser)")
 
     # Load previous films cache before step 7 overwrites it (needed by step 8)
     _prev_cache_path = "docs/data/films_cache.json"
@@ -2137,7 +2299,7 @@ def run() -> None:
     current_slugs = {film["slug"] for film in films.values() if film.get("slug")}
     archived_slugs: list[tuple[str, str]] = []  # (slug, archived_on_date)
     for entry in os.scandir("docs/listings"):
-        if not entry.is_dir() or entry.name in current_slugs:
+        if not entry.is_dir() or entry.name in current_slugs or entry.name in _city_slugs:
             continue
         archived_on_path = os.path.join(entry.path, "archived_on.txt")
         if os.path.exists(archived_on_path):
@@ -2183,7 +2345,11 @@ def run() -> None:
     today_str = anchor.strftime("%Y-%m-%d")
     sitemap_urls = [
         f"  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>{today_str}</lastmod></url>",
-        f"  <url><loc>https://whatson.movie/listings/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>{today_str}</lastmod></url>",
+        f"  <url><loc>https://whatson.movie/listings/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>{today_str}</lastmod></url>",
+        *[
+            f"  <url><loc>https://whatson.movie/listings/{c.lower()}/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>{today_str}</lastmod></url>"
+            for c in _cities
+        ],
     ]
     for title, film in films.items():
         slug = film.get("slug")
@@ -2219,6 +2385,7 @@ def run() -> None:
             "docs/index.html",
             "docs/preferences/index.html",
             "docs/listings/index.html",
+            *[f"docs/listings/{c.lower()}/index.html" for c in _cities],
             "docs/verify/index.html",
             "docs/unsubscribe/index.html",
         ]

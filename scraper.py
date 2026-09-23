@@ -1882,7 +1882,7 @@ def fetch_subscribers() -> list:
     import urllib.request
     key = SUPABASE_SERVICE_KEY or SUPABASE_ANON  # service key bypasses RLS
     try:
-        fields = "email,lang,email_enabled,vose_only,vose_lang,family_only,evening_only,new_only,rating_filter,min_rating,cinemas,unsubscribe_token"
+        fields = "email,lang,email_enabled,vose_only,vose_lang,family_only,evening_only,new_only,rating_filter,min_rating,cinemas,city,unsubscribe_token"
         url = f"{SUPABASE_URL}/rest/v1/subscribers?select={fields}&email_enabled=eq.true&active=eq.true&order=email"
         req = urllib.request.Request(url, headers={
             "apikey":        key,
@@ -1898,10 +1898,16 @@ def fetch_subscribers() -> list:
         return [{"email": r, "lang": "es"} for r in RECIPIENTS]
 
 
+_CINEMAS_BY_CITY = {
+    "Valencia":  ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa'],
+    "Barcelona": ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'],
+}
+
 def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
     """Filter films dict according to a subscriber's saved preferences."""
-    KNOWN_CINEMAS = ['kinepolis','yelmo','ocine','lys','abc_saler','abc_park','gran_turia','mn4','tivoli','babel','dor','cinesa']
-    allowed_cinemas = set(prefs.get("cinemas") or KNOWN_CINEMAS)
+    sub_city = (prefs.get("city") or "Valencia").strip().title()
+    _default_cinemas = _CINEMAS_BY_CITY.get(sub_city, _CINEMAS_BY_CITY["Valencia"])
+    allowed_cinemas = set(prefs.get("cinemas") or _default_cinemas)
     vose_only    = prefs.get("vose_only", False)
     vose_lang    = prefs.get("vose_lang", "all")
     new_only     = prefs.get("new_only", False)
