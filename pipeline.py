@@ -2098,6 +2098,7 @@ window.SUPABASE_ANON = "__SUPABASE_ANON__";
 window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
+  if ('{city_slug}') localStorage.setItem('whatson_city', '{city_slug}');
   initSections();
   applyVisibility();
   loadUserPreferences();
