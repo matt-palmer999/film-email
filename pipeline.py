@@ -1831,7 +1831,26 @@ function setLang(lang) {{
   localStorage.setItem('lang', lang);
 }}
 (function() {{
-  localStorage.setItem('whatson_city', '{city_slug}');
+  var _m = document.cookie.match(/(^| )cv_email=([^;]+)/);
+  if (_m) {{
+    var _email = decodeURIComponent(_m[2]);
+    fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(_email) + '&select=city,cinemas', {{
+      headers: {{ 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': _email }}
+    }}).then(function(r) {{ return r.json(); }}).then(function(data) {{
+      var sub = data[0];
+      var city = ((sub && sub.city) || 'valencia').toLowerCase();
+      if (city === 'valencia' && sub && sub.cinemas && sub.cinemas.length) {{
+        var bcn = ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
+        if (sub.cinemas.every(function(c) {{ return bcn.indexOf(c) !== -1; }})) city = 'barcelona';
+      }}
+      localStorage.setItem('whatson_city', city);
+      window.location.replace('./' + city + '/');
+    }}).catch(function() {{
+      var cached = localStorage.getItem('whatson_city') || 'valencia';
+      window.location.replace('./' + cached + '/');
+    }});
+    return;
+  }}
   const saved = localStorage.getItem('lang');
   if (saved === 'en') setLang('en');
 }})();
