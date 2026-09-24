@@ -1076,12 +1076,13 @@ def _build_jsonld(film: dict, slug: str) -> str:
     events: list[dict] = []
     for cinema in film.get("cinemas", []):
         cinema_name = cinema.get("name", "")
+        cinema_city = CINEMA_META.get(cinema.get("id", ""), {}).get("city", "Valencia")
         location: dict = {
             "@type": "MovieTheater",
             "name":  cinema_name,
             "address": {
                 "@type":           "PostalAddress",
-                "addressLocality": "Valencia",
+                "addressLocality": cinema_city,
                 "addressCountry":  "ES",
             },
         }
