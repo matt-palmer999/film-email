@@ -2503,6 +2503,7 @@ def run() -> None:
                 # landing + preferences pages use YOUR_SUPABASE_* placeholders (static HTML)
                 page = page.replace("YOUR_SUPABASE_URL",      SUPABASE_URL)
                 page = page.replace("YOUR_SUPABASE_ANON_KEY", SUPABASE_ANON)
+                page = page.replace("__FILM_COUNT__",         str(len(films)))
                 with open(page_path, "w", encoding="utf-8") as fh:
                     fh.write(page)
                 log.info(f"Supabase credentials injected into {page_path}")
