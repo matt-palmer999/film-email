@@ -76,7 +76,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <div class="city-emoji">🌊</div>
       <div class="city-name" style="color:#c9a84c;">Valencia</div>
       <div class="city-desc" data-es="La cartelera completa de Valencia" data-en="Valencia's complete cinema listings">La cartelera completa de Valencia</div>
-      <div class="city-count" data-es="104 películas esta semana" data-en="104 films this week">104 películas esta semana</div>
+      <div class="city-count" data-es="103 películas esta semana" data-en="103 films this week">103 películas esta semana</div>
       <div class="city-arrow" style="color:#c9a84c;">→</div>
     </a>
   </div>
@@ -109,10 +109,6 @@ function setLang(lang) {
     }).then(function(r) { return r.json(); }).then(function(data) {
       var sub = data[0];
       var city = ((sub && sub.city) || 'valencia').toLowerCase();
-      if (city === 'valencia' && sub && sub.cinemas && sub.cinemas.length) {
-        var bcn = ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
-        if (sub.cinemas.every(function(c) { return bcn.indexOf(c) !== -1; })) city = 'barcelona';
-      }
       localStorage.setItem('whatson_city', city);
       window.location.replace('./' + city + '/');
     }).catch(function() {

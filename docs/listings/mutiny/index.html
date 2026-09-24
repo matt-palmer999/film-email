@@ -61,6 +61,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .day-panel{display:none;padding:0 20px 20px}
 .day-panel.active{display:block}
 .showtime-row{padding:14px 0;border-bottom:1px solid #1e1630}
+.showtime-row.city-hidden{display:none}
 .showtime-row:last-child{border-bottom:none}
 .showtime-cinema{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .vose-mini{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}
@@ -745,10 +746,10 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
   if (!city) return;
   document.querySelectorAll('.showtime-row[data-city]').forEach(function(row) {
     const rowCity = (row.dataset.city || '').toLowerCase();
-    if (rowCity && rowCity !== city) row.style.display = 'none';
+    if (rowCity && rowCity !== city) row.classList.add('city-hidden');
   });
   document.querySelectorAll('.day-panel').forEach(function(panel) {
-    const visible = panel.querySelectorAll('.showtime-row:not([style*="display: none"])').length;
+    const visible = panel.querySelectorAll('.showtime-row:not(.city-hidden)').length;
     if (visible === 0) {
       const dk = panel.id.replace('day-', '');
       const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
