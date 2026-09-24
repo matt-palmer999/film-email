@@ -1143,6 +1143,20 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
     poster_html  = f'<img src="{poster}" alt="{esc(title_es)}" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
+    _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
+    if _film_cities == {"Barcelona"}:
+        _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
+        _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+    elif _film_cities == {"Valencia"}:
+        _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
+        _desc_en = f"{esc(title_en)} — Valencia cinemas"
+    else:
+        _brand_es, _brand_en = "whatson.movie", "whatson.movie"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios"
+        _desc_en = f"{esc(title_en)} — cinema listings Spain"
+
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
 <head>
@@ -1159,12 +1173,12 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{slug}/">
-<meta name="description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — Valencia cinemas'}">
+<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="{esc(title_es)} — Cartelera Valencia">
-<meta property="og:description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta property="og:title" content="{esc(title_es)} — {_brand_es}">
+<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
 <meta property="og:url" content="https://whatson.movie/listings/{slug}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
 <meta property="og:site_name" content="whatson.movie">
@@ -1362,6 +1376,20 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     poster_html  = f'<img src="{poster}" alt="{esc(title_es)}" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;">' if poster else '<div style="font-size:64px;text-align:center;padding:40px;">🎬</div>'
     orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
+    _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
+    if _film_cities == {"Barcelona"}:
+        _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
+        _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+    elif _film_cities == {"Valencia"}:
+        _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
+        _desc_en = f"{esc(title_en)} — Valencia cinemas"
+    else:
+        _brand_es, _brand_en = "whatson.movie", "whatson.movie"
+        _desc_es = f"{esc(title_es)} — sesiones y horarios"
+        _desc_en = f"{esc(title_en)} — cinema listings Spain"
+
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
 <head>
@@ -1378,12 +1406,12 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="{esc(title_es)} — Cartelera Valencia" data-en="{esc(title_en)} — Cartelera Valencia">{esc(title_es)} — Cartelera Valencia</title>
+<title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{film.get('slug', '')}/">
-<meta name="description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="{esc(title_es)} — Cartelera Valencia">
-<meta property="og:description" content="{esc(syn_es[:160]) if syn_es else esc(title_es) + ' — sesiones y horarios en Valencia'}">
+<meta property="og:title" content="{esc(title_es)} — {_brand_es}">
+<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
 <meta property="og:url" content="https://whatson.movie/listings/{film.get('slug', '')}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
 <meta property="og:site_name" content="whatson.movie">
