@@ -811,7 +811,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" data-count="__FILM_COUNT__" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
         <div class="stat-label" data-es="Películas esta semana" data-en="Films this week">Películas esta semana</div>
       </div>
       <div class="stat-divider"></div>
@@ -1059,11 +1059,8 @@
       }, delay + 1400);
     }
 
-    // Fetch live film count from stats.json, fall back to 30 if unavailable
-    fetch('/data/stats.json')
-      .then(r => r.json())
-      .then(d => runStatsAnimation(d.film_count || 30))
-      .catch(() => runStatsAnimation(30));
+    const _fc = parseInt(document.getElementById('stat-films').dataset.count, 10);
+    runStatsAnimation(_fc > 0 ? _fc : 30);
   </script>
 
   <script>
