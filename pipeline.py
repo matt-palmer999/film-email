@@ -44,6 +44,7 @@ CINEMA_META = {
     "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona"},
     "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona"},
     "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona"},
+    "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://www.yelmocines.es/cartelera/westfield-la-maquinista", "type": "multiplex", "city": "Barcelona"},
 }
 
 
@@ -293,6 +294,7 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.renoir_barcelona  import scrape_renoir_barcelona
     from scrapers.aribau_barcelona  import scrape_aribau_barcelona
     from scrapers.cinesa_barcelona  import scrape_cinesa_barcelona
+    from scrapers.yelmo_barcelona   import scrape_yelmo_barcelona
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis",             "Valencia"),
@@ -309,6 +311,7 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_renoir_barcelona,"Renoir Floridablanca","Barcelona"),
         (scrape_aribau_barcelona,"Aribau Multicines","Barcelona"),
         (scrape_cinesa_barcelona,"Cinesa Barcelona", "Barcelona"),
+        (scrape_yelmo_barcelona, "Yelmo La Maquinista","Barcelona"),
     ]
 
     all_results: list[dict] = []
