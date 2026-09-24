@@ -1148,14 +1148,17 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
         _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
         _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
         _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+        _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
     elif _film_cities == {"Valencia"}:
         _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
         _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
         _desc_en = f"{esc(title_en)} — Valencia cinemas"
+        _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
         _desc_en = f"{esc(title_en)} — cinema listings Spain"
+        _back_href, _back_es, _back_en = "../", "Cartelera", "Listings"
 
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
@@ -1232,7 +1235,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+    <a href="{_back_href}" class="back-link">← <span data-es="{_back_es}" data-en="{_back_en}">{_back_es}</span></a>
   </div>
 
   <div class="film-hero">
@@ -1248,12 +1251,12 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 
   <div class="archive-notice">
     <div class="archive-notice-label" data-es="Fuera de cartelera" data-en="No longer showing">Fuera de cartelera</div>
-    <div class="archive-notice-text" data-es="Esta película ya no está en cartelera en Valencia. Consulta la cartelera actual para ver qué películas están disponibles ahora." data-en="This film is no longer showing at Valencia cinemas. Check the current listings to see what's on now.">Esta película ya no está en cartelera en Valencia. Consulta la cartelera actual para ver qué películas están disponibles ahora.</div>
-    <a href="/listings/" style="display:inline-block;margin-top:14px;padding:9px 22px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:7px;text-decoration:none;" data-es="Ver cartelera →" data-en="See listings →">Ver cartelera →</a>
+    <div class="archive-notice-text" data-es="Esta película ya no está en cartelera. Consulta la cartelera actual para ver qué películas están disponibles ahora." data-en="This film is no longer showing. Check the current listings to see what's on now.">Esta película ya no está en cartelera. Consulta la cartelera actual para ver qué películas están disponibles ahora.</div>
+    <a href="{_back_href}" style="display:inline-block;margin-top:14px;padding:9px 22px;background:#ffb432;color:#0a0810;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:7px;text-decoration:none;" data-es="Ver cartelera →" data-en="See listings →">Ver cartelera →</a>
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
+    <span style="color:#7a6a9a;">© {_brand_es}</span>
   </div>
 </div>
 <script>
@@ -1264,7 +1267,7 @@ function setLang(lang) {{
   document.querySelectorAll('[data-es][data-en]').forEach(el => {{
     el.innerHTML = el.getAttribute('data-' + lang);
   }});
-  document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? '{esc(title_en)} — {_brand_en}' : '{esc(title_es)} — {_brand_es}');
   localStorage.setItem('lang', lang);
 }}
 const saved = localStorage.getItem('lang');
@@ -1381,14 +1384,17 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
         _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
         _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+        _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
     elif _film_cities == {"Valencia"}:
         _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
         _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
         _desc_en = f"{esc(title_en)} — Valencia cinemas"
+        _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
         _desc_en = f"{esc(title_en)} — cinema listings Spain"
+        _back_href, _back_es, _back_en = "../", "Cartelera", "Listings"
 
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
@@ -1486,7 +1492,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+    <a href="{_back_href}" class="back-link">← <span data-es="{_back_es}" data-en="{_back_en}">{_back_es}</span></a>
   </div>
 
   <div class="film-hero">
@@ -1518,7 +1524,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
+    <span style="color:#7a6a9a;">© {_brand_es}</span>
   </div>
 </div>
 
@@ -1539,7 +1545,7 @@ function setLang(lang) {{
   document.querySelectorAll('[data-es][data-en]').forEach(el => {{
     el.innerHTML = el.getAttribute('data-' + lang);
   }});
-  document.title = (lang === 'en' ? '{esc(title_en)}' : '{esc(title_es)}') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? '{esc(title_en)} — {_brand_en}' : '{esc(title_es)} — {_brand_es}');
   localStorage.setItem('lang', lang);
 }}
 function isWeekend(dateKey) {{
