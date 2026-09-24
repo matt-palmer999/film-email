@@ -295,33 +295,42 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.cinesa_barcelona  import scrape_cinesa_barcelona
 
     scrapers = [
-        (scrape_kinepolis,  "Kinépolis"),
-        (scrape_yelmo,      "Yelmo"),
-        (scrape_babel,      "Babel"),
-        (scrape_abc,        "ABC cinemas"),
-        (scrape_dor,        "D'Or"),
-        (scrape_tivoli,     "Tívoli"),
-        (scrape_ocine_aqua, "Ocine Aqua"),
-        (scrape_lys,        "Lys"),
-        (scrape_mn4,             "MN4"),
-        (scrape_cinesa,          "Cinesa Bonaire"),
-        (scrape_verdi_barcelona, "Cines Verdi"),
-        (scrape_renoir_barcelona,"Renoir Floridablanca"),
-        (scrape_aribau_barcelona,"Aribau Multicines"),
-        (scrape_cinesa_barcelona,"Cinesa Barcelona"),
+        (scrape_kinepolis,  "Kinépolis",             "Valencia"),
+        (scrape_yelmo,      "Yelmo",                 "Valencia"),
+        (scrape_babel,      "Babel",                 "Valencia"),
+        (scrape_abc,        "ABC cinemas",           "Valencia"),
+        (scrape_dor,        "D'Or",                  "Valencia"),
+        (scrape_tivoli,     "Tívoli",                "Valencia"),
+        (scrape_ocine_aqua, "Ocine Aqua",            "Valencia"),
+        (scrape_lys,        "Lys",                   "Valencia"),
+        (scrape_mn4,             "MN4",              "Valencia"),
+        (scrape_cinesa,          "Cinesa Bonaire",   "Valencia"),
+        (scrape_verdi_barcelona, "Cines Verdi",      "Barcelona"),
+        (scrape_renoir_barcelona,"Renoir Floridablanca","Barcelona"),
+        (scrape_aribau_barcelona,"Aribau Multicines","Barcelona"),
+        (scrape_cinesa_barcelona,"Cinesa Barcelona", "Barcelona"),
     ]
 
     all_results: list[dict] = []
     scraper_status: list[dict] = []
-    for fn, label in scrapers:
+    for fn, label, city in scrapers:
         try:
             results = fn()
             log.info(f"  {label}: {len(results)} films")
             all_results.extend(results)
-            scraper_status.append({"label": label, "count": len(results), "ok": True, "error": None})
+            if label == "Cinesa Barcelona":
+                for cid, cname in [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")]:
+                    count = sum(1 for r in results if r.get("cinema") == cid)
+                    scraper_status.append({"label": cname, "count": count, "ok": True, "error": None, "city": city})
+            else:
+                scraper_status.append({"label": label, "count": len(results), "ok": True, "error": None, "city": city})
         except Exception as exc:
             log.error(f"  {label} scraper failed: {exc}", exc_info=True)
-            scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc)})
+            if label == "Cinesa Barcelona":
+                for cname in ["Cinesa Diagonal", "Cinesa Diagonal Mar"]:
+                    scraper_status.append({"label": cname, "count": 0, "ok": False, "error": str(exc), "city": city})
+            else:
+                scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc), "city": city})
 
     films_by_title: dict = {}
 
@@ -2481,7 +2490,8 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     DROP_THRESHOLD = 0.40
     failed = [s for s in scraper_status if not s["ok"]]
     regressions = []
-    scraper_line_parts = []
+    valencia_parts = []
+    barcelona_parts = []
     for s in scraper_status:
         icon = '✅' if s['ok'] else '❌'
         if s["ok"]:
@@ -2495,8 +2505,15 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
                 note = f"{s['count']} films{prev_note}"
         else:
             note = f"FAILED — {s['error'] or 'unknown error'}"
-        scraper_line_parts.append(f"  {icon} {s['label']:<22} {note}")
-    scraper_lines = "\n".join(scraper_line_parts)
+        line = f"  {icon} {s['label']:<22} {note}"
+        if s.get("city") == "Barcelona":
+            barcelona_parts.append(line)
+        else:
+            valencia_parts.append(line)
+    scraper_lines = (
+        "Valencia:\n" + "\n".join(valencia_parts) +
+        "\n\nBarcelona:\n" + "\n".join(barcelona_parts)
+    )
 
     # Subscriber counts from Supabase
     total_subs = email_subs = new_subs = 0
@@ -2603,7 +2620,7 @@ TOP REFERRERS (yesterday):
 {ref_lines}"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
-SCRAPERS ({len(scraper_status)} cinemas):
+SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)
