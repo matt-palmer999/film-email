@@ -45,6 +45,9 @@ CINEMA_META = {
     "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona"},
     "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona"},
     "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://www.yelmocines.es/cartelera/westfield-la-maquinista", "type": "multiplex", "city": "Barcelona"},
+    "mooby_gloeries":      {"name": "Mooby Glòries",        "website": "https://moobycinemas.com/glories",    "type": "multiplex", "city": "Barcelona"},
+    "mooby_arenas":        {"name": "Mooby Arenas",         "website": "https://moobycinemas.com/arenas",     "type": "multiplex", "city": "Barcelona"},
+    "ocine_magic":         {"name": "Ocine Màgic Badalona", "website": "https://www.ocinemagic.es",           "type": "multiplex", "city": "Barcelona"},
 }
 
 
@@ -295,6 +298,9 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.aribau_barcelona  import scrape_aribau_barcelona
     from scrapers.cinesa_barcelona  import scrape_cinesa_barcelona
     from scrapers.yelmo_barcelona   import scrape_yelmo_barcelona
+    from scrapers.mooby_gloeries    import scrape_mooby_gloeries
+    from scrapers.mooby_arenas      import scrape_mooby_arenas
+    from scrapers.ocine_magic       import scrape_ocine_magic
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis",             "Valencia"),
@@ -312,6 +318,9 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_aribau_barcelona,"Aribau Multicines","Barcelona"),
         (scrape_cinesa_barcelona,"Cinesa Barcelona", "Barcelona"),
         (scrape_yelmo_barcelona, "Yelmo La Maquinista","Barcelona"),
+        (scrape_mooby_gloeries,  "Mooby Glòries",     "Barcelona"),
+        (scrape_mooby_arenas,    "Mooby Arenas",      "Barcelona"),
+        (scrape_ocine_magic,     "Ocine Màgic",       "Barcelona"),
     ]
 
     all_results: list[dict] = []
