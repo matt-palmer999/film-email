@@ -112,7 +112,7 @@ if ($exitCode -ne 0) {
 Write-Log "Pipeline succeeded."
 
 # Commit and push docs/
-git -C $RepoDir add docs/listings/ docs/data/ docs/preferences/ docs/index.html docs/verify/ 2>&1 | ForEach-Object { Write-Log "git add: $_" }
+git -C $RepoDir add docs/listings/ docs/data/ docs/preferences/ docs/index.html docs/verify/ docs/sitemap.xml docs/robots.txt "docs/*.txt" 2>&1 | ForEach-Object { Write-Log "git add: $_" }
 
 # Check if there are staged changes
 $staged = git -C $RepoDir diff --cached --name-only

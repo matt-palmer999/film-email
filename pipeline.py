@@ -21,6 +21,7 @@ VALENCIA_TZ = ZoneInfo("Europe/Madrid")
 # ── Config ────────────────────────────────────────────────────────────────────
 TMDB_API_KEY  = os.environ.get("TMDB_API_KEY", "")
 TMDB_BASE     = "https://api.themoviedb.org/3"
+INDEXNOW_KEY  = os.environ.get("INDEXNOW_KEY", "")
 SUPABASE_URL         = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON        = os.environ.get("SUPABASE_ANON", "")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -2432,7 +2433,10 @@ def run() -> None:
         fh.write(sitemap_xml)
     log.info(f"Wrote docs/sitemap.xml ({len(sitemap_urls)} URLs)")
 
-    # 10a. Ensure robots.txt points to the sitemap
+    # 10a. Notify Bing IndexNow
+    submit_indexnow(films, _cities)
+
+    # 10b. Ensure robots.txt points to the sitemap
     robots_path = "docs/robots.txt"
     robots = open(robots_path, encoding="utf-8").read() if os.path.exists(robots_path) else "User-agent: *\nDisallow: /data/\n"
     if "Sitemap:" not in robots:
@@ -2471,6 +2475,48 @@ def run() -> None:
 
     # 11. Send admin confirmation email
     send_pipeline_summary(films, scraper_status)
+
+
+def submit_indexnow(films: dict, cities: list) -> None:
+    """Notify Bing IndexNow of updated pages after each pipeline run."""
+    import urllib.request
+
+    if not INDEXNOW_KEY:
+        log.info("INDEXNOW_KEY not set — skipping IndexNow submission")
+        return
+
+    # Write the key verification file (Bing checks this URL to validate ownership)
+    with open(f"docs/{INDEXNOW_KEY}.txt", "w", encoding="utf-8") as fh:
+        fh.write(INDEXNOW_KEY)
+
+    urls = [
+        "https://whatson.movie/",
+        "https://whatson.movie/listings/",
+        *[f"https://whatson.movie/listings/{c.lower()}/" for c in cities],
+    ]
+    for film in films.values():
+        slug = film.get("slug")
+        if slug:
+            urls.append(f"https://whatson.movie/listings/{slug}/")
+
+    payload = json.dumps({
+        "host": "whatson.movie",
+        "key": INDEXNOW_KEY,
+        "keyLocation": f"https://whatson.movie/{INDEXNOW_KEY}.txt",
+        "urlList": urls,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://www.bing.com/indexnow",
+        data=payload,
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            log.info(f"IndexNow: submitted {len(urls)} URLs → HTTP {resp.status}")
+    except Exception as exc:
+        log.warning(f"IndexNow submission failed (non-fatal): {exc}")
 
 
 def send_pipeline_summary(films: dict, scraper_status: list) -> None:
