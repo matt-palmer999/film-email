@@ -796,9 +796,9 @@
     <div class="hero-bg"></div>
     <div class="film-strip"></div>
 
-    <p class="hero-eyebrow" data-es="🎬 Valencia" data-en="🎬 Valencia">🎬 Valencia</p>
+    <p class="hero-eyebrow" data-es="🎬 Valencia · Barcelona" data-en="🎬 Valencia · Barcelona">🎬 Valencia · Barcelona</p>
     <h1 class="hero-title">whatson<span class="hero-title-sub">.movie</span></h1>
-    <p class="hero-desc" data-es="Todas las películas en cartelera en Valencia esta semana. Todos los cines." data-en="Every film showing in Valencia this week. Every cinema.">Todas las películas en cartelera en Valencia esta semana. Todos los cines.</p>
+    <p class="hero-desc" data-es="Todas las películas en cartelera en Valencia y Barcelona esta semana. Todos los cines." data-en="Every film showing in Valencia and Barcelona this week. Every cinema.">Todas las películas en cartelera en Valencia y Barcelona esta semana. Todos los cines.</p>
 
     <a href="./listings/" class="listings-cta" data-es="Ver la cartelera de esta semana →" data-en="See this week's listings →">Ver la cartelera de esta semana →</a>
 
@@ -1049,7 +1049,7 @@
       const t  = document.getElementById('stat-tailored');
       const tl = document.getElementById('stat-tailored-label');
       const delay = 1600; // wait for hero fade-in (1s delay + 0.8s duration + buffer)
-      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 11, 900), delay);
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 16, 900), delay);
       setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), delay + 200);
       setTimeout(() => {
         t.style.opacity  = '1';
