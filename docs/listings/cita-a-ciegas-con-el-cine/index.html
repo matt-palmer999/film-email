@@ -26,7 +26,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}
@@ -126,7 +127,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+    <a href="../valencia/" class="back-link">← <span data-es="Cartelera Valencia" data-en="Valencia Cinema">Cartelera Valencia</span></a>
   </div>
 
   <div class="film-hero">
@@ -179,7 +180,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'CITA A CIEGAS CON EL CINE' : 'CITA A CIEGAS CON EL CINE') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'CITA A CIEGAS CON EL CINE — Valencia Cinema' : 'CITA A CIEGAS CON EL CINE — Cartelera Valencia');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {

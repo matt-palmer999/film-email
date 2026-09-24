@@ -26,7 +26,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}
@@ -153,7 +154,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+    <a href="../" class="back-link">← <span data-es="Cartelera" data-en="Listings">Cartelera</span></a>
   </div>
 
   <div class="film-hero">
@@ -185,7 +186,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
+    <span style="color:#7a6a9a;">© whatson.movie</span>
   </div>
 </div>
 
@@ -206,7 +207,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Mozart: Così Fan Tutte (Zurich Opera House)' : 'COSÌ FAN TUTTE (Mozart) - MET LIVE 26-27') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Mozart: Così Fan Tutte (Zurich Opera House) — whatson.movie' : 'COSÌ FAN TUTTE (Mozart) - MET LIVE 26-27 — whatson.movie');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
