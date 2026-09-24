@@ -4947,7 +4947,7 @@ function applyEveningHighlights(eveningFilter) {
   document.querySelectorAll('.day-panel').forEach(panel => {
     const rows = panel.querySelectorAll('.showtime-row');
     if (!rows.length) return;
-    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none');
+    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
     if (!anyVisible) {
       const msg = document.createElement('div');
       msg.className = 'no-times no-evening-times';
@@ -5003,7 +5003,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -5026,7 +5026,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const voseFilter = params.get('vose') === 'true';
   if (voseFilter) {
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
-      if (row.style.display === 'none') return; // already hidden by cinemas filter
+      if (row.style.display === 'none' || row.classList.contains('city-hidden')) return;
       const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
       btns.forEach(btn => {
         if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
@@ -5039,7 +5039,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -5120,10 +5120,11 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
   });
   document.querySelectorAll('.day-panel').forEach(function(panel) {
     const visible = panel.querySelectorAll('.showtime-row:not(.city-hidden)').length;
-    if (visible === 0) {
-      const dk = panel.id.replace('day-', '');
-      const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
-      if (tab) tab.style.display = 'none';
+    const dk = panel.id.replace('day-', '');
+    const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
+    if (visible === 0 && tab) {
+      tab.style.display = 'none';
+      tab.classList.remove('has-shows');
     }
   });
 })();

@@ -101,44 +101,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     {
       "@type": "ScreeningEvent",
       "name": "Open Season 2",
-      "startDate": "2026-09-24T16:05:00+02:00",
-      "videoFormat": "dubbed",
-      "workPresented": {
-        "@id": "https://whatson.movie/listings/open-season-2/#movie"
-      },
-      "location": {
-        "@type": "MovieTheater",
-        "name": "Cines ABC El Saler",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Valencia",
-          "addressCountry": "ES"
-        },
-        "url": "https://elsaler.cinesabc.com"
-      }
-    },
-    {
-      "@type": "ScreeningEvent",
-      "name": "Open Season 2",
-      "startDate": "2026-09-24T16:00:00+02:00",
-      "videoFormat": "dubbed",
-      "workPresented": {
-        "@id": "https://whatson.movie/listings/open-season-2/#movie"
-      },
-      "location": {
-        "@type": "MovieTheater",
-        "name": "Cines ABC Gran Turia",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Valencia",
-          "addressCountry": "ES"
-        },
-        "url": "https://granturia.cinesabc.com"
-      }
-    },
-    {
-      "@type": "ScreeningEvent",
-      "name": "Open Season 2",
       "startDate": "2026-09-24T20:25:00+02:00",
       "videoFormat": "dubbed",
       "workPresented": {
@@ -227,7 +189,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
     <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-24" data-es="Hoy 24" data-en="Today 24" onclick="showDay('2026-09-24')">Hoy 24</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-24"><div class="showtime-row" data-cinema-id="elsaler" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC El Saler</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="16:05" data-vose="false">16:05</button></div></div><div class="showtime-row" data-cinema-id="granturia" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC Gran Turia</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="16:00" data-vose="false">16:00</button><button onclick="showComingSoon()" class="time-btn" data-time="20:25" data-vose="false">20:25</button></div></div><div class="showtime-row" data-cinema-id="lys" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Lys</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="17:30" data-vose="false">17:30</button></div></div><div class="showtime-row" data-cinema-id="mn4" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines MN4</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:10" data-vose="false">20:10</button></div></div></div></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-24"><div class="showtime-row" data-cinema-id="granturia" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines ABC Gran Turia</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:25" data-vose="false">20:25</button></div></div><div class="showtime-row" data-cinema-id="lys" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Lys</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="17:30" data-vose="false">17:30</button></div></div><div class="showtime-row" data-cinema-id="mn4" data-city="Valencia" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines MN4</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="20:10" data-vose="false">20:10</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -311,7 +273,7 @@ function applyEveningHighlights(eveningFilter) {
   document.querySelectorAll('.day-panel').forEach(panel => {
     const rows = panel.querySelectorAll('.showtime-row');
     if (!rows.length) return;
-    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none');
+    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
     if (!anyVisible) {
       const msg = document.createElement('div');
       msg.className = 'no-times no-evening-times';
@@ -367,7 +329,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -390,7 +352,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const voseFilter = params.get('vose') === 'true';
   if (voseFilter) {
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
-      if (row.style.display === 'none') return; // already hidden by cinemas filter
+      if (row.style.display === 'none' || row.classList.contains('city-hidden')) return;
       const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
       btns.forEach(btn => {
         if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
@@ -403,7 +365,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -484,10 +446,11 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
   });
   document.querySelectorAll('.day-panel').forEach(function(panel) {
     const visible = panel.querySelectorAll('.showtime-row:not(.city-hidden)').length;
-    if (visible === 0) {
-      const dk = panel.id.replace('day-', '');
-      const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
-      if (tab) tab.style.display = 'none';
+    const dk = panel.id.replace('day-', '');
+    const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
+    if (visible === 0 && tab) {
+      tab.style.display = 'none';
+      tab.classList.remove('has-shows');
     }
   });
 })();
