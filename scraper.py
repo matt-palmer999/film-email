@@ -1923,8 +1923,12 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
         is_classic = film_year > 0 and film_year <= current_year - 3
 
         if is_classic:
-            # Classics always shown — only VOSE + language filters apply, everything else
-            # (cinema, new_only, family_only, rating_filter, evening_only) is ignored.
+            # Classics bypass per-cinema preferences but still respect city.
+            film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
+            sub_city = (prefs.get("city") or "Valencia").strip().title()
+            city_cinemas = set(_CINEMAS_BY_CITY.get(sub_city, []))
+            if not film_cinemas & city_cinemas:
+                continue
             if vose_only:
                 if not film.get("any_vose", False):
                     continue
@@ -2148,6 +2152,10 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
     is_es     = (lang == "es")
     date_str  = week_range_es(anchor) if is_es else week_range_en(anchor)
 
+    sub_city  = (prefs.get("city") or "Valencia").strip().title()
+    brand_es  = f"Cartelera {sub_city}"
+    brand_en  = f"{sub_city} Cinema"
+
     vose_only      = prefs.get("vose_only", False)
     new_only       = prefs.get("new_only", False)
     allowed_cinemas = set(prefs.get("cinemas") or [])
@@ -2160,7 +2168,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
 
     # ── SUBJECT LINE ──
     if total == 0:
-        subject = f"🎬 {'Cartelera Valencia' if is_es else 'Valencia Cinema'} – {date_str}"
+        subject = f"🎬 {brand_es if is_es else brand_en} – {date_str}"
     elif vose_only and vose_count > 0:
         subject = f"🎬 {vose_count} {'películas VOSE esta semana' if is_es else 'VOSE films this week'} · {date_str}"
     elif new_only and new_count > 0:
@@ -2168,7 +2176,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
     elif total <= 5:
         subject = f"🎬 {total} {'películas para ti esta semana' if is_es else 'films for you this week'} · {date_str}"
     else:
-        subject = f"🎬 {'Esta semana en Valencia' if is_es else 'This week in Valencia'}: {total} {'películas' if is_es else 'films'} · {date_str}"
+        subject = f"🎬 {'Esta semana en' if is_es else 'This week in'} {sub_city}: {total} {'películas' if is_es else 'films'} · {date_str}"
 
     # ── PERSONALISED LISTINGS URL ──
     params = {}
@@ -2293,7 +2301,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
 
   <!-- HEADER -->
   <tr><td style="background:linear-gradient(135deg,#1a0a2e,#0f0c14);border:1px solid #2a1f3d;border-bottom:none;padding:36px 40px 28px;text-align:center;border-radius:12px 12px 0 0;">
-    <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 {"Cartelera Valencia" if is_es else "Valencia Cinema"}</div>
+    <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:10px;">🎬 {brand_es if is_es else brand_en}</div>
     <div style="font-family:Georgia,serif;font-size:34px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:8px;">{"Tu cartelera<br>de esta semana" if is_es else "Your listings<br>this week"}</div>
     <div style="font-size:13px;color:#9b8faa;margin-bottom:14px;">{subtitle}</div>
     <div style="display:inline-block;padding:5px 16px;background:rgba(255,180,50,0.12);border:1px solid rgba(255,180,50,0.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px;">{date_str}</div>
@@ -2334,7 +2342,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
       {"Los horarios pueden variar — consulta siempre la web del cine." if is_es else "Showtimes may vary — always check the cinema's website."}<br>
       <a href="{prefs_url}" style="color:#5a4e6a;text-decoration:none;">{"⚙️ Gestionar preferencias" if is_es else "⚙️ Manage preferences"}</a>
       {"&nbsp;·&nbsp;<a href='" + unsub_url + "' style='color:#5a4e6a;text-decoration:none;'>" + ("Darse de baja" if is_es else "Unsubscribe") + "</a>" if unsub_url else ""}
-      <br>© {anchor.year} Cartelera Valencia Weekly
+      <br>© {anchor.year} {brand_es} Weekly
     </div>
   </td></tr>
 
@@ -2572,10 +2580,11 @@ def main():
                     filtered_films = apply_subscriber_filters(films, sub)
                     html, subject  = build_full_email(filtered_films, anchor, page_url, prefs_url, unsub_url, prefs=sub)
                     lang_plain = sub.get("lang") or "es"
+                    sub_city_plain = (sub.get("city") or "Valencia").strip().title()
                     plain = (
-                        f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
+                        f"Cartelera {sub_city_plain} – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
                         if lang_plain == "es" else
-                        f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
+                        f"{sub_city_plain} Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
                     )
                     msg = MIMEMultipart("alternative")
                     msg["Subject"] = subject
