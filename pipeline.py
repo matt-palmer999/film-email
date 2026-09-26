@@ -858,12 +858,7 @@ async function loadUserPreferences() {
       }
     }
 
-    const finalParams = new URLSearchParams(window.location.search);
-    document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
-      const base = a.getAttribute('href').split('?')[0];
-      const linkParams = new URLSearchParams(finalParams);
-      a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
-    });
+    if (window.updateFilmLinks) window.updateFilmLinks();
 
   } catch(e) {
     console.warn('Could not load preferences:', e);
@@ -2172,7 +2167,7 @@ window.addEventListener('DOMContentLoaded', () => {{
   loadUserPreferences();
   attachCardClicks();
 
-  setTimeout(() => {{
+  function updateFilmLinks() {{
     const currentParams = new URLSearchParams(window.location.search);
     if (window._qfDay && window._qfDay !== 'all') {{
       currentParams.set('tab', window._qfDay);
@@ -2186,6 +2181,11 @@ window.addEventListener('DOMContentLoaded', () => {{
       }}
       a.href = base + (linkParams.toString() ? '?' + linkParams.toString() : '');
     }});
+  }}
+  window.updateFilmLinks = updateFilmLinks;
+
+  setTimeout(() => {{
+    updateFilmLinks();
     attachCardClicks();
   }}, 1500);
 }});
@@ -2268,6 +2268,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    updateFilmLinks();
     saveQFPrefs();
   }};
 
@@ -2278,6 +2279,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    updateFilmLinks();
     saveQFPrefs();
   }};
 
@@ -2288,6 +2290,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     window.history.replaceState({{}}, '', '?' + params.toString());
     syncQFButtons();
     applyVisibility();
+    updateFilmLinks();
     saveQFPrefs();
   }};
 
