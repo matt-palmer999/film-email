@@ -335,12 +335,19 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 for cid, cname in [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")]:
                     count = sum(1 for r in results if r.get("cinema") == cid)
                     scraper_status.append({"label": cname, "count": count, "ok": True, "error": None, "city": city})
+            elif label == "ABC cinemas":
+                for cid, cname in [("park", "ABC Park"), ("elsaler", "ABC El Saler"), ("granturia", "ABC Gran Turia")]:
+                    count = sum(1 for r in results if r.get("cinema") == cid)
+                    scraper_status.append({"label": cname, "count": count, "ok": True, "error": None, "city": city})
             else:
                 scraper_status.append({"label": label, "count": len(results), "ok": True, "error": None, "city": city})
         except Exception as exc:
             log.error(f"  {label} scraper failed: {exc}", exc_info=True)
             if label == "Cinesa Barcelona":
                 for cname in ["Cinesa Diagonal", "Cinesa Diagonal Mar"]:
+                    scraper_status.append({"label": cname, "count": 0, "ok": False, "error": str(exc), "city": city})
+            elif label == "ABC cinemas":
+                for cname in ["ABC Park", "ABC El Saler", "ABC Gran Turia"]:
                     scraper_status.append({"label": cname, "count": 0, "ok": False, "error": str(exc), "city": city})
             else:
                 scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc), "city": city})
