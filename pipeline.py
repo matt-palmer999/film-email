@@ -727,6 +727,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .qf-btn{padding:7px 0;border-radius:20px;font-size:12px;font-weight:500;border:1px solid #2e2545;background:transparent;color:#9a8fb5;cursor:pointer;flex:1;text-align:center;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s;-webkit-tap-highlight-color:transparent}
 @media(hover:hover){.qf-btn:hover{color:#c5b8d8;border-color:#4a3a60}}
 .qf-active{background:rgba(255,180,50,.15);color:#ffb432;border-color:rgba(255,180,50,.4)}
+.qf-disabled{color:#5a4e70;border-color:#2e2545;pointer-events:none;cursor:default}
 .qf-hidden{display:none!important}
 .filter-empty{display:none;margin:20px 24px;padding:20px;text-align:center;color:#9a8faa;font-size:14px;border:1px dashed #2e2040;border-radius:10px}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:11px}}
@@ -2121,7 +2122,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="qf-btn" id="qf-vose" data-es="Todo VOSE" data-en="All VOSE" onclick="setQFVose()">Todo VOSE</button>
-        <button class="qf-btn" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()" style="color:#5a4e70;border-color:#2e2545;pointer-events:none;" disabled>Solo inglés</button>
+        <button class="qf-btn qf-disabled" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()">Solo inglés</button>
         <button class="qf-btn" id="qf-family" data-es="Familiar (≤ 12)" data-en="Family (≤ 12)" onclick="setQFFamily()">Familiar (≤ 12)</button>
       </div>
     </div>
@@ -2219,9 +2220,8 @@ window.addEventListener('DOMContentLoaded', () => {{
     document.getElementById('qf-family')?.classList.toggle('qf-active', familyOn);
     const enBtn = document.getElementById('qf-enlang');
     if (enBtn) {{
-      enBtn.style.opacity = voseOn ? '1' : '0.4';
-      enBtn.style.pointerEvents = voseOn ? 'auto' : 'none';
-      enBtn.classList.toggle('qf-active', englishOn);
+      enBtn.classList.toggle('qf-disabled', !voseOn);
+      enBtn.classList.toggle('qf-active', voseOn && englishOn);
     }}
   }}
 
