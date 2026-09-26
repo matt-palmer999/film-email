@@ -935,7 +935,10 @@ function initSections() {
 }
 
 function repairSection(container) {
-  const allCards     = Array.from(container.querySelectorAll('.grid-card'));
+  const allCards = Array.from(container.querySelectorAll('.grid-card'));
+  // Stamp original order on first call so re-runs always produce the same sequence.
+  allCards.forEach(function(c, i) { if (c._origOrder === undefined) c._origOrder = i; });
+  allCards.sort(function(a, b) { return a._origOrder - b._origOrder; });
   const visibleCards = allCards.filter(c => c.style.display !== 'none' && !c.classList.contains('qf-hidden'));
   container.querySelectorAll('.grid-row').forEach(row => row.remove());
   Array.from(container.children).forEach(child => {
