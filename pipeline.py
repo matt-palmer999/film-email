@@ -710,8 +710,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .grid-synopsis{font-size:13px;color:#a09aa8;line-height:1.5;margin-bottom:8px}.showtimes-hint{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #241a35;font-size:13px;font-weight:600;color:#d4913a;letter-spacing:.3px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(212,145,58,.45)}.grid-card:hover .showtimes-hint{color:#ffb432;text-decoration-color:rgba(255,180,50,.6)}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
 .footer p{font-size:13px;color:#8a7e9a;line-height:1.7}
-.footer a{color:#9a8fb5;text-decoration:none}
-.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#7a6a9a;margin-bottom:10px}
+.footer a{color:#9a8fb5;text-decoration:underline;text-underline-offset:2px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#9a8fb5;margin-bottom:10px}
 .filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
 .filter-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;font-weight:500}
 .filter-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#9a8fb5;font-family:'DM Sans',Helvetica,sans-serif;transition:all .2s}
@@ -1217,7 +1217,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .archive-notice{{margin:20px;padding:16px 20px;background:rgba(138,126,154,.08);border:1px solid rgba(138,126,154,.25);border-radius:10px;text-align:center}}
 .archive-notice-label{{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;margin-bottom:6px}}
 .archive-notice-text{{font-size:13px;color:#9a8faa;line-height:1.6}}
-.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#9a8fb5}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -1257,7 +1257,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© {_brand_es}</span>
+    <span style="color:#9a8fb5;">© {_brand_es}</span>
   </div>
 </div>
 <script>
@@ -1475,7 +1475,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-legend{{display:flex;align-items:center;gap:8px;padding:12px 20px 18px;font-size:13px;color:#9ed4b0;border-top:1px solid #1e1630}}
 .showtime-legend-dot{{width:12px;height:12px;border-radius:3px;background:#0d2c18;border:2px solid #2d8a50;flex-shrink:0}}
 .no-times{{font-size:13px;color:#8a7e9a;padding:20px 0;text-align:center}}
-.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}}
+.footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#9a8fb5}}
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -1526,7 +1526,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© {_brand_es}</span>
+    <span style="color:#9a8fb5;">© {_brand_es}</span>
   </div>
 </div>
 
@@ -1860,7 +1860,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .city-emoji{{font-size:36px;line-height:1}}
 .city-name{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700}}
 .city-desc{{font-size:13px;color:#9b8faa;text-align:center;line-height:1.4}}
-.city-count{{font-size:12px;color:#7a6a9a}}
+.city-count{{font-size:12px;color:#9a8fb5}}
 .city-arrow{{font-size:20px;font-weight:700;margin-top:4px}}
 .footer{{background:#0a0810;border-top:1px solid #1e1630;padding:20px 24px;text-align:center}}
 .footer p{{font-size:13px;color:#8a7e9a;line-height:1.7}}
@@ -1895,7 +1895,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <p>
       <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
       <a href="https://www.themoviedb.org">TMDB</a> ·
-      <span style="color:#7a6a9a;">© {anchor.year} · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <span style="color:#9a8fb5;">© {anchor.year} · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 </div>
@@ -2113,7 +2113,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="qf-btn" id="qf-vose" data-es="Todo VOSE" data-en="All VOSE" onclick="setQFVose()">Todo VOSE</button>
-        <button class="qf-btn" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()" style="opacity:0.4;pointer-events:none;">Solo inglés</button>
+        <button class="qf-btn" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()" style="color:#5a4e70;border-color:#2e2545;pointer-events:none;" disabled>Solo inglés</button>
         <button class="qf-btn" id="qf-family" data-es="Familiar (≤ 12)" data-en="Family (≤ 12)" onclick="setQFFamily()">Familiar (≤ 12)</button>
       </div>
     </div>
@@ -2145,8 +2145,8 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     <p>
       <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
-      {'<em style="color:#7a6a9a;" data-es="🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D\'Or are Valencia\'s homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>' if city_name == "Valencia" else ""}
-      <span style="color:#7a6a9a;">© {anchor.year} · Cartelera {city_name} Weekly</span> · <a href="{root_href}privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      {'<em style="color:#9a8fb5;" data-es="🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D\'Or are Valencia\'s homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>' if city_name == "Valencia" else ""}
+      <span style="color:#9a8fb5;">© {anchor.year} · Cartelera {city_name} Weekly</span> · <a href="{root_href}privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 
