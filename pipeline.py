@@ -1982,7 +1982,11 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         poster   = film.get("poster", "")
         synopsis = film.get("synopsis", "")
         meta     = film.get("meta", "")
-        vose     = film.get("any_vose", False)
+        if city:
+            _city_cinemas_in_window = [c for c in cinemas_in_window(film) if c["id"] in _city_ids]
+            vose = any(c.get("vose_showtimes") for c in _city_cinemas_in_window)
+        else:
+            vose = film.get("any_vose", False)
         is_new   = film.get("is_new", False)
         cinemas  = film["cinemas"]
         rating   = film.get("rating", "?")
