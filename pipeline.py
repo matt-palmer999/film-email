@@ -2724,7 +2724,13 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     if gc_yesterday is not None:
         book_line = f"  Booking intent clicks: {gc_book_intents}\n" if gc_book_intents else ""
         film_lines = ("".join(f"    - {f}\n" for f in gc_book_films)) if gc_book_films else ""
-        ref_lines = ("".join(f"    {r.get('name','?')} ({r.get('count',0)})\n" for r in gc_ref_rows)) if gc_ref_rows else "    (none)\n"
+        # Deduplicate by name (GoatCounter splits same source by ref_scheme), label direct traffic
+        _ref_merged = {}
+        for r in gc_ref_rows:
+            name = r.get("name") or "Direct / unknown"
+            _ref_merged[name] = _ref_merged.get(name, 0) + r.get("count", 0)
+        _ref_sorted = sorted(_ref_merged.items(), key=lambda x: x[1], reverse=True)[:5]
+        ref_lines = ("".join(f"    {n} ({c})\n" for n, c in _ref_sorted)) if _ref_sorted else "    (none)\n"
         gc_lines = f"""
 TRAFFIC (GoatCounter):
   Yesterday:            {gc_yesterday} pageviews
