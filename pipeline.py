@@ -1897,7 +1897,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 
   <div class="footer">
     <p>
-      <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
+      <span data-es="Carteleras obtenidas directamente de los cines · Información de películas de" data-en="Showtimes sourced directly from cinemas · Film details from">Carteleras obtenidas directamente de los cines · Información de películas de</span>
       <a href="https://www.themoviedb.org">TMDB</a> ·
       <span style="color:#9a8fb5;">© {anchor.year} · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
@@ -2150,7 +2150,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
   <div class="footer">
     <div class="footer-logo">Cartelera {city_name}</div>
     <p>
-      <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
+      <span data-es="Carteleras obtenidas directamente de los cines · Información de películas de" data-en="Showtimes sourced directly from cinemas · Film details from">Carteleras obtenidas directamente de los cines · Información de películas de</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
       {'<em style="color:#9a8fb5;" data-es="🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia" data-en="🎭 Babel and Cinestudio D\'Or are Valencia\'s homes for arthouse and VOSE cinema">🎭 Babel y Cinestudio D\'Or son los referentes del cine de autor y VOSE en Valencia</em><br><br>' if city_name == "Valencia" else ""}
       <span style="color:#9a8fb5;">© {anchor.year} · Cartelera {city_name} Weekly</span> · <a href="{root_href}privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
