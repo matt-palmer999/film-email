@@ -2704,8 +2704,8 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             gc_book_films   = [h["path"].replace("book-intent/", "") for h in booking_hits if h.get("count", 0) > 0]
 
             # Top referrers yesterday
-            gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/refs?start={yesterday_start}&end={yesterday_end}")
-            gc_ref_rows = gc_refs.get("refs", [])[:5]
+            gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/toprefs?start={yesterday_start}&end={yesterday_end}")
+            gc_ref_rows = gc_refs.get("stats", [])[:5]
         except Exception as exc:
             log.warning(f"Could not fetch GoatCounter stats: {exc}")
 
