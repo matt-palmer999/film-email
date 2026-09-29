@@ -2691,16 +2691,17 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             yesterday_end   = (now_v - timedelta(days=1)).strftime("%Y-%m-%dT23:00:00Z")
             week_ago_start  = (now_v - timedelta(days=7)).strftime("%Y-%m-%dT00:00:00Z")
 
-            gc_data  = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}")
+            gc_data  = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/total?start={yesterday_start}&end={yesterday_end}")
             gc_yesterday = gc_data.get("total", 0)
 
-            gc_data7 = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={week_ago_start}&end={yesterday_end}")
+            gc_data7 = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/total?start={week_ago_start}&end={yesterday_end}")
             gc_week  = gc_data7.get("total", 0)
 
-            # Booking intent events yesterday
-            gc_events = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}&filter=book-intent")
-            gc_book_intents = gc_events.get("total", 0)
-            gc_book_films   = [h["path"].replace("book-intent/", "") for h in gc_events.get("hits", []) if h.get("count", 0) > 0]
+            # Booking intent events yesterday: get all hits and filter locally for events
+            gc_all_hits = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}&limit=200")
+            booking_hits = [h for h in gc_all_hits.get("hits", []) if h.get("event") and h.get("path", "").startswith("book-intent/")]
+            gc_book_intents = sum(h.get("count", 0) for h in booking_hits)
+            gc_book_films   = [h["path"].replace("book-intent/", "") for h in booking_hits if h.get("count", 0) > 0]
 
             # Top referrers yesterday
             gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/refs?start={yesterday_start}&end={yesterday_end}")
