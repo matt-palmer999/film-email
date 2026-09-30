@@ -28,27 +28,27 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
-    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia"},
-    "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex", "city": "Valencia"},
-    "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia"},
-    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia"},
-    "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://elsaler.cinesabc.com",           "type": "multiplex", "city": "Valencia"},
-    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://granturia.cinesabc.com",         "type": "multiplex", "city": "Valencia"},
-    "lys":        {"name": "Cines Lys",             "website": "https://cineslys.com",                   "type": "multiplex", "city": "Valencia"},
-    "mn4":        {"name": "Cines MN4",             "website": "https://www.cinesmn4.com",               "type": "multiplex", "city": "Valencia"},
-    "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex", "city": "Valencia"},
-    "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse",  "city": "Valencia"},
-    "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse",  "city": "Valencia"},
-    "cinesa":              {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",       "type": "multiplex", "city": "Valencia"},
-    "verdi_barcelona":     {"name": "Cines Verdi",          "website": "https://barcelona.cines-verdi.com",           "type": "arthouse",  "city": "Barcelona"},
-    "renoir_barcelona":    {"name": "Renoir Floridablanca", "website": "https://www.cinesrenoir.com/cine/renoir-floridablanca/", "type": "arthouse", "city": "Barcelona"},
-    "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona"},
-    "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona"},
-    "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona"},
-    "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://www.yelmocines.es/cartelera/westfield-la-maquinista", "type": "multiplex", "city": "Barcelona"},
-    "mooby_gloeries":      {"name": "Mooby Glòries",        "website": "https://moobycinemas.com/glories",    "type": "multiplex", "city": "Barcelona"},
-    "mooby_arenas":        {"name": "Mooby Arenas",         "website": "https://moobycinemas.com/arenas",     "type": "multiplex", "city": "Barcelona"},
-    "ocine_magic":         {"name": "Ocine Màgic Badalona", "website": "https://www.ocinemagic.es",           "type": "multiplex", "city": "Barcelona"},
+    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Alfafar+Valencia"},
+    "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
+    "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Ocine+Premium+Aqua+Valencia"},
+    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Paterna+Valencia"},
+    "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://elsaler.cinesabc.com",           "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+El+Saler+Valencia"},
+    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://granturia.cinesabc.com",         "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Gran+Turia+Paterna+Valencia"},
+    "lys":        {"name": "Cines Lys",             "website": "https://cineslys.com",                   "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+Lys+Valencia"},
+    "mn4":        {"name": "Cines MN4",             "website": "https://www.cinesmn4.com",               "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+MN4+Valencia"},
+    "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cine+Tivoli+Valencia"},
+    "babel":      {"name": "Cines Babel",           "website": "https://www.cinesalbatrosbabel.com",     "type": "arthouse",  "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+Babel+Valencia"},
+    "dor":        {"name": "Cinestudio D'Or",       "website": "https://cinestudiodor.es",               "type": "arthouse",  "city": "Valencia", "maps": "https://maps.google.com/?q=Cinestudio+D%27Or+Valencia"},
+    "cinesa":              {"name": "Cinesa LUXE Bonaire",  "website": "https://www.cinesa.es/cines/bonaire/",       "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cinesa+LUXE+Bonaire+Valencia"},
+    "verdi_barcelona":     {"name": "Cines Verdi",          "website": "https://barcelona.cines-verdi.com",           "type": "arthouse",  "city": "Barcelona", "maps": "https://maps.google.com/?q=Cines+Verdi+Barcelona"},
+    "renoir_barcelona":    {"name": "Renoir Floridablanca", "website": "https://www.cinesrenoir.com/cine/renoir-floridablanca/", "type": "arthouse", "city": "Barcelona", "maps": "https://maps.google.com/?q=Renoir+Floridablanca+Barcelona"},
+    "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona", "maps": "https://maps.google.com/?q=Aribau+Multicines+Barcelona"},
+    "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Cinesa+Diagonal+Barcelona"},
+    "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Cinesa+Diagonal+Mar+Barcelona"},
+    "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://www.yelmocines.es/cartelera/westfield-la-maquinista", "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Yelmo+La+Maquinista+Barcelona"},
+    "mooby_gloeries":      {"name": "Mooby Glòries",        "website": "https://moobycinemas.com/glories",    "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Glories+Barcelona"},
+    "mooby_arenas":        {"name": "Mooby Arenas",         "website": "https://moobycinemas.com/arenas",     "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Arenas+Barcelona"},
+    "ocine_magic":         {"name": "Ocine Màgic Badalona", "website": "https://www.ocinemagic.es",           "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Ocine+Magic+Badalona"},
 }
 
 
@@ -697,6 +697,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .badge-final-week{background:rgba(217,119,6,.15);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
+.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#7a6e8a;text-decoration:none;vertical-align:middle;opacity:.7;transition:opacity .2s}.cinema-map-link:hover{opacity:1;color:#c5b8d8}
 .cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
@@ -1369,8 +1370,11 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                 for t, iv in all_times
             )
             vose_attr    = "true" if c["vose"] else "false"
-            cinema_city  = CINEMA_META.get(c["id"], {}).get("city", "")
-            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}</div><div class="showtime-times">{time_btns}</div></div>'
+            _cmeta       = CINEMA_META.get(c["id"], {})
+            cinema_city  = _cmeta.get("city", "")
+            _maps_url    = _cmeta.get("maps", "")
+            _maps_link   = f'<a href="{_maps_url}" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a>' if _maps_url else ""
+            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}{_maps_link}</div><div class="showtime-times">{time_btns}</div></div>'
 
         if not cinema_rows:
             cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
