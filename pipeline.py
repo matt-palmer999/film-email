@@ -28,7 +28,7 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
-    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Alfafar+Valencia"},
+    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Valencia+Burjassot"},
     "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
     "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Ocine+Premium+Aqua+Valencia"},
     "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Paterna+Valencia"},
@@ -697,7 +697,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .badge-final-week{background:rgba(217,119,6,.15);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
-.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#9a8fba;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#e0d8f0}
+.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#c5b8d8;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#f0eae0}
 .cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
@@ -843,9 +843,13 @@ async function loadUserPreferences() {
     if (prefs.evening_only)  newParams.set('evening',   'true');
     if (prefs.rating_filter) newParams.set('min_rating', prefs.min_rating || 7);
     const allCinemas = __ALL_CINEMAS__;
-    const cityPrefs = (prefs.cinemas || []).filter(c => allCinemas.includes(c));
-    if (cityPrefs.length > 0 && cityPrefs.length < allCinemas.length) {
-      newParams.set('cinemas', cityPrefs.join(','));
+    const savedList  = prefs.cinemas || [];
+    // Cinemas not in the saved list are newly added — include them by default
+    const effectiveCinemas = savedList.length > 0
+      ? [...new Set([...savedList.filter(c => allCinemas.includes(c)), ...allCinemas.filter(c => !savedList.includes(c))])]
+      : [];
+    if (effectiveCinemas.length > 0 && effectiveCinemas.length < allCinemas.length) {
+      newParams.set('cinemas', effectiveCinemas.join(','));
     }
 
     if (newParams.toString()) {
