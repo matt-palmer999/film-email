@@ -1,121 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/barcelona/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/valencia/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/life-is-beautiful/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-bridges-of-madison-county/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/always-lalisa/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cars/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/digger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/forgotten-island/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/verity/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/resident-evil/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/tad-and-the-magic-lamp/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-bola-negra/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/heart-of-the-beast/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/lucky-strike/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-odyssey/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/ownerships/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/coyote-vs-acme/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-magic-faraway-tree/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/doraemon-the-movie-new-nobita-and-the-castle-of-the-undersea-devil/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/pets-on-a-train/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/blind-ants/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/other-mommy/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-social-reckoning/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/manon-lescaut/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/avengers-endgame/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/practical-magic-2/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-beloved/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/insidious-out-of-the-further/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/spider-man-brand-new-day/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/doraemon-the-movie-nobita-s-art-world-tales/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/naza/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/hoppers/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-last-whale-singer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/verdi-macbeth/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/tomorrow-x-together-world-tour-act-sweet-mirage/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/minions-monsters/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/manon/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/rammstein-paris/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/black-narcissus/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/five-seconds/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/60-anos-cine-club-uach/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cine-con-cineastas-talk-me/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/palestine-36/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-vida-de-una-mujer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/her-private-hell/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cine-familiar-la-isla-olvidada/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cine-con-cineastas-su-propio-infierno/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cine-con-coloquio-naza-pase-especial-mostra-de-valencia/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/sacred-heart/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-umbrella-fairy/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/club-rosebud-palestina-36/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/sunny-dancer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-invasion-of-the-barbarians/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-bola-negra-35mm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-la-land/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/mulholland-drive/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/nomad-shadow/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/fall-2-deadpoint/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/pressure/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/xy9/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-sheep-detectives/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/goat/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/marsupilami/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/evolution/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/paw-patrol-the-dino-movie/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/club-rosebud-digger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/chers-parents/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/mirando-al-cielo/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/gilda/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/whalefall/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/princess-mononoke/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/stockholm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/mek-in-mek/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-last-one-for-the-road/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/los-musicos/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/michael/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/tokyo-taxi/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/bad-apples/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/ashes/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cita-a-ciegas-con-el-cine/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/operation-cronos/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/obsession/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/queen-live-in-budapest/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/thelma-louise/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/trainspotting/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/little-miss-sunshine/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/children-of-men/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/mamma-mia/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/terminator-2-judgment-day/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/nothing-personal/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/batman-begins/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/cine-a-ciegas/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-dark-knight/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/escape-room-tournament-of-champions/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-mitad-de-ana/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/a-clockwork-orange/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-dark-knight-rises/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/the-shining/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/my-neighbor-totoro/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/vengadores-endgame-infinity-vision/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/shoeshine/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/two-to-one/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/flies/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/munch-love-ghosts-and-lady-vampires/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/sesion-cortos-otono-2026/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/stockholm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/la-tosca/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/mulholland-drive-wilder-cinema/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/gilda-wilder-cinema/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/manon-the-royal-ballet/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/jim-queen-and-the-quest-for-chloroqueer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/linkin-park-unshatter/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/detective-conan-fallen-angel-of-the-highway/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/oasis-don-t-look-back-in-anger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-08</lastmod></url>
+  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/barcelona/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/valencia/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/life-is-beautiful/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-bridges-of-madison-county/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/always-lalisa/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cars/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-bola-negra/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/forgotten-island/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/heart-of-the-beast/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/coyote-vs-acme/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/resident-evil/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/verity/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-odyssey/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/digger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/tad-and-the-magic-lamp/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-magic-faraway-tree/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/doraemon-the-movie-new-nobita-and-the-castle-of-the-undersea-devil/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/pets-on-a-train/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/blind-ants/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/other-mommy/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-social-reckoning/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/doraemon-the-movie-nobita-s-art-world-tales/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/naza/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/avengers-endgame/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/insidious-out-of-the-further/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/hoppers/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-last-whale-singer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-beloved/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/verdi-macbeth/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/tomorrow-x-together-world-tour-act-sweet-mirage/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/minions-monsters/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/manon/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-nightmare-before-christmas/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-shining/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/a-nightmare-on-elm-street/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/los-cazafantasmas-de-petatiux/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/rammstein-paris/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-vida-de-una-mujer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/her-private-hell/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-familiar-la-isla-olvidada/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/queen-live-in-budapest/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-con-cineastas-su-propio-infierno/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-con-coloquio-naza-pase-especial-mostra-de-valencia/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/60-anos-cine-club-uach/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-con-coloquio-stockholm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/marsupilami/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/evolution/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/paw-patrol-the-dino-movie/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-bola-negra-35mm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/practical-magic-2/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/lucky-strike/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/ashes/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/escape-room-tournament-of-champions/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-sheep-detectives/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/goat/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/ownerships/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/pressure/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/sacred-heart/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/club-rosebud-digger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/chers-parents/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/mirando-al-cielo/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/gilda/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/el-secreto-del-park-14-10/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/whalefall/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-invasion-of-the-barbarians/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-la-land/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/princess-mononoke/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/limbo/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/stockholm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/mek-in-mek/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/fall-2-deadpoint/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/spider-man-brand-new-day/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/drisham-the-conclusion/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-last-one-for-the-road/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/los-musicos/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/michael/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/tokyo-taxi/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/viva-zapata/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/bad-apples/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cita-a-ciegas-con-el-cine/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/mulholland-drive/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/trainspotting/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/little-miss-sunshine/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/children-of-men/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/mamma-mia/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/terminator-2-judgment-day/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-dark-knight/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-mitad-de-ana/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/a-clockwork-orange/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-dark-knight-rises/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/my-neighbor-totoro/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/vengadores-endgame-infinity-vision/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/operation-cronos/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/flies/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/munch-love-ghosts-and-lady-vampires/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/palestine-36/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/sesion-cortos-otono-2026/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/stockholm/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-tosca/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/black-narcissus/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/gilda-wilder-cinema/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/la-princesa-mononoke-wilder-cinema/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/manon-the-royal-ballet/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/jim-queen-and-the-quest-for-chloroqueer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/linkin-park-unshatter/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/detective-conan-fallen-angel-of-the-highway/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/oasis-don-t-look-back-in-anger/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/sunny-dancer/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2026-10-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/30-anos-30-peliculas-in-the-mood-for-love-deseando-amar/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-01</lastmod></url>
   <url><loc>https://whatson.movie/listings/30-anos-30-peliculas-la-vida-de-los-otros/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-25</lastmod></url>
   <url><loc>https://whatson.movie/listings/30-anos-30-peliculas-las-virgenes-suicidas/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-02</lastmod></url>
@@ -126,6 +120,7 @@
   <url><loc>https://whatson.movie/listings/backrooms/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/backrooms-liquidacion-total-version-extendida-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://whatson.movie/listings/bad-apples-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/batman-begins/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/billie-eilish-hit-me-hard-and-soft-the-tour-live-in-3d/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/billie-eilish-hit-me-hard-and-soft-the-tour-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/black-box/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -139,21 +134,23 @@
   <url><loc>https://whatson.movie/listings/cat-tadeo-jones-y-la-lampara-maravillosa/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/cinco-segundos/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/cinco-segundos-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-a-ciegas/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-club-el-ladron-de-perros/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-club-lys-el-ser-querido/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-06</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-club-lys-tanit/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-club-lys-tiempo-de-victoria/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-29</lastmod></url>
+  <url><loc>https://whatson.movie/listings/cine-con-cineastas-talk-me/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-con-coloquio-la-bola-negra/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-con-coloquio-queen-budapest/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-08</lastmod></url>
   <url><loc>https://whatson.movie/listings/cine-familiar-mumbo-jumbo-se-hace-enorme/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-28</lastmod></url>
   <url><loc>https://whatson.movie/listings/club-rosebud-la-bola-negra/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://whatson.movie/listings/club-rosebud-la-copia-perfecta/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/club-rosebud-palestina-36/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-30</lastmod></url>
   <url><loc>https://whatson.movie/listings/club-rosebud-un-taxi-en-tokio/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/couture-alta-costura/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/cronos/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/cronos-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-22</lastmod></url>
   <url><loc>https://whatson.movie/listings/dentro-del-laberinto-wilder-cinema/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-25</lastmod></url>
-  <url><loc>https://whatson.movie/listings/drisham-the-conclusion/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-08</lastmod></url>
   <url><loc>https://whatson.movie/listings/dulce-sabor-a-muerte/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/eixam/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-drama-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -187,6 +184,7 @@
   <url><loc>https://whatson.movie/listings/ficiv-tadeo-jones-3-la-tabla-esmeralda/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-04</lastmod></url>
   <url><loc>https://whatson.movie/listings/ficiv-winnipeg-el-barco-de-la-esperanza/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-04</lastmod></url>
   <url><loc>https://whatson.movie/listings/film/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/five-seconds/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/forastera/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/hanuman-ansh/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://whatson.movie/listings/haute-couture/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -218,6 +216,7 @@
   <url><loc>https://whatson.movie/listings/lily-s-ritual/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/lionel/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-24</lastmod></url>
   <url><loc>https://whatson.movie/listings/living-with-gaudi/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/manon-lescaut/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/mascotas-al-rescate/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/memento/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/mis-queridisimos-padres/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -226,10 +225,14 @@
   <url><loc>https://whatson.movie/listings/mother-s-baby/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/mother-s-baby-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/mozart-cosi-fan-tutte-zurich-opera-house/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/mulholland-drive-wilder-cinema/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/mumbo-jumbo-se-hace-enorme/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/mutiny/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/napoleon-in-the-name-of-art/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-08</lastmod></url>
   <url><loc>https://whatson.movie/listings/narciso/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-30</lastmod></url>
+  <url><loc>https://whatson.movie/listings/nomad-shadow/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-07</lastmod></url>
+  <url><loc>https://whatson.movie/listings/nothing-personal/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/obsession/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/obsession-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/open-season-2/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/operacion-teheran/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -254,6 +257,7 @@
   <url><loc>https://whatson.movie/listings/searching-for-sugar-man/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/secret-flashback-5-octubre/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-06</lastmod></url>
   <url><loc>https://whatson.movie/listings/sessio-teta-el-ser-querido/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-28</lastmod></url>
+  <url><loc>https://whatson.movie/listings/shoeshine/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/sing-street/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/sira-and-the-secret-of-the-park/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-26</lastmod></url>
   <url><loc>https://whatson.movie/listings/sons/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -281,11 +285,14 @@
   <url><loc>https://whatson.movie/listings/the-money-maker/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-name-of-the-rose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-nest/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-umbrella-fairy/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
+  <url><loc>https://whatson.movie/listings/thelma-louise/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/tiempo-de-victoria/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/tiempo-de-victoria-vose/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/titian-the-empire-of-color/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/toxic-a-fairytale-for-grown-ups/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/toy-story-5/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-30</lastmod></url>
+  <url><loc>https://whatson.movie/listings/two-to-one/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/un-mundo-fragil-y-maravilloso/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/un-plan-perfecto/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-07</lastmod></url>
   <url><loc>https://whatson.movie/listings/un-taxi-en-tokio/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
@@ -302,4 +309,5 @@
   <url><loc>https://whatson.movie/listings/viaje-al-pais-de-los-blancos/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/viatge-al-pais-dels-blancs/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/when-mumbo-jumbo-grew-giant/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-09-23</lastmod></url>
+  <url><loc>https://whatson.movie/listings/xy9/</loc><changefreq>yearly</changefreq><priority>0.3</priority><lastmod>2026-10-09</lastmod></url>
 </urlset>
