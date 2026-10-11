@@ -2905,7 +2905,15 @@ def send_weekly_emails(films: dict) -> None:
     page_url  = "https://whatson.movie/listings/"
     prefs_url = "https://whatson.movie/preferences/"
 
-    subscribers = fetch_subscribers()
+    test_recipient = os.environ.get("TEST_RECIPIENT", "").strip()
+    if test_recipient:
+        log.info(f"TEST_RECIPIENT set — sending only to {test_recipient} (test mode)")
+        subscribers = [{"email": test_recipient, "lang": "es", "email_enabled": True,
+                        "cinemas": [], "vose_only": False, "new_only": False,
+                        "family_only": False, "evening_only": False,
+                        "rating_filter": False, "min_rating": 0, "unsubscribe_token": ""}]
+    else:
+        subscribers = fetch_subscribers()
     if not subscribers:
         log.info("No email-enabled subscribers found — skipping weekly send")
         return

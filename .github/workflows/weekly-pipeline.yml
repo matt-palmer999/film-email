@@ -1,0 +1,59 @@
+name: Weekly pipeline
+
+on:
+  schedule:
+    - cron: '0 17 * * 4'  # Thursdays 17:00 UTC = 19:00 CEST (summer) / 18:00 CET (winter)
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Send email only to matt_palmer@outlook.com'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium --with-deps
+
+      - name: Configure git
+        run: |
+          git config user.name "whatson-bot"
+          git config user.email "actions@github.com"
+
+      - name: Run pipeline
+        env:
+          TMDB_API_KEY:         ${{ secrets.TMDB_API_KEY }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON:        ${{ secrets.SUPABASE_ANON }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SMTP_HOST:            ${{ secrets.SMTP_HOST }}
+          SMTP_PORT:            ${{ secrets.SMTP_PORT }}
+          SMTP_USER:            ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD:        ${{ secrets.SMTP_PASSWORD }}
+          FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
+          FROM_NAME:            ${{ secrets.FROM_NAME }}
+          GOATCOUNTER_API_KEY:  ${{ secrets.GOATCOUNTER_API_KEY }}
+          INDEXNOW_KEY:         ${{ secrets.INDEXNOW_KEY }}
+          FORCE_EMAIL:          "1"
+          TEST_RECIPIENT:       ${{ inputs.test_mode == true && 'matt_palmer@outlook.com' || '' }}
+        run: python pipeline.py
+
+      - name: Commit and push docs
+        run: |
+          git add docs/listings/ docs/data/ docs/preferences/ docs/index.html docs/verify/ docs/sitemap.xml docs/robots.txt
+          git diff --cached --quiet && echo "Nothing to commit" || git commit -m "chore: update listings $(date +%Y-%m-%d) [auto]"
+          git push
