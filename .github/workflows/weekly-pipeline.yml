@@ -25,7 +25,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install requests premailer
+        run: pip install requests premailer beautifulsoup4 lxml
 
       - name: Send weekly email
         env:
