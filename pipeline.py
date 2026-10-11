@@ -2976,7 +2976,7 @@ if __name__ == "__main__":
             log.info(f"--email-only: loaded {len(_films)} films from {_cache}")
         except Exception as _exc:
             log.error(f"--email-only: could not load {_cache}: {_exc}")
-            sys.exit(1)
+            raise SystemExit(1)
         os.environ.setdefault("FORCE_EMAIL", "1")
         send_weekly_emails(_films)
     else:
