@@ -2962,7 +2962,25 @@ def send_weekly_emails(films: dict) -> None:
 
 
 if __name__ == "__main__":
-    run()
+    import argparse as _ap
+    _parser = _ap.ArgumentParser()
+    _parser.add_argument("--email-only", action="store_true",
+                         help="Skip scraping; load films_cache.json and send weekly email")
+    _args = _parser.parse_args()
+    if _args.email_only:
+        import json as _json
+        _cache = "docs/data/films_cache.json"
+        try:
+            with open(_cache, encoding="utf-8") as _fh:
+                _films = _json.load(_fh)
+            log.info(f"--email-only: loaded {len(_films)} films from {_cache}")
+        except Exception as _exc:
+            log.error(f"--email-only: could not load {_cache}: {_exc}")
+            sys.exit(1)
+        os.environ.setdefault("FORCE_EMAIL", "1")
+        send_weekly_emails(_films)
+    else:
+        run()
 
 
 
