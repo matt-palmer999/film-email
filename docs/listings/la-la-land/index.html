@@ -13,11 +13,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="LA LA LAND (10º ANIVERSARIO) — whatson.movie" data-en="La La Land — whatson.movie">LA LA LAND (10º ANIVERSARIO) — whatson.movie</title>
+<title data-es="LA LA LAND (10º ANIVERSARIO) — Cartelera Valencia" data-en="La La Land — Valencia Cinema">LA LA LAND (10º ANIVERSARIO) — Cartelera Valencia</title>
 <link rel="canonical" href="https://whatson.movie/listings/la-la-land/">
 <meta name="description" content="Mia, una joven aspirante a actriz que compagina los castings con su trabajo de camarera, y Sebastian, un pianista de jazz que se gana la vida tocando en sórdido">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="LA LA LAND (10º ANIVERSARIO) — whatson.movie">
+<meta property="og:title" content="LA LA LAND (10º ANIVERSARIO) — Cartelera Valencia">
 <meta property="og:description" content="Mia, una joven aspirante a actriz que compagina los castings con su trabajo de camarera, y Sebastian, un pianista de jazz que se gana la vida tocando en sórdido">
 <meta property="og:url" content="https://whatson.movie/listings/la-la-land/">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg">
@@ -139,25 +139,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       }
     },
     {
-      "@type": "ScreeningEvent",
-      "name": "La La Land",
-      "startDate": "2026-11-27T21:00:00+01:00",
-      "videoFormat": "dubbed",
-      "workPresented": {
-        "@id": "https://whatson.movie/listings/la-la-land/#movie"
-      },
-      "location": {
-        "@type": "MovieTheater",
-        "name": "Aribau Multicines",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Barcelona",
-          "addressCountry": "ES"
-        },
-        "url": "https://www.moobycinemas.com/aribau"
-      }
-    },
-    {
       "@type": "BreadcrumbList",
       "itemListElement": [
         {
@@ -197,13 +178,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link">← <span data-es="Cartelera" data-en="Listings">Cartelera</span></a>
+    <a href="../valencia/" class="back-link">← <span data-es="Cartelera Valencia" data-en="Valencia Cinema">Cartelera Valencia</span></a>
   </div>
 
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg" alt="LA LA LAND (10º ANIVERSARIO)" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 7.9</span><span class="rating-badge">+12</span></div>
+      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.9</span><span class="rating-badge">+12</span></div>
       <div class="hero-title" data-es="LA LA LAND (10º ANIVERSARIO)" data-en="La La Land">LA LA LAND (10º ANIVERSARIO)</div>
       
       <div class="hero-meta"><span data-es="US · 2016 · 129 min" data-en="US · 2016 · Comedy, Drama, Romance · 129 min">US · 2016 · 129 min</span></div>
@@ -229,7 +210,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#9a8fb5;">© whatson.movie</span>
+    <span style="color:#9a8fb5;">© Cartelera Valencia</span>
   </div>
 </div>
 
@@ -250,7 +231,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'La La Land — whatson.movie' : 'LA LA LAND (10º ANIVERSARIO) — whatson.movie');
+  document.title = (lang === 'en' ? 'La La Land — Valencia Cinema' : 'LA LA LAND (10º ANIVERSARIO) — Cartelera Valencia');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {

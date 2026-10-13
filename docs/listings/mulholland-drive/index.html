@@ -13,11 +13,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="MULHOLLAND DRIVE — whatson.movie" data-en="Mulholland Drive — whatson.movie">MULHOLLAND DRIVE — whatson.movie</title>
+<title data-es="MULHOLLAND DRIVE — Cartelera Valencia" data-en="Mulholland Drive — Valencia Cinema">MULHOLLAND DRIVE — Cartelera Valencia</title>
 <link rel="canonical" href="https://whatson.movie/listings/mulholland-drive/">
 <meta name="description" content="Betty, una joven aspirante a actriz, llega a Los Ángeles para convertirse en estrella de cine y se aloja en el apartamento de su tía. Allí conoce a Rita, una mu">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="MULHOLLAND DRIVE — whatson.movie">
+<meta property="og:title" content="MULHOLLAND DRIVE — Cartelera Valencia">
 <meta property="og:description" content="Betty, una joven aspirante a actriz, llega a Los Ángeles para convertirse en estrella de cine y se aloja en el apartamento de su tía. Allí conoce a Rita, una mu">
 <meta property="og:url" content="https://whatson.movie/listings/mulholland-drive/">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w500/x7A59t6ySylr1L7aubOQEA480vM.jpg">
@@ -120,25 +120,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       }
     },
     {
-      "@type": "ScreeningEvent",
-      "name": "Mulholland Drive (VOSE)",
-      "startDate": "2026-11-20T21:00:00+01:00",
-      "videoFormat": "VOSE",
-      "workPresented": {
-        "@id": "https://whatson.movie/listings/mulholland-drive/#movie"
-      },
-      "location": {
-        "@type": "MovieTheater",
-        "name": "Aribau Multicines",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Barcelona",
-          "addressCountry": "ES"
-        },
-        "url": "https://www.moobycinemas.com/aribau"
-      }
-    },
-    {
       "@type": "BreadcrumbList",
       "itemListElement": [
         {
@@ -178,13 +159,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link">← <span data-es="Cartelera" data-en="Listings">Cartelera</span></a>
+    <a href="../valencia/" class="back-link">← <span data-es="Cartelera Valencia" data-en="Valencia Cinema">Cartelera Valencia</span></a>
   </div>
 
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/x7A59t6ySylr1L7aubOQEA480vM.jpg" alt="MULHOLLAND DRIVE" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="score-badge">⭐ 7.8</span><span class="rating-badge">+18</span></div>
+      <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.8</span><span class="rating-badge">+18</span></div>
       <div class="hero-title" data-es="MULHOLLAND DRIVE" data-en="Mulholland Drive">MULHOLLAND DRIVE</div>
       
       <div class="hero-meta"><span data-es="US · 2001 · 147 min" data-en="US · 2001 · Thriller, Drama, Mystery · 147 min">US · 2001 · 147 min</span></div>
@@ -210,7 +191,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#9a8fb5;">© whatson.movie</span>
+    <span style="color:#9a8fb5;">© Cartelera Valencia</span>
   </div>
 </div>
 
@@ -231,7 +212,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Mulholland Drive — whatson.movie' : 'MULHOLLAND DRIVE — whatson.movie');
+  document.title = (lang === 'en' ? 'Mulholland Drive — Valencia Cinema' : 'MULHOLLAND DRIVE — Cartelera Valencia');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
