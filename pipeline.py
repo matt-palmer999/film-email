@@ -2546,26 +2546,17 @@ def run() -> None:
 
     # 10. Generate sitemap.xml
     today_str = anchor.strftime("%Y-%m-%d")
+    def _surl(loc): return f"  <url><loc>{loc}</loc><lastmod>{today_str}</lastmod></url>"
     sitemap_urls = [
-        f"  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>{today_str}</lastmod></url>",
-        f"  <url><loc>https://whatson.movie/listings/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>{today_str}</lastmod></url>",
-        *[
-            f"  <url><loc>https://whatson.movie/listings/{c.lower()}/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>{today_str}</lastmod></url>"
-            for c in _cities
-        ],
+        _surl("https://whatson.movie/"),
+        _surl("https://whatson.movie/listings/"),
+        *[_surl(f"https://whatson.movie/listings/{c.lower()}/") for c in _cities],
     ]
     for title, film in films.items():
         slug = film.get("slug")
         if slug:
-            sitemap_urls.append(
-                f"  <url><loc>https://whatson.movie/listings/{slug}/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>{today_str}</lastmod></url>"
-            )
-    for _slug, _arc_date in archived_slugs:
-        sitemap_urls.append(
-            f'  <url><loc>https://whatson.movie/listings/{_slug}/</loc>'
-            f'<changefreq>yearly</changefreq><priority>0.3</priority>'
-            f'<lastmod>{_arc_date}</lastmod></url>'
-        )
+            sitemap_urls.append(_surl(f"https://whatson.movie/listings/{slug}/"  ))
+    # Archived films omitted — no longer updated, adds noise for crawlers
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sitemap_xml += "\n".join(sitemap_urls)
     sitemap_xml += "\n</urlset>\n"
