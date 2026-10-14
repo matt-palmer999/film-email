@@ -2556,7 +2556,8 @@ def run() -> None:
         slug = film.get("slug")
         if slug:
             sitemap_urls.append(_surl(f"https://whatson.movie/listings/{slug}/"  ))
-    # Archived films omitted — no longer updated, adds noise for crawlers
+    for _slug, _arc_date in archived_slugs:
+        sitemap_urls.append(f"  <url><loc>https://whatson.movie/listings/{_slug}/</loc><lastmod>{_arc_date}</lastmod></url>")
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sitemap_xml += "\n".join(sitemap_urls)
     sitemap_xml += "\n</urlset>\n"
