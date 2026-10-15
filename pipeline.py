@@ -748,8 +748,8 @@ function setLang(lang) {
   url.searchParams.set('lang', lang);
   window.history.replaceState({}, '', url);
   updateHeaderDate();
-  const titleEl = document.getElementById('header-title');
-  if (titleEl) titleEl.innerHTML = lang === 'en' ? 'Cinema<br>Listings' : 'Cartelera<br>Valencia';
+  const _titleTag = document.querySelector('title[data-es]');
+  if (_titleTag) document.title = _titleTag.getAttribute('data-' + lang) || document.title;
 }
 
 function getCookie(name) {
@@ -1024,6 +1024,11 @@ function applyVisibility() {
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
     }
+    // When VOSE filter + specific cinema(s) selected, verify VOSE exists at those cinemas
+    if (show && (voseOnly || filter === 'vose') && cinemas && cinemas.length > 0) {
+      const voseCinemas = (card.dataset.voseCinemas || '').split(',').filter(Boolean);
+      if (!voseCinemas.some(c => cinemas.includes(c))) show = false;
+    }
 
     card.style.display = show ? '' : 'none';
     if (show) visible++;
@@ -1124,7 +1129,19 @@ def _build_jsonld(film: dict, slug: str) -> str:
         _events_for(cinema.get("showtimes", {}),      is_vose=False)
         _events_for(cinema.get("vose_showtimes", {}), is_vose=True)
 
-    graph: list[dict] = [movie] + events
+    breadcrumb = {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "whatson.movie",
+             "item": "https://whatson.movie/"},
+            {"@type": "ListItem", "position": 2,
+             "name": ("Cartelera Barcelona" if all(CINEMA_META.get(c.get("id",""),{}).get("city") == "Barcelona" for c in film.get("cinemas",[])) else "Cartelera Valencia"),
+             "item": ("https://whatson.movie/listings/barcelona/" if all(CINEMA_META.get(c.get("id",""),{}).get("city") == "Barcelona" for c in film.get("cinemas",[])) else "https://whatson.movie/listings/valencia/")},
+            {"@type": "ListItem", "position": 3, "name": film.get("title_en") or film["title"],
+             "item": f"https://whatson.movie/listings/{slug}/"},
+        ]
+    }
+    graph: list[dict] = [movie] + events + [breadcrumb]
     payload = {"@context": "https://schema.org", "@graph": graph}
     return f'<script type="application/ld+json">\n{_json.dumps(payload, ensure_ascii=False, indent=2)}\n</script>'
 
@@ -1158,13 +1175,19 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
     _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
     if _film_cities == {"Barcelona"}:
         _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
-        _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
-        _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+        _bcn_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Barcelona")
+        _vsfx_es = " · VOSE disponible" if film.get("any_vose") else ""
+        _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
+        _desc_es = (f"{esc(title_es)} en cartelera en Barcelona{_vsfx_es}. Horarios en {_bcn_cines}." if _bcn_cines else f"{esc(title_es)} — sesiones y horarios en Barcelona{_vsfx_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in Barcelona{_vsfx_en}. Showtimes at {_bcn_cines}." if _bcn_cines else f"{esc(title_en)} — Barcelona cinema showtimes{_vsfx_en}.")
         _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
     elif _film_cities == {"Valencia"}:
         _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
-        _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
-        _desc_en = f"{esc(title_en)} — Valencia cinemas"
+        _val_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Valencia")
+        _vsfx_val_es = " · VOSE disponible" if film.get("any_vose") else ""
+        _vsfx_val_en = " · VOSE available" if film.get("any_vose") else ""
+        _desc_es = (f"{esc(title_es)} en cartelera en Valencia{_vsfx_val_es}. Horarios en {_val_cines}." if _val_cines else f"{esc(title_es)} — sesiones y horarios en Valencia{_vsfx_val_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in Valencia{_vsfx_val_en}. Showtimes at {_val_cines}." if _val_cines else f"{esc(title_en)} — Valencia cinema showtimes{_vsfx_val_en}.")
         _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
@@ -1189,12 +1212,14 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{slug}/">
-<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta name="description" content="{_desc_es}">
 <meta property="og:type" content="video.movie">
 <meta property="og:title" content="{esc(title_es)} — {_brand_es}">
-<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta property="og:description" content="{_desc_es}">
 <meta property="og:url" content="https://whatson.movie/listings/{slug}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
+<meta property="og:image:alt" content="{esc(title_es)}">
+<meta property="og:locale" content="es_ES">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1397,13 +1422,19 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
     if _film_cities == {"Barcelona"}:
         _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
-        _desc_es = f"{esc(title_es)} — sesiones y horarios en Barcelona"
-        _desc_en = f"{esc(title_en)} — Barcelona cinemas"
+        _bcn_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Barcelona")
+        _vsfx_es = " · VOSE disponible" if film.get("any_vose") else ""
+        _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
+        _desc_es = (f"{esc(title_es)} en cartelera en Barcelona{_vsfx_es}. Horarios en {_bcn_cines}." if _bcn_cines else f"{esc(title_es)} — sesiones y horarios en Barcelona{_vsfx_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in Barcelona{_vsfx_en}. Showtimes at {_bcn_cines}." if _bcn_cines else f"{esc(title_en)} — Barcelona cinema showtimes{_vsfx_en}.")
         _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
     elif _film_cities == {"Valencia"}:
         _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
-        _desc_es = f"{esc(title_es)} — sesiones y horarios en Valencia"
-        _desc_en = f"{esc(title_en)} — Valencia cinemas"
+        _val_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Valencia")
+        _vsfx_val_es = " · VOSE disponible" if film.get("any_vose") else ""
+        _vsfx_val_en = " · VOSE available" if film.get("any_vose") else ""
+        _desc_es = (f"{esc(title_es)} en cartelera en Valencia{_vsfx_val_es}. Horarios en {_val_cines}." if _val_cines else f"{esc(title_es)} — sesiones y horarios en Valencia{_vsfx_val_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in Valencia{_vsfx_val_en}. Showtimes at {_val_cines}." if _val_cines else f"{esc(title_en)} — Valencia cinema showtimes{_vsfx_val_en}.")
         _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
@@ -1428,12 +1459,14 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{film.get('slug', '')}/">
-<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta name="description" content="{_desc_es}">
 <meta property="og:type" content="video.movie">
 <meta property="og:title" content="{esc(title_es)} — {_brand_es}">
-<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta property="og:description" content="{_desc_es}">
 <meta property="og:url" content="https://whatson.movie/listings/{film.get('slug', '')}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
+<meta property="og:image:alt" content="{esc(title_es)}">
+<meta property="og:locale" content="es_ES">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1968,6 +2001,39 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     film_count   = len(films_by_title)
     cinema_count = len({c["id"] for film in films_by_title.values() for c in film.get("cinemas", [])})
 
+    if city == "Barcelona":
+        _page_title_es = f"Cartelera de cine en Barcelona \u2014 {date_es}"
+        _page_title_en = f"Barcelona Cinema Listings \u2014 {date_en}"
+        _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de Barcelona esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
+        _page_desc_en  = f"{film_count} films across {cinema_count} Barcelona cinemas this week. VOSE screenings highlighted. Updated every Thursday."
+        _page_og_title = f"Cartelera Barcelona \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
+    else:
+        _page_title_es = f"Cartelera de cine en Valencia \u2014 {date_es}"
+        _page_title_en = f"Valencia Cinema Listings \u2014 {date_en}"
+        _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de Valencia esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
+        _page_desc_en  = f"{film_count} films across {cinema_count} Valencia cinemas this week. VOSE screenings highlighted. Updated every Thursday."
+        _page_og_title = f"Cartelera Valencia \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
+
+    import json as _json
+    _ld_items = []
+    for _pos, (_t, _f) in enumerate(
+        sorted(films_by_title.items(), key=lambda x: (-x[1]["is_new"], -(x[1].get("rating_score") or 0), x[0]))[:20], 1
+    ):
+        _ld_item: dict = {"@type": "Movie", "name": _f.get("title_en") or _t}
+        if _f.get("slug"): _ld_item["url"] = f"https://whatson.movie/listings/{_f['slug']}/"
+        if _f.get("poster"): _ld_item["image"] = _f["poster"]
+        _ld_items.append({"@type": "ListItem", "position": _pos, "item": _ld_item})
+    _listing_ld = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {"@type": "WebPage", "name": _page_title_es, "url": canonical_url,
+             "description": _page_desc_es, "inLanguage": ["es", "en"]},
+            {"@type": "ItemList", "name": f"Pel\u00edculas en cartelera en {city_name}",
+             "numberOfItems": film_count, "itemListElement": _ld_items},
+        ],
+    }
+    _listing_jsonld = f'<script type="application/ld+json">\n{_json.dumps(_listing_ld, ensure_ascii=False, indent=2)}\n</script>'
+
     multiplex_films = []
     arthouse_films: dict = {}
 
@@ -1995,6 +2061,8 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
             vose = any(c.get("vose_showtimes") for c in _city_cinemas_in_window)
         else:
             vose = film.get("any_vose", False)
+        _window_cinemas  = _city_cinemas_in_window if city else cinemas_in_window(film)
+        vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if c.get("vose_showtimes"))
         is_new   = film.get("is_new", False)
         cinemas  = film["cinemas"]
         rating   = film.get("rating", "?")
@@ -2034,7 +2102,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         if city and _city_ids and _cinema_ids_attr:
             _cinema_ids_attr = ','.join(c for c in _cinema_ids_attr.split(',') if c in _city_ids)
         return f"""
-    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
+    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{final_week_badge}{vose_badge}{score_badge}{rating_badge}</div>
@@ -2084,14 +2152,16 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title>{city_name} Cinema Listings – {date_en}</title>
+<title data-es="{_page_title_es}" data-en="{_page_title_en}">{_page_title_es}</title>
 <link rel="canonical" href="{canonical_url}">
-<meta name="description" content="Every film showing in {city_name} this week, with VOSE (original language) screenings highlighted. Filter by cinema, language and time.">
+<meta name="description" content="{_page_desc_es}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{city_name} cinema listings · VOSE &amp; original language screenings">
-<meta property="og:description" content="{film_count} films across {cinema_count} cinemas this week. VOSE screenings highlighted. Free every Thursday.">
+<meta property="og:title" content="{_page_og_title}">
+<meta property="og:description" content="{_page_desc_es}">
 <meta property="og:url" content="{canonical_url}">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
+<meta property="og:image:alt" content="Cartelera de cine en {city_name}">
+<meta property="og:locale" content="es_ES">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2100,6 +2170,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 <style>{CSS}</style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+{_listing_jsonld}
 </head>
 <body>
 <div class="wrapper">
@@ -2125,7 +2196,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 
   <main>
   <div class="header">
-    <h1 class="header-title" id="header-title">Cartelera<br>{city_name}</h1>
+    <h1 class="header-title" id="header-title" data-es="Cartelera<br>{city_name}" data-en="Cinema<br>{city_name}">Cartelera<br>{city_name}</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en {city_name} esta semana" data-en="Your complete guide to cinema in {city_name} this week">La guía completa del cine en {city_name} esta semana</div>
     <div class="header-date" id="header-date"></div>
   </div>
@@ -2475,26 +2546,18 @@ def run() -> None:
 
     # 10. Generate sitemap.xml
     today_str = anchor.strftime("%Y-%m-%d")
+    def _surl(loc): return f"  <url><loc>{loc}</loc><lastmod>{today_str}</lastmod></url>"
     sitemap_urls = [
-        f"  <url><loc>https://whatson.movie/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>{today_str}</lastmod></url>",
-        f"  <url><loc>https://whatson.movie/listings/</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>{today_str}</lastmod></url>",
-        *[
-            f"  <url><loc>https://whatson.movie/listings/{c.lower()}/</loc><changefreq>daily</changefreq><priority>0.9</priority><lastmod>{today_str}</lastmod></url>"
-            for c in _cities
-        ],
+        _surl("https://whatson.movie/"),
+        _surl("https://whatson.movie/listings/"),
+        *[_surl(f"https://whatson.movie/listings/{c.lower()}/") for c in _cities],
     ]
     for title, film in films.items():
         slug = film.get("slug")
         if slug:
-            sitemap_urls.append(
-                f"  <url><loc>https://whatson.movie/listings/{slug}/</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>{today_str}</lastmod></url>"
-            )
+            sitemap_urls.append(_surl(f"https://whatson.movie/listings/{slug}/"))
     for _slug, _arc_date in archived_slugs:
-        sitemap_urls.append(
-            f'  <url><loc>https://whatson.movie/listings/{_slug}/</loc>'
-            f'<changefreq>yearly</changefreq><priority>0.3</priority>'
-            f'<lastmod>{_arc_date}</lastmod></url>'
-        )
+        sitemap_urls.append(f"  <url><loc>https://whatson.movie/listings/{_slug}/</loc><lastmod>{_arc_date}</lastmod></url>")
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sitemap_xml += "\n".join(sitemap_urls)
     sitemap_xml += "\n</urlset>\n"
@@ -2834,7 +2897,15 @@ def send_weekly_emails(films: dict) -> None:
     page_url  = "https://whatson.movie/listings/"
     prefs_url = "https://whatson.movie/preferences/"
 
-    subscribers = fetch_subscribers()
+    test_recipient = os.environ.get("TEST_RECIPIENT", "").strip()
+    if test_recipient:
+        log.info(f"TEST_RECIPIENT set — sending only to {test_recipient} (test mode)")
+        subscribers = [{"email": test_recipient, "lang": "en", "email_enabled": True,
+                        "cinemas": [], "vose_only": False, "new_only": False,
+                        "family_only": False, "evening_only": False,
+                        "rating_filter": False, "min_rating": 0, "unsubscribe_token": ""}]
+    else:
+        subscribers = fetch_subscribers()
     if not subscribers:
         log.info("No email-enabled subscribers found — skipping weekly send")
         return
@@ -2883,5 +2954,23 @@ def send_weekly_emails(films: dict) -> None:
 
 
 if __name__ == "__main__":
-    run()
+    import argparse as _ap
+    _parser = _ap.ArgumentParser()
+    _parser.add_argument("--email-only", action="store_true",
+                         help="Skip scraping; load films_cache.json and send weekly email")
+    _args = _parser.parse_args()
+    if _args.email_only:
+        import json as _json
+        _cache = "docs/data/films_cache.json"
+        try:
+            with open(_cache, encoding="utf-8") as _fh:
+                _films = _json.load(_fh)
+            log.info(f"--email-only: loaded {len(_films)} films from {_cache}")
+        except Exception as _exc:
+            log.error(f"--email-only: could not load {_cache}: {_exc}")
+            raise SystemExit(1)
+        os.environ.setdefault("FORCE_EMAIL", "1")
+        send_weekly_emails(_films)
+    else:
+        run()
 
