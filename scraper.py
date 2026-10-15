@@ -1934,7 +1934,7 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                     continue
                 if vose_lang == "en":
                     origins = set(film.get("origin_country") or [])
-                    if origins and not origins & EN_ORIGINS:
+                    if not origins or not origins & EN_ORIGINS:
                         continue
         else:
             # Normal path — all filters apply
@@ -1949,7 +1949,7 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                     continue
                 if vose_lang == "en":
                     origins = set(film.get("origin_country") or [])
-                    if origins and not origins & EN_ORIGINS:
+                    if not origins or not origins & EN_ORIGINS:
                         continue
 
             # New-only filter
