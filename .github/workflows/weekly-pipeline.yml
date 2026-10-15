@@ -1,0 +1,64 @@
+name: Weekly email
+
+on:
+  schedule:
+    - cron: '0 17 * * 4'  # Thursdays 17:00 UTC = 19:00 CEST (summer) / 18:00 CET (winter)
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Send email only to matt_palmer@outlook.com'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Check if already sent today
+        id: check_sent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          COUNT=$(gh run list --repo ${{ github.repository }} --workflow=weekly-pipeline.yml --status=success --json createdAt --limit=10 | \
+            python3 -c "import json,sys; runs=json.load(sys.stdin); print(sum(1 for r in runs if r['createdAt'].startswith('$TODAY')))")
+          echo "already_sent=$( [ '$COUNT' -gt 0 ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "Successful runs today: $COUNT"
+
+      - name: Skip if already sent today
+        if: steps.check_sent.outputs.already_sent == 'true'
+        run: |
+          echo "Weekly email already sent today — skipping to avoid duplicate."
+          exit 0
+
+      - uses: actions/checkout@v4
+        if: steps.check_sent.outputs.already_sent == 'false'
+
+      - uses: actions/setup-python@v5
+        if: steps.check_sent.outputs.already_sent == 'false'
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        if: steps.check_sent.outputs.already_sent == 'false'
+        run: pip install -r requirements.txt
+
+      - name: Send weekly email
+        if: steps.check_sent.outputs.already_sent == 'false'
+        env:
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON:        ${{ secrets.SUPABASE_ANON }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SMTP_HOST:            ${{ secrets.SMTP_HOST }}
+          SMTP_PORT:            ${{ secrets.SMTP_PORT }}
+          SMTP_USER:            ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD:        ${{ secrets.SMTP_PASSWORD }}
+          FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
+          FROM_NAME:            ${{ secrets.FROM_NAME }}
+          TEST_RECIPIENT:       ${{ inputs.test_mode == true && 'matt_palmer@outlook.com' || '' }}
+        run: python pipeline.py --email-only
