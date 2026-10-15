@@ -1212,10 +1212,10 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{slug}/">
-<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta name="description" content="{_desc_es}">
 <meta property="og:type" content="video.movie">
 <meta property="og:title" content="{esc(title_es)} — {_brand_es}">
-<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta property="og:description" content="{_desc_es}">
 <meta property="og:url" content="https://whatson.movie/listings/{slug}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
 <meta property="og:image:alt" content="{esc(title_es)}">
@@ -1459,10 +1459,10 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{esc(title_es)} — {_brand_es}" data-en="{esc(title_en)} — {_brand_en}">{esc(title_es)} — {_brand_es}</title>
 <link rel="canonical" href="https://whatson.movie/listings/{film.get('slug', '')}/">
-<meta name="description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta name="description" content="{_desc_es}">
 <meta property="og:type" content="video.movie">
 <meta property="og:title" content="{esc(title_es)} — {_brand_es}">
-<meta property="og:description" content="{_desc_es if syn_es == '' else esc(syn_es[:160])}">
+<meta property="og:description" content="{_desc_es}">
 <meta property="og:url" content="https://whatson.movie/listings/{film.get('slug', '')}/">
 <meta property="og:image" content="{poster if poster else 'https://whatson.movie/og-image.png'}">
 <meta property="og:image:alt" content="{esc(title_es)}">
