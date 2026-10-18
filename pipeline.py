@@ -534,6 +534,71 @@ def enrich_with_tmdb(films: dict) -> None:
             film["meta_en"]        = film.get("meta", "")
 
 
+def fetch_youtube_trailer(title_en: str, year: str, api_key: str) -> str:
+    """Search YouTube for an official trailer; return the watch URL or empty string."""
+    import urllib.request as _ur, urllib.parse as _up, json as _json, re as _re, time as _time
+    query = f"{title_en} {year} official trailer"
+    search_url = (
+        "https://www.googleapis.com/youtube/v3/search"
+        f"?part=snippet&q={_up.quote(query)}&type=video&maxResults=5&key={api_key}"
+    )
+    try:
+        with _ur.urlopen(search_url, timeout=10) as r:
+            items = _json.loads(r.read()).get("items", [])
+        if not items:
+            return ""
+        video_ids = [it["id"]["videoId"] for it in items if it.get("id", {}).get("videoId")]
+        if not video_ids:
+            return ""
+        details_url = (
+            "https://www.googleapis.com/youtube/v3/videos"
+            f"?part=contentDetails&id={','.join(video_ids)}&key={api_key}"
+        )
+        _time.sleep(0.1)
+        with _ur.urlopen(details_url, timeout=10) as r:
+            details = _json.loads(r.read()).get("items", [])
+        def _duration_secs(iso: str) -> int:
+            m = _re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', iso)
+            if not m:
+                return 0
+            h, mn, s = (int(x or 0) for x in m.groups())
+            return h * 3600 + mn * 60 + s
+        for detail in details:
+            dur = _duration_secs(detail.get("contentDetails", {}).get("duration", ""))
+            if dur >= 90:
+                vid_id = detail["id"]
+                return f"https://www.youtube.com/watch?v={vid_id}"
+        # fallback: return first result even if short
+        return f"https://www.youtube.com/watch?v={video_ids[0]}"
+    except Exception as exc:
+        log.warning(f"  YouTube trailer lookup failed for '{title_en}': {exc}")
+        return ""
+
+
+def enrich_with_trailers(films: dict, prev_films_by_slug: dict) -> None:
+    """For new films, look up an official YouTube trailer and store it."""
+    api_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
+    if not api_key:
+        log.info("YOUTUBE_API_KEY not set — skipping trailer lookup")
+        return
+    for title, film in films.items():
+        slug = film.get("slug", "")
+        # Carry forward from previous cache if already fetched
+        prev = prev_films_by_slug.get(slug, {})
+        if prev.get("trailer_url"):
+            film["trailer_url"] = prev["trailer_url"]
+            continue
+        # Only look up for new films (avoid spending quota on every film daily)
+        if not film.get("is_new"):
+            continue
+        title_en = film.get("title_en") or title
+        year = str(film.get("year", ""))
+        url = fetch_youtube_trailer(title_en, year, api_key)
+        if url:
+            log.info(f"  Trailer found: {title_en} → {url}")
+        film["trailer_url"] = url
+
+
 def deduplicate_by_tmdb_id(films: dict) -> None:
     """Merge films that resolved to the same TMDB ID."""
     tmdb_id_map: dict = {}
@@ -698,7 +763,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .badge-final-week{background:rgba(217,119,6,.15);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
-.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#c5b8d8;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#f0eae0}
+.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#f0eae0;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#ffffff}
 .cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
@@ -1163,8 +1228,9 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
     meta_en    = film.get("meta_en", meta)
     score      = film.get("rating_score")
     rating     = film.get("rating", "?")
-    vose       = film.get("any_vose", False)
-    slug       = film.get("slug", "")
+    vose        = film.get("any_vose", False)
+    slug        = film.get("slug", "")
+    trailer_url = film.get("trailer_url", "")
 
     vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
@@ -1251,6 +1317,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .orig-title{{font-size:12px;color:#8a7e9a;margin-bottom:6px}}
 .hero-meta{{font-size:12px;color:#9a8faa;line-height:1.55;margin-bottom:8px}}
 .hero-synopsis{{font-size:13px;color:#a09aa8;line-height:1.6}}
+.trailer-link{{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#ffb432;text-decoration:none;opacity:.85}}
+.trailer-link:hover{{opacity:1;text-decoration:underline}}
 .archive-notice{{margin:20px;padding:16px 20px;background:rgba(138,126,154,.08);border:1px solid rgba(138,126,154,.25);border-radius:10px;text-align:center}}
 .archive-notice-label{{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;margin-bottom:6px}}
 .archive-notice-text{{font-size:13px;color:#9a8faa;line-height:1.6}}
@@ -1284,6 +1352,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
       {orig_label}
       <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
+      {f'<a href="{trailer_url}" class="trailer-link" target="_blank" rel="noopener noreferrer" data-es="Ver tráiler ↗" data-en="Watch trailer ↗">Ver tráiler ↗</a>' if trailer_url else ""}
     </div>
   </div>
 
@@ -1326,8 +1395,9 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     meta_en    = film.get("meta_en", meta)
     score      = film.get("rating_score")
     rating     = film.get("rating", "?")
-    vose       = film.get("any_vose", False)
-    is_new     = film.get("is_new", False)
+    vose        = film.get("any_vose", False)
+    is_new      = film.get("is_new", False)
+    trailer_url = film.get("trailer_url", "")
 
     today = datetime.now(VALENCIA_TZ).date()
     DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
@@ -1500,6 +1570,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .orig-title{{font-size:12px;color:#8a7e9a;margin-bottom:6px}}
 .hero-meta{{font-size:12px;color:#9a8faa;line-height:1.55;margin-bottom:8px}}
 .hero-synopsis{{font-size:13px;color:#a09aa8;line-height:1.6}}
+.trailer-link{{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#ffb432;text-decoration:none;opacity:.85}}
+.trailer-link:hover{{opacity:1;text-decoration:underline}}
 .section-title{{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#8a7e9a;padding:20px 20px 10px}}
 .day-tabs{{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}}
 .day-tab{{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:0.5px;cursor:pointer;border:1px solid #2e2545;background:transparent;color:#9a8fb5;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}}
@@ -1552,6 +1624,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
       {orig_label}
       <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
+      {f'<a href="{trailer_url}" class="trailer-link" target="_blank" rel="noopener noreferrer" data-es="Ver tráiler ↗" data-en="Watch trailer ↗">Ver tráiler ↗</a>' if trailer_url else ""}
     </div>
   </div>
 
@@ -2429,6 +2502,18 @@ def run() -> None:
         log.error(f"Only {len(films)} films found — possible scraper failure. Aborting to preserve cached listings.")
         return
 
+    # Load previous cache now so trailer URLs can be carried forward in step 3b
+    _prev_cache_path_early = "docs/data/films_cache.json"
+    _prev_films_by_slug_early: dict = {}
+    if os.path.exists(_prev_cache_path_early):
+        try:
+            with open(_prev_cache_path_early, encoding="utf-8") as _fh:
+                for _pf in json.load(_fh).values():
+                    if _pf.get("slug"):
+                        _prev_films_by_slug_early[_pf["slug"]] = _pf
+        except Exception:
+            pass
+
     # 2. TMDB enrichment
     enrich_with_tmdb(films)
 
@@ -2459,6 +2544,9 @@ def run() -> None:
     # 5. Assign slugs
     for title, film in films.items():
         film["slug"] = slugify(film.get("title_en", title) or title)
+
+    # 5.5. Look up YouTube trailers for new films
+    enrich_with_trailers(films, _prev_films_by_slug_early)
 
     # 6. Build city-specific listings pages + chooser
     os.makedirs("docs/listings", exist_ok=True)
