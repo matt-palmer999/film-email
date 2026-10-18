@@ -1,9 +1,10 @@
 """
 Cines Babel scraper.
 
-cinesbabel.com is a WordPress site with server-side rendered HTML.
-A plain requests GET + BeautifulSoup parse is all that's needed —
-no browser, no JS rendering.
+cinesbabel.com is a WordPress site with server-side rendered HTML protected
+by a Cloudflare JS challenge. We load it with a headed Playwright browser,
+wait for the challenge to pass (title changes from "Checking your browser…"),
+then parse the HTML with BeautifulSoup.
 
 VOSE is identified via the "Idioma:" metadata field on each film
 (anything other than "Castellano" = original language + Spanish subtitles).
@@ -14,25 +15,18 @@ Run directly for a quick test summary.
 
 import logging
 import re
-from datetime import date, datetime
+import time
+from datetime import date
 from zoneinfo import ZoneInfo
 
-import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 log = logging.getLogger(__name__)
 
-VALENCIA_TZ  = ZoneInfo("Europe/Madrid")
-CINEMA_NAME  = "Cines Babel"
+VALENCIA_TZ   = ZoneInfo("Europe/Madrid")
+CINEMA_NAME   = "Cines Babel"
 CARTELERA_URL = "https://cinesbabel.com/cartelera/"
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "es-ES,es;q=0.9",
-}
 
 _MONTHS_ES = {
     "ene": 1, "feb": 2, "mar": 3, "abr": 4, "may": 5, "jun": 6,
@@ -48,12 +42,11 @@ _LANG_CODES = {
     "catalán": "CA", "catalan": "CA",
 }
 
+_CF_TITLES = {"checking your browser", "just a moment"}
+
 
 def _parse_date(text: str) -> str:
-    """
-    Convert Babel's Spanish date like "Sáb 9 May" to "YYYY-MM-DD".
-    Uses the current year, bumping to next year if the month is in the past.
-    """
+    """Convert Babel's Spanish date like "Sáb 9 May" to "YYYY-MM-DD"."""
     parts = text.strip().split()
     if len(parts) < 3:
         return ""
@@ -64,7 +57,6 @@ def _parse_date(text: str) -> str:
             return ""
         today = date.today()
         year  = today.year
-        # If this month already passed this year, it must be next year
         if month < today.month or (month == today.month and day < today.day):
             year += 1
         return f"{year}-{month:02d}-{day:02d}"
@@ -77,8 +69,7 @@ def _lang_code(idioma: str) -> str:
 
 
 def _is_vose(idioma: str) -> bool:
-    key = idioma.lower().strip()
-    return key not in ("castellano", "español", "")
+    return idioma.lower().strip() not in ("castellano", "español", "")
 
 
 def _parse_film(block) -> dict | None:
@@ -88,7 +79,6 @@ def _parse_film(block) -> dict | None:
         return None
     title = title_el.get_text(strip=True)
 
-    # Metadata: Director, Duración, Idioma, Subtítulos
     meta = {}
     for div in block.select("div.pelicula-title div"):
         text = div.get_text(strip=True)
@@ -103,7 +93,6 @@ def _parse_film(block) -> dict | None:
     poster_el = block.select_one("img")
     poster    = poster_el.get("src", "") if poster_el else ""
 
-    # Showtimes table: each <tr> has date cell + one or more time cells
     showtimes = []
     for row in block.select("table.tabla-sesiones tr"):
         cells = row.find_all("td")
@@ -118,7 +107,6 @@ def _parse_film(block) -> dict | None:
             if not re.match(r"\d{1,2}:\d{2}", time_text):
                 continue
             booking_url = link.get("href", "")
-            # Extract session ID from reservaentradas URL
             m = re.search(r"/(\d+)/?$", booking_url)
             session_id = m.group(1) if m else ""
             showtimes.append({
@@ -139,30 +127,65 @@ def _parse_film(block) -> dict | None:
         return None
 
     return {
-        "cinema":       "babel",
-        "cinema_name":  CINEMA_NAME,
-        "title_es":     title,
+        "cinema":        "babel",
+        "cinema_name":   CINEMA_NAME,
+        "title_es":      title,
         "original_title": "",
-        "is_vose":      _is_vose(idioma),
-        "audio_lang":   _lang_code(idioma),
-        "spoken_lang":  idioma,
-        "subtitles":    subtitles,
-        "imdb_id":      "",
-        "is_film":      True,
+        "is_vose":       _is_vose(idioma),
+        "audio_lang":    _lang_code(idioma),
+        "spoken_lang":   idioma,
+        "subtitles":     subtitles,
+        "imdb_id":       "",
+        "is_film":       True,
         "duration_mins": int(duration.group()) if duration else 0,
-        "poster_url":   poster,
-        "synopsis_es":  "",
-        "showtimes":    showtimes,
+        "poster_url":    poster,
+        "synopsis_es":   "",
+        "showtimes":     showtimes,
     }
 
 
-def scrape_babel() -> list[dict]:
-    """Scrape Cines Babel and return a list of film dicts."""
+def scrape_babel(playwright=None) -> list[dict]:
+    """Scrape Cines Babel using a headed Playwright browser."""
     log.info("Fetching Babel cartelera …")
-    r = requests.get(CARTELERA_URL, headers=HEADERS, timeout=20)
-    r.raise_for_status()
 
-    soup   = BeautifulSoup(r.text, "lxml")
+    own_playwright = playwright is None
+    if own_playwright:
+        p = sync_playwright().start()
+    else:
+        p = playwright
+
+    try:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context(
+            locale="es-ES",
+            timezone_id="Europe/Madrid",
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+        )
+        page = context.new_page()
+        page.goto(CARTELERA_URL, timeout=30_000, wait_until="networkidle")
+
+        # Cloudflare JS challenge: poll until title is no longer the challenge page
+        for _ in range(15):
+            title_lower = page.title().lower()
+            if not any(cf in title_lower for cf in _CF_TITLES):
+                break
+            time.sleep(2)
+            try:
+                page.wait_for_load_state("networkidle", timeout=5_000)
+            except Exception:
+                pass
+
+        html = page.content()
+        browser.close()
+    finally:
+        if own_playwright:
+            p.stop()
+
+    soup   = BeautifulSoup(html, "lxml")
     blocks = soup.select("div.pelicula-post")
     log.info("Found %d film blocks", len(blocks))
 
