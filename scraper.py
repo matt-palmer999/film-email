@@ -2207,7 +2207,8 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         is_new   = film.get("is_new", False)
         any_vose = film.get("any_vose", False)
         score    = film.get("rating_score")
-        slug     = film.get("slug", "")
+        slug        = film.get("slug", "")
+        trailer_url = film.get("trailer_url", "")
 
         label_parts = []
         if is_new:
@@ -2231,11 +2232,20 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         else:
             film_url = listings_url
         showtimes_label = "Horarios y detalles" if is_es else "Showtimes &amp; details"
+        trailer_label = "Ver tráiler" if is_es else "Watch trailer"
+        trailer_link = (
+            f'&nbsp;&nbsp;·&nbsp;&nbsp;'
+            f'<a href="{trailer_url}" target="_blank" style="font-size:12px;color:#a07840;text-decoration:none;">'
+            f'&#9654;&#65039; {trailer_label} &rarr;'
+            f'</a>'
+            if trailer_url else ""
+        )
         showtimes_rows = (
             f'<div style="margin-top:10px;padding-top:9px;border-top:1px solid #241a35;">'
             f'<a href="{film_url}" target="_blank" style="font-size:12px;color:#a07840;text-decoration:none;">'
             f'&#128336; {showtimes_label} &rarr;'
             f'</a>'
+            f'{trailer_link}'
             f'</div>'
         )
         synopsis_short = (synopsis[:220] + "…") if len(synopsis) > 220 else synopsis
