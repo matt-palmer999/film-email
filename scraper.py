@@ -2243,7 +2243,7 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
         )
         showtimes_rows = (
             f'<div style="margin-top:10px;padding-top:9px;border-top:1px solid #241a35;">'
-            f'<a href="{film_url}" target="_blank" style="font-size:12px;color:#a07840;text-decoration:none;">'
+            f'<a href="{film_url}" target="_blank" style="font-size:12px;color:#a07840;text-decoration:none;white-space:nowrap;">'
             f'&#128336; {showtimes_label} &rarr;'
             f'</a>'
             f'{trailer_row}'
