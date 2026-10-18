@@ -166,6 +166,7 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
         r'|Edici[oó]n\s+(Especial|Coleccionista|Definitiva)'  # Edición especial
         r'|Pase\s+Especial'                                   # Pase especial
         r'|4K(\s+Restaurad[ao])?'                             # 4K / 4K Restaurada
+        r'|Infinity\s+Vision|4DX|IMAX|Dolby|ScreenX|D-BOX'  # premium screen formats appended by cinemas
         r'|\d{4}'                                             # bare year (1986)
     )
     search_title = _re.sub(
