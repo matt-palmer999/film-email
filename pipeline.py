@@ -698,7 +698,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .badge-final-week{background:rgba(217,119,6,.15);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
-.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#c5b8d8;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#f0eae0}
+.cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#f0eae0;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#ffffff}
 .cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .cinema-tag{display:inline-block;padding:3px 9px;border-radius:4px;font-size:11px;color:#9a8fb0;background:rgba(255,255,255,.04);border:1px solid #2e2545;text-decoration:none;line-height:1.4}
