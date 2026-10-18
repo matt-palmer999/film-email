@@ -61,4 +61,5 @@ jobs:
           FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
           FROM_NAME:            ${{ secrets.FROM_NAME }}
           TEST_RECIPIENT:       ${{ inputs.test_mode == true && 'matt_palmer@outlook.com' || '' }}
+          YOUTUBE_API_KEY:      ${{ secrets.YOUTUBE_API_KEY }}
         run: python pipeline.py --email-only
