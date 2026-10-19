@@ -762,7 +762,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
-.badge-final-week{background:rgba(217,119,6,.15);color:#fbbf24;border:1px solid rgba(217,119,6,.3)}
 .cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#f0eae0;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#ffffff}
 .cinema-links-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a7e9a;font-weight:500;margin-bottom:5px}
 .cinema-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
@@ -2151,15 +2150,6 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
         rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
         rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
-        _today_fw     = datetime.now(VALENCIA_TZ).date()
-        _today_fw_str = _today_fw.strftime("%Y-%m-%d")
-        _sunday_fw    = (_today_fw + timedelta(days=(6 - _today_fw.weekday()) % 7)).strftime("%Y-%m-%d")
-        _fw_dates: set = set()
-        for _fc in film.get("cinemas", []):
-            _fw_dates.update(dk for dk in _fc.get("showtimes", {}).keys() if dk >= _today_fw_str)
-            _fw_dates.update(dk for dk in _fc.get("vose_showtimes", {}).keys() if dk >= _today_fw_str)
-        _is_final_week = not _is_classic(film) and not film.get("is_new") and bool(_fw_dates) and max(_fw_dates) <= _sunday_fw
-        final_week_badge = '<span class="film-badge badge-final-week" data-es="ÚLTIMA SEMANA" data-en="FINAL WEEK">ÚLTIMA SEMANA</span>' if _is_final_week else ""
         cd = compute_card_data(film)
         title_es = film["title"]
         title_en = film.get("title_en", film["title"])
@@ -2179,7 +2169,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
-        <div class="badges">{new_badge}{final_week_badge}{vose_badge}{score_badge}{rating_badge}</div>
+        <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
         {title_html}
         <div class="grid-meta"><span data-es="{meta[:80]}" data-en="{film.get('meta_en', meta)[:80]}">{meta[:80]}</span></div>
         <div class="grid-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
