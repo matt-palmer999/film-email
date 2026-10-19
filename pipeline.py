@@ -2158,7 +2158,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         for _fc in film.get("cinemas", []):
             _fw_dates.update(dk for dk in _fc.get("showtimes", {}).keys() if dk >= _today_fw_str)
             _fw_dates.update(dk for dk in _fc.get("vose_showtimes", {}).keys() if dk >= _today_fw_str)
-        _is_final_week = not _is_classic(film) and bool(_fw_dates) and max(_fw_dates) <= _sunday_fw
+        _is_final_week = not _is_classic(film) and not film.get("is_new") and bool(_fw_dates) and max(_fw_dates) <= _sunday_fw
         final_week_badge = '<span class="film-badge badge-final-week" data-es="ÚLTIMA SEMANA" data-en="FINAL WEEK">ÚLTIMA SEMANA</span>' if _is_final_week else ""
         cd = compute_card_data(film)
         title_es = film["title"]
