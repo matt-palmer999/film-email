@@ -13,12 +13,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="HYBE CHEERING PARTY — whatson.movie" data-en="HYBE CHEERING PARTY — whatson.movie">HYBE CHEERING PARTY — whatson.movie</title>
+<title data-es="HYBE CHEERING PARTY — Cartelera Valencia" data-en="HYBE CHEERING PARTY — Valencia Cinema">HYBE CHEERING PARTY — Cartelera Valencia</title>
 <link rel="canonical" href="https://whatson.movie/listings/hybe-cheering-party/">
-<meta name="description" content="HYBE CHEERING PARTY — sesiones y horarios">
+<meta name="description" content="HYBE CHEERING PARTY en cartelera en Valencia · VOSE disponible. Horarios en Yelmo Campanar.">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="HYBE CHEERING PARTY — whatson.movie">
-<meta property="og:description" content="HYBE CHEERING PARTY — sesiones y horarios">
+<meta property="og:title" content="HYBE CHEERING PARTY — Cartelera Valencia">
+<meta property="og:description" content="HYBE CHEERING PARTY en cartelera en Valencia · VOSE disponible. Horarios en Yelmo Campanar.">
 <meta property="og:url" content="https://whatson.movie/listings/hybe-cheering-party/">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w500/8udWFUoL5NxqKR1xtYinhcxY3gn.jpg">
 <meta property="og:image:alt" content="HYBE CHEERING PARTY">
@@ -198,25 +198,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       }
     },
     {
-      "@type": "ScreeningEvent",
-      "name": "HYBE CHEERING PARTY (VOSE)",
-      "startDate": "2026-10-30T03:35:00+01:00",
-      "videoFormat": "VOSE",
-      "workPresented": {
-        "@id": "https://whatson.movie/listings/hybe-cheering-party/#movie"
-      },
-      "location": {
-        "@type": "MovieTheater",
-        "name": "Yelmo La Maquinista",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Barcelona",
-          "addressCountry": "ES"
-        },
-        "url": "https://www.yelmocines.es/cartelera/westfield-la-maquinista"
-      }
-    },
-    {
       "@type": "BreadcrumbList",
       "itemListElement": [
         {
@@ -256,13 +237,13 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link">← <span data-es="Cartelera" data-en="Listings">Cartelera</span></a>
+    <a href="../valencia/" class="back-link">← <span data-es="Cartelera Valencia" data-en="Valencia Cinema">Cartelera Valencia</span></a>
   </div>
 
   <div class="film-hero">
     <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/8udWFUoL5NxqKR1xtYinhcxY3gn.jpg" alt="HYBE CHEERING PARTY" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
-      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span></div>
+      <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span><span class="vose-badge">VOSE</span></div>
       <div class="hero-title" data-es="HYBE CHEERING PARTY" data-en="HYBE CHEERING PARTY">HYBE CHEERING PARTY</div>
       <div class="orig-title" translate="no">하이브 치어링 파티</div>
       <div class="hero-meta"><span data-es="KR · 2026 · 60 min" data-en="KR · 2026 · Music · 60 min">KR · 2026 · 60 min</span></div>
@@ -289,7 +270,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#9a8fb5;">© whatson.movie</span>
+    <span style="color:#9a8fb5;">© Cartelera Valencia</span>
   </div>
 </div>
 
@@ -310,7 +291,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'HYBE CHEERING PARTY — whatson.movie' : 'HYBE CHEERING PARTY — whatson.movie');
+  document.title = (lang === 'en' ? 'HYBE CHEERING PARTY — Valencia Cinema' : 'HYBE CHEERING PARTY — Cartelera Valencia');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
