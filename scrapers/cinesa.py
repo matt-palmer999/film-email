@@ -10,7 +10,7 @@ page.route() + route.fetch() to:
   2. Capture the films JSON (92 films) via route.fetch().
 
 Once the Bearer token is in hand, all subsequent API calls (film-screening-dates
-for the 7-day range, per-date showtimes) are made directly with Python requests.
+for the 30-day range, per-date showtimes) are made directly with Python requests.
 
 VOSE detection: attributeId "0000000068" == "Vose" (confirmed from attribute legend).
 
@@ -35,7 +35,7 @@ CINEMA_NAME  = "Cinesa LUXE Bonaire"
 PAGE_URL     = "https://www.cinesa.es/cines/bonaire/"
 VWC_BASE     = "https://vwc.cinesa.es/WSVistaWebClient/ocapi/v1"
 VOSE_ATTR    = "0000000068"   # confirmed: attribute legend alt="Vose"
-DAYS_AHEAD   = 7
+DAYS_AHEAD   = 30
 
 
 def _api_headers(bearer: str, cf_cookie: str | None = None) -> dict:

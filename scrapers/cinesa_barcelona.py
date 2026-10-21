@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 BARCELONA_TZ = ZoneInfo("Europe/Madrid")
 VWC_BASE     = "https://vwc.cinesa.es/WSVistaWebClient/ocapi/v1"
 VOSE_ATTR    = "0000000068"
-DAYS_AHEAD   = 7
+DAYS_AHEAD   = 30
 
 CINEMAS = [
     {"site_id": "012", "key": "cinesa_diagonal",     "name": "Cinesa Diagonal",     "page_url": "https://www.cinesa.es/cines/diagonal/"},

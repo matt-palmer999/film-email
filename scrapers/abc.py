@@ -8,7 +8,7 @@ Three Valencia multiplexes on the same platform:
 
 Strategy:
 1. GET {base}/index?pag=cartelera  — film list (titles, posters, fichas, etiq)
-2. For each film/ficha POST {base}/ws.pro with a 7-day window — sessions + metadata
+2. For each film/ficha POST {base}/ws.pro with a 30-day window — sessions + metadata
 3. VOSE detected via Formato field on each session
 
 No browser needed — plain requests + BeautifulSoup throughout.
@@ -182,7 +182,7 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
     # ---- Step 2: query ws.pro per film ----------------------------------------
     today     = date.today()
     primerdia = today.strftime("%Y-%m-%d")
-    ultimodia = (today + timedelta(days=7)).strftime("%Y-%m-%d")
+    ultimodia = (today + timedelta(days=30)).strftime("%Y-%m-%d")
 
     results: list[dict] = []
 
