@@ -1,167 +1,234 @@
 """
-Yelmo Campanar scraper.
+Yelmo Campanar (Valencia) scraper.
 
-A plain POST request to yelmocines.es/now-playing.aspx/GetNowPlaying
-returns all films and showtimes as JSON — no browser needed.
+Yelmo was acquired by Cinépolis; the old yelmocines.es API is gone.
+Now uses the Cinépolis GraphQL API at api-g.cinepolis.com.
 
-Returns a list of film dicts in the same format as scrapers/kinepolis.py.
+Two queries:
+  1. billboardByCinema  — all movies + showtimes for this cinema in one call
+  2. movie              — title, original title, duration, poster for each film
+
 Run directly for a quick test summary.
 """
 
-import json
 import logging
 import re
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
+import time
 
 import requests
 
 log = logging.getLogger(__name__)
 
-VALENCIA_TZ = ZoneInfo("Europe/Madrid")
-CINEMA_KEY  = "mercado-de-campanar"
-CINEMA_NAME = "Yelmo Campanar"
-API_URL     = "https://www.yelmocines.es/now-playing.aspx/GetNowPlaying"
-HEADERS     = {
-    "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Content-Type":    "application/json; charset=UTF-8",
-    "X-Requested-With": "XMLHttpRequest",
-    "Referer":         "https://www.yelmocines.es/cartelera/campanar",
-    "Accept":          "application/json, text/javascript, */*; q=0.01",
-    "Origin":          "https://www.yelmocines.es",
+CINEMA_KEY   = "mercado-de-campanar"
+CINEMA_NAME  = "Yelmo Campanar"
+CINEMA_SLUG  = "mercado-de-campanar-valencia"
+COUNTRY_ID   = "ES"
+TIMEZONE     = "Europe/Madrid"
+
+_API         = "https://api-g.cinepolis.com/v2/billboards/graphql"
+_API_KEY     = "lQM6Mkvri1iHksKKCfpAiwGXq0YUZA7Nn6XAXRPr4i13LwXo"
+_HEADERS     = {
+    "Content-Type": "application/json",
+    "x-apikey":     _API_KEY,
+    "Origin":       "https://cineyelmo.com",
+    "Referer":      "https://cineyelmo.com/",
+    "User-Agent":   (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
 }
 
-# /Date(1778374800000)/ — .NET JSON timestamp (ms since Unix epoch)
-_DOTNET_TS = re.compile(r"/Date\((\d+)\)/")
+_BILLBOARD_QUERY = """
+  query BillboardByCinema(
+    $cinemaId: String!
+    $countryId: String!
+    $timezone: String
+    $isAbsoluteExperiencePath: Boolean
+  ) {
+    billboardByCinema(
+      cinemaId: $cinemaId
+      countryId: $countryId
+      timezone: $timezone
+      isAbsoluteExperiencePath: $isAbsoluteExperiencePath
+    ) {
+      schedules {
+        movieId
+        dates {
+          date
+          languages {
+            language
+            displayLanguage
+            showtimes {
+              sessionId
+              datetime
+              format { name }
+              experience { name }
+            }
+          }
+        }
+      }
+    }
+  }
+"""
+
+_MOVIE_QUERY = """
+  query Movies($countryId: String!, $id: String!, $isAbsoluteMediaPath: Boolean) {
+    movie(countryId: $countryId, id: $id, isAbsoluteMediaPath: $isAbsoluteMediaPath) {
+      id
+      name
+      originalName
+      length
+      synopsis
+      media {
+        resource
+        type
+        code
+        sizes { large medium small }
+      }
+    }
+  }
+"""
+
+_LENGTH_RE = re.compile(r"(\d+)")
 
 
-def _parse_dotnet_ts(ts_str: str) -> str:
-    """Return ISO local datetime string from a .NET /Date(ms)/ value."""
-    m = _DOTNET_TS.search(ts_str)
-    if not m:
-        return ts_str
-    ms = int(m.group(1))
-    dt = datetime.fromtimestamp(ms / 1000, tz=timezone.utc).astimezone(VALENCIA_TZ)
-    return dt.strftime("%Y-%m-%dT%H:%M:%S")
+def _parse_duration(length_str: str) -> int:
+    m = _LENGTH_RE.search(length_str or "")
+    return int(m.group(1)) if m else 0
 
 
 def _is_vose(language: str) -> bool:
     lang = language.upper()
-    return "VOSE" in lang or "SUBTITULADO" in lang
+    return lang not in ("ESP", "ESPAÑOL")
 
 
-def _lang_code(language: str) -> str:
-    """Best-effort 2-letter audio language code from the Spanish label."""
+def _audio_lang(language: str) -> str:
     lang = language.upper()
-    if "INGL" in lang:   return "EN"
-    if "FRANC" in lang:  return "FR"
-    if "JAPON" in lang:  return "JA"
-    if "ITAL" in lang:   return "IT"
-    if "ALEM" in lang:   return "DE"
-    if "PORT" in lang:   return "PT"
-    return "ES"
+    if lang in ("ESP", "ESPAÑOL"):
+        return "ES"
+    if lang in ("COR", "COREANO"):
+        return "KO"
+    return "EN"
+
+
+def _poster_url(media: list) -> str:
+    for item in media or []:
+        if item.get("code") == "poster":
+            return item.get("sizes", {}).get("large", "") or item.get("sizes", {}).get("medium", "")
+    return ""
+
+
+def _fetch_billboard(sess: requests.Session) -> list[dict]:
+    r = sess.post(_API, headers=_HEADERS, json={
+        "query":     _BILLBOARD_QUERY,
+        "variables": {
+            "cinemaId":                CINEMA_SLUG,
+            "countryId":               COUNTRY_ID,
+            "timezone":                TIMEZONE,
+            "isAbsoluteExperiencePath": True,
+        },
+    }, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    if "errors" in data:
+        raise RuntimeError(f"billboardByCinema errors: {data['errors']}")
+    return data["data"]["billboardByCinema"]["schedules"]
+
+
+def _fetch_movie(sess: requests.Session, movie_id: str) -> dict:
+    r = sess.post(_API, headers=_HEADERS, json={
+        "query":     _MOVIE_QUERY,
+        "variables": {
+            "countryId":            COUNTRY_ID,
+            "id":                   movie_id,
+            "isAbsoluteMediaPath":  True,
+        },
+    }, timeout=15)
+    r.raise_for_status()
+    data = r.json()
+    if "errors" in data:
+        log.debug("movie query errors for %s: %s", movie_id, data["errors"])
+        return {}
+    return data["data"].get("movie") or {}
 
 
 def scrape_yelmo() -> list[dict]:
     """Fetch Yelmo Campanar listings and return a list of film dicts."""
-    log.info("Fetching Yelmo now-playing data …")
-    r = requests.post(
-        API_URL,
-        data=json.dumps({"cityKey": "valencia"}),
-        headers=HEADERS,
-        timeout=20,
-    )
-    r.raise_for_status()
-    payload = r.json()
+    log.info("Fetching Yelmo Campanar (Cinépolis) billboard …")
 
-    cinemas = payload["d"]["Cinemas"]
-    cinema  = next((c for c in cinemas if c["Key"] == CINEMA_KEY), None)
-    if cinema is None:
-        raise RuntimeError(f"Cinema {CINEMA_KEY!r} not found in Yelmo API response")
+    with requests.Session() as sess:
+        schedules = _fetch_billboard(sess)
+        log.info("Yelmo Campanar: %d movie slots in billboard", len(schedules))
 
-    log.info("Found cinema: %s (id=%s)", cinema["Name"], cinema["Id"])
+        # Gather unique movie IDs and their combined showtimes
+        movies_raw: dict[str, list[dict]] = {}
+        for sched in schedules:
+            mid = sched["movieId"]
+            if mid not in movies_raw:
+                movies_raw[mid] = []
+            for day in sched.get("dates", []):
+                date_str = day["date"]
+                for lang_entry in day.get("languages", []):
+                    language = lang_entry.get("displayLanguage", lang_entry.get("language", ""))
+                    vose     = _is_vose(language)
+                    alang    = _audio_lang(language)
+                    for st in lang_entry.get("showtimes", []):
+                        dt_str   = st.get("datetime", "")
+                        time_str = dt_str[11:16] if len(dt_str) >= 16 else ""
+                        fmt_name = st.get("format", {}).get("name", "2D") or "2D"
+                        if not time_str:
+                            continue
+                        movies_raw[mid].append({
+                            "date":           date_str,
+                            "time":           time_str,
+                            "datetime_local": dt_str[:19] if len(dt_str) >= 19 else f"{date_str}T{time_str}:00",
+                            "format":         fmt_name,
+                            "language":       language,
+                            "is_vose":        vose,
+                            "audio_lang":     alang,
+                            "is_3d":          "3D" in fmt_name.upper(),
+                            "is_imax":        "IMAX" in fmt_name.upper(),
+                            "is_4dx":         "4DX" in fmt_name.upper(),
+                            "booking_url":    "",
+                        })
 
-    # Aggregate films across all dates
-    # Structure: Dates > Movies > Formats > Showtimes
-    # NOTE: The date for each batch of showtimes comes from date_entry["FilterDate"]
-    # (a .NET /Date(ms)/ UTC timestamp representing the cinema business day start).
-    # Individual showtime "TimeFilter" timestamps are unreliable for extracting the
-    # correct local date/time — use date_entry for the date and showtime "Time" for
-    # the display time (e.g. "17:00").
-    films_map: dict[int, dict] = {}
+        # Fetch metadata for each movie
+        results = []
+        for mid, showtimes in movies_raw.items():
+            if not showtimes:
+                continue
+            meta = _fetch_movie(sess, mid)
+            time.sleep(0.05)
 
-    for date_entry in cinema["Dates"]:
-        # Extract the calendar date for this batch from FilterDate
-        filter_date_raw = date_entry.get("FilterDate", "")
-        date_str = _parse_dotnet_ts(filter_date_raw)[:10] if filter_date_raw else ""
+            name          = meta.get("name") or mid.replace("-", " ").title()
+            original_name = meta.get("originalName") or ""
+            duration      = _parse_duration(meta.get("length", ""))
+            synopsis      = meta.get("synopsis") or ""
+            poster        = _poster_url(meta.get("media", []))
+            any_vose      = any(s["is_vose"] for s in showtimes)
+            vose_langs    = {s["audio_lang"] for s in showtimes if s["is_vose"]}
+            alang_out     = next(iter(vose_langs), "ES") if any_vose and len(vose_langs) == 1 else (
+                "EN" if any_vose else "ES"
+            )
 
-        for movie in date_entry["Movies"]:
-            fid = movie["Id"]
-            if fid not in films_map:
-                films_map[fid] = {
-                    "id":             fid,
-                    "title_es":       movie["Title"],
-                    "original_title": movie.get("OriginalTitle", "") or "",
-                    "runtime_mins":   int(movie.get("RunTime") or 0),
-                    "poster_url":     movie.get("Poster", ""),
-                    "synopsis_es":    movie.get("Synopsis", "") or "",
-                    "yelmo_key":      movie.get("Key", ""),
-                    "showtimes":      [],
-                }
+            results.append({
+                "cinema":         CINEMA_KEY,
+                "cinema_name":    CINEMA_NAME,
+                "title_es":       name,
+                "original_title": original_name,
+                "is_vose":        any_vose,
+                "audio_lang":     alang_out,
+                "imdb_id":        "",
+                "is_film":        True,
+                "duration_mins":  duration,
+                "poster_url":     poster,
+                "synopsis_es":    synopsis,
+                "showtimes":      showtimes,
+            })
 
-            for fmt in movie.get("Formats", []):
-                language  = fmt.get("Language", "")
-                fmt_name  = fmt.get("Name", "2D")
-                is_vose   = _is_vose(language)
-                audio_lang = _lang_code(language)
-
-                for st in fmt.get("Showtimes", []):
-                    time_str = st.get("Time", "")
-                    if not time_str or not date_str:
-                        continue
-                    local_dt = f"{date_str}T{time_str}:00"
-
-                    films_map[fid]["showtimes"].append({
-                        "date":           date_str,
-                        "time":           time_str,
-                        "datetime_local": local_dt,
-                        "format":         fmt_name,
-                        "language":       language,
-                        "is_vose":        is_vose,
-                        "audio_lang":     audio_lang,
-                        "is_3d":          "3D" in fmt_name.upper(),
-                        "is_imax":        "IMAX" in fmt_name.upper(),
-                        "is_4dx":         "4DX" in fmt_name.upper(),
-                    })
-
-    # Build output list — attach top-level VOSE flag if ANY showtime is VOSE
-    results = []
-    for film in films_map.values():
-        showtimes = film.pop("showtimes")
-        any_vose  = any(s["is_vose"] for s in showtimes)
-        # If ALL showtimes are VOSE, use the first audio lang; else mark ES
-        vose_langs = {s["audio_lang"] for s in showtimes if s["is_vose"]}
-        audio_lang = next(iter(vose_langs), "ES") if any_vose and len(vose_langs) == 1 else (
-            "EN" if any_vose else "ES"
-        )
-        results.append({
-            "cinema":       "yelmo",
-            "cinema_name":  CINEMA_NAME,
-            "title_es":     film["title_es"],
-            "original_title": film["original_title"],
-            "is_vose":      any_vose,
-            "audio_lang":   audio_lang,
-            "imdb_id":      "",          # not provided by Yelmo API
-            "is_film":      True,        # Yelmo doesn't mix in events
-            "duration_mins": film["runtime_mins"],
-            "poster_url":   film["poster_url"],
-            "synopsis_es":  film["synopsis_es"],
-            "yelmo_key":    film["yelmo_key"],
-            "showtimes":    showtimes,
-        })
-
-    log.info("Yelmo: %d films, %d sessions",
-             len(results), sum(len(f["showtimes"]) for f in results))
+    total = sum(len(f["showtimes"]) for f in results)
+    log.info("Yelmo Campanar: %d films, %d sessions", len(results), total)
     return results
 
 
@@ -179,7 +246,8 @@ if __name__ == "__main__":
 
     for f in sorted(films, key=lambda x: x["title_es"]):
         vose_tag = "VOSE" if f["is_vose"] else "    "
-        dates    = sorted(set(s["datetime_local"][:10] for s in f["showtimes"] if s["datetime_local"]))
         langs    = sorted({s["language"] for s in f["showtimes"] if s["is_vose"]})
-        lang_str = langs[0][:35] if langs else ""
-        print(f"  [{vose_tag}] {f['title_es'][:45]:<45}  {lang_str}")
+        lang_str = langs[0][:30] if langs else ""
+        dates    = sorted({s["date"] for s in f["showtimes"]})
+        d_range  = f"{dates[0]} -> {dates[-1]}" if dates else "?"
+        print(f"  [{vose_tag}] {f['title_es'][:45]:<45}  {lang_str:<12} {d_range}")
