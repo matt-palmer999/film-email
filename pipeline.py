@@ -29,7 +29,7 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
     "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Valencia+Burjassot"},
-    "yelmo":      {"name": "Yelmo Campanar",       "website": "https://www.yelmocines.es",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
+    "mercado-de-campanar": {"name": "Yelmo Campanar", "website": "https://cineyelmo.com/cines/mercado-de-campanar-valencia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
     "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Ocine+Premium+Aqua+Valencia"},
     "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Paterna+Valencia"},
     "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://elsaler.cinesabc.com",           "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+El+Saler+Valencia"},
@@ -45,7 +45,7 @@ CINEMA_META = {
     "aribau_barcelona":    {"name": "Aribau Multicines",    "website": "https://www.moobycinemas.com/aribau",         "type": "arthouse",  "city": "Barcelona", "maps": "https://maps.google.com/?q=Aribau+Multicines+Barcelona"},
     "cinesa_diagonal":     {"name": "Cinesa Diagonal",      "website": "https://www.cinesa.es/cines/diagonal/",       "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Cinesa+Diagonal+Barcelona"},
     "cinesa_diagonal_mar": {"name": "Cinesa Diagonal Mar",  "website": "https://www.cinesa.es/cines/diagonal-mar/",   "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Cinesa+Diagonal+Mar+Barcelona"},
-    "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://www.yelmocines.es/cartelera/westfield-la-maquinista", "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Yelmo+La+Maquinista+Barcelona"},
+    "yelmo_maquinista":    {"name": "Yelmo La Maquinista",  "website": "https://cineyelmo.com/cines/westfield-la-maquinista-barcelona", "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Yelmo+La+Maquinista+Barcelona"},
     "mooby_gloeries":      {"name": "Mooby Glòries",        "website": "https://moobycinemas.com/glories",    "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Glories+Barcelona"},
     "mooby_arenas":        {"name": "Mooby Arenas",         "website": "https://moobycinemas.com/arenas",     "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Arenas+Barcelona"},
     "ocine_magic":         {"name": "Ocine Màgic Badalona", "website": "https://www.ocinemagic.es",           "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Ocine+Magic+Badalona"},

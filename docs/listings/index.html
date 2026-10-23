@@ -16,7 +16,8 @@
 <meta property="og:image" content="https://whatson.movie/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh;display:flex;flex-direction:column}
@@ -36,7 +37,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .city-emoji{font-size:36px;line-height:1}
 .city-name{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700}
 .city-desc{font-size:13px;color:#9b8faa;text-align:center;line-height:1.4}
-.city-count{font-size:12px;color:#7a6a9a}
+.city-count{font-size:12px;color:#9a8fb5}
 .city-arrow{font-size:20px;font-weight:700;margin-top:4px}
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:20px 24px;text-align:center}
 .footer p{font-size:13px;color:#8a7e9a;line-height:1.7}
@@ -69,29 +70,29 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <div class="city-emoji">🏛️</div>
       <div class="city-name" style="color:#c084fc;">Barcelona</div>
       <div class="city-desc" data-es="La cartelera completa de Barcelona" data-en="Barcelona's complete cinema listings">La cartelera completa de Barcelona</div>
-      <div class="city-count" data-es="47 películas esta semana" data-en="47 films this week">47 películas esta semana</div>
+      <div class="city-count" data-es="100 películas esta semana" data-en="100 films this week">100 películas esta semana</div>
       <div class="city-arrow" style="color:#c084fc;">→</div>
     </a>
     <a href="./valencia/" class="city-card" style="border-color:#c9a84c33;">
       <div class="city-emoji">🌊</div>
       <div class="city-name" style="color:#c9a84c;">Valencia</div>
       <div class="city-desc" data-es="La cartelera completa de Valencia" data-en="Valencia's complete cinema listings">La cartelera completa de Valencia</div>
-      <div class="city-count" data-es="99 películas esta semana" data-en="99 films this week">99 películas esta semana</div>
+      <div class="city-count" data-es="132 películas esta semana" data-en="132 films this week">132 películas esta semana</div>
       <div class="city-arrow" style="color:#c9a84c;">→</div>
     </a>
   </div>
 
   <div class="footer">
     <p>
-      <span data-es="Fuente de metadatos:" data-en="Metadata source:">Fuente de metadatos:</span>
+      <span data-es="Carteleras obtenidas directamente de los cines · Información de películas de" data-en="Showtimes sourced directly from cinemas · Film details from">Carteleras obtenidas directamente de los cines · Información de películas de</span>
       <a href="https://www.themoviedb.org">TMDB</a> ·
-      <span style="color:#7a6a9a;">© 2026 · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <span style="color:#9a8fb5;">© 2026 · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 </div>
 <script>
-window.SUPABASE_URL  = "https://xhvbvggbrmlloefsgofy.supabase.co";
-window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc";
+window.SUPABASE_URL  = "__SUPABASE_URL__";
+window.SUPABASE_ANON = "__SUPABASE_ANON__";
 function setLang(lang) {
   document.getElementById('btn-es').classList.toggle('active', lang === 'es');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
@@ -109,10 +110,6 @@ function setLang(lang) {
     }).then(function(r) { return r.json(); }).then(function(data) {
       var sub = data[0];
       var city = ((sub && sub.city) || 'valencia').toLowerCase();
-      if (city === 'valencia' && sub && sub.cinemas && sub.cinemas.length) {
-        var bcn = ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar'];
-        if (sub.cinemas.every(function(c) { return bcn.indexOf(c) !== -1; })) city = 'barcelona';
-      }
       localStorage.setItem('whatson_city', city);
       window.location.replace('./' + city + '/');
     }).catch(function() {
