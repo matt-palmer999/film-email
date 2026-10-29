@@ -27,7 +27,7 @@ jobs:
           TODAY=$(date -u +%Y-%m-%d)
           COUNT=$(gh run list --repo ${{ github.repository }} --workflow=weekly-pipeline.yml --status=success --json createdAt --limit=10 | \
             python3 -c "import json,sys; runs=json.load(sys.stdin); print(sum(1 for r in runs if r['createdAt'].startswith('$TODAY')))")
-          echo "already_sent=$( [ '$COUNT' -gt 0 ] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "already_sent=$( [ "$COUNT" -gt 0 ] && echo true || echo false )" >> $GITHUB_OUTPUT
           echo "Successful runs today: $COUNT"
 
       - name: Skip if already sent today
