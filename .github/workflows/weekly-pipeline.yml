@@ -1,8 +1,6 @@
 name: Weekly email
 
 on:
-  schedule:
-    - cron: '0 17 * * 4'  # Thursdays 17:00 UTC = 19:00 CEST (summer) / 18:00 CET (winter)
   workflow_dispatch:
     inputs:
       test_mode:
