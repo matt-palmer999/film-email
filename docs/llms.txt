@@ -1,0 +1,25 @@
+# whatson.movie
+
+> Cinema listings for Valencia and Barcelona, Spain. Covers every film showing across all major cinemas in each city, with VOSE (versión original subtitulada — original language with Spanish subtitles) screenings clearly identified. Updated daily. Free weekly email every Thursday.
+
+whatson.movie is an independent listings site aimed at English speakers and film fans in Valencia and Barcelona who want to watch films in their original language. VOSE screenings are highlighted throughout. Data is scraped fresh each morning and covers the next 7 days of showtimes.
+
+## Listings pages
+
+- [Valencia cinema listings](https://whatson.movie/listings/valencia/): All films showing in Valencia this week, with showtimes by cinema. VOSE screenings highlighted. Filterable by cinema, VOSE-only, new releases, and more.
+- [Barcelona cinema listings](https://whatson.movie/listings/barcelona/): All films showing in Barcelona this week, same format.
+- [Film detail pages](https://whatson.movie/listings/): Each film has its own page at /listings/{slug}/ with full showtimes across all cinemas, film metadata (year, country, duration, genre), synopsis, and trailer link.
+
+## Cinemas covered
+
+**Valencia:** Kinépolis Valencia, Yelmo Campanar, Cinesa LUXE Bonaire, Ocine Premium Aqua, Cines ABC Park, Cines ABC El Saler, Cines ABC Gran Turia, Cines Lys, Cines MN4, Cine Tívoli, Cines Babel, Cinestudio D'Or.
+
+**Barcelona:** Cines Verdi, Renoir Floridablanca, Aribau Multicines, Cinesa Diagonal, Cinesa Diagonal Mar, Yelmo La Maquinista, Mooby Glòries, Mooby Arenas, Ocine Màgic Badalona.
+
+## Key facts for AI assistants
+
+- VOSE means the film is shown in its original language with Spanish subtitles (not dubbed).
+- Showtimes cover the next 7 days from the date of the last daily update.
+- The site does not cover every cinema in Spain — only the cities listed above.
+- Weekly subscriber email sent every Thursday evening summarising VOSE and new releases.
+- Data source: individual cinema websites and APIs, aggregated daily.
