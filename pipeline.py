@@ -370,10 +370,18 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_ocine_magic,     "Ocine Màgic",       "Barcelona"),
     ]
 
+    # Testing aid: FORCE_FAIL_SCRAPERS="Yelmo,Lys" makes those scrapers fail
+    # (labels as below), to rehearse failure handling on a real run.
+    force_fail = {s.strip() for s in os.environ.get("FORCE_FAIL_SCRAPERS", "").split(",") if s.strip()}
+    if force_fail:
+        log.warning(f"FORCE_FAIL_SCRAPERS set — forcing failure of: {', '.join(sorted(force_fail))}")
+
     all_results: list[dict] = []
     scraper_status: list[dict] = []
     for fn, label, city in scrapers:
         try:
+            if label in force_fail:
+                raise RuntimeError("forced failure (FORCE_FAIL_SCRAPERS)")
             results = fn()
             log.info(f"  {label}: {len(results)} films")
             all_results.extend(results)
@@ -673,6 +681,136 @@ def deduplicate_by_tmdb_id(films: dict) -> None:
 
     for title in duplicates:
         del films[title]
+
+
+# ── Carry forward listings for cinemas whose scraper failed ───────────────────
+
+CINEMA_LAST_OK_PATH = "docs/data/cinema_last_ok.json"
+MAX_CARRY_DAYS      = 3   # stop carrying a cinema's old listings after this many days
+
+
+def carry_forward_failed_cinemas(films: dict, prev_cache: dict, today: date,
+                                 prev_updated: str | None) -> dict:
+    """
+    If a cinema had films in the previous run but none today (scraper crashed,
+    was blocked, or silently returned 0), copy its upcoming showtimes from the
+    previous films_cache.json into `films`, so it doesn't vanish from the site.
+
+    Runs after TMDB enrichment + dedup, before stale removal: `films` and
+    `prev_cache` are then the same shape and can be matched on tmdb_id / slug.
+
+    - Per cinema id, so one failed ABC or Cinesa venue is carried on its own.
+    - Only showtimes dated today or later are kept.
+    - A cinema is carried for at most MAX_CARRY_DAYS after its last successful
+      scrape (tracked in docs/data/cinema_last_ok.json).
+    - Only ids in CINEMA_META are carried, so renamed/retired ids don't come back.
+
+    Mutates `films` and writes cinema_last_ok.json. Returns
+    {cinema_id: {"since": "YYYY-MM-DD", "films": n}} for the cinemas carried.
+    """
+    import copy
+
+    today_str = today.isoformat()
+
+    try:
+        with open(CINEMA_LAST_OK_PATH, encoding="utf-8") as fh:
+            last_ok: dict = json.load(fh)
+    except (OSError, ValueError):
+        last_ok = {}
+
+    current_ids = {c["id"] for f in films.values() for c in f.get("cinemas", [])}
+    prev_ids    = {c["id"] for f in prev_cache.values() for c in f.get("cinemas", [])}
+
+    # Record today's successes before deciding what to carry
+    for cid in current_ids:
+        last_ok[cid] = today_str
+
+    to_carry: dict = {}   # cinema_id -> date of its last successful scrape
+    for cid in sorted(prev_ids - current_ids):
+        if cid not in CINEMA_META:
+            log.info(f"  Carry-forward: skipping '{cid}' (no longer a known cinema id)")
+            continue
+        since = last_ok.get(cid) or prev_updated
+        if not since:
+            continue
+        try:
+            age = (today - date.fromisoformat(since)).days
+        except ValueError:
+            continue
+        if age > MAX_CARRY_DAYS:
+            log.warning(f"  Carry-forward: '{cid}' last scraped OK on {since} "
+                        f"({age} days ago) — too old, dropping it")
+            continue
+        to_carry[cid] = since
+
+    # Indexes for matching cached films to today's films
+    def _slug_of(title: str, film: dict) -> str:
+        return film.get("slug") or slugify(film.get("title_en", title) or title)
+
+    by_tmdb = {f["tmdb_id"]: t for t, f in films.items() if f.get("tmdb_id")}
+    by_slug = {_slug_of(t, f): t for t, f in films.items()}
+
+    carried: dict = {}
+    for cid, since in to_carry.items():
+        n = 0
+        for p_title, p_film in prev_cache.items():
+            entry = next((c for c in p_film.get("cinemas", []) if c.get("id") == cid), None)
+            if not entry:
+                continue
+            entry = copy.deepcopy(entry)
+            for key in ("showtimes", "vose_showtimes"):
+                entry[key] = {d: t for d, t in (entry.get(key) or {}).items() if d >= today_str}
+            if not entry["showtimes"] and not entry["vose_showtimes"]:
+                continue
+            entry["vose"]         = bool(entry["vose_showtimes"])
+            entry["carried_from"] = since
+
+            target = None
+            if p_film.get("tmdb_id") and p_film["tmdb_id"] in by_tmdb:
+                target = by_tmdb[p_film["tmdb_id"]]
+            elif _slug_of(p_title, p_film) in by_slug:
+                target = by_slug[_slug_of(p_title, p_film)]
+            elif p_title in films and (
+                not films[p_title].get("tmdb_id") or not p_film.get("tmdb_id")
+                or films[p_title]["tmdb_id"] == p_film["tmdb_id"]
+            ):
+                # Same title and no conflicting TMDB id (e.g. TMDB lookup failed today)
+                target = p_title
+
+            if target is not None:
+                tf = films[target]
+                if any(c["id"] == cid for c in tf["cinemas"]):
+                    continue
+                tf["cinemas"].append(entry)
+                if entry["vose"]:
+                    tf["any_vose"] = True
+            else:
+                if p_title in films:
+                    # Same title as a different (unmatched) current film — don't overwrite it
+                    log.warning(f"  Carry-forward: title clash for '{p_title}' at '{cid}' — skipped")
+                    continue
+                nf = copy.deepcopy(p_film)
+                nf["cinemas"]  = [entry]
+                nf["any_vose"] = entry["vose"]
+                films[p_title] = nf
+                if nf.get("tmdb_id"):
+                    by_tmdb[nf["tmdb_id"]] = p_title
+                by_slug[_slug_of(p_title, nf)] = p_title
+            n += 1
+
+        if n:
+            carried[cid] = {"since": since, "films": n}
+            log.warning(f"  Carry-forward: '{cid}' had no films today — showing {n} films "
+                        f"from its last successful scrape ({since})")
+
+    try:
+        os.makedirs(os.path.dirname(CINEMA_LAST_OK_PATH), exist_ok=True)
+        with open(CINEMA_LAST_OK_PATH, "w", encoding="utf-8") as fh:
+            json.dump(dict(sorted(last_ok.items())), fh, indent=2)
+    except OSError as exc:
+        log.warning(f"  Could not write {CINEMA_LAST_OK_PATH}: {exc}")
+
+    return carried
 
 
 # ── HTML helpers ──────────────────────────────────────────────────────────────
@@ -2542,14 +2680,23 @@ def run() -> None:
     # Load previous cache now so trailer URLs can be carried forward in step 3b
     _prev_cache_path_early = "docs/data/films_cache.json"
     _prev_films_by_slug_early: dict = {}
+    _prev_cache_raw: dict = {}
     if os.path.exists(_prev_cache_path_early):
         try:
             with open(_prev_cache_path_early, encoding="utf-8") as _fh:
-                for _pf in json.load(_fh).values():
-                    if _pf.get("slug"):
-                        _prev_films_by_slug_early[_pf["slug"]] = _pf
+                _prev_cache_raw = json.load(_fh)
+            for _pf in _prev_cache_raw.values():
+                if _pf.get("slug"):
+                    _prev_films_by_slug_early[_pf["slug"]] = _pf
         except Exception:
             pass
+    # Date of the previous run (stats.json is rewritten in step 7)
+    _prev_updated = None
+    try:
+        with open("docs/data/stats.json", encoding="utf-8") as _fh:
+            _prev_updated = json.load(_fh).get("updated")
+    except Exception:
+        pass
 
     # 2. TMDB enrichment
     enrich_with_tmdb(films)
@@ -2557,6 +2704,17 @@ def run() -> None:
     # 3. Deduplicate by TMDB ID
     deduplicate_by_tmdb_id(films)
     log.info(f"Films after deduplication: {len(films)}")
+
+    # 3c. Carry forward listings for cinemas whose scraper failed today.
+    #     Any error here must not stop the run — fall back to today's behaviour.
+    carried: dict = {}
+    try:
+        carried = carry_forward_failed_cinemas(
+            films, _prev_cache_raw, datetime.now(VALENCIA_TZ).date(), _prev_updated)
+        if carried:
+            log.info(f"Films after carry-forward: {len(films)}")
+    except Exception as exc:
+        log.error(f"Carry-forward failed — continuing without it: {exc}", exc_info=True)
 
     # 4. Remove films with no showtimes in the relevant window
     #    Classics (3+ years old) use a 30-day window; everything else uses 7 days.
@@ -2733,7 +2891,7 @@ def run() -> None:
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
     # 11. Send admin confirmation email
-    send_pipeline_summary(films, scraper_status, id_problems)
+    send_pipeline_summary(films, scraper_status, id_problems, carried)
 
 
 def submit_indexnow(films: dict, cities: list) -> None:
@@ -2778,7 +2936,8 @@ def submit_indexnow(films: dict, cities: list) -> None:
         log.warning(f"IndexNow submission failed (non-fatal): {exc}")
 
 
-def send_pipeline_summary(films: dict, scraper_status: list, id_problems: list | None = None) -> None:
+def send_pipeline_summary(films: dict, scraper_status: list, id_problems: list | None = None,
+                          carried: dict | None = None) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
     import smtplib
     from email.mime.text import MIMEText
@@ -2927,6 +3086,19 @@ def send_pipeline_summary(films: dict, scraper_status: list, id_problems: list |
             "what users already have saved).\n"
             + "".join(f"  - {p}\n" for p in id_problems) + "\n"
         )
+    carried = carried or {}
+    carry_block = ""
+    if carried:
+        carry_lines = "".join(
+            f"  - {CINEMA_META.get(cid, {}).get('name', cid)}: {v['films']} films "
+            f"from its last successful scrape ({v['since']})\n"
+            for cid, v in sorted(carried.items())
+        )
+        carry_block = (
+            "♻️ CARRIED FORWARD — these cinemas returned no films today, so the site is\n"
+            f"showing their previous upcoming showtimes (for up to {MAX_CARRY_DAYS} days):\n"
+            + carry_lines + "\n"
+        )
     new_subs_str = f"+{new_subs} new in last 24h" if new_subs else "no new in last 24h"
     new_subs_detail = ("\n" + "\n".join(f"    {e}" for e in new_sub_emails)) if new_sub_emails else ""
     active_lines = ""
@@ -2956,7 +3128,7 @@ TOP REFERRERS (yesterday):
 {ref_lines}"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
-{id_block}SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
+{id_block}{carry_block}SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)
@@ -2973,7 +3145,8 @@ Site: https://whatson.movie/listings/
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
     regression_note = f" — ⚠️ {len(regressions)} drop(s)" if regressions else ""
     id_note = f" — ⚠️ cinema id mismatch" if id_problems else ""
-    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note}{id_note} · {now_str}"
+    carry_note = f" — ♻️ {len(carried)} carried forward" if carried else ""
+    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note}{id_note}{carry_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
     msg["To"]      = ", ".join(admin_to)
 
