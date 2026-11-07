@@ -29,7 +29,7 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
     "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Valencia+Burjassot"},
-    "mercado-de-campanar": {"name": "Yelmo Campanar", "website": "https://cineyelmo.com/cines/mercado-de-campanar-valencia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
+    "yelmo":               {"name": "Yelmo Campanar", "website": "https://cineyelmo.com/cines/mercado-de-campanar-valencia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
     "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Ocine+Premium+Aqua+Valencia"},
     "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Paterna+Valencia"},
     "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://www.cinesabc.com/cine/abcelsaler", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+El+Saler+Valencia"},
@@ -273,6 +273,51 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
     except Exception as e:
         log.warning(f"  TMDB lookup failed for '{title}': {e}")
         return {}
+
+
+# ── Cinema id consistency check ───────────────────────────────────────────────
+
+PREFERENCES_PAGE = "docs/preferences/index.html"
+
+
+def check_cinema_ids(films: dict) -> list[str]:
+    """
+    Cross-check the three places a cinema id lives:
+      - the ids scrapers put on their films ("cinema" field)
+      - CINEMA_META keys in this file
+      - the hand-maintained list in docs/preferences/index.html — these are the
+        ids saved in users' "my cinemas" preferences (localStorage + Supabase)
+    If they disagree, users who picked that cinema silently see no films
+    (Yelmo Campanar, 2026-10-23 → 2026-11-07). Returns a list of problems.
+    """
+    problems: list[str] = []
+
+    try:
+        with open(PREFERENCES_PAGE, encoding="utf-8") as fh:
+            pref_ids = set(re.findall(r"\{\s*id:\s*'([^']+)'", fh.read()))
+    except OSError as exc:
+        return [f"could not read {PREFERENCES_PAGE}: {exc}"]
+    if not pref_ids:
+        return [f"no cinema ids found in {PREFERENCES_PAGE} — has its format changed?"]
+
+    meta_ids    = set(CINEMA_META)
+    scraped_ids = {c.get("id") for f in films.values() for c in f.get("cinemas", []) if c.get("id")}
+
+    for cid in sorted(scraped_ids - meta_ids):
+        problems.append(f"scraper emits '{cid}', which is not a CINEMA_META key")
+    for cid in sorted(scraped_ids - pref_ids):
+        problems.append(f"scraper emits '{cid}', which is not in the preferences page — "
+                        f"users who selected this cinema will see none of its films")
+    for cid in sorted(meta_ids - pref_ids):
+        problems.append(f"CINEMA_META has '{cid}', but the preferences page doesn't offer it")
+    for cid in sorted(pref_ids - meta_ids):
+        problems.append(f"preferences page offers '{cid}', but CINEMA_META has no such cinema")
+
+    for p in problems:
+        log.error(f"CINEMA ID MISMATCH: {p}")
+    if not problems:
+        log.info(f"Cinema ids consistent ({len(pref_ids)} cinemas)")
+    return problems
 
 
 # ── Scraper aggregation ───────────────────────────────────────────────────────
@@ -2488,6 +2533,7 @@ def run() -> None:
     log.info("Running scrapers …")
     films, scraper_status = aggregate_scrapers()
     log.info(f"Unique films before enrichment: {len(films)}")
+    id_problems = check_cinema_ids(films)
 
     if len(films) < 10:
         log.error(f"Only {len(films)} films found — possible scraper failure. Aborting to preserve cached listings.")
@@ -2687,7 +2733,7 @@ def run() -> None:
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
     # 11. Send admin confirmation email
-    send_pipeline_summary(films, scraper_status)
+    send_pipeline_summary(films, scraper_status, id_problems)
 
 
 def submit_indexnow(films: dict, cities: list) -> None:
@@ -2732,7 +2778,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
         log.warning(f"IndexNow submission failed (non-fatal): {exc}")
 
 
-def send_pipeline_summary(films: dict, scraper_status: list) -> None:
+def send_pipeline_summary(films: dict, scraper_status: list, id_problems: list | None = None) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
     import smtplib
     from email.mime.text import MIMEText
@@ -2870,7 +2916,17 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             log.warning(f"Could not fetch GoatCounter stats: {exc}")
 
     now_str = datetime.now(VALENCIA_TZ).strftime("%Y-%m-%d %H:%M")
-    status_icon = "⚠️" if failed else "✅"
+    id_problems = id_problems or []
+    status_icon = "⚠️" if (failed or id_problems) else "✅"
+    id_block = ""
+    if id_problems:
+        id_block = (
+            "⚠️ CINEMA ID MISMATCH — users who selected these cinemas may see no films.\n"
+            "Fix: make the scraper's CINEMA_KEY, CINEMA_META in pipeline.py and the list in\n"
+            "docs/preferences/index.html use the same id (keep the preferences id — it's\n"
+            "what users already have saved).\n"
+            + "".join(f"  - {p}\n" for p in id_problems) + "\n"
+        )
     new_subs_str = f"+{new_subs} new in last 24h" if new_subs else "no new in last 24h"
     new_subs_detail = ("\n" + "\n".join(f"    {e}" for e in new_sub_emails)) if new_sub_emails else ""
     active_lines = ""
@@ -2900,7 +2956,7 @@ TOP REFERRERS (yesterday):
 {ref_lines}"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
-SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
+{id_block}SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)
@@ -2916,7 +2972,8 @@ Site: https://whatson.movie/listings/
     msg = MIMEText(body, "plain", "utf-8")
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
     regression_note = f" — ⚠️ {len(regressions)} drop(s)" if regressions else ""
-    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note} · {now_str}"
+    id_note = f" — ⚠️ cinema id mismatch" if id_problems else ""
+    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note}{id_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
     msg["To"]      = ", ".join(admin_to)
 

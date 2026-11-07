@@ -19,7 +19,9 @@ import requests
 
 log = logging.getLogger(__name__)
 
-CINEMA_KEY   = "mercado-de-campanar"
+# Must stay "yelmo": it's the id saved in users' cinema preferences (localStorage +
+# Supabase) and in docs/preferences. Changing it silently empties their listings.
+CINEMA_KEY   = "yelmo"
 CINEMA_NAME  = "Yelmo Campanar"
 CINEMA_SLUG  = "mercado-de-campanar-valencia"
 COUNTRY_ID   = "ES"
