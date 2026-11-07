@@ -733,6 +733,9 @@ def carry_forward_failed_cinemas(films: dict, prev_cache: dict, today: date,
         since = last_ok.get(cid) or prev_updated
         if not since:
             continue
+        # First time we see this cinema fail with no record yet: pin the date, so the
+        # age keeps growing on later runs instead of resetting to each new run date.
+        last_ok.setdefault(cid, since)
         try:
             age = (today - date.fromisoformat(since)).days
         except ValueError:
