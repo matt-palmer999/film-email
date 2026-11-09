@@ -113,7 +113,7 @@ def scrape_ocine_magic() -> list[dict]:
                 if not date_str or not hora:
                     continue
 
-                booking_url = f"{BASE_URL}/compra/{plan_id}" if plan_id else ""
+                booking_url = f"{BASE_URL}/#/DetallPelicula/{group_id}"
                 showtimes.append({
                     "datetime_local": f"{date_str}T{hora}:00",
                     "date":           date_str,
