@@ -70,16 +70,27 @@ def _parse_session(session: dict, film_is_vose: bool = False) -> dict:
     attrs = session.get("rawSessionAttributes", "")
     parts = [p.strip() for p in attrs.split(",")]
     fmt = session.get("film", {}).get("format", {}).get("name", "2D")
+    is_vose = _session_is_vose(attrs, film_is_vose)
+    dt_local = _to_local(session["showtime"])
+    vista_id = session.get("vistaSessionId", "")
+    booking_url = (
+        f"https://kinepolis.es/direct-vista-redirect/{vista_id}/0/KVAL/0"
+        if vista_id else ""
+    )
     return {
         "datetime_utc":   session["showtime"],
-        "datetime_local": _to_local(session["showtime"]),
+        "datetime_local": dt_local,
+        "date":           dt_local[:10],
+        "time":           dt_local[11:16],
         "format":         fmt,
-        "is_vose":        _session_is_vose(attrs, film_is_vose),
+        "is_vose":        is_vose,
+        "audio_lang":     "EN" if is_vose else "ES",
         "is_3d":          any("3D" in p for p in parts),
         "is_imax":        any("IMAX" in p for p in parts),
         "is_4dx":         any("4DX" in p for p in parts),
         "attributes":     attrs,
         "session_id":     session.get("id", ""),
+        "booking_url":    booking_url,
     }
 
 
