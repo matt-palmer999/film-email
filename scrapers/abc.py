@@ -149,7 +149,7 @@ def _fmt_label(fmt: str) -> str:
 def _booking_url(booking: str, ses_id: str) -> str:
     if not ses_id:
         return ""
-    return f"https://{booking}.reservaentradas.com/{booking}/?pag=sesion&id={ses_id}"
+    return f"https://{booking}.reservaentradas.com/{booking}/index?pag=patio&sesion={ses_id}"
 
 
 def _build_showtime(ses: dict, booking: str) -> dict | None:
