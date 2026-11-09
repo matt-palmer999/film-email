@@ -1459,7 +1459,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             def _tbtn(t, iv, url):
                 vattr = "true" if iv else "false"
                 if url:
-                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</a>'
+                    _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+window.location.pathname.split('/').pop(),title:'Booking click',event:true})"
+                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{t}</a>'
                 return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
             time_btns  = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
             vose_attr    = "true" if c["vose"] else "false"
