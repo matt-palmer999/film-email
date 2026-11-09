@@ -205,11 +205,16 @@ def scrape_cinesa(playwright=None) -> list[dict]:
             except Exception:
                 time_str = starts_at[11:16]
 
+            st_id = st.get("id", "")
+            booking_url = (
+                f"https://www.cinesa.es/compra/butacas/?showtimeId={st_id}"
+                if st_id else ""
+            )
             fs = film_sessions.setdefault(film_id, {"any_vose": False, "all": {}, "vose": {}})
-            fs["all"].setdefault(date_str, set()).add(time_str)
+            fs["all"].setdefault(date_str, {})[time_str] = booking_url
             if is_vose:
                 fs["any_vose"] = True
-                fs["vose"].setdefault(date_str, set()).add(time_str)
+                fs["vose"].setdefault(date_str, {})[time_str] = booking_url
 
     # Ensure every Bonaire film has an entry (even if no per-session data yet)
     for film_id in bonaire_ids:
@@ -239,12 +244,19 @@ def scrape_cinesa(playwright=None) -> list[dict]:
         runtime   = info.get("runtimeInMinutes", 0)
 
         showtime_list = []
-        for date_str, times in fs["all"].items():
-            for t in sorted(times):
+        for date_str, time_map in fs["all"].items():
+            for t in sorted(time_map):
                 showtime_list.append({
                     "datetime_local": f"{date_str}T{t}:00",
+                    "date":           date_str,
+                    "time":           t,
+                    "format":         "2D",
                     "is_vose":        any_vose,
                     "audio_lang":     "EN" if any_vose else "ES",
+                    "is_3d":          False,
+                    "is_imax":        False,
+                    "is_4dx":         False,
+                    "booking_url":    time_map[t],
                 })
 
         if not showtime_list:
