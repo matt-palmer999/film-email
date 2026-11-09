@@ -459,6 +459,18 @@ def enrich_with_tmdb(films: dict) -> None:
         log.info("Enriching films with TMDB data …")
         for title, film in films.items():
             tmdb = tmdb_lookup(title, imdb_id=film.get("imdb_id", ""))
+            # Retry with event/festival prefix stripped for titles like
+            # "Mostra 2026 – Paris, Texas" or "Wilder Cinema – Tokyo Godfathers"
+            if not tmdb:
+                _stripped = re.sub(
+                    r'^(?:[A-Za-záéíóúüñÁÉÍÓÚÜÑ ]+\s+\d{4}'
+                    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)'
+                    r'|Otra vez[^–]*|Vino Club Babel|Preestreno\s+\S+)'
+                    r'\s*[-–]\s*',
+                    '', title, flags=re.IGNORECASE,
+                ).strip()
+                if _stripped and _stripped != title:
+                    tmdb = tmdb_lookup(_stripped, imdb_id=film.get("imdb_id", ""))
             if tmdb:
                 if tmdb.get("poster_url"):
                     film["poster"] = tmdb["poster_url"]
@@ -1459,7 +1471,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             def _tbtn(t, iv, url):
                 vattr = "true" if iv else "false"
                 if url:
-                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</a>'
+                    _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+window.location.pathname.split('/').pop(),title:'Booking click',event:true})"
+                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{t}</a>'
                 return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
             time_btns  = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
             vose_attr    = "true" if c["vose"] else "false"

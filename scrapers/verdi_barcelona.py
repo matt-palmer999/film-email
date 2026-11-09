@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 CINEMA_KEY  = "verdi_barcelona"
 CINEMA_NAME = "Cines Verdi"
 API_URL     = "https://barcelona.cines-verdi.com/api/get-events"
+SHOP_URL    = "https://verdibcn.admit-one.eu/?p=tickets&s=VERDIBCN&perfCode={code}&language=es"
 
 _HEADERS = {
     "User-Agent": (
@@ -99,7 +100,7 @@ def scrape_verdi_barcelona() -> list[dict]:
                 "is_3d":          is_3d,
                 "is_imax":        False,
                 "is_4dx":         False,
-                "booking_url":    p.get("booking_url") or p.get("url") or "",
+                "booking_url":    SHOP_URL.format(code=p["code"]) if p.get("code") else "",
             })
 
         if not showtimes:

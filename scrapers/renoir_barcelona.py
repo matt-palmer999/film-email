@@ -5,7 +5,7 @@ The official site (cinesrenoir.com) is server-rendered HTML — no JS runtime
 needed.  Showtimes for a given date are at:
   https://www.cinesrenoir.com/cine/renoir-floridablanca/cartelera/?fecha=YYYY-MM-DD
 
-Strategy: fetch 7 days (today + 6), aggregate showtimes per film slug.
+Strategy: fetch 30 days (today + 29), aggregate showtimes per film slug.
 
 Version labels:
   "Versión Original subtitulada a Castellano"  →  VOSE
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 CINEMA_KEY  = "renoir_barcelona"
 CINEMA_NAME = "Renoir Floridablanca"
 BASE_URL    = "https://www.cinesrenoir.com/cine/renoir-floridablanca/cartelera/"
-DAYS_AHEAD  = 7
+DAYS_AHEAD  = 30
 
 _HEADERS = {
     "User-Agent": (

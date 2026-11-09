@@ -16,9 +16,11 @@ Run directly for a quick test summary.
 import logging
 import re
 import time
+import unicodedata
 from datetime import date
 from zoneinfo import ZoneInfo
 
+import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
@@ -72,6 +74,74 @@ def _is_vose(idioma: str) -> bool:
     return idioma.lower().strip() not in ("castellano", "español", "")
 
 
+
+_RE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "es-ES,es;q=0.9",
+}
+
+
+def _parse_re_date(text: str) -> str:
+    """'Ma 10 / 11' -> 'YYYY-MM-DD'; bumps year if month already passed."""
+    m = re.search(r"(\d{1,2})\s*/\s*(\d{2})", text)
+    if not m:
+        return ""
+    day, month = int(m.group(1)), int(m.group(2))
+    today = date.today()
+    year = today.year
+    if month < today.month or (month == today.month and day < today.day):
+        year += 1
+    return f"{year}-{month:02d}-{day:02d}"
+
+
+def _title_to_re_slug(title: str) -> str:
+    """Convert a film title to a reservaentradas URL slug."""
+    s = unicodedata.normalize("NFKD", title)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "-", s.lower())
+    return s.strip("-")
+
+
+def _fetch_session_urls(
+    ses_url: str, session: requests.Session
+) -> dict[tuple[str, str], str]:
+    """Fetch a reservaentradas /sesiones/ page and return {(date, time): entrada_url}."""
+    try:
+        r = session.get(ses_url, headers=_RE_HEADERS, timeout=15)
+        r.raise_for_status()
+    except Exception as exc:
+        log.warning("Could not fetch %s: %s", ses_url, exc)
+        return {}
+
+    soup = BeautifulSoup(r.text, "lxml")
+
+    tab_dates: list[str] = []
+    for li in soup.select("ul.nav-tabs li"):
+        a = li.select_one("a")
+        tab_dates.append(_parse_re_date(a.get_text()) if a else "")
+
+    result: dict[tuple[str, str], str] = {}
+    for i, date_str in enumerate(tab_dates, start=1):
+        if not date_str:
+            continue
+        tab_div = soup.find("div", id=str(i))
+        if not tab_div:
+            continue
+        for sc in tab_div.select("div.session-container"):
+            a = sc.select_one("a")
+            if not a:
+                continue
+            time_str = a.get_text(strip=True)
+            if re.match(r"\d{1,2}:\d{2}", time_str):
+                href = a.get("href", "")
+                if href:
+                    result[(date_str, time_str)] = href
+    return result
+
 def _parse_film(block) -> dict | None:
     """Parse one div.pelicula-post into a film dict."""
     title_el = block.select_one("h2")
@@ -101,13 +171,21 @@ def _parse_film(block) -> dict | None:
         date_str = _parse_date(cells[0].get_text(strip=True))
         for cell in cells[1:]:
             link = cell.find("a")
-            if not link:
-                continue
-            time_text = link.get_text(strip=True)
-            if not re.match(r"\d{1,2}:\d{2}", time_text):
-                continue
-            booking_url = link.get("href", "")
-            m = re.search(r"/(\d+)/?$", booking_url)
+            if link:
+                time_text = link.get_text(strip=True)
+                if not re.match(r"\d{1,2}:\d{2}", time_text):
+                    continue
+                booking_url = link.get("href", "")
+            else:
+                # Gray span: showtime with no booking link on cinesbabel.com yet
+                span = cell.find("span", class_="gray")
+                if not span:
+                    continue
+                time_text = span.get_text(strip=True)
+                if not re.match(r"\d{1,2}:\d{2}", time_text):
+                    continue
+                booking_url = ""
+            m = re.search(r"/(\d+)/?$", booking_url) if booking_url else None
             session_id = m.group(1) if m else ""
             showtimes.append({
                 "datetime_local": f"{date_str}T{time_text}:00" if date_str else "",
@@ -194,6 +272,24 @@ def scrape_babel(playwright=None) -> list[dict]:
         film = _parse_film(block)
         if film:
             films.append(film)
+
+    # Enrich each film's showtimes with per-session /entrada/ booking URLs
+    with requests.Session() as re_sess:
+        for film in films:
+            ses_urls = list(dict.fromkeys(
+                st["booking_url"] for st in film["showtimes"] if st["booking_url"]
+            ))
+            # Fallback for films whose cinesbabel.com page shows gray spans only:
+            # construct the reservaentradas film page URL from the title slug
+            if not ses_urls:
+                slug = _title_to_re_slug(film["title_es"])
+                ses_urls = [f"https://www.reservaentradas.com/sesiones/valencia/cinesbabel/{slug}/"]
+            for ses_url in ses_urls:
+                session_map = _fetch_session_urls(ses_url, re_sess)
+                for st in film["showtimes"]:
+                    key = (st["date"], st["time"])
+                    if key in session_map:
+                        st["booking_url"] = session_map[key]
 
     total = sum(len(f["showtimes"]) for f in films)
     log.info("Babel: %d films, %d sessions", len(films), total)

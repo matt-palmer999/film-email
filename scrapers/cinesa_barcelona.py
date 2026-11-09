@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 BARCELONA_TZ = ZoneInfo("Europe/Madrid")
 VWC_BASE     = "https://vwc.cinesa.es/WSVistaWebClient/ocapi/v1"
 VOSE_ATTR    = "0000000068"
-DAYS_AHEAD   = 7
+DAYS_AHEAD   = 30
 
 CINEMAS = [
     {"site_id": "012", "key": "cinesa_diagonal",     "name": "Cinesa Diagonal",     "page_url": "https://www.cinesa.es/cines/diagonal/"},
@@ -163,10 +163,15 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
                 except Exception:
                     time_str = starts_at[11:16]
 
+                st_id = st.get("id", "")
+                booking_url = (
+                    f"https://www.cinesa.es/compra/butacas/?showtimeId={st_id}"
+                    if st_id else ""
+                )
                 fs = film_sessions.setdefault(film_id, {"any_vose": False, "dates": {}})
                 if is_vose:
                     fs["any_vose"] = True
-                fs["dates"].setdefault(date_str, []).append((time_str, is_vose))
+                fs["dates"].setdefault(date_str, []).append((time_str, is_vose, booking_url))
 
         for film_id, fs in film_sessions.items():
             info = film_by_id.get(film_id)
@@ -183,7 +188,7 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
 
             showtime_list = []
             for date_str, times in fs["dates"].items():
-                for t, is_v in sorted(times):
+                for t, is_v, b_url in sorted(times, key=lambda x: x[0]):
                     showtime_list.append({
                         "datetime_local": f"{date_str}T{t}:00",
                         "date":           date_str,
@@ -194,7 +199,7 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
                         "is_3d":          False,
                         "is_imax":        "IMAX" in (info.get("title", {}).get("text", "") or "").upper(),
                         "is_4dx":         False,
-                        "booking_url":    "",
+                        "booking_url":    b_url,
                     })
 
             if not showtime_list:

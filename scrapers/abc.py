@@ -8,7 +8,7 @@ Three Valencia multiplexes on the same platform:
 
 Strategy:
 1. GET {base}/index?pag=cartelera  — film list (titles, posters, fichas, etiq)
-2. For each film/ficha POST {base}/ws.pro with a 7-day window — sessions + metadata
+2. For each film/ficha POST {base}/ws.pro with a 30-day window — sessions + metadata
 3. VOSE detected via Formato field on each session
 
 No browser needed — plain requests + BeautifulSoup throughout.
@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import time
+import unicodedata
 from datetime import date, timedelta
 from zoneinfo import ZoneInfo
 
@@ -126,6 +127,14 @@ def _fmt_is_3d(fmt: str) -> bool:
     return "3D" in fmt.upper()
 
 
+def _to_slug(title: str) -> str:
+    import unicodedata
+    s = unicodedata.normalize("NFKD", title)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "-", s.lower())
+    return s.strip("-")
+
+
 def _fmt_label(fmt: str) -> str:
     """Clean up the Formato value: '(VOSE)' -> 'VOSE', '' -> '2D'."""
     s = fmt.strip().strip("()")
@@ -182,7 +191,7 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
     # ---- Step 2: query ws.pro per film ----------------------------------------
     today     = date.today()
     primerdia = today.strftime("%Y-%m-%d")
-    ultimodia = (today + timedelta(days=7)).strftime("%Y-%m-%d")
+    ultimodia = (today + timedelta(days=30)).strftime("%Y-%m-%d")
 
     results: list[dict] = []
 
@@ -230,9 +239,9 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
 
             is_v   = _fmt_is_vose(formato)
             is_3d  = _fmt_is_3d(formato)
+            slug   = _to_slug(fmeta["title"])
             b_url  = (
-                f"https://{booking}.reservaentradas.com/{booking}/"
-                f"?pag=sesion&id={ses_id}"
+                f"https://www.reservaentradas.com/entrada/valencia/{booking}/{slug}/{ses_id}/?step=2"
                 if ses_id else ""
             )
 
