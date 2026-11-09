@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
@@ -14,11 +13,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="Peer Gynt - Teatro alla Scala — Cartelera Valencia" data-en="Peer Gynt — Cartelera Valencia">Peer Gynt - Teatro alla Scala — Cartelera Valencia</title>
+<title data-es="Peer Gynt - Teatro alla Scala — Cartelera Barcelona" data-en="Peer Gynt — Barcelona Cinema">Peer Gynt - Teatro alla Scala — Cartelera Barcelona</title>
 <link rel="canonical" href="https://whatson.movie/listings/peer-gynt/">
 <meta name="description" content="French television adaptation of Henrik Ibsen&#39;s five-act play in verse.">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="Peer Gynt - Teatro alla Scala — Cartelera Valencia">
+<meta property="og:title" content="Peer Gynt - Teatro alla Scala — Cartelera Barcelona">
 <meta property="og:description" content="French television adaptation of Henrik Ibsen&#39;s five-act play in verse.">
 <meta property="og:url" content="https://whatson.movie/listings/peer-gynt/">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
@@ -26,7 +25,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0;min-height:100vh}
@@ -61,6 +61,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .day-panel{display:none;padding:0 20px 20px}
 .day-panel.active{display:block}
 .showtime-row{padding:14px 0;border-bottom:1px solid #1e1630}
+.showtime-row.city-hidden{display:none}
 .showtime-row:last-child{border-bottom:none}
 .showtime-cinema{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .vose-mini{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}
@@ -74,7 +75,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .showtime-legend{display:flex;align-items:center;gap:8px;padding:12px 20px 18px;font-size:13px;color:#9ed4b0;border-top:1px solid #1e1630}
 .showtime-legend-dot{width:12px;height:12px;border-radius:3px;background:#0d2c18;border:2px solid #2d8a50;flex-shrink:0}
 .no-times{font-size:13px;color:#8a7e9a;padding:20px 0;text-align:center}
-.footer{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#7a6a9a}
+.footer{background:#0a0810;border-top:1px solid #1e1630;padding:20px;text-align:center;font-size:12px;color:#9a8fb5}
 @media(max-width:480px){.lang-bar{padding:8px 12px}.lang-btn{padding:4px 10px;font-size:11px}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -109,7 +110,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         "name": "Cines Verdi",
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": "Valencia",
+          "addressLocality": "Barcelona",
           "addressCountry": "ES"
         },
         "url": "https://barcelona.cines-verdi.com"
@@ -132,7 +133,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../" class="back-link" onclick="history.length>1?history.back():window.location='../';return false;">← <span data-es="Volver a la cartelera" data-en="Back to listings">Volver a la cartelera</span></a>
+    <a href="../barcelona/" class="back-link">← <span data-es="Cartelera Barcelona" data-en="Barcelona Cinema">Cartelera Barcelona</span></a>
   </div>
 
   <div class="film-hero">
@@ -148,8 +149,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximas fechas" data-en="🕖 SHOWTIMES — upcoming dates">🕖 HORARIOS — próximas fechas</div>
-    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-27" data-es="Domingo 27" data-en="Sunday 27" onclick="showDay('2026-09-27')">Domingo 27</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-09-27"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Verdi</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="11:30" data-vose="false">11:30</button></div></div></div></div>
+    <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-09-27" data-es="Hoy 27" data-en="Today 27" onclick="showDay('2026-09-27')">Hoy 27</button></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-09-27"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-city="Barcelona" data-vose="false"><div class="showtime-cinema"><span translate="no">Cines Verdi</span></div><div class="showtime-times"><button onclick="showComingSoon()" class="time-btn" data-time="11:30" data-vose="false">11:30</button></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -164,7 +165,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#7a6a9a;">© Cartelera Valencia</span>
+    <span style="color:#9a8fb5;">© Cartelera Barcelona</span>
   </div>
 </div>
 
@@ -185,7 +186,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Peer Gynt' : 'Peer Gynt - Teatro alla Scala') + ' — Cartelera Valencia';
+  document.title = (lang === 'en' ? 'Peer Gynt — Barcelona Cinema' : 'Peer Gynt - Teatro alla Scala — Cartelera Barcelona');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
@@ -233,7 +234,7 @@ function applyEveningHighlights(eveningFilter) {
   document.querySelectorAll('.day-panel').forEach(panel => {
     const rows = panel.querySelectorAll('.showtime-row');
     if (!rows.length) return;
-    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none');
+    const anyVisible = Array.from(rows).some(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
     if (!anyVisible) {
       const msg = document.createElement('div');
       msg.className = 'no-times no-evening-times';
@@ -289,7 +290,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -312,7 +313,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const voseFilter = params.get('vose') === 'true';
   if (voseFilter) {
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
-      if (row.style.display === 'none') return; // already hidden by cinemas filter
+      if (row.style.display === 'none' || row.classList.contains('city-hidden')) return;
       const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
       btns.forEach(btn => {
         if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
@@ -325,7 +326,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.day-panel').forEach(panel => {
       const dayKey = panel.id.replace('day-', '');
       const visibleRows = Array.from(panel.querySelectorAll('.showtime-row[data-cinema-id]'))
-                               .filter(r => r.style.display !== 'none');
+                               .filter(r => r.style.display !== 'none' && !r.classList.contains('city-hidden'));
       const noTimesEl = panel.querySelector('.no-times');
       if (visibleRows.length === 0) {
         if (!noTimesEl) {
@@ -396,6 +397,23 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
       if (_legend) _legend.style.display = 'flex';
     }
   } catch(e) { /* silent */ }
+})();
+(function() {
+  const city = (localStorage.getItem('whatson_city') || '').toLowerCase();
+  if (!city) return;
+  document.querySelectorAll('.showtime-row[data-city]').forEach(function(row) {
+    const rowCity = (row.dataset.city || '').toLowerCase();
+    if (rowCity && rowCity !== city) row.classList.add('city-hidden');
+  });
+  document.querySelectorAll('.day-panel').forEach(function(panel) {
+    const visible = panel.querySelectorAll('.showtime-row:not(.city-hidden)').length;
+    const dk = panel.id.replace('day-', '');
+    const tab = document.querySelector('.day-tab[data-day="' + dk + '"]');
+    if (visible === 0 && tab) {
+      tab.style.display = 'none';
+      tab.classList.remove('has-shows');
+    }
+  });
 })();
 </script>
 </body>
