@@ -150,10 +150,10 @@ def _fmt_label(fmt: str) -> str:
 
 
 def _to_slug(title: str) -> str:
-    import unicodedata as _ud
-    s = _ud.normalize("NFKD", title)
-    s = "".join(c for c in s if not _ud.combining(c))
-    s = _re.sub(r"[^a-z0-9]+", "-", s.lower())
+    import unicodedata
+    s = unicodedata.normalize("NFKD", title)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "-", s.lower())
     return s.strip("-")
 
 
