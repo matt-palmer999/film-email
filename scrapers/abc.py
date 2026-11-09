@@ -2,14 +2,23 @@
 ABC Cinemas scraper.
 
 Three Valencia multiplexes on the same platform:
-  - Cines ABC Park      (park.cinesabc.com)
-  - Cines ABC El Saler  (elsaler.cinesabc.com)
-  - Cines ABC Gran Turia (granturia.cinesabc.com)
+  - Cines ABC Park      (recinto 2)
+  - Cines ABC El Saler  (recinto 172)
+  - Cines ABC Gran Turia (recinto 171)
 
-Strategy:
+Primary strategy — reservaentradas JSON API (the backend of the new Flutter
+site at www.cinesabc.com/cine/<booking>, which El Saler and Gran Turia moved to
+in Nov 2026; their old *.cinesabc.com subdomains now just JS-redirect there):
+1. GET https://{booking}.reservaentradas.com/{booking}/index?recinto=N&key=apirswebapp
+   — Eventos (now showing, today's sessions only) + ProximosEventos
+2. For each event GET .../sesiones?recinto=N&key=apirswebapp&evento=ID
+   — the event's full list of sessions (all upcoming dates)
+3. VOSE detected via Formato field on each session
+Responses are cp1252 despite the UTF-8 content-type header.
+
+Fallback — legacy HTML platform (only Park still served it as of Nov 2026):
 1. GET {base}/index?pag=cartelera  — film list (titles, posters, fichas, etiq)
 2. For each film/ficha POST {base}/ws.pro with a 30-day window — sessions + metadata
-3. VOSE detected via Formato field on each session
 
 No browser needed — plain requests + BeautifulSoup throughout.
 Run directly for a quick test summary.
@@ -37,20 +46,27 @@ CINEMAS = [
         "name":    "Cines ABC Park",
         "base":    "https://park.cinesabc.com",
         "booking": "abcpark",
+        "recinto": 2,
     },
     {
         "key":     "elsaler",
         "name":    "Cines ABC El Saler",
         "base":    "https://elsaler.cinesabc.com",
         "booking": "abcelsaler",
+        "recinto": 172,
     },
     {
         "key":     "granturia",
         "name":    "Cines ABC Gran Turia",
         "base":    "https://granturia.cinesabc.com",
         "booking": "abcgranturia",
+        "recinto": 171,
     },
 ]
+
+_BOOKING_TO_BASE = {c["booking"]: c["base"] for c in CINEMAS}
+
+_API_KEY = "apirswebapp"
 
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -127,6 +143,12 @@ def _fmt_is_3d(fmt: str) -> bool:
     return "3D" in fmt.upper()
 
 
+def _fmt_label(fmt: str) -> str:
+    """Clean up the Formato value: '(VOSE)' -> 'VOSE', '' -> '2D'."""
+    s = fmt.strip().strip("()")
+    return s if s else "2D"
+
+
 def _to_slug(title: str) -> str:
     import unicodedata
     s = unicodedata.normalize("NFKD", title)
@@ -135,14 +157,157 @@ def _to_slug(title: str) -> str:
     return s.strip("-")
 
 
-def _fmt_label(fmt: str) -> str:
-    """Clean up the Formato value: '(VOSE)' -> 'VOSE', '' -> '2D'."""
-    s = fmt.strip().strip("()")
-    return s if s else "2D"
+def _booking_url(booking: str, ses_id: str, title: str = "") -> str:
+    if not ses_id:
+        return ""
+    slug = _to_slug(title) if title else "film"
+    return f"https://www.reservaentradas.com/entrada/valencia/{booking}/{slug}/{ses_id}/?step=2"
+
+
+def _build_showtime(ses: dict, booking: str, title: str = "") -> dict | None:
+    """Convert one platform session dict (same shape in both APIs) to our format."""
+    date_str = _parse_fecha(ses.get("Fecha", ""))
+    time_str = _parse_time(ses.get("Hora", ""))
+    if not date_str or not time_str:
+        return None
+    formato = ses.get("Formato", "") or ""
+    ses_id  = str(ses.get("Id", "") or "")
+    is_v    = _fmt_is_vose(formato)
+    return {
+        "datetime_local": f"{date_str}T{time_str}:00",
+        "date":           date_str,
+        "time":           time_str,
+        "format":         _fmt_label(formato),
+        "is_vose":        is_v,
+        "audio_lang":     "EN" if is_v else "ES",
+        "is_3d":          _fmt_is_3d(formato),
+        "is_imax":        False,
+        "is_4dx":         False,
+        "sala":           str(ses.get("Sala", "") or "").strip(),
+        "session_id":     ses_id,
+        "booking_url":    _booking_url(booking, ses_id, title),
+    }
 
 
 # ---------------------------------------------------------------------------
-# Per-cinema scraper
+# Per-cinema scraper — reservaentradas JSON API (primary)
+# ---------------------------------------------------------------------------
+
+def _api_get(session: requests.Session, url: str, params: dict) -> dict:
+    r = session.get(
+        url,
+        params={**params, "key": _API_KEY},
+        headers={
+            **_BASE_HEADERS,
+            "Accept":  "application/json",
+            "Origin":  "https://www.cinesabc.com",
+            "Referer": "https://www.cinesabc.com/",
+        },
+        timeout=20,
+    )
+    r.raise_for_status()
+    # Header claims UTF-8 but the body mixes encodings per field (titles are
+    # often cp1252, synopses sometimes UTF-8). Parse losslessly as Latin-1,
+    # then re-decode each string: UTF-8 if valid, else cp1252.
+    return _fix_strings(json.loads(r.content.decode("latin-1")))
+
+
+def _fix_text(s: str) -> str:
+    b = s.encode("latin-1")
+    try:
+        return b.decode("utf-8")
+    except UnicodeDecodeError:
+        return b.decode("cp1252", errors="replace")
+
+
+def _fix_strings(obj):
+    if isinstance(obj, str):
+        return _fix_text(obj)
+    if isinstance(obj, list):
+        return [_fix_strings(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _fix_strings(v) for k, v in obj.items()}
+    return obj
+
+
+def _scrape_one_api(cinema: dict, session: requests.Session) -> list[dict]:
+    booking = cinema["booking"]
+    name    = cinema["name"]
+    key     = cinema["key"]
+    recinto = cinema["recinto"]
+    api     = f"https://{booking}.reservaentradas.com/{booking}"
+
+    log.info("Fetching %s via reservaentradas API …", name)
+    index = _api_get(session, f"{api}/index", {"recinto": recinto})
+
+    # Now-showing first, then upcoming; de-duplicate by event Id
+    events: dict[int, dict] = {}
+    for ev in (index.get("Eventos") or []) + (index.get("ProximosEventos") or []):
+        if ev.get("Id") is not None and ev["Id"] not in events:
+            events[ev["Id"]] = ev
+    log.info("%s: %d events in API index", name, len(events))
+    if not events:
+        raise RuntimeError("API index returned no events")
+
+    today   = date.today()
+    horizon = today + timedelta(days=30)
+
+    results: list[dict] = []
+    errors = 0
+    for ev_id, ev in events.items():
+        try:
+            detail = _api_get(session, f"{api}/sesiones",
+                              {"recinto": recinto, "evento": ev_id})
+            sesiones = (detail.get("Evento") or {}).get("Sesiones") or []
+        except Exception as exc:
+            errors += 1
+            log.warning("%s evento=%s sesiones error: %s", name, ev_id, exc)
+            sesiones = ev.get("Sesiones") or []   # today's sessions, if any
+
+        showtimes: list[dict] = []
+        seen: set[str] = set()
+        for ses in sesiones:
+            st = _build_showtime(ses, booking, (ev.get("Titulo") or "").strip())
+            if not st or st["datetime_local"] in seen:
+                continue
+            if not (today.isoformat() <= st["date"] <= horizon.isoformat()):
+                continue
+            seen.add(st["datetime_local"])
+            showtimes.append(st)
+
+        time.sleep(0.1)   # gentle rate limit
+        if not showtimes:
+            continue
+
+        showtimes.sort(key=lambda s: s["datetime_local"])
+        any_vose = any(s["is_vose"] for s in showtimes)
+        results.append({
+            "cinema":         key,
+            "cinema_name":    name,
+            "title_es":       (ev.get("Titulo") or "").strip(),
+            "original_title": (ev.get("TituloOriginal") or "").strip(),
+            "is_vose":        any_vose,
+            "audio_lang":     "EN" if any_vose else "ES",
+            "imdb_id":        "",
+            "is_film":        True,
+            "duration_mins":  int(ev.get("Duracion") or 0),
+            "poster_url":     ev.get("Imagen") or "",
+            "synopsis_es":    (ev.get("Sinopsis") or "").strip(),
+            "showtimes":      showtimes,
+        })
+
+    if errors and errors == len(events):
+        raise RuntimeError("every sesiones request failed")
+
+    log.info(
+        "%s: %d films, %d sessions (API)",
+        name, len(results), sum(len(f["showtimes"]) for f in results),
+    )
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Per-cinema scraper — legacy HTML platform (fallback)
 # ---------------------------------------------------------------------------
 
 def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
@@ -226,39 +391,10 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
         # Sessions
         showtimes: list[dict] = []
         sdata = _add_to_json(body, "s")
-        for ses_key, ses in sdata.items():
-            fecha_str = ses.get("Fecha", "")
-            hora_str  = ses.get("Hora", "")
-            formato   = ses.get("Formato", "")
-            ses_id    = str(ses.get("Id", ""))
-
-            date_str = _parse_fecha(fecha_str)
-            time_str = _parse_time(hora_str)
-            if not date_str or not time_str:
-                continue
-
-            is_v   = _fmt_is_vose(formato)
-            is_3d  = _fmt_is_3d(formato)
-            slug   = _to_slug(fmeta["title"])
-            b_url  = (
-                f"https://www.reservaentradas.com/entrada/valencia/{booking}/{slug}/{ses_id}/?step=2"
-                if ses_id else ""
-            )
-
-            showtimes.append({
-                "datetime_local": f"{date_str}T{time_str}:00",
-                "date":           date_str,
-                "time":           time_str,
-                "format":         _fmt_label(formato),
-                "is_vose":        is_v,
-                "audio_lang":     "EN" if is_v else "ES",
-                "is_3d":          is_3d,
-                "is_imax":        False,
-                "is_4dx":         False,
-                "sala":           ses.get("Sala", ""),
-                "session_id":     ses_id,
-                "booking_url":    b_url,
-            })
+        for ses in sdata.values():
+            st = _build_showtime(ses, booking, fmeta["title"])
+            if st:
+                showtimes.append(st)
 
         if not showtimes:
             continue  # film has no upcoming sessions this week
@@ -297,11 +433,18 @@ def scrape_abc() -> list[dict]:
     all_films: list[dict] = []
     with requests.Session() as sess:
         for cinema in CINEMAS:
+            films: list[dict] = []
             try:
-                films = _scrape_one(cinema, sess)
-                all_films.extend(films)
+                films = _scrape_one_api(cinema, sess)
             except Exception as exc:
-                log.error("Failed to scrape %s: %s", cinema["name"], exc, exc_info=True)
+                log.warning("%s: API scrape failed (%s) — trying legacy HTML",
+                            cinema["name"], exc)
+            if not films:
+                try:
+                    films = _scrape_one(cinema, sess)
+                except Exception as exc:
+                    log.error("Failed to scrape %s: %s", cinema["name"], exc, exc_info=True)
+            all_films.extend(films)
     return all_films
 
 
