@@ -15,7 +15,6 @@ probe_*.py
 logs/
 
 # Pipeline cache and debug dumps
-docs/data/films_cache.json
 cinesa_*.json
 cinesa_raw*.json
 

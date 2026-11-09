@@ -51,7 +51,7 @@ if (-not $Force) {
     $today = Get-Date -Format "yyyy-MM-dd"
     $alreadyRan = $false
     if (Test-Path $LogFile) {
-        $alreadyRan = (Select-String -Path $LogFile -Pattern "Pipeline complete\." -SimpleMatch |
+        $alreadyRan = (Select-String -Path $LogFile -Pattern "Pipeline complete." -SimpleMatch |
             Where-Object { $_.Line -match $today }) -ne $null
     }
     if ($alreadyRan) {
@@ -59,6 +59,17 @@ if (-not $Force) {
         Write-Log "=== Skipped (already ran today) ==="
         exit 0
     }
+}
+
+# Guard: only one pipeline run at a time (e.g. Task Scheduler catch-up + a manual/health-check run).
+# The OS releases the exclusive handle when this process exits, so a crash can't leave a stale lock.
+$LockPath = Join-Path $LogDir "pipeline.lock"
+try {
+    $script:Lock = [System.IO.File]::Open($LockPath, 'OpenOrCreate', 'ReadWrite', 'None')
+} catch {
+    Write-Log "Another pipeline run is already in progress - exiting."
+    Write-Log "=== Skipped (already running) ==="
+    exit 0
 }
 
 # Wait for DNS to be available (the task may fire before the network stack is fully ready
