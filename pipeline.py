@@ -372,8 +372,9 @@ def aggregate_scrapers() -> tuple[dict, list]:
         # film results per language; those have no per-showtime flag so we fall
         # back to the film-level "is_vose".
         film_is_vose = bool(film.get("is_vose", False))
-        showtimes_by_date: dict = {}      # dubbed / language-agnostic
-        vose_showtimes_by_date: dict = {} # VOSE / subtitled
+        # showtimes_by_date / vose_showtimes_by_date: {date: {time: booking_url}}
+        showtimes_by_date: dict = {}
+        vose_showtimes_by_date: dict = {}
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
@@ -384,16 +385,10 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 if len(dl) >= 16 and not t:
                     t = dl[11:16]
             if d and t:
-                # Use per-showtime flag if present, else film-level flag
                 st_is_vose = st.get("is_vose", film_is_vose)
                 target = vose_showtimes_by_date if st_is_vose else showtimes_by_date
-                bucket = target.setdefault(d, [])
-                if t not in bucket:
-                    bucket.append(t)
-        for d in showtimes_by_date:
-            showtimes_by_date[d].sort()
-        for d in vose_showtimes_by_date:
-            vose_showtimes_by_date[d].sort()
+                url = st.get("booking_url", "")
+                target.setdefault(d, {})[t] = url
 
         is_vose = bool(vose_showtimes_by_date)  # True if this result has any VOSE times
 
@@ -431,11 +426,10 @@ def aggregate_scrapers() -> tuple[dict, list]:
         if existing:
             for bucket_key, src in (("showtimes", showtimes_by_date), ("vose_showtimes", vose_showtimes_by_date)):
                 for d, times in src.items():
-                    bucket = existing[bucket_key].setdefault(d, [])
-                    for t in times:
+                    bucket = existing[bucket_key].setdefault(d, {})
+                    for t, url in times.items():
                         if t not in bucket:
-                            bucket.append(t)
-                    existing[bucket_key][d].sort()
+                            bucket[t] = url
             if is_vose:
                 existing["vose"] = True
         else:
@@ -661,10 +655,10 @@ def compute_card_data(film: dict) -> dict:
 
     has_eve = False
     for _c in film.get("cinemas", []):
-        all_st = {**_c.get("showtimes", {})}
-        for _dk, _times in _c.get("vose_showtimes", {}).items():
-            all_st.setdefault(_dk, [])
-            all_st[_dk] = sorted(set(all_st[_dk]) | set(_times))
+        all_st: dict[str, set] = {}
+        for _src in (_c.get("showtimes", {}), _c.get("vose_showtimes", {})):
+            for _dk, _times in _src.items():
+                all_st.setdefault(_dk, set()).update(_times.keys())
         for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
@@ -691,18 +685,16 @@ def compute_card_data(film: dict) -> dict:
     showtimes_by_cinema_day: dict = {}
     for _c in film.get("cinemas", []):
         _cid = _c.get("id", "")
-        all_st = {**_c.get("showtimes", {})}
-        for _dk, _times in _c.get("vose_showtimes", {}).items():
-            all_st.setdefault(_dk, [])
-            all_st[_dk] = sorted(set(all_st[_dk]) | set(_times))
+        all_st: dict[str, set] = {}
+        for _src in (_c.get("showtimes", {}), _c.get("vose_showtimes", {})):
+            for _dk, _times in _src.items():
+                all_st.setdefault(_dk, set()).update(_times.keys())
         for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
                 if today_qf <= _d <= window_end:
                     showdays.add(_dk)
-                    showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(
-                        str(t) for t in _times
-                    )
+                    showtimes_by_cinema_day.setdefault(f"{_cid}_{_dk}", set()).update(_times)
             except Exception:
                 pass
     showdays_attr   = ",".join(sorted(showdays))
@@ -1176,7 +1168,7 @@ def _build_jsonld(film: dict, slug: str) -> str:
             fmt = "VOSE" if is_vose else "dubbed"
             event_name = f"{title} (VOSE)" if is_vose else title
             for date_str, times in showtimes_dict.items():
-                for time_str in (times or []):
+                for time_str in times:
                     try:
                         naive = datetime.fromisoformat(f"{date_str}T{time_str}:00")
                         aware = naive.replace(tzinfo=VALENCIA_TZ)
@@ -1454,20 +1446,22 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 
         cinema_rows = ""
         for c in film["cinemas"]:
-            dubbed = c.get("showtimes", {}).get(day["key"], [])
-            vose   = c.get("vose_showtimes", {}).get(day["key"], [])
-            # Merge into sorted list of (time, is_vose) tuples
+            dubbed = c.get("showtimes", {}).get(day["key"], {})
+            vose   = c.get("vose_showtimes", {}).get(day["key"], {})
+            # Merge into sorted list of (time, is_vose, booking_url) tuples
             all_times = sorted(
-                [(t, False) for t in dubbed] + [(t, True) for t in vose],
+                [(t, False, url) for t, url in dubbed.items()] + [(t, True, url) for t, url in vose.items()],
                 key=lambda x: x[0]
             )
             if not all_times:
                 continue
             vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
-            time_btns  = "".join(
-                f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{"true" if iv else "false"}">{t}</button>'
-                for t, iv in all_times
-            )
+            def _tbtn(t, iv, url):
+                vattr = "true" if iv else "false"
+                if url:
+                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</a>'
+                return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
+            time_btns  = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
             vose_attr    = "true" if c["vose"] else "false"
             _cmeta       = CINEMA_META.get(c["id"], {})
             cinema_city  = _cmeta.get("city", "")
@@ -1584,7 +1578,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
 .vose-mini{{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
 .showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
-.time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500}}
+.time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500;cursor:pointer;display:inline-block}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
 .time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
