@@ -29,6 +29,7 @@ import json
 import logging
 import re
 import time
+import unicodedata
 from datetime import date, timedelta
 from zoneinfo import ZoneInfo
 
@@ -148,16 +149,22 @@ def _fmt_label(fmt: str) -> str:
     return s if s else "2D"
 
 
-def _booking_url(booking: str, ses_id: str) -> str:
+def _to_slug(title: str) -> str:
+    import unicodedata as _ud
+    s = _ud.normalize("NFKD", title)
+    s = "".join(c for c in s if not _ud.combining(c))
+    s = _re.sub(r"[^a-z0-9]+", "-", s.lower())
+    return s.strip("-")
+
+
+def _booking_url(booking: str, ses_id: str, title: str = "") -> str:
     if not ses_id:
         return ""
-    base = _BOOKING_TO_BASE.get(booking, "")
-    if not base:
-        return ""
-    return f"{base}/index?pag=patio&sesion={ses_id}"
+    slug = _to_slug(title) if title else "film"
+    return f"https://www.reservaentradas.com/entrada/valencia/{booking}/{slug}/{ses_id}/?step=2"
 
 
-def _build_showtime(ses: dict, booking: str) -> dict | None:
+def _build_showtime(ses: dict, booking: str, title: str = "") -> dict | None:
     """Convert one platform session dict (same shape in both APIs) to our format."""
     date_str = _parse_fecha(ses.get("Fecha", ""))
     time_str = _parse_time(ses.get("Hora", ""))
@@ -178,7 +185,7 @@ def _build_showtime(ses: dict, booking: str) -> dict | None:
         "is_4dx":         False,
         "sala":           str(ses.get("Sala", "") or "").strip(),
         "session_id":     ses_id,
-        "booking_url":    _booking_url(booking, ses_id),
+        "booking_url":    _booking_url(booking, ses_id, title),
     }
 
 
@@ -260,7 +267,7 @@ def _scrape_one_api(cinema: dict, session: requests.Session) -> list[dict]:
         showtimes: list[dict] = []
         seen: set[str] = set()
         for ses in sesiones:
-            st = _build_showtime(ses, booking)
+            st = _build_showtime(ses, booking, (ev.get("Titulo") or "").strip())
             if not st or st["datetime_local"] in seen:
                 continue
             if not (today.isoformat() <= st["date"] <= horizon.isoformat()):
@@ -385,7 +392,7 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
         showtimes: list[dict] = []
         sdata = _add_to_json(body, "s")
         for ses in sdata.values():
-            st = _build_showtime(ses, booking)
+            st = _build_showtime(ses, booking, fmeta["title"])
             if st:
                 showtimes.append(st)
 
