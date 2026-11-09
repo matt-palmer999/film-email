@@ -181,7 +181,7 @@ def scrape_yelmo_barcelona() -> list[dict]:
                             continue
                         session_id = st.get("sessionId", "")
                         booking_url = (
-                            f"https://cineyelmo.com/es/horarios?session={session_id}&cinema={CINEMA_SLUG}"
+                            f"https://cineyelmo.com/es/asientos?country=es&movie={mid}&cinema={CINEMA_SLUG}&selected={CINEMA_SLUG}&session={session_id}"
                             if session_id else ""
                         )
                         movies_raw[mid].append({
