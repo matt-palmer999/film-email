@@ -19,9 +19,7 @@ import requests
 
 log = logging.getLogger(__name__)
 
-# Must stay "yelmo": it's the id saved in users' cinema preferences (localStorage +
-# Supabase) and in docs/preferences. Changing it silently empties their listings.
-CINEMA_KEY   = "yelmo"
+CINEMA_KEY   = "mercado-de-campanar"
 CINEMA_NAME  = "Yelmo Campanar"
 CINEMA_SLUG  = "mercado-de-campanar-valencia"
 COUNTRY_ID   = "ES"
@@ -181,6 +179,11 @@ def scrape_yelmo() -> list[dict]:
                         fmt_name = st.get("format", {}).get("name", "2D") or "2D"
                         if not time_str:
                             continue
+                        session_id = st.get("sessionId", "")
+                        booking_url = (
+                            f"https://cineyelmo.com/es/horarios?session={session_id}"
+                            if session_id else ""
+                        )
                         movies_raw[mid].append({
                             "date":           date_str,
                             "time":           time_str,
@@ -192,7 +195,7 @@ def scrape_yelmo() -> list[dict]:
                             "is_3d":          "3D" in fmt_name.upper(),
                             "is_imax":        "IMAX" in fmt_name.upper(),
                             "is_4dx":         "4DX" in fmt_name.upper(),
-                            "booking_url":    "",
+                            "booking_url":    booking_url,
                         })
 
         # Fetch metadata for each movie
