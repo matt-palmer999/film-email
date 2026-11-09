@@ -459,6 +459,18 @@ def enrich_with_tmdb(films: dict) -> None:
         log.info("Enriching films with TMDB data …")
         for title, film in films.items():
             tmdb = tmdb_lookup(title, imdb_id=film.get("imdb_id", ""))
+            # Retry with event/festival prefix stripped for titles like
+            # "Mostra 2026 – Paris, Texas" or "Wilder Cinema – Tokyo Godfathers"
+            if not tmdb:
+                _stripped = re.sub(
+                    r'^(?:[A-Za-záéíóúüñÁÉÍÓÚÜÑ ]+\s+\d{4}'
+                    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)'
+                    r'|Otra vez[^–]*|Vino Club Babel|Preestreno\s+\S+)'
+                    r'\s*[-–]\s*',
+                    '', title, flags=re.IGNORECASE,
+                ).strip()
+                if _stripped and _stripped != title:
+                    tmdb = tmdb_lookup(_stripped, imdb_id=film.get("imdb_id", ""))
             if tmdb:
                 if tmdb.get("poster_url"):
                     film["poster"] = tmdb["poster_url"]

@@ -16,6 +16,7 @@ Run directly for a quick test summary.
 import logging
 import re
 import time
+import unicodedata
 from datetime import date
 from zoneinfo import ZoneInfo
 
@@ -97,6 +98,14 @@ def _parse_re_date(text: str) -> str:
     return f"{year}-{month:02d}-{day:02d}"
 
 
+def _title_to_re_slug(title: str) -> str:
+    """Convert a film title to a reservaentradas URL slug."""
+    s = unicodedata.normalize("NFKD", title)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "-", s.lower())
+    return s.strip("-")
+
+
 def _fetch_session_urls(
     ses_url: str, session: requests.Session
 ) -> dict[tuple[str, str], str]:
@@ -162,13 +171,21 @@ def _parse_film(block) -> dict | None:
         date_str = _parse_date(cells[0].get_text(strip=True))
         for cell in cells[1:]:
             link = cell.find("a")
-            if not link:
-                continue
-            time_text = link.get_text(strip=True)
-            if not re.match(r"\d{1,2}:\d{2}", time_text):
-                continue
-            booking_url = link.get("href", "")
-            m = re.search(r"/(\d+)/?$", booking_url)
+            if link:
+                time_text = link.get_text(strip=True)
+                if not re.match(r"\d{1,2}:\d{2}", time_text):
+                    continue
+                booking_url = link.get("href", "")
+            else:
+                # Gray span: showtime with no booking link on cinesbabel.com yet
+                span = cell.find("span", class_="gray")
+                if not span:
+                    continue
+                time_text = span.get_text(strip=True)
+                if not re.match(r"\d{1,2}:\d{2}", time_text):
+                    continue
+                booking_url = ""
+            m = re.search(r"/(\d+)/?$", booking_url) if booking_url else None
             session_id = m.group(1) if m else ""
             showtimes.append({
                 "datetime_local": f"{date_str}T{time_text}:00" if date_str else "",
@@ -262,6 +279,11 @@ def scrape_babel(playwright=None) -> list[dict]:
             ses_urls = list(dict.fromkeys(
                 st["booking_url"] for st in film["showtimes"] if st["booking_url"]
             ))
+            # Fallback for films whose cinesbabel.com page shows gray spans only:
+            # construct the reservaentradas film page URL from the title slug
+            if not ses_urls:
+                slug = _title_to_re_slug(film["title_es"])
+                ses_urls = [f"https://www.reservaentradas.com/sesiones/valencia/cinesbabel/{slug}/"]
             for ses_url in ses_urls:
                 session_map = _fetch_session_urls(ses_url, re_sess)
                 for st in film["showtimes"]:
