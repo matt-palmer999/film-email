@@ -63,6 +63,8 @@ CINEMAS = [
     },
 ]
 
+_BOOKING_TO_BASE = {c["booking"]: c["base"] for c in CINEMAS}
+
 _API_KEY = "apirswebapp"
 
 _UA = (
@@ -149,7 +151,10 @@ def _fmt_label(fmt: str) -> str:
 def _booking_url(booking: str, ses_id: str) -> str:
     if not ses_id:
         return ""
-    return f"https://{booking}.reservaentradas.com/{booking}/index?pag=patio&sesion={ses_id}"
+    base = _BOOKING_TO_BASE.get(booking, "")
+    if not base:
+        return ""
+    return f"{base}/index?pag=patio&sesion={ses_id}"
 
 
 def _build_showtime(ses: dict, booking: str) -> dict | None:
