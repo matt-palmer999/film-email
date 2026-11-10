@@ -1258,6 +1258,30 @@ def _build_jsonld(film: dict, slug: str) -> str:
 ARCHIVE_MAX_DAYS = 180  # keep archive pages for 6 months
 
 
+def _film_from_page_html(film_dir: str, slug: str) -> dict | None:
+    """Recover minimal film data (title, poster) from an existing detail page's
+    meta tags, for archiving a page that has no films_cache entry.
+    Returns None if there is no readable index.html."""
+    import html as _html
+    path = os.path.join(film_dir, "index.html")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            page = fh.read()
+    except OSError:
+        return None
+
+    def _meta(prop: str) -> str:
+        m = re.search(rf'<meta\s+property="{re.escape(prop)}"\s+content="([^"]*)"', page)
+        return _html.unescape(m.group(1)).strip() if m else ""
+
+    title = _meta("og:image:alt")
+    if not title:
+        title = re.sub(r"\s+—\s+whatson\.movie$", "", _meta("og:title"))
+    if not title:
+        title = slug.replace("-", " ").title()
+    return {"title": title, "poster": _meta("og:image"), "slug": slug}
+
+
 def build_film_archive_page(film: dict, anchor: datetime) -> str:
     """Generate a minimal 'no longer showing' page preserving the film's URL."""
     title_es   = film["title"]
@@ -2674,6 +2698,13 @@ def run() -> None:
                 log.debug(f"  Keeping archive: {entry.name} ({age_days}d old)")
         else:
             prev_film = _prev_films_by_slug.get(entry.name)
+            if not prev_film:
+                # No cache data (e.g. a run from a worktree missing this page):
+                # rebuild minimal film data from the live page so the URL
+                # becomes an archive page instead of a hard 404.
+                prev_film = _film_from_page_html(entry.path, entry.name)
+                if prev_film:
+                    log.info(f"  No cache data for {entry.name}; archiving from page HTML")
             if prev_film:
                 archive_html = build_film_archive_page(prev_film, anchor)
                 with open(os.path.join(entry.path, "index.html"), "w", encoding="utf-8") as fh:
@@ -2684,7 +2715,7 @@ def run() -> None:
                 log.info(f"  Archived stale: {entry.name}")
             else:
                 shutil.rmtree(entry.path)
-                log.info(f"  Deleted stale (no cache data): {entry.name}")
+                log.info(f"  Deleted stale (no cache data, no page): {entry.name}")
 
     # 9. Generate film detail pages
     generated = 0
