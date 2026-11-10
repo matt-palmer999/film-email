@@ -35,6 +35,8 @@ CINEMA_NAME  = "Cinesa LUXE Bonaire"
 PAGE_URL     = "https://www.cinesa.es/cines/bonaire/"
 VWC_BASE     = "https://vwc.cinesa.es/WSVistaWebClient/ocapi/v1"
 VOSE_ATTR    = "0000000068"   # confirmed: attribute legend alt="Vose"
+SCREENX_ATTR = "0000000088"   # confirmed: exclusive to screen 028-7 (Sala 7 ScreenX)
+ISENSE_ATTR  = "0000000069"   # confirmed: exclusive to screen 028-1 (Sala 1 iSense)
 DAYS_AHEAD   = 30
 
 
@@ -194,8 +196,10 @@ def scrape_cinesa(playwright=None) -> list[dict]:
             film_id  = st.get("filmId", "")
             if film_id not in bonaire_ids:
                 continue
-            attr_ids = st.get("attributeIds") or []
-            is_vose  = VOSE_ATTR in attr_ids
+            attr_ids   = st.get("attributeIds") or []
+            is_vose    = VOSE_ATTR    in attr_ids
+            is_screenx = SCREENX_ATTR in attr_ids
+            is_isense  = ISENSE_ATTR  in attr_ids
             starts_at = st.get("schedule", {}).get("startsAt", "")
             if not starts_at:
                 continue
@@ -211,7 +215,11 @@ def scrape_cinesa(playwright=None) -> list[dict]:
                 if st_id else ""
             )
             fs = film_sessions.setdefault(film_id, {"any_vose": False, "all": {}, "vose": {}})
-            fs["all"].setdefault(date_str, {})[time_str] = booking_url
+            fs["all"].setdefault(date_str, {})[time_str] = {
+                "booking_url": booking_url,
+                "is_screenx":  is_screenx,
+                "is_isense":   is_isense,
+            }
             if is_vose:
                 fs["any_vose"] = True
                 fs["vose"].setdefault(date_str, {})[time_str] = booking_url
@@ -246,6 +254,7 @@ def scrape_cinesa(playwright=None) -> list[dict]:
         showtime_list = []
         for date_str, time_map in fs["all"].items():
             for t in sorted(time_map):
+                st_data = time_map[t]
                 showtime_list.append({
                     "datetime_local": f"{date_str}T{t}:00",
                     "date":           date_str,
@@ -254,9 +263,10 @@ def scrape_cinesa(playwright=None) -> list[dict]:
                     "is_vose":        any_vose,
                     "audio_lang":     "EN" if any_vose else "ES",
                     "is_3d":          False,
-                    "is_imax":        False,
+                    "is_imax":        st_data["is_isense"],
                     "is_4dx":         False,
-                    "booking_url":    time_map[t],
+                    "is_screenx":     st_data["is_screenx"],
+                    "booking_url":    st_data["booking_url"],
                 })
 
         if not showtime_list:
