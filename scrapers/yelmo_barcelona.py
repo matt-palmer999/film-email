@@ -195,6 +195,7 @@ def scrape_yelmo_barcelona() -> list[dict]:
                             "is_3d":          "3D" in fmt_name.upper(),
                             "is_imax":        "IMAX" in fmt_name.upper(),
                             "is_4dx":         "4DX" in fmt_name.upper(),
+                            "is_screenx":     "SCREENX" in fmt_name.upper().replace(" ", ""),
                             "booking_url":    booking_url,
                         })
 

@@ -104,6 +104,7 @@ def scrape_ocine_magic() -> list[dict]:
             fmt      = _props_to_format(props)
             is_3d    = "3D" in fmt
             is_4dx   = "4DX" in fmt
+            is_screenx = "ScreenX" in fmt
 
             showtimes: list[dict] = []
             for s in sessions_raw:
@@ -124,6 +125,7 @@ def scrape_ocine_magic() -> list[dict]:
                     "is_3d":          is_3d,
                     "is_imax":        False,
                     "is_4dx":         is_4dx,
+                    "is_screenx":     is_screenx,
                     "booking_url":    booking_url,
                 })
 
