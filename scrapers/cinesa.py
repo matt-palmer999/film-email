@@ -265,6 +265,7 @@ def scrape_cinesa(playwright=None) -> list[dict]:
                     "is_3d":          False,
                     "is_imax":        False,
                     "is_isense":      st_data["is_isense"],
+                    "is_sala_xl":     False,
                     "is_4dx":         False,
                     "is_screenx":     st_data["is_screenx"],
                     "booking_url":    st_data["booking_url"],

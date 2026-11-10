@@ -23,8 +23,10 @@ log = logging.getLogger(__name__)
 BARCELONA_TZ = ZoneInfo("Europe/Madrid")
 VWC_BASE     = "https://vwc.cinesa.es/WSVistaWebClient/ocapi/v1"
 VOSE_ATTR    = "0000000068"
-SCREENX_ATTR = "0000000088"   # confirmed: exclusive to ScreenX screen (Bonaire + Diagonal Mar)
-ISENSE_ATTR  = "0000000069"   # confirmed: exclusive to iSense screen (Bonaire)
+SCREENX_ATTR = "0000000088"   # confirmed: exclusive to ScreenX screens
+ISENSE_ATTR  = "0000000069"   # confirmed: exclusive to iSense screens (Bonaire sala 1, Diagonal Mar sala 10)
+IMAX_ATTR    = "0000000086"   # confirmed: exclusive to IMAX screen (Diagonal Mar sala 9; 0000000087 also appears there)
+SALA_XL_ATTR = "0000000108"   # confirmed: exclusive to Sala XL screens (Diagonal salas 1-3)
 DAYS_AHEAD   = 30
 
 CINEMAS = [
@@ -158,6 +160,8 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
                 is_vose    = VOSE_ATTR    in attr_ids
                 is_screenx = SCREENX_ATTR in attr_ids
                 is_isense  = ISENSE_ATTR  in attr_ids
+                is_imax    = IMAX_ATTR    in attr_ids
+                is_sala_xl = SALA_XL_ATTR in attr_ids
                 starts_at = st.get("schedule", {}).get("startsAt", "")
                 if not starts_at:
                     continue
@@ -176,7 +180,7 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
                 if is_vose:
                     fs["any_vose"] = True
                 fs["dates"].setdefault(date_str, []).append(
-                    (time_str, is_vose, booking_url, is_screenx, is_isense)
+                    (time_str, is_vose, booking_url, is_screenx, is_isense, is_imax, is_sala_xl)
                 )
 
         for film_id, fs in film_sessions.items():
@@ -194,7 +198,7 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
 
             showtime_list = []
             for date_str, times in fs["dates"].items():
-                for t, is_v, b_url, is_screenx, is_isense in sorted(times, key=lambda x: x[0]):
+                for t, is_v, b_url, is_screenx, is_isense, is_imax, is_sala_xl in sorted(times, key=lambda x: x[0]):
                     showtime_list.append({
                         "datetime_local": f"{date_str}T{t}:00",
                         "date":           date_str,
@@ -203,8 +207,9 @@ def scrape_cinesa_barcelona(playwright=None) -> list[dict]:
                         "is_vose":        is_v,
                         "audio_lang":     "EN" if is_v else "ES",
                         "is_3d":          False,
-                        "is_imax":        False,
+                        "is_imax":        is_imax,
                         "is_isense":      is_isense,
+                        "is_sala_xl":     is_sala_xl,
                         "is_4dx":         False,
                         "is_screenx":     is_screenx,
                         "booking_url":    b_url,
