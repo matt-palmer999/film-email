@@ -275,6 +275,26 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
         return {}
 
 
+# ── Format badge constants ────────────────────────────────────────────────────
+# Maps per-showtime flag → internal bucket key (first match wins)
+_FORMAT_FLAG_ORDER = [
+    ("is_imax",    "imax"),
+    ("is_screenx", "screenx"),
+    ("is_isense",  "isense"),
+    ("is_sala_xl", "sala_xl"),
+    ("is_4dx",     "4dx"),
+    ("is_3d",      "3d"),
+]
+# Display label and CSS class per bucket key (order = render order)
+_FORMAT_DISPLAY = [
+    ("imax",    "IMAX",    "format-imax"),
+    ("screenx", "ScreenX", "format-screenx"),
+    ("isense",  "iSense",  "format-isense"),
+    ("sala_xl", "Sala XL", "format-sala-xl"),
+    ("4dx",     "4DX",     "format-4dx"),
+    ("3d",      "3D",      "format-3d"),
+]
+
 # ── Scraper aggregation ───────────────────────────────────────────────────────
 
 def aggregate_scrapers() -> tuple[dict, list]:
@@ -373,8 +393,10 @@ def aggregate_scrapers() -> tuple[dict, list]:
         # back to the film-level "is_vose".
         film_is_vose = bool(film.get("is_vose", False))
         # showtimes_by_date / vose_showtimes_by_date: {date: {time: booking_url}}
+        # format_showtimes: {fmt_key: {date: {time: {url, is_vose}}}} for premium formats
         showtimes_by_date: dict = {}
         vose_showtimes_by_date: dict = {}
+        format_showtimes: dict = {}
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
@@ -386,11 +408,20 @@ def aggregate_scrapers() -> tuple[dict, list]:
                     t = dl[11:16]
             if d and t:
                 st_is_vose = st.get("is_vose", film_is_vose)
-                target = vose_showtimes_by_date if st_is_vose else showtimes_by_date
                 url = st.get("booking_url", "")
-                target.setdefault(d, {})[t] = url
+                fmt_key = next((k for flag, k in _FORMAT_FLAG_ORDER if st.get(flag)), None)
+                if fmt_key:
+                    format_showtimes.setdefault(fmt_key, {}).setdefault(d, {})[t] = {
+                        "url": url, "is_vose": st_is_vose,
+                    }
+                else:
+                    target = vose_showtimes_by_date if st_is_vose else showtimes_by_date
+                    target.setdefault(d, {})[t] = url
 
-        is_vose = bool(vose_showtimes_by_date)  # True if this result has any VOSE times
+        is_vose = bool(vose_showtimes_by_date) or any(
+            any(entry["is_vose"] for times in dates.values() for entry in times.values())
+            for dates in format_showtimes.values()
+        )
 
         if title not in films_by_title:
             duration = film.get("duration_mins", 0)
@@ -430,17 +461,25 @@ def aggregate_scrapers() -> tuple[dict, list]:
                     for t, url in times.items():
                         if t not in bucket:
                             bucket[t] = url
+            for fmt_key, fmt_dates in format_showtimes.items():
+                fmt_bucket = existing["format_showtimes"].setdefault(fmt_key, {})
+                for d, times in fmt_dates.items():
+                    day_bucket = fmt_bucket.setdefault(d, {})
+                    for t, entry in times.items():
+                        if t not in day_bucket:
+                            day_bucket[t] = entry
             if is_vose:
                 existing["vose"] = True
         else:
             films_by_title[title]["cinemas"].append({
-                "id":             cinema_id,
-                "name":           meta_info.get("name", cinema_id),
-                "website":        meta_info.get("website", ""),
-                "type":           meta_info.get("type", "multiplex"),
-                "vose":           is_vose,
-                "showtimes":      showtimes_by_date,
-                "vose_showtimes": vose_showtimes_by_date,
+                "id":              cinema_id,
+                "name":            meta_info.get("name", cinema_id),
+                "website":         meta_info.get("website", ""),
+                "type":            meta_info.get("type", "multiplex"),
+                "vose":            is_vose,
+                "showtimes":       showtimes_by_date,
+                "vose_showtimes":  vose_showtimes_by_date,
+                "format_showtimes": format_showtimes,
             })
 
         if is_vose:
@@ -1460,12 +1499,19 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         for c in film["cinemas"]:
             dubbed = c.get("showtimes", {}).get(day["key"], {})
             vose   = c.get("vose_showtimes", {}).get(day["key"], {})
-            # Merge into sorted list of (time, is_vose, booking_url) tuples
+            fmt_st = c.get("format_showtimes", {})
+            # Merge standard/VOSE into sorted list of (time, is_vose, booking_url) tuples
             all_times = sorted(
                 [(t, False, url) for t, url in dubbed.items()] + [(t, True, url) for t, url in vose.items()],
                 key=lambda x: x[0]
             )
-            if not all_times:
+            # Collect format rows that have showtimes today
+            fmt_rows_today = [
+                (fmt_key, label, css_cls, fmt_st[fmt_key][day["key"]])
+                for fmt_key, label, css_cls in _FORMAT_DISPLAY
+                if fmt_key in fmt_st and day["key"] in fmt_st[fmt_key]
+            ]
+            if not all_times and not fmt_rows_today:
                 continue
             vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
             def _tbtn(t, iv, url):
@@ -1474,13 +1520,27 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+window.location.pathname.split('/').pop(),title:'Booking click',event:true})"
                     return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{t}</a>'
                 return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
-            time_btns  = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
+            # Standard/VOSE times row
+            times_html = ""
+            if all_times:
+                std_btns = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
+                times_html += f'<div class="times-row">{std_btns}</div>'
+            # Premium format rows
+            for fmt_key, label, css_cls in _FORMAT_DISPLAY:
+                if fmt_key not in fmt_st or day["key"] not in fmt_st[fmt_key]:
+                    continue
+                day_times = fmt_st[fmt_key][day["key"]]
+                fmt_btns = "".join(
+                    _tbtn(t, entry["is_vose"], entry["url"])
+                    for t, entry in sorted(day_times.items())
+                )
+                times_html += f'<div class="format-row"><span class="format-label {css_cls}">{label}</span>{fmt_btns}</div>'
             vose_attr    = "true" if c["vose"] else "false"
             _cmeta       = CINEMA_META.get(c["id"], {})
             cinema_city  = _cmeta.get("city", "")
             _maps_url    = _cmeta.get("maps", "")
             _maps_link   = f'<a href="{_maps_url}" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a>' if _maps_url else ""
-            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}{_maps_link}</div><div class="showtime-times">{time_btns}</div></div>'
+            cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}{_maps_link}</div><div class="showtime-times">{times_html}</div></div>'
 
         if not cinema_rows:
             cinema_rows = f'<div class="no-times" data-es="Sin sesiones este día" data-en="No screenings this day">Sin sesiones este día</div>'
@@ -1590,7 +1650,16 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-row:last-child{{border-bottom:none}}
 .showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
 .vose-mini{{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
-.showtime-times{{display:flex;flex-wrap:wrap;gap:8px}}
+.showtime-times{{display:flex;flex-direction:column;gap:6px}}
+.times-row{{display:flex;flex-wrap:wrap;gap:8px}}
+.format-row{{display:flex;flex-wrap:wrap;align-items:center;gap:6px}}
+.format-label{{font-size:10px;font-weight:700;letter-spacing:.8px;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}}
+.format-imax{{background:rgba(0,160,255,.12);color:#4fb8ff;border:1px solid rgba(0,160,255,.3)}}
+.format-screenx{{background:rgba(140,80,220,.12);color:#b08fff;border:1px solid rgba(140,80,220,.3)}}
+.format-isense{{background:rgba(255,140,0,.12);color:#ffaa44;border:1px solid rgba(255,140,0,.3)}}
+.format-sala-xl{{background:rgba(0,190,120,.1);color:#4de88a;border:1px solid rgba(0,190,120,.28)}}
+.format-4dx{{background:rgba(220,60,60,.1);color:#ff7a7a;border:1px solid rgba(220,60,60,.28)}}
+.format-3d{{background:rgba(160,160,180,.1);color:#b0b0c8;border:1px solid rgba(160,160,180,.28)}}
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500;cursor:pointer;display:inline-block}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
