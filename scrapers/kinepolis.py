@@ -66,7 +66,8 @@ def _session_is_vose(attrs: str, film_is_vose: bool) -> bool:
     return film_is_vose  # fall back to film-level flag
 
 
-def _parse_session(session: dict, film_is_vose: bool = False) -> dict:
+def _parse_session(session: dict, film_is_vose: bool = False,
+                   complex_code: str = COMPLEX_CODE) -> dict:
     attrs = session.get("rawSessionAttributes", "")
     parts = [p.strip() for p in attrs.split(",")]
     fmt = session.get("film", {}).get("format", {}).get("name", "2D")
@@ -74,7 +75,7 @@ def _parse_session(session: dict, film_is_vose: bool = False) -> dict:
     dt_local = _to_local(session["showtime"])
     vista_id = session.get("vistaSessionId", "")
     booking_url = (
-        f"https://kinepolis.es/direct-vista-redirect/{vista_id}/0/KVAL/0"
+        f"https://kinepolis.es/direct-vista-redirect/{vista_id}/0/{complex_code}/0"
         if vista_id else ""
     )
     return {
@@ -94,7 +95,8 @@ def _parse_session(session: dict, film_is_vose: bool = False) -> dict:
     }
 
 
-def _build_film(film: dict, sessions: list[dict]) -> dict:
+def _build_film(film: dict, sessions: list[dict], cinema_key: str = "kinepolis",
+                cinema_name: str = CINEMA_NAME, complex_code: str = COMPLEX_CODE) -> dict:
     audio_lang   = film.get("audioLanguage", "ES")
     sl = film.get("spokenLanguage", {})
     spoken_lang  = (sl[0].get("code", "") if isinstance(sl, list) else sl.get("code", "")) if sl else ""
@@ -111,12 +113,13 @@ def _build_film(film: dict, sessions: list[dict]) -> dict:
     if not poster_url and film.get("images"):
         poster_url = IMAGE_BASE + film["images"][0]["url"]
 
-    parsed_sessions = [_parse_session(s, film_is_vose=is_vose) for s in sessions]
+    parsed_sessions = [_parse_session(s, film_is_vose=is_vose, complex_code=complex_code)
+                       for s in sessions]
     any_vose = any(s["is_vose"] for s in parsed_sessions)
 
     return {
-        "cinema":       "kinepolis",
-        "cinema_name":  CINEMA_NAME,
+        "cinema":       cinema_key,
+        "cinema_name":  cinema_name,
         "title_es":     _clean_title(raw_title),
         "title_raw":    raw_title,
         "is_vose":      any_vose,
@@ -138,6 +141,21 @@ def scrape_kinepolis(playwright=None) -> list[dict]:
     multiple cinemas in one run). If None, a headed browser is launched
     and closed within this call.
     """
+    return scrape_kinepolis_complex(COMPLEX_CODE, "kinepolis", CINEMA_NAME, playwright)
+
+
+def scrape_kinepolis_complex(complex_code: str, cinema_key: str, cinema_name: str,
+                             playwright=None) -> list[dict]:
+    """
+    Scrape one Kinépolis complex (e.g. "KVAL" Valencia, "KALIC" Alicante).
+
+    The cartelera page embeds sessions for every Spanish complex; this keeps
+    only those whose complexOperator matches complex_code.
+    """
+    cartelera_url = (
+        "https://kinepolis.es/"
+        f"?complex={complex_code}&select_theater={complex_code}&main_section=cartelera"
+    )
     own_playwright = playwright is None
     if own_playwright:
         p = sync_playwright().start()
@@ -157,7 +175,7 @@ def scrape_kinepolis(playwright=None) -> list[dict]:
         )
         page = context.new_page()
         log.info("Loading Kinépolis cartelera page …")
-        page.goto(CARTELERA_URL, timeout=30_000, wait_until="networkidle")
+        page.goto(cartelera_url, timeout=30_000, wait_until="networkidle")
         log.info("Page loaded: %s", page.title())
 
         raw = page.evaluate(
@@ -183,23 +201,28 @@ def scrape_kinepolis(playwright=None) -> list[dict]:
     # Index films by corporateId
     film_by_id = {f["corporateId"]: f for f in all_films}
 
-    # Group KVAL sessions by film corporateId
-    kval_by_film: dict[int, list] = {}
+    # Group this complex's sessions by film corporateId
+    by_film: dict[int, list] = {}
     for s in all_sessions:
-        if s.get("complexOperator") != COMPLEX_CODE:
+        if s.get("complexOperator") != complex_code:
             continue
         corp_id = s["film"]["corporateId"]
-        kval_by_film.setdefault(corp_id, []).append(s)
+        by_film.setdefault(corp_id, []).append(s)
+
+    if not by_film:
+        known = sorted({s.get("complexOperator") for s in all_sessions})
+        log.warning("No sessions for complex %s (complexes on page: %s)", complex_code, known)
 
     films = []
-    for corp_id, sessions in kval_by_film.items():
+    for corp_id, sessions in by_film.items():
         film = film_by_id.get(corp_id)
         if not film:
             log.warning("No film record for corporateId %s", corp_id)
             continue
-        films.append(_build_film(film, sessions))
+        films.append(_build_film(film, sessions, cinema_key, cinema_name, complex_code))
 
-    log.info("Kinépolis: %d films, %d sessions", len(films), sum(len(f["showtimes"]) for f in films))
+    log.info("%s: %d films, %d sessions", cinema_name, len(films),
+             sum(len(f["showtimes"]) for f in films))
     return films
 
 
