@@ -741,7 +741,7 @@ function showComingSoon() {
   });
   // Track booking intent in GoatCounter
   if (window.goatcounter && window.goatcounter.count) {
-    const slug = window.location.pathname.replace(/\/\$/, '').split('/').pop() || 'unknown';
+    const slug = window.location.pathname.replace(/\/$/, '').split('/').pop() || 'unknown';
     window.goatcounter.count({ path: 'book-intent/' + slug, title: 'Booking intent', event: true });
   }
 }

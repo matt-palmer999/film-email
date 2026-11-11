@@ -1541,7 +1541,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             def _tbtn(t, iv, url):
                 vattr = "true" if iv else "false"
                 if url:
-                    _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+window.location.pathname.split('/').pop(),title:'Booking click',event:true})"
+                    _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})"
                     return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{t}</a>'
                 return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
             # Standard/VOSE times row
@@ -1997,7 +1997,7 @@ function showComingSoon() {{
   }});
   // Track booking intent in GoatCounter
   if (window.goatcounter && window.goatcounter.count) {{
-    const slug = window.location.pathname.replace(/\/\$/, '').split('/').pop() || 'unknown';
+    const slug = window.location.pathname.replace(/\\/$/, '').split('/').pop() || 'unknown';
     window.goatcounter.count({{ path: 'book-intent/' + slug, title: 'Booking intent', event: true }});
   }}
 }}
@@ -2976,8 +2976,9 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             log.warning(f"Could not fetch subscriber count: {exc}")
 
     # GoatCounter stats
-    gc_yesterday = gc_week = gc_book_intents = None
+    gc_yesterday = gc_week = gc_book_intents = gc_book_clicks = None
     gc_book_films = []
+    gc_click_films = []
     gc_ref_rows = []
     gc_key = os.environ.get("GOATCOUNTER_API_KEY", "")
     if gc_key:
@@ -3011,11 +3012,28 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
             gc_data7 = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/total?start={week_ago_start}&end={yesterday_end}")
             gc_week  = gc_data7.get("total", 0)
 
-            # Booking intent events yesterday: get all hits and filter locally for events
-            gc_all_hits = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}&limit=200")
-            booking_hits = [h for h in gc_all_hits.get("hits", []) if h.get("event") and h.get("path", "").startswith("book-intent/")]
-            gc_book_intents = sum(h.get("count", 0) for h in booking_hits)
-            gc_book_films   = [h["path"].replace("book-intent/", "") for h in booking_hits if h.get("count", 0) > 0]
+            # Booking events yesterday. The API has no path filter and returns at
+            # most 100 paths per call, so page through everything (exclude_paths)
+            # and pick the events out locally.
+            _hits_url = f"https://whatsonmovie.goatcounter.com/api/v0/stats/hits?start={yesterday_start}&end={yesterday_end}&limit=100"
+            gc_all_hits: list = []
+            _seen_ids: list = []
+            for _ in range(20):
+                _page = _gc_fetch(_hits_url + (f"&exclude_paths={','.join(map(str, _seen_ids))}" if _seen_ids else ""))
+                _batch = _page.get("hits", [])
+                gc_all_hits += _batch
+                _seen_ids += [h["path_id"] for h in _batch if "path_id" in h]
+                if not _page.get("more") or not _batch:
+                    break
+
+            def _event_summary(prefix: str) -> tuple[int, list[str]]:
+                ev = [h for h in gc_all_hits if h.get("event") and h.get("path", "").startswith(prefix)]
+                films = [f"{(h['path'][len(prefix):] or 'unknown')} ({h.get('count', 0)})"
+                         for h in sorted(ev, key=lambda h: -h.get("count", 0)) if h.get("count", 0) > 0]
+                return sum(h.get("count", 0) for h in ev), films
+
+            gc_book_clicks, gc_click_films = _event_summary("book-click/")
+            gc_book_intents, gc_book_films = _event_summary("book-intent/")
 
             # Top referrers yesterday
             gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/toprefs?start={yesterday_start}&end={yesterday_end}")
@@ -3036,8 +3054,12 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
         )
     gc_lines = ""
     if gc_yesterday is not None:
-        book_line = f"  Booking intent clicks: {gc_book_intents}\n" if gc_book_intents else ""
-        film_lines = ("".join(f"    - {f}\n" for f in gc_book_films)) if gc_book_films else ""
+        book_line = (
+            f"  Booking clicks (to cinema):   {'n/a' if gc_book_clicks is None else gc_book_clicks}\n"
+            + "".join(f"    - {f}\n" for f in gc_click_films)
+            + f"  Coming-soon clicks (no link): {'n/a' if gc_book_intents is None else gc_book_intents}\n"
+        )
+        film_lines = "".join(f"    - {f}\n" for f in gc_book_films)
         # Deduplicate by name (GoatCounter splits same source by ref_scheme), label direct traffic
         _ref_merged = {}
         for r in gc_ref_rows:
