@@ -267,7 +267,55 @@ function showDay(key) {
   const params = new URLSearchParams(window.location.search);
   applyEveningHighlights(params.get('evening') === 'true');
 }
+// Remove showtimes that have already started (Spain time). Pages are built once
+// a day, so by the evening the morning's times would otherwise still show.
+function hidePastShowtimes() {
+  let p;
+  try {
+    p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  } catch (e) { return; }
+  const todayKey = p.year + '-' + p.month + '-' + p.day;
+  const nowKey   = todayKey + 'T' + p.hour + ':' + p.minute;
+  const lang = document.getElementById('html-root')?.getAttribute('lang') || 'es';
+  let activeEmptied = false;
+  document.querySelectorAll('.day-panel').forEach(panel => {
+    const dayKey = panel.id.replace('day-', '');
+    if (dayKey > todayKey) return;
+    panel.querySelectorAll('.time-btn[data-time]').forEach(btn => {
+      let t = btn.getAttribute('data-time');
+      // After-midnight sessions (e.g. 00:30) belong to the end of this day
+      if (t < '05:00') t = (24 + parseInt(t, 10)) + t.slice(2);
+      if (dayKey + 'T' + t < nowKey) btn.remove();
+    });
+    panel.querySelectorAll('.showtime-row').forEach(row => {
+      if (!row.querySelector('.time-btn')) row.remove();
+    });
+    if (panel.querySelector('.showtime-row')) return;
+    const tab = document.querySelector(`.day-tab[data-day="${dayKey}"]`);
+    if (tab) tab.classList.remove('has-shows');
+    if (panel.classList.contains('active')) activeEmptied = true;
+    if (dayKey < todayKey) {
+      if (tab) tab.style.display = 'none';
+      return;
+    }
+    const msg = document.createElement('div');
+    msg.className = 'no-times';
+    msg.setAttribute('data-es', 'No quedan más sesiones hoy');
+    msg.setAttribute('data-en', 'No more screenings today');
+    msg.textContent = lang === 'en' ? 'No more screenings today' : 'No quedan más sesiones hoy';
+    panel.appendChild(msg);
+  });
+  if (activeEmptied) {
+    const next = Array.from(document.querySelectorAll('.day-tab.has-shows'))
+                      .find(t => t.style.display !== 'none');
+    if (next) showDay(next.getAttribute('data-day'));
+  }
+}
 window.addEventListener('DOMContentLoaded', () => {
+  hidePastShowtimes();
   const urlParams = new URLSearchParams(window.location.search);
   const lang = urlParams.get('lang') || localStorage.getItem('lang') || localStorage.getItem('cv_lang') || 'es';
   if (lang !== 'es') setLang(lang);
