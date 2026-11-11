@@ -430,9 +430,18 @@ def _scrape_one(cinema: dict, session: requests.Session) -> list[dict]:
 
 def scrape_abc() -> list[dict]:
     """Scrape all three ABC cinemas and return a combined film list."""
+    return scrape_abc_cinemas(CINEMAS)
+
+
+def scrape_abc_cinemas(cinemas: list[dict]) -> list[dict]:
+    """
+    Scrape the given ABC cinemas (dicts shaped like CINEMAS entries) and
+    return a combined film list. Used for cinemas outside Valencia (e.g.
+    scrapers/abc_elx.py) without adding them to the Valencia CINEMAS list.
+    """
     all_films: list[dict] = []
     with requests.Session() as sess:
-        for cinema in CINEMAS:
+        for cinema in cinemas:
             films: list[dict] = []
             try:
                 films = _scrape_one_api(cinema, sess)
