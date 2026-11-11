@@ -119,11 +119,11 @@ def _poster_url(media: list) -> str:
     return ""
 
 
-def _fetch_billboard(sess: requests.Session) -> list[dict]:
+def _fetch_billboard(sess: requests.Session, cinema_slug: str = CINEMA_SLUG) -> list[dict]:
     r = sess.post(_API, headers=_HEADERS, json={
         "query":     _BILLBOARD_QUERY,
         "variables": {
-            "cinemaId":                CINEMA_SLUG,
+            "cinemaId":                cinema_slug,
             "countryId":               COUNTRY_ID,
             "timezone":                TIMEZONE,
             "isAbsoluteExperiencePath": True,
@@ -155,11 +155,22 @@ def _fetch_movie(sess: requests.Session, movie_id: str) -> dict:
 
 def scrape_yelmo() -> list[dict]:
     """Fetch Yelmo Campanar listings and return a list of film dicts."""
-    log.info("Fetching Yelmo Campanar (Cinépolis) billboard …")
+    return scrape_yelmo_cinema(CINEMA_SLUG, CINEMA_KEY, CINEMA_NAME)
+
+
+def scrape_yelmo_cinema(cinema_slug: str, cinema_key: str, cinema_name: str) -> list[dict]:
+    """
+    Fetch one Yelmo cinema's listings from the Cinépolis API.
+
+    cinema_slug is the API's cinemaId, as stored by cineyelmo.com when the
+    cinema is picked (e.g. "mercado-de-campanar-valencia"). Slugs don't always
+    follow the cinema's name or city — Alicante's is "puerta-de-alicante-albacete".
+    """
+    log.info("Fetching %s (Cinépolis) billboard …", cinema_name)
 
     with requests.Session() as sess:
-        schedules = _fetch_billboard(sess)
-        log.info("Yelmo Campanar: %d movie slots in billboard", len(schedules))
+        schedules = _fetch_billboard(sess, cinema_slug)
+        log.info("%s: %d movie slots in billboard", cinema_name, len(schedules))
 
         # Gather unique movie IDs and their combined showtimes
         movies_raw: dict[str, list[dict]] = {}
@@ -181,7 +192,7 @@ def scrape_yelmo() -> list[dict]:
                             continue
                         session_id = st.get("sessionId", "")
                         booking_url = (
-                            f"https://cineyelmo.com/es/asientos?country=es&movie={mid}&cinema={CINEMA_SLUG}&selected={CINEMA_SLUG}&session={session_id}"
+                            f"https://cineyelmo.com/es/asientos?country=es&movie={mid}&cinema={cinema_slug}&selected={cinema_slug}&session={session_id}"
                             if session_id else ""
                         )
                         movies_raw[mid].append({
@@ -219,8 +230,8 @@ def scrape_yelmo() -> list[dict]:
             )
 
             results.append({
-                "cinema":         CINEMA_KEY,
-                "cinema_name":    CINEMA_NAME,
+                "cinema":         cinema_key,
+                "cinema_name":    cinema_name,
                 "title_es":       name,
                 "original_title": original_name,
                 "is_vose":        any_vose,
@@ -234,7 +245,7 @@ def scrape_yelmo() -> list[dict]:
             })
 
     total = sum(len(f["showtimes"]) for f in results)
-    log.info("Yelmo Campanar: %d films, %d sessions", len(results), total)
+    log.info("%s: %d films, %d sessions", cinema_name, len(results), total)
     return results
 
 
