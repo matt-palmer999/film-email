@@ -1005,6 +1005,8 @@
 
         // Build personalised listings URL from saved preferences
         const citySlug    = (prefs.city || 'Valencia').toLowerCase();
+        // Saved city is now the default: film pages read it from here
+        try { localStorage.setItem('whatson_city', citySlug); } catch (e) {}
         const listingsBase = `../listings/${citySlug}/`;
         const p = new URLSearchParams();
         if (prefs.vose_only)     p.set('vose',      'true');

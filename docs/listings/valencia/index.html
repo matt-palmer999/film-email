@@ -1880,6 +1880,16 @@ function setSubscriberUI(isSubscriber) {
   if (anonBanner) anonBanner.style.display = isSubscriber ? 'none' : 'flex';
 }
 
+// Keep the browser's remembered city in line with the subscriber's saved city.
+function syncSubscriberCity(email) {
+  if (!email || !window.SUPABASE_URL || !window.SUPABASE_ANON) return;
+  fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=city',
+    { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } })
+    .then(r => r.json())
+    .then(rows => { if (rows && rows[0] && rows[0].city) localStorage.setItem('whatson_city', String(rows[0].city).toLowerCase()); })
+    .catch(() => {});
+}
+
 async function loadUserPreferences() {
   const savedLang = localStorage.getItem('cv_lang') || localStorage.getItem('lang');
   if (savedLang) setLang(savedLang);
@@ -1889,6 +1899,7 @@ async function loadUserPreferences() {
 
   if (hasParams) {
     setSubscriberUI(true);
+    syncSubscriberCity(getCookie('cv_email'));
     applyPreferencesFromURL();
     const currentParams = new URLSearchParams(window.location.search);
     document.querySelectorAll('a.film-title, a.grid-title, a.list-title').forEach(a => {
