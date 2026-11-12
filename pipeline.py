@@ -49,6 +49,12 @@ CINEMA_META = {
     "mooby_gloeries":      {"name": "Mooby Glòries",        "website": "https://moobycinemas.com/glories",    "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Glories+Barcelona"},
     "mooby_arenas":        {"name": "Mooby Arenas",         "website": "https://moobycinemas.com/arenas",     "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Mooby+Arenas+Barcelona"},
     "ocine_magic":         {"name": "Ocine Màgic Badalona", "website": "https://www.ocinemagic.es",           "type": "multiplex", "city": "Barcelona", "maps": "https://maps.google.com/?q=Ocine+Magic+Badalona"},
+    "kinepolis_alicante":  {"name": "Kinépolis Alicante",       "website": "https://kinepolis.es/?complex=KALIC&select_theater=KALIC&main_section=cartelera", "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Kinepolis+Alicante+Plaza+Mar+2"},
+    "yelmo_alicante":      {"name": "Yelmo Puerta de Alicante", "website": "https://cineyelmo.com/cines/puerta-de-alicante-albacete", "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Yelmo+Cines+Puerta+de+Alicante"},
+    "odeon_alicante":      {"name": "Odeon Multicines Alicante", "website": "https://odeonmulticines.com/odeon-alicante", "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Odeon+Multicines+Alicante+San+Vicente+del+Raspeig"},
+    "abc_elx":             {"name": "Cines ABC Elx",            "website": "https://www.cinesabc.com/cine/abcelx",       "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+ABC+Elx+L%27Aljub+Elche"},
+    "aana_alicante":       {"name": "Cines Aana Alicante",      "website": "https://www.cinesaana.com/",                 "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+Aana+Alicante"},
+    "aana_san_juan":       {"name": "Cines Aana San Juan",      "website": "https://www.cinesaana.com/",                 "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+Aana+San+Juan+de+Alicante"},
 }
 
 
@@ -323,6 +329,11 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.mooby_gloeries    import scrape_mooby_gloeries
     from scrapers.mooby_arenas      import scrape_mooby_arenas
     from scrapers.ocine_magic       import scrape_ocine_magic
+    from scrapers.kinepolis_alicante import scrape_kinepolis_alicante
+    from scrapers.yelmo_alicante    import scrape_yelmo_alicante
+    from scrapers.odeon_alicante    import scrape_odeon_alicante
+    from scrapers.abc_elx           import scrape_abc_elx
+    from scrapers.aana              import scrape_aana
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis",             "Valencia"),
@@ -343,7 +354,18 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_mooby_gloeries,  "Mooby Glòries",     "Barcelona"),
         (scrape_mooby_arenas,    "Mooby Arenas",      "Barcelona"),
         (scrape_ocine_magic,     "Ocine Màgic",       "Barcelona"),
+        (scrape_kinepolis_alicante, "Kinépolis Alicante", "Alicante"),
+        (scrape_yelmo_alicante,  "Yelmo Alicante",    "Alicante"),
+        (scrape_odeon_alicante,  "Odeon Alicante",    "Alicante"),
+        (scrape_abc_elx,         "ABC Elx",           "Alicante"),
+        (scrape_aana,            "Cines Aana",        "Alicante"),
     ]
+    # Scrapers that return several cinemas: report each cinema separately.
+    multi_cinema = {
+        "Cinesa Barcelona": [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")],
+        "ABC cinemas":      [("park", "ABC Park"), ("elsaler", "ABC El Saler"), ("granturia", "ABC Gran Turia")],
+        "Cines Aana":       [("aana_alicante", "Aana Alicante"), ("aana_san_juan", "Aana San Juan")],
+    }
 
     all_results: list[dict] = []
     scraper_status: list[dict] = []
@@ -352,23 +374,16 @@ def aggregate_scrapers() -> tuple[dict, list]:
             results = fn()
             log.info(f"  {label}: {len(results)} films")
             all_results.extend(results)
-            if label == "Cinesa Barcelona":
-                for cid, cname in [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")]:
-                    count = sum(1 for r in results if r.get("cinema") == cid)
-                    scraper_status.append({"label": cname, "count": count, "ok": True, "error": None, "city": city})
-            elif label == "ABC cinemas":
-                for cid, cname in [("park", "ABC Park"), ("elsaler", "ABC El Saler"), ("granturia", "ABC Gran Turia")]:
+            if label in multi_cinema:
+                for cid, cname in multi_cinema[label]:
                     count = sum(1 for r in results if r.get("cinema") == cid)
                     scraper_status.append({"label": cname, "count": count, "ok": True, "error": None, "city": city})
             else:
                 scraper_status.append({"label": label, "count": len(results), "ok": True, "error": None, "city": city})
         except Exception as exc:
             log.error(f"  {label} scraper failed: {exc}", exc_info=True)
-            if label == "Cinesa Barcelona":
-                for cname in ["Cinesa Diagonal", "Cinesa Diagonal Mar"]:
-                    scraper_status.append({"label": cname, "count": 0, "ok": False, "error": str(exc), "city": city})
-            elif label == "ABC cinemas":
-                for cname in ["ABC Park", "ABC El Saler", "ABC Gran Turia"]:
+            if label in multi_cinema:
+                for _cid, cname in multi_cinema[label]:
                     scraper_status.append({"label": cname, "count": 0, "ok": False, "error": str(exc), "city": city})
             else:
                 scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc), "city": city})
@@ -1237,14 +1252,16 @@ def _build_jsonld(film: dict, slug: str) -> str:
         _events_for(cinema.get("showtimes", {}),      is_vose=False)
         _events_for(cinema.get("vose_showtimes", {}), is_vose=True)
 
+    _crumb_cities = {CINEMA_META.get(c.get("id",""),{}).get("city") for c in film.get("cinemas",[])}
+    _crumb_city = next(iter(_crumb_cities)) if len(_crumb_cities) == 1 and None not in _crumb_cities else "Valencia"
     breadcrumb = {
         "@type": "BreadcrumbList",
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "whatson.movie",
              "item": "https://whatson.movie/"},
             {"@type": "ListItem", "position": 2,
-             "name": ("Cartelera Barcelona" if all(CINEMA_META.get(c.get("id",""),{}).get("city") == "Barcelona" for c in film.get("cinemas",[])) else "Cartelera Valencia"),
-             "item": ("https://whatson.movie/listings/barcelona/" if all(CINEMA_META.get(c.get("id",""),{}).get("city") == "Barcelona" for c in film.get("cinemas",[])) else "https://whatson.movie/listings/valencia/")},
+             "name": f"Cartelera {_crumb_city}",
+             "item": f"https://whatson.movie/listings/{_crumb_city.lower()}/"},
             {"@type": "ListItem", "position": 3, "name": film.get("title_en") or film["title"],
              "item": f"https://whatson.movie/listings/{slug}/"},
         ]
@@ -1306,22 +1323,15 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
     orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
     _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
-    if _film_cities == {"Barcelona"}:
-        _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
-        _bcn_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Barcelona")
+    if len(_film_cities) == 1:
+        _city = next(iter(_film_cities))
+        _brand_es, _brand_en = f"Cartelera {_city}", f"{_city} Cinema"
+        _city_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == _city)
         _vsfx_es = " · VOSE disponible" if film.get("any_vose") else ""
         _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
-        _desc_es = (f"{esc(title_es)} en cartelera en Barcelona{_vsfx_es}. Horarios en {_bcn_cines}." if _bcn_cines else f"{esc(title_es)} — sesiones y horarios en Barcelona{_vsfx_es}.")
-        _desc_en = (f"{esc(title_en)} now showing in Barcelona{_vsfx_en}. Showtimes at {_bcn_cines}." if _bcn_cines else f"{esc(title_en)} — Barcelona cinema showtimes{_vsfx_en}.")
-        _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
-    elif _film_cities == {"Valencia"}:
-        _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
-        _val_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Valencia")
-        _vsfx_val_es = " · VOSE disponible" if film.get("any_vose") else ""
-        _vsfx_val_en = " · VOSE available" if film.get("any_vose") else ""
-        _desc_es = (f"{esc(title_es)} en cartelera en Valencia{_vsfx_val_es}. Horarios en {_val_cines}." if _val_cines else f"{esc(title_es)} — sesiones y horarios en Valencia{_vsfx_val_es}.")
-        _desc_en = (f"{esc(title_en)} now showing in Valencia{_vsfx_val_en}. Showtimes at {_val_cines}." if _val_cines else f"{esc(title_en)} — Valencia cinema showtimes{_vsfx_val_en}.")
-        _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
+        _desc_es = (f"{esc(title_es)} en cartelera en {_city}{_vsfx_es}. Horarios en {_city_cines}." if _city_cines else f"{esc(title_es)} — sesiones y horarios en {_city}{_vsfx_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in {_city}{_vsfx_en}. Showtimes at {_city_cines}." if _city_cines else f"{esc(title_en)} — {_city} cinema showtimes{_vsfx_en}.")
+        _back_href, _back_es, _back_en = f"../{_city.lower()}/", f"Cartelera {_city}", f"{_city} Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
@@ -1581,22 +1591,15 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     orig_label   = f'<div class="orig-title" translate="no">{title_orig}</div>' if title_orig and title_orig != title_es and title_orig != title_en else ""
 
     _film_cities = {CINEMA_META.get(c.get("id",""), {}).get("city","") for c in film.get("cinemas",[])} - {""}
-    if _film_cities == {"Barcelona"}:
-        _brand_es, _brand_en = "Cartelera Barcelona", "Barcelona Cinema"
-        _bcn_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Barcelona")
+    if len(_film_cities) == 1:
+        _city = next(iter(_film_cities))
+        _brand_es, _brand_en = f"Cartelera {_city}", f"{_city} Cinema"
+        _city_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == _city)
         _vsfx_es = " · VOSE disponible" if film.get("any_vose") else ""
         _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
-        _desc_es = (f"{esc(title_es)} en cartelera en Barcelona{_vsfx_es}. Horarios en {_bcn_cines}." if _bcn_cines else f"{esc(title_es)} — sesiones y horarios en Barcelona{_vsfx_es}.")
-        _desc_en = (f"{esc(title_en)} now showing in Barcelona{_vsfx_en}. Showtimes at {_bcn_cines}." if _bcn_cines else f"{esc(title_en)} — Barcelona cinema showtimes{_vsfx_en}.")
-        _back_href, _back_es, _back_en = "../barcelona/", "Cartelera Barcelona", "Barcelona Cinema"
-    elif _film_cities == {"Valencia"}:
-        _brand_es, _brand_en = "Cartelera Valencia", "Valencia Cinema"
-        _val_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == "Valencia")
-        _vsfx_val_es = " · VOSE disponible" if film.get("any_vose") else ""
-        _vsfx_val_en = " · VOSE available" if film.get("any_vose") else ""
-        _desc_es = (f"{esc(title_es)} en cartelera en Valencia{_vsfx_val_es}. Horarios en {_val_cines}." if _val_cines else f"{esc(title_es)} — sesiones y horarios en Valencia{_vsfx_val_es}.")
-        _desc_en = (f"{esc(title_en)} now showing in Valencia{_vsfx_val_en}. Showtimes at {_val_cines}." if _val_cines else f"{esc(title_en)} — Valencia cinema showtimes{_vsfx_val_en}.")
-        _back_href, _back_es, _back_en = "../valencia/", "Cartelera Valencia", "Valencia Cinema"
+        _desc_es = (f"{esc(title_es)} en cartelera en {_city}{_vsfx_es}. Horarios en {_city_cines}." if _city_cines else f"{esc(title_es)} — sesiones y horarios en {_city}{_vsfx_es}.")
+        _desc_en = (f"{esc(title_en)} now showing in {_city}{_vsfx_en}. Showtimes at {_city_cines}." if _city_cines else f"{esc(title_en)} — {_city} cinema showtimes{_vsfx_en}.")
+        _back_href, _back_es, _back_en = f"../{_city.lower()}/", f"Cartelera {_city}", f"{_city} Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
@@ -2072,7 +2075,15 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
             "emoji": "🏛️",
             "color": "#c084fc",
         },
+        "Alicante": {
+            "es": "La cartelera completa de Alicante",
+            "en": "Alicante's complete cinema listings",
+            "emoji": "🏖️",
+            "color": "#38bdf8",
+        },
     }
+    _sorted_cities = sorted(cities)
+    _cities_es = (", ".join(_sorted_cities[:-1]) + " y " + _sorted_cities[-1]) if len(_sorted_cities) > 1 else "".join(_sorted_cities)
 
     cards_html = ""
     for city in sorted(cities):
@@ -2099,7 +2110,7 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
 <meta name="theme-color" content="#0a0810">
 <title>Elige tu ciudad · whatson.movie</title>
 <link rel="canonical" href="https://whatson.movie/listings/">
-<meta name="description" content="Cartelera de cine en Valencia y Barcelona. Elige tu ciudad para ver las películas de esta semana.">
+<meta name="description" content="Cartelera de cine en {_cities_es}. Elige tu ciudad para ver las películas de esta semana.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="whatson.movie — elige tu ciudad">
 <meta property="og:url" content="https://whatson.movie/listings/">
@@ -2220,20 +2231,13 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     date_es = week_range_es(anchor)
     date_en = week_range_en(anchor)
     film_count   = len(films_by_title)
-    cinema_count = len({c["id"] for film in films_by_title.values() for c in film.get("cinemas", [])})
+    cinema_count = len({c["id"] for film in films_by_title.values() for c in film.get("cinemas", []) if not city or c["id"] in _city_ids})
 
-    if city == "Barcelona":
-        _page_title_es = f"Cartelera de cine en Barcelona \u2014 {date_es}"
-        _page_title_en = f"Barcelona Cinema Listings \u2014 {date_en}"
-        _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de Barcelona esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
-        _page_desc_en  = f"{film_count} films across {cinema_count} Barcelona cinemas this week. VOSE screenings highlighted. Updated every Thursday."
-        _page_og_title = f"Cartelera Barcelona \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
-    else:
-        _page_title_es = f"Cartelera de cine en Valencia \u2014 {date_es}"
-        _page_title_en = f"Valencia Cinema Listings \u2014 {date_en}"
-        _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de Valencia esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
-        _page_desc_en  = f"{film_count} films across {cinema_count} Valencia cinemas this week. VOSE screenings highlighted. Updated every Thursday."
-        _page_og_title = f"Cartelera Valencia \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
+    _page_title_es = f"Cartelera de cine en {city_name} \u2014 {date_es}"
+    _page_title_en = f"{city_name} Cinema Listings \u2014 {date_en}"
+    _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de {city_name} esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
+    _page_desc_en  = f"{film_count} films across {cinema_count} {city_name} cinemas this week. VOSE screenings highlighted. Updated every Thursday."
+    _page_og_title = f"Cartelera {city_name} \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
 
     import json as _json
     _ld_items = []
@@ -2917,8 +2921,7 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     DROP_THRESHOLD = 0.40
     failed = [s for s in scraper_status if not s["ok"]]
     regressions = []
-    valencia_parts = []
-    barcelona_parts = []
+    city_parts: dict = {}
     for s in scraper_status:
         icon = '✅' if s['ok'] else '❌'
         if s["ok"]:
@@ -2933,13 +2936,9 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
         else:
             note = f"FAILED — {s['error'] or 'unknown error'}"
         line = f"  {icon} {s['label']:<22} {note}"
-        if s.get("city") == "Barcelona":
-            barcelona_parts.append(line)
-        else:
-            valencia_parts.append(line)
-    scraper_lines = (
-        "Valencia:\n" + "\n".join(valencia_parts) +
-        "\n\nBarcelona:\n" + "\n".join(barcelona_parts)
+        city_parts.setdefault(s.get("city") or "Valencia", []).append(line)
+    scraper_lines = "\n\n".join(
+        f"{c}:\n" + "\n".join(lines) for c, lines in city_parts.items()
     )
 
     # Subscriber counts from Supabase
@@ -3076,7 +3075,7 @@ TOP REFERRERS (yesterday):
 {ref_lines}"""
     body = f"""whatson.movie pipeline completed at {now_str}
 
-SCRAPERS ({len(scraper_status)} cinemas, {len([s for s in scraper_status if s.get('city')=='Valencia'])} Valencia / {len([s for s in scraper_status if s.get('city')=='Barcelona'])} Barcelona):
+SCRAPERS ({len(scraper_status)} cinemas, {" / ".join(f"{len([s for s in scraper_status if s.get('city')==c])} {c}" for c in dict.fromkeys(s.get('city') for s in scraper_status))}):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)

@@ -2,6 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://whatson.movie/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/alicante/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/barcelona/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/valencia/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/west-side-story/</loc><lastmod>2026-11-12</lastmod></url>
@@ -47,13 +48,13 @@
   <url><loc>https://whatson.movie/listings/the-invite/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/verity/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/arriba-tutto/</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://whatson.movie/listings/hear-the-yellow/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/mostra-2026-calle-de-los-angeles/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/flies/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-spirit-of-the-beehive/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-great-organ/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/dear-marcelle/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/landscape-in-the-mist/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/hear-the-yellow/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/chemsex-a-journey-within/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/honey-bunny/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/shana/</loc><lastmod>2026-11-12</lastmod></url>
@@ -166,6 +167,10 @@
   <url><loc>https://whatson.movie/listings/coyote-vs-acme/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/cinc-david-una-aventura-gigante-catala/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/tad-and-the-magic-lamp/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/el-cielo-es-para-siempre/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/sesion-misteriosa/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/diversion-navidena-con-peppa-la-experiencia-en-cines/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/todo-sobre-mi-madre-1999-wilder-cinema/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-2026/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-cat/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/200-dias-paco-rabal/</loc><lastmod>2026-11-09</lastmod></url>
@@ -724,7 +729,6 @@
   <url><loc>https://whatson.movie/listings/titian-the-empire-of-color/</loc><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/to-rosa/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/todo-es-carcel-41o-mostra-de-valencia/</loc><lastmod>2026-11-05</lastmod></url>
-  <url><loc>https://whatson.movie/listings/todo-sobre-mi-madre-1999-wilder-cinema/</loc><lastmod>2026-11-05</lastmod></url>
   <url><loc>https://whatson.movie/listings/tokyo-taxi/</loc><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/tombs-of-the-blind-dead/</loc><lastmod>2026-10-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/tomorrow-x-together-world-tour-act-sweet-mirage/</loc><lastmod>2026-10-11</lastmod></url>

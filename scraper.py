@@ -1901,6 +1901,7 @@ def fetch_subscribers() -> list:
 _CINEMAS_BY_CITY = {
     "Valencia":  ['kinepolis','yelmo','ocine_aqua','lys','park','elsaler','granturia','mn4','tivoli','babel','dor','cinesa'],
     "Barcelona": ['verdi_barcelona','renoir_barcelona','aribau_barcelona','cinesa_diagonal','cinesa_diagonal_mar','yelmo_maquinista','mooby_gloeries','mooby_arenas','ocine_magic'],
+    "Alicante":  ['kinepolis_alicante','yelmo_alicante','odeon_alicante','abc_elx','aana_alicante','aana_san_juan'],
 }
 
 def apply_subscriber_filters(films: dict, prefs: dict) -> dict:

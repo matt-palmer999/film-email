@@ -13,12 +13,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — Cartelera Valencia" data-en="PARA VIVIR: The Implacable Times of Pablo Milanés — Valencia Cinema">PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — Cartelera Valencia</title>
+<title data-es="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — whatson.movie" data-en="PARA VIVIR: The Implacable Times of Pablo Milanés — whatson.movie">PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — whatson.movie</title>
 <link rel="canonical" href="https://whatson.movie/listings/para-vivir-the-implacable-times-of-pablo-milanes/">
-<meta name="description" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS en cartelera en Valencia. Horarios en Cines ABC Park, Cines ABC El Saler.">
+<meta name="description" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — sesiones y horarios">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — Cartelera Valencia">
-<meta property="og:description" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS en cartelera en Valencia. Horarios en Cines ABC Park, Cines ABC El Saler.">
+<meta property="og:title" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — whatson.movie">
+<meta property="og:description" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — sesiones y horarios">
 <meta property="og:url" content="https://whatson.movie/listings/para-vivir-the-implacable-times-of-pablo-milanes/">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w500/wSWIirnIEMIWCIWdnFZqTdZI3ex.jpg">
 <meta property="og:image:alt" content="PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS">
@@ -177,6 +177,25 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       }
     },
     {
+      "@type": "ScreeningEvent",
+      "name": "PARA VIVIR: The Implacable Times of Pablo Milanés",
+      "startDate": "2026-11-19T20:00:00+01:00",
+      "videoFormat": "dubbed",
+      "workPresented": {
+        "@id": "https://whatson.movie/listings/para-vivir-the-implacable-times-of-pablo-milanes/#movie"
+      },
+      "location": {
+        "@type": "MovieTheater",
+        "name": "Cines ABC Elx",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Alicante",
+          "addressCountry": "ES"
+        },
+        "url": "https://www.cinesabc.com/cine/abcelx"
+      }
+    },
+    {
       "@type": "BreadcrumbList",
       "itemListElement": [
         {
@@ -216,7 +235,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="back-bar">
-    <a href="../valencia/" class="back-link">← <span data-es="Cartelera Valencia" data-en="Valencia Cinema">Cartelera Valencia</span></a>
+    <a href="../" class="back-link">← <span data-es="Cartelera" data-en="Listings">Cartelera</span></a>
   </div>
 
   <div class="film-hero">
@@ -249,7 +268,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="footer">
-    <span style="color:#9a8fb5;">© Cartelera Valencia</span>
+    <span style="color:#9a8fb5;">© whatson.movie</span>
   </div>
 </div>
 
@@ -270,7 +289,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'PARA VIVIR: The Implacable Times of Pablo Milanés — Valencia Cinema' : 'PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — Cartelera Valencia');
+  document.title = (lang === 'en' ? 'PARA VIVIR: The Implacable Times of Pablo Milanés — whatson.movie' : 'PARA VIVIR. EL IMPLACABLE TIEMPO DE PABLO MILANÉS — whatson.movie');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {

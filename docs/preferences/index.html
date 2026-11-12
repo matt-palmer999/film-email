@@ -619,6 +619,7 @@
         <div style="display:flex;gap:8px;margin-bottom:12px;">
           <button id="city-btn-Valencia"  class="filter-btn active" onclick="selectCity('Valencia')">🌊 Valencia</button>
           <button id="city-btn-Barcelona" class="filter-btn"        onclick="selectCity('Barcelona')">🏛️ Barcelona</button>
+          <button id="city-btn-Alicante"  class="filter-btn"        onclick="selectCity('Alicante')">🏖️ Alicante</button>
         </div>
         <div class="cinema-grid" id="cinema-grid" translate="no">
           <!-- populated by JS -->
@@ -764,6 +765,14 @@
         { id: 'mooby_gloeries',      name: 'Mooby Glòries',        arthouse: false },
         { id: 'mooby_arenas',        name: 'Mooby Arenas',         arthouse: false },
         { id: 'ocine_magic',         name: 'Ocine Màgic Badalona', arthouse: false },
+      ],
+      Alicante: [
+        { id: 'kinepolis_alicante',  name: 'Kinépolis Alicante',        arthouse: false },
+        { id: 'yelmo_alicante',      name: 'Yelmo Puerta de Alicante',  arthouse: false },
+        { id: 'odeon_alicante',      name: 'Odeon Multicines Alicante', arthouse: false },
+        { id: 'abc_elx',             name: 'Cines ABC Elx',             arthouse: false },
+        { id: 'aana_alicante',       name: 'Cines Aana Alicante',       arthouse: false },
+        { id: 'aana_san_juan',       name: 'Cines Aana San Juan',       arthouse: false },
       ],
     };
     const CITIES = Object.keys(CINEMAS_BY_CITY);
