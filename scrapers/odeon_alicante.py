@@ -12,6 +12,8 @@ server-rendered WordPress HTML (no WAF; plain requests works):
       time[data-time] > a        "HH:MM", href = booking page (sesion?pid=…&sesion=…)
 
 VOSE comes from the data-format tokens ("VOSE", or "VO" for original version).
+Premium screens: "CINITY" and "INFINITY" (Infinity Vision) tokens set
+is_cinity / is_infinity_vision. Atmos/Laser alone are not flagged.
 
 Not yet wired into pipeline.py — Alicante scrapers are being built and
 checked standalone first. Run directly for a quick test summary.
@@ -92,6 +94,10 @@ def _parse_day(div, date_str: str) -> list[dict]:
                 "is_imax":        "IMAX" in tokens,
                 "is_4dx":         "4DX" in tokens,
                 "is_screenx":     "SCREENX" in tokens,
+                # Odeon premium screens. Labels get truncated ("INFINITY VI"),
+                # so match on the INFINITY token. Cinity wins in the pipeline.
+                "is_cinity":      "CINITY" in tokens,
+                "is_infinity_vision": "INFINITY" in tokens,
                 "booking_url":    a.get("href", ""),
             })
     return showtimes

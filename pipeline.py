@@ -286,6 +286,8 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
 _FORMAT_FLAG_ORDER = [
     ("is_imax",    "imax"),
     ("is_screenx", "screenx"),
+    ("is_cinity",  "cinity"),
+    ("is_infinity_vision", "infinity_vision"),
     ("is_isense",  "isense"),
     ("is_sala_xl", "sala_xl"),
     ("is_4dx",     "4dx"),
@@ -295,6 +297,8 @@ _FORMAT_FLAG_ORDER = [
 _FORMAT_DISPLAY = [
     ("imax",    "IMAX",    "format-imax"),
     ("screenx", "ScreenX", "format-screenx"),
+    ("cinity",  "CINITY",  "format-cinity"),
+    ("infinity_vision", "Infinity Vision", "format-infinity"),
     ("isense",  "iSense",  "format-isense"),
     ("sala_xl", "Sala XL", "format-sala-xl"),
     ("4dx",     "4DX",     "format-4dx"),
@@ -1683,6 +1687,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .format-label{{font-size:10px;font-weight:700;letter-spacing:.8px;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}}
 .format-imax{{background:rgba(0,160,255,.12);color:#4fb8ff;border:1px solid rgba(0,160,255,.3)}}
 .format-screenx{{background:rgba(140,80,220,.12);color:#b08fff;border:1px solid rgba(140,80,220,.3)}}
+.format-cinity{{background:rgba(0,200,220,.1);color:#5ee0f0;border:1px solid rgba(0,200,220,.3)}}
+.format-infinity{{background:rgba(255,90,200,.1);color:#ff8ad8;border:1px solid rgba(255,90,200,.3)}}
 .format-isense{{background:rgba(255,140,0,.12);color:#ffaa44;border:1px solid rgba(255,140,0,.3)}}
 .format-sala-xl{{background:rgba(0,190,120,.1);color:#4de88a;border:1px solid rgba(0,190,120,.28)}}
 .format-4dx{{background:rgba(220,60,60,.1);color:#ff7a7a;border:1px solid rgba(220,60,60,.28)}}
