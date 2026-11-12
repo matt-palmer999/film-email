@@ -887,6 +887,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .footer{background:#0a0810;border-top:1px solid #1e1630;padding:28px 40px;text-align:center}
 .footer p{font-size:13px;color:#8a7e9a;line-height:1.7}
 .footer a{color:#9a8fb5;text-decoration:underline;text-underline-offset:2px}
+.footer-cities{font-size:14px;margin:0 0 12px}
 .footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#9a8fb5;margin-bottom:10px}
 .filter-bar{background:#0a0810;padding:10px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1e1630;flex-wrap:wrap}
 .filter-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a7e9a;font-weight:500}
@@ -979,7 +980,7 @@ async function loadUserPreferences() {
 
   try {
     const res = await fetch(
-      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,rating_filter,min_rating,email_enabled',
+      window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=active,lang,city,cinemas,vose_only,vose_lang,new_only,family_only,evening_only,rating_filter,min_rating,email_enabled',
       { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } }
     );
     const rows = await res.json();
@@ -992,6 +993,10 @@ async function loadUserPreferences() {
 
     const prefs = rows[0];
     setSubscriberUI(true);
+    // Subscribers' default city is their saved choice, not the last city page they browsed
+    if (prefs.city) {
+      try { localStorage.setItem('whatson_city', String(prefs.city).toLowerCase()); } catch(e) {}
+    }
     if (prefs.lang) setLang(prefs.lang);
 
     if (!sessionStorage.getItem('cv_visit')) {
@@ -2273,6 +2278,12 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     slug_prefix   = "../" if city else "./"
     canonical_url = f"https://whatson.movie/listings/{city_slug}/" if city else "https://whatson.movie/listings/"
     _all_cinemas      = [k for k, v in CINEMA_META.items() if not city or v.get("city") == city]
+    _other_cities = sorted({v["city"] for v in CINEMA_META.values() if v.get("city") and v.get("city") != city}) if city else []
+    _other_cities_html = (
+        '<p class="footer-cities"><span data-es="Otras ciudades:" data-en="Other cities:">Otras ciudades:</span> '
+        + " · ".join(f'<a href="../{c.lower()}/">{c}</a>' for c in _other_cities)
+        + "</p>"
+    ) if _other_cities else ""
     _all_cinemas_json = json.dumps(_all_cinemas)
 
     date_es = week_range_es(anchor)
@@ -2501,6 +2512,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 
   <div class="footer">
     <div class="footer-logo">Cartelera {city_name}</div>
+    {_other_cities_html}
     <p>
       <span data-es="Carteleras obtenidas directamente de los cines · Información de películas de" data-en="Showtimes sourced directly from cinemas · Film details from">Carteleras obtenidas directamente de los cines · Información de películas de</span>
       <a href="https://www.themoviedb.org">TMDB</a><br>
@@ -2515,7 +2527,8 @@ window.SUPABASE_ANON = "__SUPABASE_ANON__";
 window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
-  if ('{city_slug}') localStorage.setItem('whatson_city', '{city_slug}');
+  // Non-subscribers: remember the last city viewed. Subscribers keep their saved city.
+  if ('{city_slug}' && !/(^|; )cv_email=/.test(document.cookie)) localStorage.setItem('whatson_city', '{city_slug}');
   initSections();
   applyVisibility();
   loadUserPreferences();
