@@ -292,6 +292,15 @@ _FORMAT_FLAG_ORDER = [
     ("is_sala_xl", "sala_xl"),
     ("is_4dx",     "4dx"),
     ("is_3d",      "3d"),
+    ("is_35mm",    "35mm"),
+]
+# Formats some cinemas put in the film title instead of a format field, e.g.
+# "LA BOLA NEGRA - 35MM" (film print) or "VENGADORES: DOOMSDAY (INFINITY VISION)"
+# (Disney's large-screen certification, used by several chains). Strip the suffix
+# so the session merges into the normal film, and flag it for the format label.
+_TITLE_FORMAT_SUFFIXES = [
+    (re.compile(r"\s*[-–(\[]?\s*35\s*mm\s*[)\]]?\s*$", re.IGNORECASE), "is_35mm"),
+    (re.compile(r"\s*[-–(\[]?\s*infinity\s*vision\s*[)\]]?\s*$", re.IGNORECASE), "is_infinity_vision"),
 ]
 # Display label and CSS class per bucket key (order = render order)
 _FORMAT_DISPLAY = [
@@ -303,6 +312,7 @@ _FORMAT_DISPLAY = [
     ("sala_xl", "Sala XL", "format-sala-xl"),
     ("4dx",     "4DX",     "format-4dx"),
     ("3d",      "3D",      "format-3d"),
+    ("35mm",    "35mm",    "format-35mm"),
 ]
 
 # ── Scraper aggregation ───────────────────────────────────────────────────────
@@ -399,6 +409,11 @@ def aggregate_scrapers() -> tuple[dict, list]:
             continue
 
         title     = film["title_es"]
+        title_flags = {}
+        for _rx, _flag in _TITLE_FORMAT_SUFFIXES:
+            if _rx.search(title):
+                title = _rx.sub("", title).strip()
+                title_flags[_flag] = True
         cinema_id = film["cinema"]
         meta_info = CINEMA_META.get(cinema_id, {})
 
@@ -428,6 +443,10 @@ def aggregate_scrapers() -> tuple[dict, list]:
             if d and t:
                 st_is_vose = st.get("is_vose", film_is_vose)
                 url = st.get("booking_url", "")
+                if title_flags:
+                    st = {**st, **title_flags}
+                if "35MM" in str(st.get("format", "")).upper().replace(" ", ""):
+                    st = {**st, "is_35mm": True}
                 fmt_key = next((k for flag, k in _FORMAT_FLAG_ORDER if st.get(flag)), None)
                 if fmt_key:
                     format_showtimes.setdefault(fmt_key, {}).setdefault(d, {})[t] = {
@@ -663,6 +682,23 @@ def enrich_with_trailers(films: dict, prev_films_by_slug: dict) -> None:
         film["trailer_url"] = url
 
 
+def _merge_cinema_times(dst: dict, src: dict) -> None:
+    """Add src's showtimes to dst (same cinema), keeping dst's entry when a time clashes."""
+    for key in ("showtimes", "vose_showtimes"):
+        for d, times in (src.get(key) or {}).items():
+            bucket = dst.setdefault(key, {}).setdefault(d, {})
+            for t, url in times.items():
+                bucket.setdefault(t, url)
+    for fmt_key, fmt_dates in (src.get("format_showtimes") or {}).items():
+        fmt_bucket = dst.setdefault("format_showtimes", {}).setdefault(fmt_key, {})
+        for d, times in fmt_dates.items():
+            day_bucket = fmt_bucket.setdefault(d, {})
+            for t, entry in times.items():
+                day_bucket.setdefault(t, entry)
+    if src.get("vose"):
+        dst["vose"] = True
+
+
 def deduplicate_by_tmdb_id(films: dict) -> None:
     """Merge films that resolved to the same TMDB ID."""
     tmdb_id_map: dict = {}
@@ -675,11 +711,15 @@ def deduplicate_by_tmdb_id(films: dict) -> None:
         if tid in tmdb_id_map:
             canonical = tmdb_id_map[tid]
             log.info(f"  Merging '{title}' → '{canonical}' (TMDB {tid})")
-            existing_ids = {c["id"] for c in films[canonical]["cinemas"]}
+            existing_by_id = {c["id"]: c for c in films[canonical]["cinemas"]}
             for c in film["cinemas"]:
-                if c["id"] not in existing_ids:
+                if c["id"] not in existing_by_id:
                     films[canonical]["cinemas"].append(c)
-                    existing_ids.add(c["id"])
+                    existing_by_id[c["id"]] = c
+                else:
+                    # Same cinema under another title variant (e.g. "(VOSE)"):
+                    # merge its times instead of dropping them.
+                    _merge_cinema_times(existing_by_id[c["id"]], c)
             if film.get("any_vose"):
                 films[canonical]["any_vose"] = True
             if film.get("is_new"):
@@ -1693,6 +1733,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .format-sala-xl{{background:rgba(0,190,120,.1);color:#4de88a;border:1px solid rgba(0,190,120,.28)}}
 .format-4dx{{background:rgba(220,60,60,.1);color:#ff7a7a;border:1px solid rgba(220,60,60,.28)}}
 .format-3d{{background:rgba(160,160,180,.1);color:#b0b0c8;border:1px solid rgba(160,160,180,.28)}}
+.format-35mm{{background:rgba(210,170,110,.1);color:#e0bb84;border:1px solid rgba(210,170,110,.3)}}
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500;cursor:pointer;display:inline-block}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
