@@ -2783,7 +2783,15 @@ def run() -> None:
         if not entry.is_dir() or entry.name in current_slugs or entry.name in _city_slugs:
             continue
         archived_on_path = os.path.join(entry.path, "archived_on.txt")
-        if os.path.exists(archived_on_path):
+        # A page with archived_on.txt but no archive notice is a live detail page
+        # left behind when a film came back and then left again. Re-archive it so
+        # it doesn't keep showing old showtimes.
+        _page_path = os.path.join(entry.path, "index.html")
+        _is_archive_page = False
+        if os.path.exists(_page_path):
+            with open(_page_path, encoding="utf-8", errors="replace") as _fh:
+                _is_archive_page = "archive-notice-label" in _fh.read()
+        if os.path.exists(archived_on_path) and _is_archive_page:
             try:
                 archived_date = date.fromisoformat(open(archived_on_path, encoding="utf-8").read().strip())
             except Exception:
@@ -2823,6 +2831,10 @@ def run() -> None:
         if slug:
             film_dir = f"docs/listings/{slug}"
             os.makedirs(film_dir, exist_ok=True)
+            # Film is showing again: it's no longer an archive.
+            _stale_marker = os.path.join(film_dir, "archived_on.txt")
+            if os.path.exists(_stale_marker):
+                os.remove(_stale_marker)
             detail_html = build_film_detail_page(film, anchor)
             with open(f"{film_dir}/index.html", "w", encoding="utf-8") as fh:
                 fh.write(detail_html)
