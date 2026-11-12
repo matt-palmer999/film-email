@@ -1473,7 +1473,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <div class="hero-poster">{poster_html}</div>
     <div class="hero-info">
       <div class="badges">{vose_badge}{score_badge}{rating_badge}</div>
-      <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+      <h1 class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</h1>
       {orig_label}
       <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
@@ -1774,7 +1774,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <div class="hero-poster">{poster_html}</div>
     <div class="hero-info">
       <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>
-      <div class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</div>
+      <h1 class="hero-title" data-es="{esc(title_es)}" data-en="{esc(title_en)}">{title_es}</h1>
       {orig_label}
       <div class="hero-meta"><span data-es="{meta}" data-en="{meta_en}">{meta}</span></div>
       <div class="hero-synopsis" data-es="{esc(syn_es)}" data-en="{esc(syn_en)}">{syn_es}</div>
