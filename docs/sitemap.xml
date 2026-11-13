@@ -4,6 +4,7 @@
   <url><loc>https://whatson.movie/listings/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/alicante/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/barcelona/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/malaga/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/american-beauty/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-omen/</loc><lastmod>2026-11-13</lastmod></url>
@@ -66,10 +67,8 @@
   <url><loc>https://whatson.movie/listings/tokyo-godfathers/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/calle-de-los-angeles/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/cecilia-bartolome-so-far-so-close/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://whatson.movie/listings/curtmetratges-finestra-i-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/curtmetratges-finestra-ii-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-kid/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://whatson.movie/listings/hear-the-yellow-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-flesh/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-violinist/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/leviticus/</loc><lastmod>2026-11-13</lastmod></url>
@@ -138,6 +137,15 @@
   <url><loc>https://whatson.movie/listings/tad-and-the-magic-lamp/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-cielo-es-para-siempre/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/sesion-misteriosa/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/street-fighter/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/36-festival-de-cine-fantastico-de-la-universidad-de-malaga-fancine/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/bicycle-thieves/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/pavarotti-live-in-central-park/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/inception/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-hustler/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/crimes-and-misdemeanors/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/the-apartment/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/blade-runner/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-2026/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-cat/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/200-dias-paco-rabal/</loc><lastmod>2026-11-09</lastmod></url>
@@ -272,6 +280,7 @@
   <url><loc>https://whatson.movie/listings/coyote-contra-acme/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/cronos/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/cronos-vose/</loc><lastmod>2026-09-22</lastmod></url>
+  <url><loc>https://whatson.movie/listings/curtmetratges-finestra-i-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/dentro-del-laberinto-wilder-cinema/</loc><lastmod>2026-09-25</lastmod></url>
   <url><loc>https://whatson.movie/listings/detective-conan-fallen-angel-of-the-highway/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/digger-vose/</loc><lastmod>2026-11-12</lastmod></url>
@@ -374,6 +383,7 @@
   <url><loc>https://whatson.movie/listings/hanuman-ansh/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://whatson.movie/listings/haute-couture/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/hear-the-yellow/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/hear-the-yellow-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/her-private-hell/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/hijos-de-los-hombres/</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://whatson.movie/listings/honey-bunny-41o-mostra-de-valencia/</loc><lastmod>2026-11-13</lastmod></url>
@@ -651,7 +661,6 @@
   <url><loc>https://whatson.movie/listings/stockholm/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://whatson.movie/listings/stray-kids-world-tour-dominate-celebrate/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/stray-kids-world-tour-run-it-live-viewing/</loc><lastmod>2026-11-08</lastmod></url>
-  <url><loc>https://whatson.movie/listings/street-fighter/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/sucedera-esta-noche-41o-mostra-de-valencia/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/summer-with-monika/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/sunny-dancer/</loc><lastmod>2026-10-12</lastmod></url>

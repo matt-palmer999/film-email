@@ -616,10 +616,11 @@
       <!-- CINEMAS -->
       <div class="prefs-section">
         <div class="prefs-section-title" data-es="Cines a incluir" data-en="Cinemas to include">Cines a incluir</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           <button id="city-btn-Valencia"  class="filter-btn active" onclick="selectCity('Valencia')">🌊 Valencia</button>
           <button id="city-btn-Barcelona" class="filter-btn"        onclick="selectCity('Barcelona')">🏛️ Barcelona</button>
           <button id="city-btn-Alicante"  class="filter-btn"        onclick="selectCity('Alicante')">🏖️ Alicante</button>
+          <button id="city-btn-Málaga"    class="filter-btn"        onclick="selectCity('Málaga')">☀️ Málaga</button>
         </div>
         <div class="cinema-grid" id="cinema-grid" translate="no">
           <!-- populated by JS -->
@@ -774,6 +775,13 @@
         { id: 'aana_alicante',       name: 'Cines Aana Alicante',       arthouse: false },
         { id: 'aana_san_juan',       name: 'Cines Aana San Juan',       arthouse: false },
       ],
+      'Málaga': [
+        { id: 'yelmo_vialia',        name: 'Yelmo Vialia Málaga',       arthouse: false },
+        { id: 'yelmo_plaza_mayor',   name: 'Yelmo Plaza Mayor',         arthouse: false },
+        { id: 'albeniz',             name: 'Cine Albéniz',              arthouse: true  },
+        { id: 'mk2_miramar',         name: 'mk2 Miramar (Fuengirola)',  arthouse: false },
+        { id: 'kinepolis_marbella',  name: 'Kinépolis La Cañada (Marbella)', arthouse: false },
+      ],
     };
     const CITIES = Object.keys(CINEMAS_BY_CITY);
 
@@ -850,7 +858,7 @@
         prefs.min_rating   = sub.min_rating   || 7.0;
         const _rawCity = (sub.city || 'Valencia');
         const _cityKeys = Object.keys(CINEMAS_BY_CITY);
-        prefs.city = _cityKeys.find(function(k) { return k.toLowerCase() === _rawCity.toLowerCase(); }) || 'Valencia';
+        prefs.city = _cityKeys.find(function(k) { return k.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === _rawCity.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }) || 'Valencia';
         const _defaultCinemas = (CINEMAS_BY_CITY[prefs.city] || CINEMAS_BY_CITY.Valencia).map(c => c.id);
         prefs.cinemas      = sub.cinemas      || _defaultCinemas;
         prefs.lang         = sub.lang         || 'es';
@@ -1004,7 +1012,7 @@
         setCookie('cv_email', currentEmail);
 
         // Build personalised listings URL from saved preferences
-        const citySlug    = (prefs.city || 'Valencia').toLowerCase();
+        const citySlug    = (prefs.city || 'Valencia').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         // Saved city is now the default: film pages read it from here
         try { localStorage.setItem('whatson_city', citySlug); } catch (e) {}
         const listingsBase = `../listings/${citySlug}/`;

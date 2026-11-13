@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0a0810">
 <title>Elige tu ciudad · whatson.movie</title>
 <link rel="canonical" href="https://whatson.movie/listings/">
-<meta name="description" content="Cartelera de cine en Alicante, Barcelona y Valencia. Elige tu ciudad para ver las películas de esta semana.">
+<meta name="description" content="Cartelera de cine en Alicante, Barcelona, Málaga y Valencia. Elige tu ciudad para ver las películas de esta semana.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="whatson.movie — elige tu ciudad">
 <meta property="og:url" content="https://whatson.movie/listings/">
@@ -80,11 +80,18 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       <div class="city-count" data-es="70 películas esta semana" data-en="70 films this week">70 películas esta semana</div>
       <div class="city-arrow" style="color:#c084fc;">→</div>
     </a>
+    <a href="./malaga/" class="city-card" style="border-color:#fb923c33;">
+      <div class="city-emoji">☀️</div>
+      <div class="city-name" style="color:#fb923c;">Málaga</div>
+      <div class="city-desc" data-es="La cartelera completa de Málaga y la Costa del Sol" data-en="Málaga and Costa del Sol cinema listings">La cartelera completa de Málaga y la Costa del Sol</div>
+      <div class="city-count" data-es="50 películas esta semana" data-en="50 films this week">50 películas esta semana</div>
+      <div class="city-arrow" style="color:#fb923c;">→</div>
+    </a>
     <a href="./valencia/" class="city-card" style="border-color:#c9a84c33;">
       <div class="city-emoji">🌊</div>
       <div class="city-name" style="color:#c9a84c;">Valencia</div>
       <div class="city-desc" data-es="La cartelera completa de Valencia" data-en="Valencia's complete cinema listings">La cartelera completa de Valencia</div>
-      <div class="city-count" data-es="111 películas esta semana" data-en="111 films this week">111 películas esta semana</div>
+      <div class="city-count" data-es="109 películas esta semana" data-en="109 films this week">109 películas esta semana</div>
       <div class="city-arrow" style="color:#c9a84c;">→</div>
     </a>
   </div>
@@ -116,7 +123,7 @@ function setLang(lang) {
       headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': _email }
     }).then(function(r) { return r.json(); }).then(function(data) {
       var sub = data[0];
-      var city = ((sub && sub.city) || 'valencia').toLowerCase();
+      var city = ((sub && sub.city) || 'valencia').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       localStorage.setItem('whatson_city', city);
       window.location.replace('./' + city + '/');
     }).catch(function() {

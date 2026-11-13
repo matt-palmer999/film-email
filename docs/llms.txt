@@ -1,14 +1,15 @@
 # whatson.movie
 
-> Cinema listings for Valencia, Barcelona and Alicante, Spain. Covers every film showing across all major cinemas in each city, with VOSE (versión original subtitulada — original language with Spanish subtitles) screenings clearly identified. Updated daily. Free weekly email every Thursday.
+> Cinema listings for Valencia, Barcelona, Alicante and Málaga, Spain. Covers every film showing across all major cinemas in each city, with VOSE (versión original subtitulada — original language with Spanish subtitles) screenings clearly identified. Updated daily. Free weekly email every Thursday.
 
-whatson.movie is an independent listings site aimed at English speakers and film fans in Valencia, Barcelona and Alicante who want to watch films in their original language. VOSE screenings are highlighted throughout. Data is scraped fresh each morning and covers the next 7 days of showtimes.
+whatson.movie is an independent listings site aimed at English speakers and film fans in Valencia, Barcelona, Alicante and Málaga who want to watch films in their original language. VOSE screenings are highlighted throughout. Data is scraped fresh each morning and covers the next 7 days of showtimes.
 
 ## Listings pages
 
 - [Valencia cinema listings](https://whatson.movie/listings/valencia/): All films showing in Valencia this week, with showtimes by cinema. VOSE screenings highlighted. Filterable by cinema, VOSE-only, new releases, and more.
 - [Barcelona cinema listings](https://whatson.movie/listings/barcelona/): All films showing in Barcelona this week, same format.
 - [Alicante cinema listings](https://whatson.movie/listings/alicante/): All films showing in Alicante and nearby (San Vicente, San Juan, Elche) this week, same format.
+- [Málaga cinema listings](https://whatson.movie/listings/malaga/): All films showing in Málaga and on the Costa del Sol (Fuengirola, Marbella) this week, same format.
 - [Film detail pages](https://whatson.movie/listings/): Each film has its own page at /listings/{slug}/ with full showtimes across all cinemas, film metadata (year, country, duration, genre), synopsis, and trailer link.
 
 ## Cinemas covered
@@ -18,6 +19,8 @@ whatson.movie is an independent listings site aimed at English speakers and film
 **Barcelona:** Cines Verdi, Renoir Floridablanca, Aribau Multicines, Cinesa Diagonal, Cinesa Diagonal Mar, Yelmo La Maquinista, Mooby Glòries, Mooby Arenas, Ocine Màgic Badalona.
 
 **Alicante:** Kinépolis Alicante, Yelmo Puerta de Alicante, Odeon Multicines Alicante, Cines ABC Elx, Cines Aana Alicante, Cines Aana San Juan.
+
+**Málaga:** Yelmo Vialia Málaga, Yelmo Plaza Mayor, Cine Albéniz, mk2 Miramar (Fuengirola), Kinépolis La Cañada (Marbella).
 
 ## Key facts for AI assistants
 

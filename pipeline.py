@@ -55,6 +55,12 @@ CINEMA_META = {
     "abc_elx":             {"name": "Cines ABC Elx",            "website": "https://www.cinesabc.com/cine/abcelx",       "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+ABC+Elx+L%27Aljub+Elche"},
     "aana_alicante":       {"name": "Cines Aana Alicante",      "website": "https://www.cinesaana.com/",                 "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+Aana+Alicante"},
     "aana_san_juan":       {"name": "Cines Aana San Juan",      "website": "https://www.cinesaana.com/",                 "type": "multiplex", "city": "Alicante", "maps": "https://maps.google.com/?q=Cines+Aana+San+Juan+de+Alicante"},
+    "yelmo_vialia":        {"name": "Yelmo Vialia Málaga",      "website": "https://cineyelmo.com/cines/vialia-malaga-malaga", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Yelmo+Cines+Vialia+Malaga"},
+    "yelmo_plaza_mayor":   {"name": "Yelmo Plaza Mayor",        "website": "https://cineyelmo.com/cines/plaza-mayor-malaga",   "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Yelmo+Cines+Plaza+Mayor+Malaga"},
+    "albeniz":             {"name": "Cine Albéniz",             "website": "https://cinealbeniz.com/",                  "type": "arthouse",  "city": "Málaga", "maps": "https://maps.google.com/?q=Cine+Albeniz+Malaga"},
+    "mk2_miramar":         {"name": "mk2 Miramar (Fuengirola)", "website": "https://www.mk2cines.es/es/mk2-cinesur-miramar", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=mk2+Miramar+Fuengirola"},
+    "mk2_malaga_nostrum":  {"name": "mk2 Málaga Nostrum",       "website": "https://www.mk2cines.es/es/cine-mk2-malaga-nostrum-premium", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=mk2+Malaga+Nostrum"},
+    "kinepolis_marbella":  {"name": "Kinépolis La Cañada (Marbella)", "website": "https://kinepolis.es/?complex=ESMAR&select_theater=ESMAR&main_section=cartelera", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Kinepolis+La+Ca%C3%B1ada+Marbella"},
 }
 
 
@@ -82,6 +88,11 @@ def slugify(title: str) -> str:
     s = "".join(c for c in s if not unicodedata.combining(c))
     s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
     return s or "film"
+
+
+def city_slug(city: str) -> str:
+    """URL/localStorage slug for a city name: "Málaga" → "malaga"."""
+    return slugify(city or "")
 
 
 def esc(s: str) -> str:
@@ -492,6 +503,10 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.odeon_alicante    import scrape_odeon_alicante
     from scrapers.abc_elx           import scrape_abc_elx
     from scrapers.aana              import scrape_aana
+    from scrapers.yelmo_malaga      import scrape_yelmo_malaga
+    from scrapers.albeniz           import scrape_albeniz
+    from scrapers.mk2               import scrape_mk2_malaga
+    from scrapers.kinepolis_marbella import scrape_kinepolis_marbella
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis",             "Valencia"),
@@ -517,12 +532,18 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_odeon_alicante,  "Odeon Alicante",    "Alicante"),
         (scrape_abc_elx,         "ABC Elx",           "Alicante"),
         (scrape_aana,            "Cines Aana",        "Alicante"),
+        (scrape_yelmo_malaga,    "Yelmo Málaga",      "Málaga"),
+        (scrape_albeniz,         "Cine Albéniz",      "Málaga"),
+        (scrape_mk2_malaga,      "mk2 Málaga",        "Málaga"),
+        (scrape_kinepolis_marbella, "Kinépolis Marbella", "Málaga"),
     ]
     # Scrapers that return several cinemas: report each cinema separately.
     multi_cinema = {
         "Cinesa Barcelona": [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")],
         "ABC cinemas":      [("park", "ABC Park"), ("elsaler", "ABC El Saler"), ("granturia", "ABC Gran Turia")],
         "Cines Aana":       [("aana_alicante", "Aana Alicante"), ("aana_san_juan", "Aana San Juan")],
+        "Yelmo Málaga":     [("yelmo_vialia", "Yelmo Vialia"), ("yelmo_plaza_mayor", "Yelmo Plaza Mayor")],
+        "mk2 Málaga":       [("mk2_miramar", "mk2 Miramar")],
     }
 
     all_results: list[dict] = []
@@ -1187,7 +1208,7 @@ function syncSubscriberCity(email) {
   fetch(window.SUPABASE_URL + '/rest/v1/subscribers?email=eq.' + encodeURIComponent(email) + '&select=city',
     { headers: { 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': email } })
     .then(r => r.json())
-    .then(rows => { if (rows && rows[0] && rows[0].city) localStorage.setItem('whatson_city', String(rows[0].city).toLowerCase()); })
+    .then(rows => { if (rows && rows[0] && rows[0].city) localStorage.setItem('whatson_city', String(rows[0].city).normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()); })
     .catch(() => {});
 }
 
@@ -1234,7 +1255,7 @@ async function loadUserPreferences() {
     setSubscriberUI(true);
     // Subscribers' default city is their saved choice, not the last city page they browsed
     if (prefs.city) {
-      try { localStorage.setItem('whatson_city', String(prefs.city).toLowerCase()); } catch(e) {}
+      try { localStorage.setItem('whatson_city', String(prefs.city).normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()); } catch(e) {}
     }
     if (prefs.lang) setLang(prefs.lang);
 
@@ -1549,7 +1570,7 @@ def _build_jsonld(film: dict, slug: str) -> str:
              "item": "https://whatson.movie/"},
             {"@type": "ListItem", "position": 2,
              "name": f"Cartelera {_crumb_city}",
-             "item": f"https://whatson.movie/listings/{_crumb_city.lower()}/"},
+             "item": f"https://whatson.movie/listings/{city_slug(_crumb_city)}/"},
             {"@type": "ListItem", "position": 3, "name": film.get("title_en") or film["title"],
              "item": f"https://whatson.movie/listings/{slug}/"},
         ]
@@ -1653,7 +1674,7 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
         _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
         _desc_es = (f"{esc(title_es)} en cartelera en {_city}{_vsfx_es}. Horarios en {_city_cines}." if _city_cines else f"{esc(title_es)} — sesiones y horarios en {_city}{_vsfx_es}.")
         _desc_en = (f"{esc(title_en)} now showing in {_city}{_vsfx_en}. Showtimes at {_city_cines}." if _city_cines else f"{esc(title_en)} — {_city} cinema showtimes{_vsfx_en}.")
-        _back_href, _back_es, _back_en = f"../{_city.lower()}/", f"Cartelera {_city}", f"{_city} Cinema"
+        _back_href, _back_es, _back_en = f"../{city_slug(_city)}/", f"Cartelera {_city}", f"{_city} Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
@@ -1922,7 +1943,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
         _desc_es = (f"{esc(title_es)} en cartelera en {_city}{_vsfx_es}. Horarios en {_city_cines}." if _city_cines else f"{esc(title_es)} — sesiones y horarios en {_city}{_vsfx_es}.")
         _desc_en = (f"{esc(title_en)} now showing in {_city}{_vsfx_en}. Showtimes at {_city_cines}." if _city_cines else f"{esc(title_en)} — {_city} cinema showtimes{_vsfx_en}.")
-        _back_href, _back_es, _back_en = f"../{_city.lower()}/", f"Cartelera {_city}", f"{_city} Cinema"
+        _back_href, _back_es, _back_en = f"../{city_slug(_city)}/", f"Cartelera {_city}", f"{_city} Cinema"
     else:
         _brand_es, _brand_en = "whatson.movie", "whatson.movie"
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
@@ -2357,10 +2378,10 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
   }} catch(e) {{ /* silent */ }}
 }})();
 (function() {{
-  const city = (localStorage.getItem('whatson_city') || '').toLowerCase();
+  const city = (localStorage.getItem('whatson_city') || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
   if (!city) return;
   document.querySelectorAll('.showtime-row[data-city]').forEach(function(row) {{
-    const rowCity = (row.dataset.city || '').toLowerCase();
+    const rowCity = (row.dataset.city || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
     if (rowCity && rowCity !== city) row.classList.add('city-hidden');
   }});
   document.querySelectorAll('.day-panel').forEach(function(panel) {{
@@ -2408,13 +2429,19 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
             "emoji": "🏖️",
             "color": "#38bdf8",
         },
+        "Málaga": {
+            "es": "La cartelera completa de Málaga y la Costa del Sol",
+            "en": "Málaga and Costa del Sol cinema listings",
+            "emoji": "☀️",
+            "color": "#fb923c",
+        },
     }
     _sorted_cities = sorted(cities)
     _cities_es = (", ".join(_sorted_cities[:-1]) + " y " + _sorted_cities[-1]) if len(_sorted_cities) > 1 else "".join(_sorted_cities)
 
     cards_html = ""
     for city in sorted(cities):
-        slug  = city.lower()
+        slug  = city_slug(city)
         meta  = CITY_META.get(city, {"es": city, "en": city, "emoji": "🎬", "color": "#c9a84c"})
         count = city_film_counts.get(city, 0)
         cards_html += f"""
@@ -2523,7 +2550,7 @@ function setLang(lang) {{
       headers: {{ 'apikey': window.SUPABASE_ANON, 'Authorization': 'Bearer ' + window.SUPABASE_ANON, 'x-subscriber-email': _email }}
     }}).then(function(r) {{ return r.json(); }}).then(function(data) {{
       var sub = data[0];
-      var city = ((sub && sub.city) || 'valencia').toLowerCase();
+      var city = ((sub && sub.city) || 'valencia').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
       localStorage.setItem('whatson_city', city);
       window.location.replace('./' + city + '/');
     }}).catch(function() {{
@@ -2548,15 +2575,15 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
             if any(c["id"] in _city_ids for c in cinemas_in_window(f))
         }
     city_name     = city or "Valencia"
-    city_slug     = city.lower() if city else ""
+    city_slug_    = city_slug(city) if city else ""
     root_href     = "../../" if city else "../"
     slug_prefix   = "../" if city else "./"
-    canonical_url = f"https://whatson.movie/listings/{city_slug}/" if city else "https://whatson.movie/listings/"
+    canonical_url = f"https://whatson.movie/listings/{city_slug_}/" if city else "https://whatson.movie/listings/"
     _all_cinemas      = [k for k, v in CINEMA_META.items() if not city or v.get("city") == city]
     _other_cities = sorted({v["city"] for v in CINEMA_META.values() if v.get("city") and v.get("city") != city}) if city else []
     _other_cities_html = (
         '<p class="footer-cities"><span data-es="Otras ciudades:" data-en="Other cities:">Otras ciudades:</span> '
-        + " · ".join(f'<a href="../{c.lower()}/">{c}</a>' for c in _other_cities)
+        + " · ".join(f'<a href="../{city_slug(c)}/">{c}</a>' for c in _other_cities)
         + "</p>"
     ) if _other_cities else ""
     _all_cinemas_json = json.dumps(_all_cinemas)
@@ -2602,7 +2629,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         cinema_types = {c["type"] for c in film["cinemas"]}
         cinema_ids   = {c["id"]   for c in film["cinemas"]}
 
-        _arthouse_only = {"babel", "dor", "verdi_barcelona", "renoir_barcelona", "aribau_barcelona"}
+        _arthouse_only = {"babel", "dor", "verdi_barcelona", "renoir_barcelona", "aribau_barcelona", "albeniz"}
         if "multiplex" in cinema_types or cinema_ids.issubset(_arthouse_only):
             multiplex_films.append(film)
 
@@ -2803,7 +2830,7 @@ window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
   // Non-subscribers: remember the last city viewed. Subscribers keep their saved city.
-  if ('{city_slug}' && !/(^|; )cv_email=/.test(document.cookie)) localStorage.setItem('whatson_city', '{city_slug}');
+  if ('{city_slug_}' && !/(^|; )cv_email=/.test(document.cookie)) localStorage.setItem('whatson_city', '{city_slug_}');
   initSections();
   applyVisibility();
   loadUserPreferences();
@@ -3032,12 +3059,12 @@ def run() -> None:
     _cities.sort()
     for _city in _cities:
         _city_html = build_html(films, anchor, city=_city)
-        _city_dir  = f"docs/listings/{_city.lower()}"
+        _city_dir  = f"docs/listings/{city_slug(_city)}"
         os.makedirs(_city_dir, exist_ok=True)
         with open(f"{_city_dir}/index.html", "w", encoding="utf-8") as fh:
             fh.write(_city_html)
         log.info(f"Wrote {_city_dir}/index.html")
-    _city_slugs = {c.lower() for c in _cities}
+    _city_slugs = {city_slug(c) for c in _cities}
     _chooser_html = build_city_chooser_html(_cities, films, anchor)
     with open("docs/listings/index.html", "w", encoding="utf-8") as fh:
         fh.write(_chooser_html)
@@ -3140,7 +3167,7 @@ def run() -> None:
     sitemap_urls = [
         _surl("https://whatson.movie/"),
         _surl("https://whatson.movie/listings/"),
-        *[_surl(f"https://whatson.movie/listings/{c.lower()}/") for c in _cities],
+        *[_surl(f"https://whatson.movie/listings/{city_slug(c)}/") for c in _cities],
     ]
     for title, film in films.items():
         slug = film.get("slug")
@@ -3173,7 +3200,7 @@ def run() -> None:
             "docs/index.html",
             "docs/preferences/index.html",
             "docs/listings/index.html",
-            *[f"docs/listings/{c.lower()}/index.html" for c in _cities],
+            *[f"docs/listings/{city_slug(c)}/index.html" for c in _cities],
             "docs/verify/index.html",
             "docs/unsubscribe/index.html",
         ]
@@ -3215,7 +3242,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
     urls = [
         "https://whatson.movie/",
         "https://whatson.movie/listings/",
-        *[f"https://whatson.movie/listings/{c.lower()}/" for c in cities],
+        *[f"https://whatson.movie/listings/{city_slug(c)}/" for c in cities],
     ]
     for film in films.values():
         slug = film.get("slug")
