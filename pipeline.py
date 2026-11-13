@@ -102,7 +102,7 @@ TMDB_DOUBTFUL: list = []
 # e.g. "Mostra 2026 – Paris, Texas" or "Wilder Cinema – Tokyo Godfathers"
 _EVENT_PREFIX_RE = re.compile(
     r'^(?:[A-Za-záéíóúüñÁÉÍÓÚÜÑ ]+\s+\d{4}'
-    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)'
+    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)|Cine ?Club'
     r'|Otra vez[^–]*|Vino Club Babel|Preestreno\s+\S+)'
     r'\s*[-–]\s*',
     re.IGNORECASE,
@@ -114,7 +114,7 @@ _REISSUE_SUFFIXES = (
     r'|Versi[oó]n\s+(Extendida|Restaurada|Remasterizada|Original|del\s+Director)'  # Versión extendida etc.
     r'|Director\'?s?\s+Cut|Montaje\s+del\s+Director'     # Director's Cut
     r'|Edici[oó]n\s+(Especial|Coleccionista|Definitiva)'  # Edición especial
-    r'|Pase\s+Especial'                                   # Pase especial
+    r'|Pase\s+Especial|Encore'                                   # Pase especial
     r'|4K(\s+Restaurad[ao])?'                             # 4K / 4K Restaurada
     r'|Parte\s+(Uno|1)|Part\s+(One|1)'                   # "Dune: Parte Uno" is just "Dune" on TMDB
     r'|Infinity\s+Vision|4DX|IMAX|Dolby|ScreenX|D-BOX'  # premium screen formats appended by cinemas
@@ -131,7 +131,7 @@ _EVENT_CINEMA_RE = re.compile(
 _EVENT_BRAND_RE = re.compile(
     r'National Theatre|NT Live|\bMet\b|Metropolitan|Royal (Opera|Ballet)|\bROH\b'
     r'|Teatro Real|Bolsh|Op[eé]ra (de|National)', re.IGNORECASE)
-# Festival screenings are new films: an old TMDB film with the same name is wrong.
+# Festivals screen shorts (but also restored classics, e.g. Arrebato at the Mostra).
 _FESTIVAL_RE = re.compile(r'\b(Mostra|Festival|Preestreno)', re.IGNORECASE)
 
 
@@ -142,6 +142,11 @@ def _strip_event_prefix(title: str) -> str:
 def _tmdb_clean_title(title: str) -> str:
     """Title with language prefixes and reissue/format suffixes removed (not yet cut at dashes)."""
     t = re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=re.IGNORECASE)
+    # Version tags and trailing dots: "Jujutsu Kaisen 0: La película (VOSE)."
+    t = re.sub(r'\s*\((VOSE|VOS|VO|V\.O\.S\.E\.?|VOSC|DOBLADA)\)', '', t, flags=re.IGNORECASE)
+    t = t.rstrip(" .")
+    # Screening-series tags after a dash: "GILDA - WILDER CINEMA"
+    t = re.sub(r'\s*[-–]\s*(Wilder Cinema|Cine ?Club|Cine con coloquio)\s*$', '', t, flags=re.IGNORECASE)
     return re.sub(r'\s*[\(\[]?\s*(' + _REISSUE_SUFFIXES + r')\s*[\)\]]?$',
                   '', t, flags=re.IGNORECASE).strip()
 
@@ -231,10 +236,12 @@ def _tmdb_ranked(title: str, results_by_query: dict, this_year: int) -> list:
     targets = [title, clean] + [q for q in results_by_query if q != cut or q == clean]
     if _EVENT_CINEMA_RE.search(title):
         targets.append(cut)       # "All My Sons - National Theatre 26-27" → "All My Sons"
+    elif (cut != clean and re.match(re.escape(cut) + r'\s*[-–]', clean)
+          and not _EVENT_PREFIX_RE.match(clean)):
+        targets.append(cut)       # "SEÑORAS Y SEÑORAS - Maria Guerra y ..." → "SEÑORAS Y SEÑORAS"
     # Opera/ballet/theatre broadcasts: TMDB is full of older recordings and
     # adaptations with the same name — only this season's, branded entry counts.
     is_event = bool(_EVENT_CINEMA_RE.search(title))
-    is_festival = bool(_FESTIVAL_RE.search(title))
     # A year in the title ("11 (2026)", "SOSPECHA (1941) - WILDER CINEMA",
     # "Akira 1988") pins the release year.
     ym = re.search(r'[\(\[]\s*((?:19|20)\d{2})\s*[\)\]]|\s((?:19|20)\d{2})\s*$', title)
@@ -257,8 +264,6 @@ def _tmdb_ranked(title: str, results_by_query: dict, this_year: int) -> list:
             ok = sim >= 0.9 or (sim >= 0.6 and recent)
             if is_event and not (year and year >= this_year - 1
                                  and any(_EVENT_BRAND_RE.search(n) for n in names if n)):
-                ok = False
-            if is_festival and year and year < this_year - 2:
                 ok = False
             # ±2: Spanish release dates can lag the original by a year or two
             if title_year and not (year and abs(year - title_year) <= 2):
@@ -388,9 +393,10 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
         festival = bool(_FESTIVAL_RE.search(title))
         for movie, sim, recent in ranked[:3]:
             out = _tmdb_details(movie["id"], headers, movie)
-            # Cinemas rarely list shorts (festivals aside): an exact-title hit on a
-            # 3- or 20-minute film is usually a different work with the same name.
-            if out.get("runtime") and out["runtime"] < 40 and not festival:
+            # Cinemas rarely list shorts: an exact-title hit on a 3- or 20-minute
+            # film is usually a different work with the same name. Festivals do
+            # show shorts, but new ones — not a 1992 six-minute namesake.
+            if out.get("runtime") and out["runtime"] < 40 and not (festival and recent):
                 log.info(f"  TMDB: skipped short '{out.get('title_en')}' ({out['runtime']} min) for '{title}'")
                 continue
             if sim < 0.8 or (out.get("runtime") or 99) < 40:
@@ -2991,10 +2997,14 @@ def run() -> None:
         # left behind when a film came back and then left again. Re-archive it so
         # it doesn't keep showing old showtimes.
         _page_path = os.path.join(entry.path, "index.html")
-        _is_archive_page = False
+        _is_archive_page = _is_redirect = False
         if os.path.exists(_page_path):
             with open(_page_path, encoding="utf-8", errors="replace") as _fh:
-                _is_archive_page = "archive-notice-label" in _fh.read()
+                _page_src = _fh.read()
+            _is_archive_page = "archive-notice-label" in _page_src
+            # Redirect stub left where a page was built from a wrong TMDB match
+            _is_redirect = "data-redirect-stub" in _page_src
+            _is_archive_page = _is_archive_page or _is_redirect
         if os.path.exists(archived_on_path) and _is_archive_page:
             try:
                 archived_date = date.fromisoformat(open(archived_on_path, encoding="utf-8").read().strip())
@@ -3004,7 +3014,7 @@ def run() -> None:
             if age_days >= ARCHIVE_MAX_DAYS:
                 shutil.rmtree(entry.path)
                 log.info(f"  Deleted expired archive: {entry.name} ({age_days}d old)")
-            else:
+            elif not _is_redirect:
                 archived_slugs.append((entry.name, archived_date.isoformat()))
                 log.debug(f"  Keeping archive: {entry.name} ({age_days}d old)")
         else:
