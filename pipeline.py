@@ -1354,9 +1354,43 @@ def _film_from_page_html(film_dir: str, slug: str) -> dict | None:
     title = _meta("og:image:alt")
     if not title:
         title = re.sub(r"\s+—\s+whatson\.movie$", "", _meta("og:title"))
+    # Social tags carry site branding ("X — Cartelera Valencia"); keep just the film title
+    title = re.sub(r"(\s+—\s+(Cartelera \w+|whatson\.movie))+$", "", title)
     if not title:
         title = slug.replace("-", " ").title()
     return {"title": title, "poster": _meta("og:image"), "slug": slug}
+
+
+def _meta_description(film: dict, title: str, archived: bool = False, limit: int = 155) -> str:
+    """Search-result snippet (Spanish): title (year) + city/VOSE/cinemas + start of synopsis.
+    Returned HTML-escaped and cut at a word boundary to ~limit characters."""
+    year = str(film.get("year") or "").strip()
+    head = f"{title} ({year})" if year and year not in title else title
+    cinemas = film.get("cinemas", [])
+    cities = sorted({CINEMA_META.get(c.get("id", ""), {}).get("city") for c in cinemas} - {None, ""})
+    vose = " · VOSE disponible" if film.get("any_vose") else ""
+    if archived:
+        lead = f"{head} ya no está en cartelera."
+    elif len(cities) == 1:
+        names = [c.get("name", "") for c in cinemas if c.get("name")]
+        if len(names) > 2:
+            where = f"{names[0]}, {names[1]} y {len(names) - 2} cines más"
+        else:
+            where = " y ".join(names)
+        lead = f"{head} en cartelera en {cities[0]}{vose}." + (f" Horarios en {where}." if where else "")
+    elif cities:
+        city_txt = ", ".join(cities[:-1]) + " y " + cities[-1]
+        lead = f"{head} en cartelera en {city_txt}{vose}. Horarios en {len(cinemas)} cines."
+    else:
+        lead = f"{head} — sesiones y horarios."
+    synopsis = re.sub(r"\s+", " ", film.get("synopsis_es") or film.get("synopsis") or "").strip()
+    if not synopsis:
+        synopsis = ("Consulta la cartelera de esta semana en whatson.movie, con las sesiones VOSE destacadas."
+                    if archived else "Sesiones y horarios actualizados cada día.")
+    text = f"{lead} {synopsis}"
+    if len(text) > limit:
+        text = text[:limit - 1].rsplit(" ", 1)[0].rstrip(",;:·—–- ") + "…"
+    return esc(text)
 
 
 def build_film_archive_page(film: dict, anchor: datetime) -> str:
@@ -1397,6 +1431,7 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
         _desc_en = f"{esc(title_en)} — cinema listings Spain"
         _back_href, _back_es, _back_en = "../", "Cartelera", "Listings"
+    _desc_es = _meta_description(film, title_es, archived=True)
 
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
@@ -1665,6 +1700,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         _desc_es = f"{esc(title_es)} — sesiones y horarios"
         _desc_en = f"{esc(title_en)} — cinema listings Spain"
         _back_href, _back_es, _back_en = "../", "Cartelera", "Listings"
+    _desc_es = _meta_description(film, title_es)
 
     return f"""<!DOCTYPE html>
 <html lang="es" id="html-root">
