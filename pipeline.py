@@ -60,6 +60,9 @@ CINEMA_META = {
     "albeniz":             {"name": "Cine Albéniz",             "website": "https://cinealbeniz.com/",                  "type": "arthouse",  "city": "Málaga", "maps": "https://maps.google.com/?q=Cine+Albeniz+Malaga"},
     "mk2_miramar":         {"name": "mk2 Miramar (Fuengirola)", "website": "https://www.mk2cines.es/es/mk2-cinesur-miramar", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=mk2+Miramar+Fuengirola"},
     "mk2_malaga_nostrum":  {"name": "mk2 Málaga Nostrum",       "website": "https://www.mk2cines.es/es/cine-mk2-malaga-nostrum-premium", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=mk2+Malaga+Nostrum"},
+    "yelmo_rincon":        {"name": "Yelmo Rincón de la Victoria", "website": "https://cineyelmo.com/cines/rincon-de-la-victoria-malaga", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Yelmo+Cines+Rincon+de+la+Victoria"},
+    "mk2_el_ingenio":      {"name": "mk2 El Ingenio (Vélez-Málaga)", "website": "https://www.mk2cines.es/", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=mk2+El+Ingenio+Velez-Malaga"},
+    "rosaleda":            {"name": "Multicines Rosaleda",      "website": "https://www.cineciudad.com/", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Multicines+Rosaleda+Malaga"},
     "kinepolis_marbella":  {"name": "Kinépolis La Cañada (Marbella)", "website": "https://kinepolis.es/?complex=ESMAR&select_theater=ESMAR&main_section=cartelera", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Kinepolis+La+Ca%C3%B1ada+Marbella"},
 }
 
@@ -507,6 +510,7 @@ def aggregate_scrapers() -> tuple[dict, list]:
     from scrapers.albeniz           import scrape_albeniz
     from scrapers.mk2               import scrape_mk2_malaga
     from scrapers.kinepolis_marbella import scrape_kinepolis_marbella
+    from scrapers.rosaleda          import scrape_rosaleda
 
     scrapers = [
         (scrape_kinepolis,  "Kinépolis",             "Valencia"),
@@ -536,14 +540,15 @@ def aggregate_scrapers() -> tuple[dict, list]:
         (scrape_albeniz,         "Cine Albéniz",      "Málaga"),
         (scrape_mk2_malaga,      "mk2 Málaga",        "Málaga"),
         (scrape_kinepolis_marbella, "Kinépolis Marbella", "Málaga"),
+        (scrape_rosaleda,        "Multicines Rosaleda", "Málaga"),
     ]
     # Scrapers that return several cinemas: report each cinema separately.
     multi_cinema = {
         "Cinesa Barcelona": [("cinesa_diagonal", "Cinesa Diagonal"), ("cinesa_diagonal_mar", "Cinesa Diagonal Mar")],
         "ABC cinemas":      [("park", "ABC Park"), ("elsaler", "ABC El Saler"), ("granturia", "ABC Gran Turia")],
         "Cines Aana":       [("aana_alicante", "Aana Alicante"), ("aana_san_juan", "Aana San Juan")],
-        "Yelmo Málaga":     [("yelmo_vialia", "Yelmo Vialia"), ("yelmo_plaza_mayor", "Yelmo Plaza Mayor")],
-        "mk2 Málaga":       [("mk2_miramar", "mk2 Miramar")],
+        "Yelmo Málaga":     [("yelmo_vialia", "Yelmo Vialia"), ("yelmo_plaza_mayor", "Yelmo Plaza Mayor"), ("yelmo_rincon", "Yelmo Rincón")],
+        "mk2 Málaga":       [("mk2_miramar", "mk2 Miramar"), ("mk2_el_ingenio", "mk2 El Ingenio")],
     }
 
     all_results: list[dict] = []

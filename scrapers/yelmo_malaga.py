@@ -1,11 +1,11 @@
 """
 Yelmo cinemas in Málaga: Vialia (María Zambrano station, 13 screens) and
-Plaza Mayor (near the airport).
+Plaza Mayor (near the airport), plus Rincón de la Victoria (~15 km east).
 
 Same Cinépolis GraphQL API as Yelmo Campanar — reuses scrapers.yelmo. The API
 cinemaIds were found by trial on 2026-11-13: Vialia is "vialia-malaga-malaga"
 (not "vialia-malaga"), Plaza Mayor is "plaza-mayor-malaga". Yelmo Rincón de la
-Victoria would be "rincon-de-la-victoria-malaga" if it's ever wanted.
+Victoria is "rincon-de-la-victoria-malaga".
 """
 
 import logging
@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 VENUES = [
     ("vialia-malaga-malaga", "yelmo_vialia",      "Yelmo Vialia Málaga"),
     ("plaza-mayor-malaga",   "yelmo_plaza_mayor", "Yelmo Plaza Mayor"),
+    ("rincon-de-la-victoria-malaga", "yelmo_rincon", "Yelmo Rincón de la Victoria"),
 ]
 
 

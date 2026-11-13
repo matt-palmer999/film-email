@@ -24,6 +24,8 @@ log = logging.getLogger(__name__)
 VENUES = [
     {"key": "mk2_miramar", "name": "mk2 Miramar", "cinema_id": "1746",
      "path": "fuengirola/cinesur-miramar-fuengirola-3d", "enabled": True},
+    {"key": "mk2_el_ingenio", "name": "mk2 El Ingenio", "cinema_id": "1690",
+     "path": "velez-malaga/cinesur-el-ingenio", "enabled": True},
     {"key": "mk2_malaga_nostrum", "name": "mk2 Málaga Nostrum", "cinema_id": "1760",
      "path": "malaga/cinesur-malaga-nostrum", "enabled": False},
 ]

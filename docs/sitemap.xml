@@ -42,9 +42,6 @@
   <url><loc>https://whatson.movie/listings/thesis/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/sense-and-sensibility/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/arriba-tutto/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://whatson.movie/listings/letters-from-an-inner-exile/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://whatson.movie/listings/robin-and-marian/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://whatson.movie/listings/honey-bunny/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/dear-marcelle/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-great-organ/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/dear-nanni/</loc><lastmod>2026-11-13</lastmod></url>
@@ -75,6 +72,7 @@
   <url><loc>https://whatson.movie/listings/the-rivals-of-amziah-king/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/verity/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/do-you-understand-or-do-i-have-to-spell-it-out-for-you/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/honey-bunny/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-invasion-of-the-barbarians/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/caravaggio/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/chopin-a-sonata-in-paris/</loc><lastmod>2026-11-13</lastmod></url>
@@ -109,6 +107,7 @@
   <url><loc>https://whatson.movie/listings/cine-a-ciegas/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/exposicion-superthings-rivals-of-kaboom/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/pets-on-a-train/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/teenage-sex-and-death-at-camp-miasma/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-big-lebowski/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/howl-s-moving-castle/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-boy-and-the-heron/</loc><lastmod>2026-11-13</lastmod></url>
@@ -146,6 +145,7 @@
   <url><loc>https://whatson.movie/listings/crimes-and-misdemeanors/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/the-apartment/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/blade-runner/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://whatson.movie/listings/el-mundo-es-ansi/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-2026/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/11-cat/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/200-dias-paco-rabal/</loc><lastmod>2026-11-09</lastmod></url>
@@ -309,7 +309,6 @@
   <url><loc>https://whatson.movie/listings/el-maquinista-de-la-general-wilder-cinema/</loc><lastmod>2026-09-30</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-misterio-de-lucy-lost/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-motin/</loc><lastmod>2026-09-23</lastmod></url>
-  <url><loc>https://whatson.movie/listings/el-mundo-es-ansi/</loc><lastmod>2026-11-05</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-nido/</loc><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-nino/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/el-nombre-de-la-rosa/</loc><lastmod>2026-09-23</lastmod></url>
@@ -461,6 +460,7 @@
   <url><loc>https://whatson.movie/listings/leones-en-invierno/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/les-culpables-docs-del-mes/</loc><lastmod>2026-10-02</lastmod></url>
   <url><loc>https://whatson.movie/listings/les-enfants-iront-bien/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/letters-from-an-inner-exile/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/life-is-beautiful/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/lily-s-ritual/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/limbo/</loc><lastmod>2026-11-12</lastmod></url>
@@ -617,6 +617,7 @@
   <url><loc>https://whatson.movie/listings/resurrection/</loc><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/retrato-de-una-cerilla-41o-mostra-de-valencia/</loc><lastmod>2026-11-05</lastmod></url>
   <url><loc>https://whatson.movie/listings/rise-up-levantate/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://whatson.movie/listings/robin-and-marian/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/rock-bottom/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/rocky-50-aniversario/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/ruega-por-nosotras/</loc><lastmod>2026-11-12</lastmod></url>
@@ -672,7 +673,6 @@
   <url><loc>https://whatson.movie/listings/tadeo-jones-y-la-lampara-maravillosa-doblada-cat/</loc><lastmod>2026-09-23</lastmod></url>
   <url><loc>https://whatson.movie/listings/tanit/</loc><lastmod>2026-09-29</lastmod></url>
   <url><loc>https://whatson.movie/listings/tanit-41o-mostra-de-valencia/</loc><lastmod>2026-11-05</lastmod></url>
-  <url><loc>https://whatson.movie/listings/teenage-sex-and-death-at-camp-miasma/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/terminator-2-judgment-day/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://whatson.movie/listings/terrorificamente-lys-adolescencia-sexo-y-muerte-en-campamento-miasma/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://whatson.movie/listings/terrorificamente-lys-hope/</loc><lastmod>2026-11-09</lastmod></url>

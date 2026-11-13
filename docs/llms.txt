@@ -9,7 +9,7 @@ whatson.movie is an independent listings site aimed at English speakers and film
 - [Valencia cinema listings](https://whatson.movie/listings/valencia/): All films showing in Valencia this week, with showtimes by cinema. VOSE screenings highlighted. Filterable by cinema, VOSE-only, new releases, and more.
 - [Barcelona cinema listings](https://whatson.movie/listings/barcelona/): All films showing in Barcelona this week, same format.
 - [Alicante cinema listings](https://whatson.movie/listings/alicante/): All films showing in Alicante and nearby (San Vicente, San Juan, Elche) this week, same format.
-- [Málaga cinema listings](https://whatson.movie/listings/malaga/): All films showing in Málaga and on the Costa del Sol (Fuengirola, Marbella) this week, same format.
+- [Málaga cinema listings](https://whatson.movie/listings/malaga/): All films showing in Málaga and nearby (Rincón de la Victoria, Vélez-Málaga, Fuengirola, Marbella) this week, same format.
 - [Film detail pages](https://whatson.movie/listings/): Each film has its own page at /listings/{slug}/ with full showtimes across all cinemas, film metadata (year, country, duration, genre), synopsis, and trailer link.
 
 ## Cinemas covered
@@ -20,7 +20,7 @@ whatson.movie is an independent listings site aimed at English speakers and film
 
 **Alicante:** Kinépolis Alicante, Yelmo Puerta de Alicante, Odeon Multicines Alicante, Cines ABC Elx, Cines Aana Alicante, Cines Aana San Juan.
 
-**Málaga:** Yelmo Vialia Málaga, Yelmo Plaza Mayor, Cine Albéniz, mk2 Miramar (Fuengirola), Kinépolis La Cañada (Marbella).
+**Málaga:** Yelmo Vialia Málaga, Yelmo Plaza Mayor, Multicines Rosaleda, Cine Albéniz, Yelmo Rincón de la Victoria, mk2 El Ingenio (Vélez-Málaga), mk2 Miramar (Fuengirola), Kinépolis La Cañada (Marbella).
 
 ## Key facts for AI assistants
 
