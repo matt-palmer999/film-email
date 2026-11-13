@@ -89,19 +89,274 @@ def esc(s: str) -> str:
 
 
 # ── TMDB lookup ───────────────────────────────────────────────────────────────
+#
+# Search results are scored before being accepted: TMDB's first hit for a
+# mangled or event-style title ("Mostra 2026 – Honey Bunny") is often an
+# unrelated old film, and a wrong poster/synopsis is worse than none.
+
+TMDB_OVERRIDES_PATH = "tmdb_overrides.json"
+# Matches accepted with a borderline score — listed in the admin summary email.
+TMDB_DOUBTFUL: list = []
+
+# Event/festival prefixes some cinemas put before the film title,
+# e.g. "Mostra 2026 – Paris, Texas" or "Wilder Cinema – Tokyo Godfathers"
+_EVENT_PREFIX_RE = re.compile(
+    r'^(?:[A-Za-záéíóúüñÁÉÍÓÚÜÑ ]+\s+\d{4}'
+    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)'
+    r'|Otra vez[^–]*|Vino Club Babel|Preestreno\s+\S+)'
+    r'\s*[-–]\s*',
+    re.IGNORECASE,
+)
+
+_REISSUE_SUFFIXES = (
+    r'\d+[°ºo]?\s*(Aniversario|Aniversari|Anniversary)'  # 40 Aniversario / 40º Anniversary
+    r'|Reestreno|Re-estreno'                              # Reestreno
+    r'|Versi[oó]n\s+(Extendida|Restaurada|Remasterizada|Original|del\s+Director)'  # Versión extendida etc.
+    r'|Director\'?s?\s+Cut|Montaje\s+del\s+Director'     # Director's Cut
+    r'|Edici[oó]n\s+(Especial|Coleccionista|Definitiva)'  # Edición especial
+    r'|Pase\s+Especial'                                   # Pase especial
+    r'|4K(\s+Restaurad[ao])?'                             # 4K / 4K Restaurada
+    r'|Parte\s+(Uno|1)|Part\s+(One|1)'                   # "Dune: Parte Uno" is just "Dune" on TMDB
+    r'|Infinity\s+Vision|4DX|IMAX|Dolby|ScreenX|D-BOX'  # premium screen formats appended by cinemas
+    r'|\d{4}'                                             # bare year (1986)
+)
+
+
+_EVENT_CINEMA_RE = re.compile(
+    r'\b(MET|ROH|National Theatre|NT|Teatro Real|Ballet|Bolshoi|[OÓ]pera|Royal Opera'
+    r'|Zarzuela|Recital|Concierto)\b'
+    r'|\b\d{2}[-/]\d{2}\s*$', re.IGNORECASE)
+# Broadcasts are only matched to TMDB entries that name the broadcaster
+# ("National Theatre Live: All My Sons"); a plain same-name film is a guess.
+_EVENT_BRAND_RE = re.compile(
+    r'National Theatre|NT Live|\bMet\b|Metropolitan|Royal (Opera|Ballet)|\bROH\b'
+    r'|Teatro Real|Bolsh|Op[eé]ra (de|National)', re.IGNORECASE)
+# Festival screenings are new films: an old TMDB film with the same name is wrong.
+_FESTIVAL_RE = re.compile(r'\b(Mostra|Festival|Preestreno)', re.IGNORECASE)
+
+
+def _strip_event_prefix(title: str) -> str:
+    return _EVENT_PREFIX_RE.sub("", title).strip()
+
+
+def _tmdb_clean_title(title: str) -> str:
+    """Title with language prefixes and reissue/format suffixes removed (not yet cut at dashes)."""
+    t = re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=re.IGNORECASE)
+    return re.sub(r'\s*[\(\[]?\s*(' + _REISSUE_SUFFIXES + r')\s*[\)\]]?$',
+                  '', t, flags=re.IGNORECASE).strip()
+
+
+def _tmdb_search_title(title: str) -> str:
+    """The single query the old matcher used: cleaned title cut at the first ' - X' or '+'."""
+    return re.split(r'\s*[-–]\s*[A-Z]|\s*\+', _tmdb_clean_title(title))[0].strip()
+
+
+def _tmdb_queries(title: str) -> list:
+    """Search queries to try, most likely first."""
+    clean = _tmdb_clean_title(title)
+    qs = [_tmdb_search_title(title)]
+    parts = [p.strip() for p in re.split(r'\s+[-–]\s+|\s*\+\s*', clean) if p.strip()]
+    if len(parts) > 1:
+        qs += [clean, parts[-1]]          # whole title, and the part after the dash/plus
+    qs.append(_strip_event_prefix(clean))
+    # "LA VIOLINISTA (THE VIOLINIST)": try without the brackets, and the
+    # bracketed alternate title itself (only if it's more than one word)
+    for q in list(qs):
+        m = re.search(r'\s*\(([^()]+)\)\s*$', q)
+        if m:
+            qs.append(q[:m.start()])
+            if len(m.group(1).split()) >= 2:
+                qs.append(m.group(1))
+    # "Película+coloquio: VOSE Los juegos del hambre" → "Los juegos del hambre"
+    qs += [re.sub(r'^[^:]{1,30}:\s*(VOSE|VOS|VO)\s+', '', q) for q in qs]
+    out = []
+    for q in qs:
+        q = q.strip(" -–:")
+        if len(q) >= 2 and q.lower() not in [o.lower() for o in out]:
+            out.append(q)
+    return out
+
+
+def _norm_title(s: str) -> str:
+    import unicodedata
+    s = unicodedata.normalize("NFKD", (s or "").lower())
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.replace("&", " y ")
+    s = re.sub(r"[^a-z0-9]+", " ", s).strip()
+    return re.sub(r"^(the|el|la|los|las|le|les|il|l|a|an) ", "", s)
+
+
+def _title_sim(a: str, b: str) -> float:
+    from difflib import SequenceMatcher
+    a, b = _norm_title(a), _norm_title(b)
+    if not a or not b:
+        return 0.0
+    if a == b:
+        return 1.0
+    ratio = SequenceMatcher(None, a, b).ratio()
+    sorted_ratio = SequenceMatcher(None, " ".join(sorted(a.split())), " ".join(sorted(b.split()))).ratio()
+    score = max(ratio, sorted_ratio)
+    # One title is a whole phrase inside the other (2+ words, so "dune" or
+    # "hamlet" alone don't count): "Dersu Uzala" / "Dersu Uzala (El cazador)",
+    # "Madoka Magica" / "Mahou Shoujo Madoka Magica: Walpurgisnacht Rising"
+    # a = our title, b = TMDB's. Our title inside a longer TMDB title is a good
+    # sign; a TMDB title inside ours is weaker (could be an event prefix like
+    # "Cine Club"), so it scores lower.
+    if len(a.split()) >= 2 and re.search(r"(^| )" + re.escape(a) + r"( |$)", b):
+        score = max(score, 0.95 if b.startswith(a + " ") else 0.85)
+    elif len(b.split()) >= 2 and re.search(r"(^| )" + re.escape(b) + r"( |$)", a):
+        score = max(score, 0.85)
+    return score
+
+
+def _tmdb_choose(title: str, results_by_query: dict, this_year: int):
+    """Best acceptable candidate: (movie, sim, recent) or (None, 0.0, None)."""
+    ranked = _tmdb_ranked(title, results_by_query, this_year)
+    return ranked[0] if ranked else (None, 0.0, None)
+
+
+def _tmdb_ranked(title: str, results_by_query: dict, this_year: int) -> list:
+    """Acceptable candidates from search results, best first, as (movie, sim, recent).
+
+    A candidate is
+    accepted if its title is a near-exact match (any year), or a reasonable
+    match released recently (a film in cinemas now is usually new — old films
+    only qualify on a near-exact title, which covers classics/reissues).
+    """
+    # Compare against the full title and the deliberate variants (after the
+    # dash, prefix stripped) — not the old "cut at first dash/plus" fragment,
+    # which can be junk like "Mostra 2026" or "Película".
+    clean = _tmdb_clean_title(title)
+    cut = _tmdb_search_title(title)
+    targets = [title, clean] + [q for q in results_by_query if q != cut or q == clean]
+    if _EVENT_CINEMA_RE.search(title):
+        targets.append(cut)       # "All My Sons - National Theatre 26-27" → "All My Sons"
+    # Opera/ballet/theatre broadcasts: TMDB is full of older recordings and
+    # adaptations with the same name — only this season's, branded entry counts.
+    is_event = bool(_EVENT_CINEMA_RE.search(title))
+    is_festival = bool(_FESTIVAL_RE.search(title))
+    # A year in the title ("11 (2026)", "SOSPECHA (1941) - WILDER CINEMA",
+    # "Akira 1988") pins the release year.
+    ym = re.search(r'[\(\[]\s*((?:19|20)\d{2})\s*[\)\]]|\s((?:19|20)\d{2})\s*$', title)
+    title_year = int(ym.group(1) or ym.group(2)) if ym else None
+    accepted = []        # (sim, order, movie, recent)
+    order = 0
+    seen = set()
+    for q, results in results_by_query.items():
+        for m in results[:8]:
+            order += 1
+            if m["id"] in seen:
+                continue
+            seen.add(m["id"])
+            names = [m.get("title", ""), m.get("original_title", "")]
+            sim = max(_title_sim(t, n) for t in targets for n in names if n)
+            y = (m.get("release_date") or "")[:4]
+            year = int(y) if y.isdigit() else None
+            # Undated TMDB entries are mostly obscure stubs — treat as old.
+            recent = year is not None and year >= this_year - 2
+            ok = sim >= 0.9 or (sim >= 0.6 and recent)
+            if is_event and not (year and year >= this_year - 1
+                                 and any(_EVENT_BRAND_RE.search(n) for n in names if n)):
+                ok = False
+            if is_festival and year and year < this_year - 2:
+                ok = False
+            # ±2: Spanish release dates can lag the original by a year or two
+            if title_year and not (year and abs(year - title_year) <= 2):
+                ok = False
+            if ok:
+                accepted.append((sim, order, m, recent))
+    # Prefer clearly better titles; within 0.05, keep TMDB's relevance order.
+    ranked = []
+    while accepted:
+        best = None
+        for c in accepted:
+            if best is None or c[0] > best[0] + 0.05:
+                best = c
+        accepted.remove(best)
+        ranked.append((best[2], best[0], best[3]))
+    return ranked
+
+
+def _tmdb_details(movie_id: int, headers: dict, fallback: dict = None) -> dict:
+    import requests as req
+    fallback = fallback or {}
+    detail_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=en-US", headers=headers, timeout=10)
+    detail_res.raise_for_status()
+    detail = detail_res.json()
+    detail_es_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=es-ES", headers=headers, timeout=10)
+    detail_es_res.raise_for_status()
+    detail_es = detail_es_res.json()
+
+    cert_es = "?"
+    try:
+        rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
+        rel_res.raise_for_status()
+        rel_results = rel_res.json().get("results", [])
+        maps = [("ES", None),
+                ("GB", {"U": "TP", "PG": "TP", "12": "12", "12A": "12", "15": "16", "18": "18", "R18": "18"}),
+                ("US", {"G": "TP", "PG": "TP", "PG-13": "12", "R": "16", "NC-17": "18"})]
+        for country, cmap in maps:
+            for entry in rel_results:
+                if entry.get("iso_3166_1") == country:
+                    for rd in entry.get("release_dates", []):
+                        cert = rd.get("certification", "").strip()
+                        if cert and (cmap is None or cert in cmap):
+                            cert_es = cert if cmap is None else cmap[cert]
+                            break
+                    break
+            if cert_es != "?":
+                break
+    except Exception:
+        pass
+
+    synopsis_es = detail_es.get("overview") or detail.get("overview", "")
+    poster_path = detail.get("poster_path") or fallback.get("poster_path")
+    poster_url  = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
+    vote = detail.get("vote_average", 0)
+    return {
+        "title_en":       detail.get("title", ""),
+        "title_original": detail.get("original_title", ""),
+        "synopsis_en":    detail.get("overview", ""),
+        "synopsis_es":    synopsis_es,
+        "poster_url":     poster_url,
+        "year":           (detail.get("release_date") or "")[:4],
+        "release_date":   detail.get("release_date", ""),
+        "tmdb_id":        movie_id,
+        "rating_score":   round(vote, 1) if vote else None,
+        "genres_en":      [g["name"] for g in detail.get("genres", [])],
+        "runtime":        detail.get("runtime"),
+        "origin_country": detail.get("origin_country", []),
+        "cert_es":        cert_es,
+    }
+
+
+def _tmdb_headers() -> dict:
+    return {"Authorization": f"Bearer {TMDB_API_KEY}", "accept": "application/json"}
+
+
+def tmdb_search_candidates(title: str) -> dict:
+    """{query: results} — es-ES searches for every query variant, plus an
+    en-US search of the main query if Spanish gives nothing usable."""
+    import requests as req
+    import time as _time
+    headers = _tmdb_headers()
+    out = {}
+    for q in _tmdb_queries(title):
+        _time.sleep(0.25)
+        res = req.get(f"{TMDB_BASE}/search/movie?query={req.utils.quote(q)}&language=es-ES&region=ES",
+                      headers=headers, timeout=10)
+        res.raise_for_status()
+        out[q] = res.json().get("results", [])
+    return out
+
 
 def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
     import requests as req
     import time as _time
-    import re as _re
 
     if not TMDB_API_KEY:
         return {}
-
-    headers = {
-        "Authorization": f"Bearer {TMDB_API_KEY}",
-        "accept": "application/json",
-    }
+    headers = _tmdb_headers()
 
     # If a valid IMDB ID is provided, use /find/ endpoint for an exact match
     if imdb_id and imdb_id.startswith("tt"):
@@ -114,170 +369,53 @@ def tmdb_lookup(title: str, imdb_id: str = "") -> dict:
             find_res.raise_for_status()
             movie_results = find_res.json().get("movie_results", [])
             if movie_results:
-                movie_id = movie_results[0]["id"]
-                detail_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=en-US", headers=headers, timeout=10)
-                detail_res.raise_for_status()
-                detail = detail_res.json()
-                detail_es_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=es-ES", headers=headers, timeout=10)
-                detail_es_res.raise_for_status()
-                detail_es = detail_es_res.json()
-
-                cert_es = "?"
-                try:
-                    rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
-                    rel_res.raise_for_status()
-                    rel_results = rel_res.json().get("results", [])
-                    for entry in rel_results:
-                        if entry.get("iso_3166_1") == "ES":
-                            for rd in entry.get("release_dates", []):
-                                cert = rd.get("certification", "").strip()
-                                if cert:
-                                    cert_es = cert
-                                    break
-                            break
-                except Exception:
-                    pass
-
-                synopsis_es = detail_es.get("overview") or detail.get("overview", "")
-                poster_path = detail.get("poster_path") or movie_results[0].get("poster_path")
-                poster_url  = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
-                vote = detail.get("vote_average", 0)
-                log.info(f"  TMDB /find/{imdb_id} → {detail.get('title','?')} (for '{title}')")
-                return {
-                    "title_en":       detail.get("title", ""),
-                    "title_original": detail.get("original_title", ""),
-                    "synopsis_en":    detail.get("overview", ""),
-                    "synopsis_es":    synopsis_es,
-                    "poster_url":     poster_url,
-                    "year":           (detail.get("release_date") or "")[:4],
-                    "release_date":   detail.get("release_date", ""),
-                    "tmdb_id":        movie_id,
-                    "rating_score":   round(vote, 1) if vote else None,
-                    "genres_en":      [g["name"] for g in detail.get("genres", [])],
-                    "runtime":        detail.get("runtime"),
-                    "origin_country": detail.get("origin_country", []),
-                    "cert_es":        cert_es,
-                }
+                out = _tmdb_details(movie_results[0]["id"], headers, movie_results[0])
+                log.info(f"  TMDB /find/{imdb_id} → {out.get('title_en','?')} (for '{title}')")
+                return out
         except Exception as e:
             log.warning(f"  TMDB /find/{imdb_id} failed: {e}")
 
-    # Strip regional language prefixes added by Spanish exhibitors (e.g. "CAT ", "VA ", "EUS ", "GAL ")
-    search_title = _re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=_re.IGNORECASE)
-    # Strip re-release/special-screening suffixes before TMDB search
-    _REISSUE_SUFFIXES = (
-        r'\d+[°ºo]?\s*(Aniversario|Aniversari|Anniversary)'  # 40 Aniversario / 40º Anniversary
-        r'|Reestreno|Re-estreno'                              # Reestreno
-        r'|Versi[oó]n\s+(Extendida|Restaurada|Remasterizada|Original|del\s+Director)'  # Versión extendida etc.
-        r'|Director\'?s?\s+Cut|Montaje\s+del\s+Director'     # Director's Cut
-        r'|Edici[oó]n\s+(Especial|Coleccionista|Definitiva)'  # Edición especial
-        r'|Pase\s+Especial'                                   # Pase especial
-        r'|4K(\s+Restaurad[ao])?'                             # 4K / 4K Restaurada
-        r'|Infinity\s+Vision|4DX|IMAX|Dolby|ScreenX|D-BOX'  # premium screen formats appended by cinemas
-        r'|\d{4}'                                             # bare year (1986)
-    )
-    search_title = _re.sub(
-        r'\s*[\(\[]?\s*(' + _REISSUE_SUFFIXES + r')\s*[\)\]]?$',
-        '', search_title, flags=_re.IGNORECASE
-    ).strip()
-    search_title = _re.split(r'\s*[-–]\s*[A-Z]|\s*\+', search_title)[0].strip()
-    _time.sleep(0.25)
-
     try:
-        search_url = (
-            f"{TMDB_BASE}/search/movie"
-            f"?query={req.utils.quote(search_title)}"
-            f"&language=es-ES&region=ES"
-        )
-        res = req.get(search_url, headers=headers, timeout=10)
-        res.raise_for_status()
-        results = res.json().get("results", [])
-
-        if not results:
-            search_url_en = (
-                f"{TMDB_BASE}/search/movie"
-                f"?query={req.utils.quote(search_title)}&language=en-US"
-            )
-            res = req.get(search_url_en, headers=headers, timeout=10)
+        this_year = datetime.now(VALENCIA_TZ).year
+        ranked = _tmdb_ranked(title, tmdb_search_candidates(title), this_year)
+        if not ranked:
+            q = _tmdb_search_title(title)
+            _time.sleep(0.25)
+            res = req.get(f"{TMDB_BASE}/search/movie?query={req.utils.quote(q)}&language=en-US",
+                          headers=headers, timeout=10)
             res.raise_for_status()
-            results = res.json().get("results", [])
-
-        if not results:
-            log.info(f"  TMDB: no results for '{title}'")
-            return {}
-
-        movie    = results[0]
-        movie_id = movie["id"]
-
-        detail_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=en-US", headers=headers, timeout=10)
-        detail_res.raise_for_status()
-        detail = detail_res.json()
-
-        detail_es_res = req.get(f"{TMDB_BASE}/movie/{movie_id}?language=es-ES", headers=headers, timeout=10)
-        detail_es_res.raise_for_status()
-        detail_es = detail_es_res.json()
-
-        cert_es = "?"
-        try:
-            rel_res = req.get(f"{TMDB_BASE}/movie/{movie_id}/release_dates", headers=headers, timeout=10)
-            rel_res.raise_for_status()
-            rel_results = rel_res.json().get("results", [])
-
-            for entry in rel_results:
-                if entry.get("iso_3166_1") == "ES":
-                    for rd in entry.get("release_dates", []):
-                        cert = rd.get("certification", "").strip()
-                        if cert:
-                            cert_es = cert
-                            break
-                    break
-
-            if cert_es == "?":
-                gb_map = {"U": "TP", "PG": "TP", "12": "12", "12A": "12", "15": "16", "18": "18", "R18": "18"}
-                for entry in rel_results:
-                    if entry.get("iso_3166_1") == "GB":
-                        for rd in entry.get("release_dates", []):
-                            cert = rd.get("certification", "").strip()
-                            if cert and cert in gb_map:
-                                cert_es = gb_map[cert]
-                                break
-                        break
-
-            if cert_es == "?":
-                us_map = {"G": "TP", "PG": "TP", "PG-13": "12", "R": "16", "NC-17": "18"}
-                for entry in rel_results:
-                    if entry.get("iso_3166_1") == "US":
-                        for rd in entry.get("release_dates", []):
-                            cert = rd.get("certification", "").strip()
-                            if cert and cert in us_map:
-                                cert_es = us_map[cert]
-                                break
-                        break
-        except Exception:
-            pass
-
-        synopsis_es = detail_es.get("overview") or detail.get("overview", "")
-        poster_path = detail.get("poster_path") or movie.get("poster_path")
-        poster_url  = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
-        vote = detail.get("vote_average", 0)
-
-        return {
-            "title_en":       detail.get("title", ""),
-            "title_original": detail.get("original_title", ""),
-            "synopsis_en":    detail.get("overview", ""),
-            "synopsis_es":    synopsis_es,
-            "poster_url":     poster_url,
-            "year":           (detail.get("release_date") or "")[:4],
-            "release_date":   detail.get("release_date", ""),
-            "tmdb_id":        movie_id,
-            "rating_score":   round(vote, 1) if vote else None,
-            "genres_en":      [g["name"] for g in detail.get("genres", [])],
-            "runtime":        detail.get("runtime"),
-            "origin_country": detail.get("origin_country", []),
-            "cert_es":        cert_es,
-        }
+            ranked = _tmdb_ranked(title, {q: res.json().get("results", [])}, this_year)
+        festival = bool(_FESTIVAL_RE.search(title))
+        for movie, sim, recent in ranked[:3]:
+            out = _tmdb_details(movie["id"], headers, movie)
+            # Cinemas rarely list shorts (festivals aside): an exact-title hit on a
+            # 3- or 20-minute film is usually a different work with the same name.
+            if out.get("runtime") and out["runtime"] < 40 and not festival:
+                log.info(f"  TMDB: skipped short '{out.get('title_en')}' ({out['runtime']} min) for '{title}'")
+                continue
+            if sim < 0.8 or (out.get("runtime") or 99) < 40:
+                TMDB_DOUBTFUL.append((title, movie.get("title", ""),
+                                      (movie.get("release_date") or "")[:4], round(sim, 2), movie["id"]))
+            return out
+        log.info(f"  TMDB: no confident match for '{title}'")
+        return {}
 
     except Exception as e:
         log.warning(f"  TMDB lookup failed for '{title}': {e}")
+        return {}
+
+
+def load_tmdb_overrides() -> dict:
+    """tmdb_overrides.json: {"Exact scraped title": tmdb_id, "Other title": null}.
+    A number forces that TMDB film; null means "never match this title"."""
+    try:
+        with open(TMDB_OVERRIDES_PATH, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return {k: v for k, v in data.items() if not k.startswith("_")}
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        log.warning(f"Could not read {TMDB_OVERRIDES_PATH}: {e}")
         return {}
 
 
@@ -534,18 +672,24 @@ def enrich_with_tmdb(films: dict) -> None:
 
     if TMDB_API_KEY:
         log.info("Enriching films with TMDB data …")
+        overrides = load_tmdb_overrides()
+        TMDB_DOUBTFUL.clear()
         for title, film in films.items():
-            tmdb = tmdb_lookup(title, imdb_id=film.get("imdb_id", ""))
+            if title in overrides:
+                # Manual fix: a TMDB id forces that film, null means no match
+                tmdb = {}
+                if overrides[title]:
+                    try:
+                        tmdb = _tmdb_details(int(overrides[title]), _tmdb_headers())
+                        log.info(f"  TMDB override '{title}' → {tmdb.get('title_en','?')}")
+                    except Exception as e:
+                        log.warning(f"  TMDB override for '{title}' failed: {e}")
+            else:
+                tmdb = tmdb_lookup(title, imdb_id=film.get("imdb_id", ""))
             # Retry with event/festival prefix stripped for titles like
             # "Mostra 2026 – Paris, Texas" or "Wilder Cinema – Tokyo Godfathers"
-            if not tmdb:
-                _stripped = re.sub(
-                    r'^(?:[A-Za-záéíóúüñÁÉÍÓÚÜÑ ]+\s+\d{4}'
-                    r'|Wilder Cinema|Babelitos|Cine (?:con coloquio|familiar)'
-                    r'|Otra vez[^–]*|Vino Club Babel|Preestreno\s+\S+)'
-                    r'\s*[-–]\s*',
-                    '', title, flags=re.IGNORECASE,
-                ).strip()
+            if not tmdb and title not in overrides:
+                _stripped = _strip_event_prefix(title)
                 if _stripped and _stripped != title:
                     tmdb = tmdb_lookup(_stripped, imdb_id=film.get("imdb_id", ""))
             if tmdb:
@@ -3192,13 +3336,18 @@ TRAFFIC (GoatCounter):
 {book_line}{film_lines}
 TOP REFERRERS (yesterday):
 {ref_lines}"""
+    tmdb_lines = ""
+    if TMDB_DOUBTFUL:
+        tmdb_lines = ("\nTMDB MATCHES TO CHECK (borderline title match — fix in tmdb_overrides.json):\n"
+                      + "\n".join(f"  '{t}' → {m} ({y}) score {sc} · themoviedb.org/movie/{mid}"
+                                   for t, m, y, sc, mid in TMDB_DOUBTFUL) + "\n")
     body = f"""whatson.movie pipeline completed at {now_str}
 
 SCRAPERS ({len(scraper_status)} cinemas, {" / ".join(f"{len([s for s in scraper_status if s.get('city')==c])} {c}" for c in dict.fromkeys(s.get('city') for s in scraper_status))}):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)
-
+{tmdb_lines}
 SUBSCRIBERS:
   Total signed up:      {total_subs}
   Active (email on):    {email_subs}
