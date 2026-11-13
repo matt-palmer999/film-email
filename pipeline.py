@@ -849,6 +849,98 @@ def _merge_cinema_times(dst: dict, src: dict) -> None:
         dst["vose"] = True
 
 
+def _merge_film_into(films: dict, canonical: str, title: str) -> None:
+    """Move title's cinemas/showtimes into films[canonical] (caller deletes title)."""
+    film = films[title]
+    existing_by_id = {c["id"]: c for c in films[canonical]["cinemas"]}
+    for c in film["cinemas"]:
+        if c["id"] not in existing_by_id:
+            films[canonical]["cinemas"].append(c)
+            existing_by_id[c["id"]] = c
+        else:
+            # Same cinema under another title variant (e.g. "(VOSE)"):
+            # merge its times instead of dropping them.
+            _merge_cinema_times(existing_by_id[c["id"]], c)
+    if film.get("any_vose"):
+        films[canonical]["any_vose"] = True
+    if film.get("is_new"):
+        films[canonical]["is_new"] = True
+    if film.get("poster") and not films[canonical].get("poster"):
+        films[canonical]["poster"] = film["poster"]
+
+
+# Fields enrich_with_tmdb() sets from a TMDB match
+_TMDB_FIELDS = ("poster", "title_en", "title_original", "synopsis_en", "synopsis_es",
+                "rating_score", "tmdb_id", "origin_country", "rating", "is_new",
+                "year", "meta", "meta_en")
+
+
+def _title_key(title: str) -> str:
+    """Titles that differ only in case, accents, punctuation or a version tag share a key."""
+    t = re.sub(r'\s*\((Doblada|Dob\.?)(\s+ESP)?\)', '', title, flags=re.IGNORECASE)
+    return _norm_title(_tmdb_clean_title(t))
+
+
+def unify_title_variants(films: dict) -> None:
+    """Run after TMDB enrichment, before deduplicate_by_tmdb_id().
+
+    Different cinemas write the same film differently ("EL CIELO ES PARA
+    SIEMPRE" / "El cielo es para siempre"). Within each group of same-key
+    titles:
+      * if one entry was matched via its IMDb ID, that's the film — entries
+        without an IMDb ID take its TMDB data (fixes a plain "Los miserables"
+        landing on the 2012 musical while the IMDb-confirmed entry is 2026);
+      * otherwise unmatched entries take the data of a matched one, provided
+        the matched entries agree on one film;
+      * entries still without a TMDB match are merged by title.
+    """
+    groups: dict = {}
+    for title in films:
+        groups.setdefault(_title_key(title), []).append(title)
+
+    to_delete = []
+    for key, titles in groups.items():
+        if len(titles) < 2 or not key:
+            continue
+        anchors = [t for t in titles
+                   if films[t].get("tmdb_id") and (films[t].get("imdb_id") or "").startswith("tt")]
+        anchor_ids = {films[t]["tmdb_id"] for t in anchors}
+        if len(anchor_ids) == 1:
+            anchor = anchors[0]
+            takers = [t for t in titles if not (films[t].get("imdb_id") or "").startswith("tt")
+                      or not films[t].get("tmdb_id")]
+        else:
+            matched_ids = {films[t]["tmdb_id"] for t in titles if films[t].get("tmdb_id")}
+            if len(matched_ids) != 1:
+                if len(matched_ids) > 1:
+                    log.info(f"  Title variants of '{key}' match different films {sorted(matched_ids)} — left apart")
+                    continue
+                anchor = None
+            else:
+                anchor = next(t for t in titles if films[t].get("tmdb_id"))
+            takers = [t for t in titles if not films[t].get("tmdb_id")]
+
+        if anchor:
+            for t in takers:
+                if t == anchor or films[t].get("tmdb_id") == films[anchor]["tmdb_id"]:
+                    continue
+                log.info(f"  Title variant '{t}' → TMDB {films[anchor]['tmdb_id']} (as '{anchor}')")
+                for f in _TMDB_FIELDS:
+                    if f in films[anchor]:
+                        films[t][f] = films[anchor][f]
+        else:
+            # None matched: merge by title. Keep the most-listed spelling,
+            # preferring one that isn't all capitals.
+            canonical = max(titles, key=lambda t: (not t.isupper(), len(films[t]["cinemas"])))
+            for t in titles:
+                if t != canonical:
+                    log.info(f"  Merging '{t}' → '{canonical}' (same title)")
+                    _merge_film_into(films, canonical, t)
+                    to_delete.append(t)
+    for t in to_delete:
+        del films[t]
+
+
 def deduplicate_by_tmdb_id(films: dict) -> None:
     """Merge films that resolved to the same TMDB ID."""
     tmdb_id_map: dict = {}
@@ -861,21 +953,7 @@ def deduplicate_by_tmdb_id(films: dict) -> None:
         if tid in tmdb_id_map:
             canonical = tmdb_id_map[tid]
             log.info(f"  Merging '{title}' → '{canonical}' (TMDB {tid})")
-            existing_by_id = {c["id"]: c for c in films[canonical]["cinemas"]}
-            for c in film["cinemas"]:
-                if c["id"] not in existing_by_id:
-                    films[canonical]["cinemas"].append(c)
-                    existing_by_id[c["id"]] = c
-                else:
-                    # Same cinema under another title variant (e.g. "(VOSE)"):
-                    # merge its times instead of dropping them.
-                    _merge_cinema_times(existing_by_id[c["id"]], c)
-            if film.get("any_vose"):
-                films[canonical]["any_vose"] = True
-            if film.get("is_new"):
-                films[canonical]["is_new"] = True
-            if film.get("poster") and not films[canonical].get("poster"):
-                films[canonical]["poster"] = film["poster"]
+            _merge_film_into(films, canonical, title)
             duplicates.append(title)
         else:
             tmdb_id_map[tid] = title
@@ -2916,7 +2994,8 @@ def run() -> None:
     # 2. TMDB enrichment
     enrich_with_tmdb(films)
 
-    # 3. Deduplicate by TMDB ID
+    # 3. Deduplicate: same-title variants first, then by TMDB ID
+    unify_title_variants(films)
     deduplicate_by_tmdb_id(films)
     log.info(f"Films after deduplication: {len(films)}")
 
