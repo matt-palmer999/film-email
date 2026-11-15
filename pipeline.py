@@ -1907,7 +1907,13 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             times_html = ""
             if all_times:
                 std_btns = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
-                times_html += f'<div class="times-row">{std_btns}</div>'
+                if fmt_rows_today:
+                    # Label the standard row too, so every row reads "format: times"
+                    times_html += ('<div class="format-row std-row"><span class="format-label format-std" '
+                                   'data-es="Estándar" data-en="Standard">Estándar</span>'
+                                   f'<div class="fmt-times">{std_btns}</div></div>')
+                else:
+                    times_html += f'<div class="times-row">{std_btns}</div>'
             # Premium format rows
             for fmt_key, label, css_cls in _FORMAT_DISPLAY:
                 if fmt_key not in fmt_st or day["key"] not in fmt_st[fmt_key]:
@@ -1917,7 +1923,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     _tbtn(t, entry["is_vose"], entry["url"])
                     for t, entry in sorted(day_times.items())
                 )
-                times_html += f'<div class="format-row"><span class="format-label {css_cls}">{label}</span>{fmt_btns}</div>'
+                times_html += f'<div class="format-row"><span class="format-label {css_cls}">{label}</span><div class="fmt-times">{fmt_btns}</div></div>'
             vose_attr    = "true" if c["vose"] else "false"
             _cmeta       = CINEMA_META.get(c["id"], {})
             cinema_city  = _cmeta.get("city", "")
@@ -2029,8 +2035,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .vose-mini{{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
 .showtime-times{{display:flex;flex-direction:column;gap:6px}}
 .times-row{{display:flex;flex-wrap:wrap;gap:8px}}
-.format-row{{display:flex;flex-wrap:wrap;align-items:center;gap:6px}}
-.format-label{{font-size:10px;font-weight:700;letter-spacing:.8px;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}}
+.format-row{{display:grid;grid-template-columns:minmax(76px,max-content) 1fr;align-items:start;column-gap:10px}}
+.fmt-times{{display:flex;flex-wrap:wrap;gap:8px}}
+.format-label{{font-size:10px;font-weight:700;letter-spacing:.8px;padding:2px 6px;border-radius:3px;white-space:nowrap;justify-self:start;margin-top:7px}}
+.format-std{{background:rgba(240,234,224,.06);color:#b8aec8;border:1px solid rgba(240,234,224,.18)}}
 .format-imax{{background:rgba(0,160,255,.12);color:#4fb8ff;border:1px solid rgba(0,160,255,.3)}}
 .format-screenx{{background:rgba(140,80,220,.12);color:#b08fff;border:1px solid rgba(140,80,220,.3)}}
 .format-cinity{{background:rgba(0,200,220,.1);color:#5ee0f0;border:1px solid rgba(0,200,220,.3)}}
@@ -2139,6 +2147,7 @@ function applyEveningHighlights(eveningFilter) {{
   }});
   document.querySelectorAll('.time-btn--match').forEach(b => b.classList.remove('time-btn--match'));
   document.querySelectorAll('.no-evening-times').forEach(el => el.remove());
+  syncTimeRows();
   if (!eveningFilter) return;
   // Mark & hide non-qualifying buttons; highlight qualifying ones
   document.querySelectorAll('.time-btn[data-time]').forEach(btn => {{
@@ -2180,6 +2189,7 @@ function applyEveningHighlights(eveningFilter) {{
       panel.appendChild(msg);
     }}
   }});
+  syncTimeRows();
 }}
 function showDay(key) {{
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
@@ -2190,6 +2200,14 @@ function showDay(key) {{
   if (panel) panel.classList.add('active');
   const params = new URLSearchParams(window.location.search);
   applyEveningHighlights(params.get('evening') === 'true');
+}}
+// Hide a standard/format row once none of its times are visible, so a format
+// label (IMAX, 4DX…) is never left on its own after times are removed/filtered.
+function syncTimeRows() {{
+  document.querySelectorAll('.times-row, .format-row').forEach(r => {{
+    const live = Array.from(r.querySelectorAll('.time-btn')).some(b => b.style.display !== 'none');
+    r.style.display = live ? '' : 'none';
+  }});
 }}
 // Remove showtimes that have already started (Spain time). Pages are built once
 // a day, so by the evening the morning's times would otherwise still show.
@@ -2232,6 +2250,7 @@ function hidePastShowtimes() {{
     msg.textContent = lang === 'en' ? 'No more screenings today' : 'No quedan más sesiones hoy';
     panel.appendChild(msg);
   }});
+  syncTimeRows();
   if (activeEmptied) {{
     const next = Array.from(document.querySelectorAll('.day-tab.has-shows'))
                       .find(t => t.style.display !== 'none');
@@ -2306,6 +2325,7 @@ window.addEventListener('DOMContentLoaded', () => {{
         row.style.display = 'none';
       }}
     }});
+    syncTimeRows();
     // Update no-times messages and tab indicators
     document.querySelectorAll('.day-panel').forEach(panel => {{
       const dayKey = panel.id.replace('day-', '');
