@@ -1525,7 +1525,7 @@ function applyVisibility() {
 
 # ── HTML page builders ────────────────────────────────────────────────────────
 
-def _build_jsonld(film: dict, slug: str) -> str:
+def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
     """Return a <script type="application/ld+json"> block for a film detail page.
 
     Uses @graph so the Movie entity is declared once and each ScreeningEvent
@@ -1574,27 +1574,45 @@ def _build_jsonld(film: dict, slug: str) -> str:
         if cinema.get("website"):
             location["url"] = cinema["website"]
 
-        def _events_for(showtimes_dict: dict, is_vose: bool) -> None:
-            fmt = "VOSE" if is_vose else "dubbed"
-            event_name = f"{title} (VOSE)" if is_vose else title
-            for date_str, times in showtimes_dict.items():
-                for time_str in times:
-                    try:
-                        naive = datetime.fromisoformat(f"{date_str}T{time_str}:00")
-                        aware = naive.replace(tzinfo=VALENCIA_TZ)
-                        events.append({
-                            "@type":          "ScreeningEvent",
-                            "name":           event_name,
-                            "startDate":      aware.isoformat(),
-                            "videoFormat":    fmt,
-                            "workPresented":  {"@id": movie_id},
-                            "location":       location,
-                        })
-                    except Exception:
-                        pass
+        def _add_event(date_str: str, time_str: str, is_vose: bool, url: str, video_format: str) -> None:
+            # Only sessions on the days the page shows (markup should match visible content)
+            if shown_dates is not None and date_str not in shown_dates:
+                return
+            try:
+                naive = datetime.fromisoformat(f"{date_str}T{time_str}:00")
+            except ValueError:
+                return
+            ev: dict = {
+                "@type":          "ScreeningEvent",
+                "name":           f"{title} (VOSE)" if is_vose else title,
+                "startDate":      naive.replace(tzinfo=VALENCIA_TZ).isoformat(),
+                "eventStatus":    "https://schema.org/EventScheduled",
+                "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+                "videoFormat":    video_format,
+                "workPresented":  {"@id": movie_id},
+                "location":       location,
+            }
+            # VOSE = original audio with Spanish subtitles (original language not
+            # known per session); otherwise the session is in Spanish.
+            if is_vose:
+                ev["subtitleLanguage"] = "es"
+            else:
+                ev["inLanguage"] = "es"
+            if url:
+                ev["offers"] = {"@type": "Offer", "url": url}
+            events.append(ev)
 
-        _events_for(cinema.get("showtimes", {}),      is_vose=False)
-        _events_for(cinema.get("vose_showtimes", {}), is_vose=True)
+        for is_vose, key in ((False, "showtimes"), (True, "vose_showtimes")):
+            for date_str, times in (cinema.get(key) or {}).items():
+                for time_str in times:
+                    url = times.get(time_str) if isinstance(times, dict) else ""
+                    _add_event(date_str, time_str, is_vose, url or "", "2D")
+        # Premium-format sessions (IMAX, 4DX, 3D…) are stored separately
+        for fmt_key, fmt_label, _css in _FORMAT_DISPLAY:
+            for date_str, times in (cinema.get("format_showtimes", {}).get(fmt_key) or {}).items():
+                for time_str, entry in times.items():
+                    _add_event(date_str, time_str, bool(entry.get("is_vose")),
+                               entry.get("url") or "", fmt_label)
 
     _crumb_cities = {CINEMA_META.get(c.get("id",""),{}).get("city") for c in film.get("cinemas",[])}
     _crumb_city = next(iter(_crumb_cities)) if len(_crumb_cities) == 1 and None not in _crumb_cities else "Valencia"
@@ -2091,7 +2109,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 @media(max-width:480px){{.lang-bar{{padding:8px 12px}}.lang-btn{{padding:4px 10px;font-size:11px}}}}
 </style>
 <script data-goatcounter="https://whatsonmovie.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-{_build_jsonld(film, film.get('slug', ''))}
+{_build_jsonld(film, film.get('slug', ''), {d['key'] for d in days})}
 </head>
 <body>
 <div class="wrapper">
