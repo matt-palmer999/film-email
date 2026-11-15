@@ -334,6 +334,7 @@ def _tmdb_details(movie_id: int, headers: dict, fallback: dict = None) -> dict:
     vote = detail.get("vote_average", 0)
     return {
         "title_en":       detail.get("title", ""),
+        "title_es":       detail_es.get("title", ""),
         "title_original": detail.get("original_title", ""),
         "synopsis_en":    detail.get("overview", ""),
         "synopsis_es":    synopsis_es,
@@ -728,6 +729,7 @@ def enrich_with_tmdb(films: dict) -> None:
                 if tmdb.get("poster_url"):
                     film["poster"] = tmdb["poster_url"]
                 film["title_en"]       = tmdb.get("title_en", title)
+                film["title_es"]       = tmdb.get("title_es", "")
                 film["title_original"] = tmdb.get("title_original", title)
                 film["synopsis_en"]    = tmdb.get("synopsis_en", "")
                 film["synopsis_es"]    = tmdb.get("synopsis_es") or film.get("synopsis", "")
@@ -896,7 +898,7 @@ def _merge_film_into(films: dict, canonical: str, title: str) -> None:
 
 
 # Fields enrich_with_tmdb() sets from a TMDB match
-_TMDB_FIELDS = ("poster", "title_en", "title_original", "synopsis_en", "synopsis_es",
+_TMDB_FIELDS = ("poster", "title_en", "title_es", "title_original", "synopsis_en", "synopsis_es",
                 "rating_score", "tmdb_id", "origin_country", "rating", "is_new",
                 "year", "meta", "meta_en")
 
@@ -965,6 +967,32 @@ def unify_title_variants(films: dict) -> None:
                     to_delete.append(t)
     for t in to_delete:
         del films[t]
+
+
+_LATIN_RE     = re.compile(r"[A-Za-zÀ-ÿ0-9]")
+_NON_LATIN_RE = re.compile(r"[^\u0000-ɏ -⁯ -ÿ]")
+
+
+def apply_spanish_display_titles(films: dict) -> None:
+    """Show TMDB's official Spain-Spanish title for matched films.
+
+    film["title"] is otherwise whichever cinema's spelling the merge kept first,
+    which can be an event listing ("Película+coloquio: VOSE …"), a language
+    prefix ("CAT …"), a version tag or all capitals. Keeps the cinema title when
+    TMDB has no usable Spanish title (missing, or in a non-Latin script).
+    Dict keys and slugs (from title_en) are unchanged.
+    """
+    changed = 0
+    for film in films.values():
+        tes = (film.get("title_es") or "").strip()
+        usable = (film.get("tmdb_id") and tes and _LATIN_RE.search(tes)
+                  and not _NON_LATIN_RE.search(tes))
+        if usable and film.get("title") != tes:
+            film["title"] = tes
+            changed += 1
+        # The weekly email reads title_es first — keep it in step with the page
+        film["title_es"] = film["title"]
+    log.info(f"Spanish display titles from TMDB: {changed} updated")
 
 
 def deduplicate_by_tmdb_id(films: dict) -> None:
@@ -3050,6 +3078,7 @@ def run() -> None:
     unify_title_variants(films)
     deduplicate_by_tmdb_id(films)
     log.info(f"Films after deduplication: {len(films)}")
+    apply_spanish_display_titles(films)
 
     # 4. Remove films with no showtimes in the relevant window
     #    Classics (3+ years old) use a 30-day window; everything else uses 7 days.

@@ -13,15 +13,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="whatson.movie">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<title data-es="Rocky (50 aniversario) — whatson.movie" data-en="Rocky — whatson.movie">Rocky (50 aniversario) — whatson.movie</title>
+<title data-es="Rocky — whatson.movie" data-en="Rocky — whatson.movie">Rocky — whatson.movie</title>
 <link rel="canonical" href="https://whatson.movie/listings/rocky/">
-<meta name="description" content="Rocky (50 aniversario) (1976) en cartelera en Alicante, Barcelona, Málaga y Valencia · VOSE disponible. Horarios en 7 cines. Rocky Balboa es un…">
+<meta name="description" content="Rocky (1976) en cartelera en Alicante, Barcelona, Málaga y Valencia · VOSE disponible. Horarios en 7 cines. Rocky Balboa es un desconocido boxeador a…">
 <meta property="og:type" content="video.movie">
-<meta property="og:title" content="Rocky (50 aniversario) — whatson.movie">
-<meta property="og:description" content="Rocky (50 aniversario) (1976) en cartelera en Alicante, Barcelona, Málaga y Valencia · VOSE disponible. Horarios en 7 cines. Rocky Balboa es un…">
+<meta property="og:title" content="Rocky — whatson.movie">
+<meta property="og:description" content="Rocky (1976) en cartelera en Alicante, Barcelona, Málaga y Valencia · VOSE disponible. Horarios en 7 cines. Rocky Balboa es un desconocido boxeador a…">
 <meta property="og:url" content="https://whatson.movie/listings/rocky/">
 <meta property="og:image" content="https://image.tmdb.org/t/p/w500/1mcJmdbRLusxhoSGjFI3pbEboXt.jpg">
-<meta property="og:image:alt" content="Rocky (50 aniversario)">
+<meta property="og:image:alt" content="Rocky">
 <meta property="og:locale" content="es_ES">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
@@ -749,10 +749,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
 
   <div class="film-hero">
-    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/1mcJmdbRLusxhoSGjFI3pbEboXt.jpg" alt="Rocky (50 aniversario)" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
+    <div class="hero-poster"><img src="https://image.tmdb.org/t/p/w500/1mcJmdbRLusxhoSGjFI3pbEboXt.jpg" alt="Rocky" width="500" height="750" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
     <div class="hero-info">
       <div class="badges"><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.8</span><span class="rating-badge">+18</span></div>
-      <h1 class="hero-title" data-es="Rocky (50 aniversario)" data-en="Rocky">Rocky (50 aniversario)</h1>
+      <h1 class="hero-title" data-es="Rocky" data-en="Rocky">Rocky</h1>
       
       <div class="hero-meta"><span data-es="US · 1976 · 119 min" data-en="US · 1976 · Drama · 119 min">US · 1976 · 119 min</span></div>
       <div class="hero-synopsis" data-es="Rocky Balboa es un desconocido boxeador a quien se le ofrece la posibilidad de pelear por el título mundial de los pesos pesados. Con mucha fuerza de voluntad, Rocky se preparará concienzudamente para este combate, y también para los cambios que producirá en su vida." data-en="Rocky Balboa is a Philadelphia club fighter who seems to be going nowhere. But when a stroke of fate puts him in the ring with a world heavyweight champion, Rocky knows that it&#39;s his one shot at the big time — a once-in-a-lifetime opportunity to go the distance and come out a winner!">Rocky Balboa es un desconocido boxeador a quien se le ofrece la posibilidad de pelear por el título mundial de los pesos pesados. Con mucha fuerza de voluntad, Rocky se preparará concienzudamente para este combate, y también para los cambios que producirá en su vida.</div>
@@ -799,7 +799,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
     el.innerHTML = el.getAttribute('data-' + lang);
   });
-  document.title = (lang === 'en' ? 'Rocky — whatson.movie' : 'Rocky (50 aniversario) — whatson.movie');
+  document.title = (lang === 'en' ? 'Rocky — whatson.movie' : 'Rocky — whatson.movie');
   localStorage.setItem('lang', lang);
 }
 function isWeekend(dateKey) {
