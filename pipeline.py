@@ -2600,8 +2600,8 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 
     _page_title_es = f"Cartelera de cine en {city_name} \u2014 {date_es}"
     _page_title_en = f"{city_name} Cinema Listings \u2014 {date_en}"
-    _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de {city_name} esta semana. Sesiones VOSE destacadas. Actualizado cada jueves."
-    _page_desc_en  = f"{film_count} films across {cinema_count} {city_name} cinemas this week. VOSE screenings highlighted. Updated every Thursday."
+    _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de {city_name} esta semana. Sesiones VOSE destacadas. Actualizado a diario."
+    _page_desc_en  = f"{film_count} films across {cinema_count} {city_name} cinemas this week. VOSE screenings highlighted. Updated daily."
     _page_og_title = f"Cartelera {city_name} \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
 
     import json as _json
