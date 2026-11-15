@@ -1,4 +1,5 @@
 {
   "_help": "Manual TMDB fixes, keyed by the exact title as scraped. A number forces that TMDB film id (from themoviedb.org/movie/<id>); null means never match this title. Keys starting with _ are ignored.",
-  "LA JUNGLA DE CRISTAL": 562
+  "LA JUNGLA DE CRISTAL": 562,
+  "DERSU URZALA (1975) - WILDER CINEMA": 9764
 }

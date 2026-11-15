@@ -161,6 +161,8 @@ def _tmdb_clean_title(title: str) -> str:
     t = t.rstrip(" .")
     # Screening-series tags after a dash: "GILDA - WILDER CINEMA"
     t = re.sub(r'\s*[-–]\s*(Wilder Cinema|Cine ?Club|Cine con coloquio)\s*$', '', t, flags=re.IGNORECASE)
+    # …or in square brackets: "DERSU UZALA (EL CAZADOR) [WILDER CINEMA]"
+    t = re.sub(r'\s*\[\s*(Wilder Cinema|Cine ?Club|Cine con coloquio)\s*\]\s*$', '', t, flags=re.IGNORECASE)
     return re.sub(r'\s*[\(\[]?\s*(' + _REISSUE_SUFFIXES + r')\s*[\)\]]?$',
                   '', t, flags=re.IGNORECASE).strip()
 
