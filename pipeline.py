@@ -3285,10 +3285,14 @@ def send_pipeline_summary(films: dict, scraper_status: list) -> None:
     smtp_pass = os.environ.get("SMTP_PASSWORD", "")
     from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
     from_name = os.environ.get("FROM_NAME", "whatson.movie")
-    admin_to  = ["matt_palmer@outlook.com", "clare_noeken@outlook.com"]
+    # Comma-separated list, set in .env (and as a GitHub secret for Actions runs)
+    admin_to  = [a.strip() for a in os.environ.get("ADMIN_EMAILS", "").split(",") if a.strip()]
 
     if not all([smtp_host, smtp_user, smtp_pass]):
         log.warning("SMTP not configured — skipping pipeline summary email")
+        return
+    if not admin_to:
+        log.warning("ADMIN_EMAILS not set — skipping pipeline summary email")
         return
 
     # Load previous scraper counts for regression detection
@@ -3490,7 +3494,7 @@ Site: https://whatson.movie/listings/
             server.starttls()
             server.login(smtp_user, smtp_pass)
             server.sendmail(from_addr, admin_to, msg.as_string())
-        log.info(f"Pipeline summary email sent to {', '.join(admin_to)}")
+        log.info(f"Pipeline summary email sent to {len(admin_to)} admin recipient(s)")
     except Exception as exc:
         log.warning(f"Could not send pipeline summary email: {exc}")
 
