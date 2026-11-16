@@ -12,6 +12,24 @@ Branches to avoid:
 - `feat/city-pages` — fully merged 2026-11-09, do not use
 - `dev` — dead since 2026-08-04, do not use
 
+## Cinema ids are permanent
+
+Never rename or remove a cinema id (the `CINEMA_META` keys in `pipeline.py`, each
+scraper's `CINEMA_KEY`, and the list in `docs/preferences/index.html`). Users'
+saved cinema choices (browser + Supabase), the weekly email filters and shared
+links all depend on them. Yelmo Campanar is `yelmo`, and it has broken twice
+when that was changed. New cinemas get a new id, added to `FROZEN_CINEMA_IDS` in
+`tests/test_pipeline_safety.py`.
+
+## Before changing code
+
+- `git pull` first and edit the current `main`. On 2026-11-09 a commit made from
+  an old copy of `pipeline.py` silently undid three fixes. Check that
+  `git diff --stat` only shows the lines you meant to change.
+- Run `python -m unittest discover -s tests` before committing. The pre-commit hook
+  (`.githooks/pre-commit`) runs it for you when code is staged; enable it in a new
+  clone with `git config core.hooksPath .githooks`.
+
 ## Running the pipeline manually
 
 Always load the `.env` file before running `pipeline.py`:

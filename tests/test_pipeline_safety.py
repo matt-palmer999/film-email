@@ -40,7 +40,36 @@ def _pref_ids() -> set:
         return set(re.findall(r"\{\s*id:\s*'([^']+)'", fh.read()))
 
 
+# Cinema ids are PERMANENT. They are saved in users' browsers, in Supabase and
+# in shared links, so renaming one silently breaks those users' listings and
+# the weekly email (Yelmo Campanar, twice). New cinemas may be added to this
+# list; nothing may ever be removed or renamed.
+FROZEN_CINEMA_IDS = {
+    "aana_alicante", "aana_san_juan", "abc_elx", "albeniz", "aribau_barcelona", "babel",
+    "cinesa", "cinesa_diagonal", "cinesa_diagonal_mar", "dor", "elsaler", "granturia",
+    "kinepolis", "kinepolis_alicante", "kinepolis_marbella", "lys", "mk2_el_ingenio",
+    "mk2_malaga_nostrum", "mk2_miramar", "mn4", "mooby_arenas", "mooby_gloeries",
+    "ocine_aqua", "ocine_magic", "odeon_alicante", "park", "renoir_barcelona", "rosaleda",
+    "tivoli", "verdi_barcelona", "yelmo", "yelmo_alicante", "yelmo_maquinista",
+    "yelmo_plaza_mayor", "yelmo_rincon", "yelmo_vialia",
+}
+# Closed cinemas keep their id in CINEMA_META but aren't offered in preferences.
+NOT_OFFERED = {"mk2_malaga_nostrum"}
+
+
 class CinemaIds(unittest.TestCase):
+    def test_no_cinema_id_is_ever_removed_or_renamed(self):
+        missing = FROZEN_CINEMA_IDS - set(pipeline.CINEMA_META)
+        self.assertFalse(missing, f"cinema ids removed or renamed in CINEMA_META: {sorted(missing)} "
+                                  "— ids are permanent, put them back")
+        missing_pref = FROZEN_CINEMA_IDS - NOT_OFFERED - _pref_ids()
+        self.assertFalse(missing_pref, f"cinema ids missing from the preferences page: {sorted(missing_pref)}")
+
+    def test_new_cinemas_are_added_to_the_frozen_list(self):
+        new = set(pipeline.CINEMA_META) - FROZEN_CINEMA_IDS
+        self.assertFalse(new, f"new cinema ids {sorted(new)}: add them to FROZEN_CINEMA_IDS "
+                              "in tests/test_pipeline_safety.py (they become permanent)")
+
     def test_yelmo_campanar_keeps_the_saved_preferences_id(self):
         from scrapers import yelmo
         self.assertEqual(yelmo.CINEMA_KEY, "yelmo")

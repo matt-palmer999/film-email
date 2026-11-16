@@ -1,0 +1,22 @@
+#!/bin/sh
+# Blocks a commit that would break the safety tests (VOSE rules, permanent
+# cinema ids, carry-forward). Only runs when code or rule files are staged, so
+# the daily listings auto-commit (docs/ only) is never held up.
+#
+# Enabled per clone with:  git config core.hooksPath .githooks
+
+staged=$(git diff --cached --name-only --diff-filter=ACMRD)
+echo "$staged" | grep -qE '(\.py$|^tests/|^tmdb_overrides\.json$|^vose_reviewed\.json$)' || exit 0
+
+PY=python
+command -v "$PY" >/dev/null 2>&1 || PY=python3
+
+echo "pre-commit: running safety tests..."
+if ! "$PY" -m unittest discover -s tests >/tmp/whatson_tests.log 2>&1; then
+    tail -30 /tmp/whatson_tests.log
+    echo
+    echo "pre-commit: tests failed, so the commit was stopped. Fix the problem above."
+    echo "(Cinema ids are permanent: never rename or remove one.)"
+    exit 1
+fi
+echo "pre-commit: all tests pass"
