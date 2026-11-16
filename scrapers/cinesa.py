@@ -215,10 +215,13 @@ def scrape_cinesa(playwright=None) -> list[dict]:
                 if st_id else ""
             )
             fs = film_sessions.setdefault(film_id, {"any_vose": False, "all": {}, "vose": {}})
-            fs["all"].setdefault(date_str, {})[time_str] = {
+            # Keyed by (time, is_vose) so a dubbed and a VOSE session at the same
+            # time on different screens don't overwrite each other.
+            fs["all"].setdefault(date_str, {})[(time_str, is_vose)] = {
                 "booking_url": booking_url,
                 "is_screenx":  is_screenx,
                 "is_isense":   is_isense,
+                "is_vose":     is_vose,
             }
             if is_vose:
                 fs["any_vose"] = True
@@ -253,15 +256,18 @@ def scrape_cinesa(playwright=None) -> list[dict]:
 
         showtime_list = []
         for date_str, time_map in fs["all"].items():
-            for t in sorted(time_map):
-                st_data = time_map[t]
+            for (t, _v) in sorted(time_map):
+                st_data = time_map[(t, _v)]
+                # Per-session flag: a film with some VOSE sessions also has dubbed
+                # ones, so never copy the film-level flag onto every session.
+                st_vose = st_data["is_vose"]
                 showtime_list.append({
                     "datetime_local": f"{date_str}T{t}:00",
                     "date":           date_str,
                     "time":           t,
                     "format":         "2D",
-                    "is_vose":        any_vose,
-                    "audio_lang":     "EN" if any_vose else "ES",
+                    "is_vose":        st_vose,
+                    "audio_lang":     "EN" if st_vose else "ES",
                     "is_3d":          False,
                     "is_imax":        False,
                     "is_isense":      st_data["is_isense"],

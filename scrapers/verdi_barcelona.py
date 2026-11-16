@@ -32,14 +32,12 @@ _HEADERS = {
 
 
 def _is_vose(film: dict) -> bool:
-    version  = (film.get("version")  or "").upper()
-    language = (film.get("language") or "").lower()
-    return (
-        "V.O" in version
-        or "VOSE" in version
-        or "ORIGINAL" in version
-        or language not in ("castellano", "español", "es", "")
-    )
+    """VOSE only when Verdi's version label says original version, e.g.
+    "V.O. SUB. CASTELLANO". The language field is NOT used: it lists every
+    language in the film, and "CATALÁN" (dubbed into Catalan) or "VARIOS"
+    versions would otherwise be wrongly shown as VOSE."""
+    version = (film.get("version") or "").upper()
+    return "V.O" in version or "VOSE" in version or "ORIGINAL" in version
 
 
 def scrape_verdi_barcelona() -> list[dict]:

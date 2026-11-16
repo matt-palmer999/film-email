@@ -1905,8 +1905,35 @@ _CINEMAS_BY_CITY = {
     "Málaga":    ['yelmo_vialia','yelmo_plaza_mayor','yelmo_rincon','albeniz','mk2_miramar','mk2_el_ingenio','kinepolis_marbella','rosaleda'],
 }
 
+def _cinema_has_vose(cinema: dict) -> bool:
+    """True if this cinema has at least one VOSE session for the film,
+    including premium-format (IMAX, 4DX...) sessions."""
+    if cinema.get("vose_showtimes"):
+        return True
+    return any(
+        isinstance(info, dict) and info.get("is_vose")
+        for dates in (cinema.get("format_showtimes") or {}).values()
+        for times in dates.values()
+        for info in times.values()
+    )
+
+
+def _is_english_film(film: dict, en_origins: set) -> bool:
+    """TMDB original language when known (a Canadian film may be in French);
+    otherwise fall back to country of origin."""
+    lang = film.get("original_language") or ""
+    if lang:
+        return lang == "en"
+    origins = set(film.get("origin_country") or [])
+    return bool(origins & en_origins)
+
+
 def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
-    """Filter films dict according to a subscriber's saved preferences."""
+    """Filter films dict according to a subscriber's saved preferences.
+
+    "any_vose" on each returned film is recomputed for the subscriber's own
+    cinemas, so the VOSE filter and VOSE badge never rely on VOSE sessions
+    at a cinema (or city) the subscriber doesn't go to."""
     sub_city = (prefs.get("city") or "Valencia").strip().title()
     _default_cinemas = _CINEMAS_BY_CITY.get(sub_city, _CINEMAS_BY_CITY["Valencia"])
     allowed_cinemas = set(prefs.get("cinemas") or _default_cinemas)
@@ -1931,28 +1958,28 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
             city_cinemas = set(_CINEMAS_BY_CITY.get(sub_city, []))
             if not film_cinemas & city_cinemas:
                 continue
+            local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
+                             if c.get("id", "") in city_cinemas)
             if vose_only:
-                if not film.get("any_vose", False):
+                if not local_vose:
                     continue
-                if vose_lang == "en":
-                    origins = set(film.get("origin_country") or [])
-                    if not origins or not origins & EN_ORIGINS:
-                        continue
+                if vose_lang == "en" and not _is_english_film(film, EN_ORIGINS):
+                    continue
         else:
             # Normal path — all filters apply
             # Cinema filter
             film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
             if not film_cinemas & allowed_cinemas:
                 continue
+            local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
+                             if c.get("id", "") in allowed_cinemas)
 
             # VOSE + language filter
             if vose_only:
-                if not film.get("any_vose", False):
+                if not local_vose:
                     continue
-                if vose_lang == "en":
-                    origins = set(film.get("origin_country") or [])
-                    if not origins or not origins & EN_ORIGINS:
-                        continue
+                if vose_lang == "en" and not _is_english_film(film, EN_ORIGINS):
+                    continue
 
             # New-only filter
             if new_only and not film.get("is_new", False):
@@ -1970,7 +1997,7 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                 if score and score < min_rating:
                     continue
 
-        result[title] = film
+        result[title] = {**film, "any_vose": local_vose}
     return result
 
 

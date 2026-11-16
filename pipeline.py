@@ -348,6 +348,7 @@ def _tmdb_details(movie_id: int, headers: dict, fallback: dict = None) -> dict:
         "genres_en":      [g["name"] for g in detail.get("genres", [])],
         "runtime":        detail.get("runtime"),
         "origin_country": detail.get("origin_country", []),
+        "original_language": detail.get("original_language", ""),
         "cert_es":        cert_es,
     }
 
@@ -738,6 +739,7 @@ def enrich_with_tmdb(films: dict) -> None:
                 film["rating_score"]   = tmdb.get("rating_score")
                 film["tmdb_id"]        = tmdb.get("tmdb_id")
                 film["origin_country"] = tmdb.get("origin_country", [])
+                film["original_language"] = tmdb.get("original_language", "")
 
                 if tmdb.get("cert_es") and tmdb["cert_es"] != "?":
                     cert = tmdb["cert_es"]
@@ -901,7 +903,7 @@ def _merge_film_into(films: dict, canonical: str, title: str) -> None:
 
 # Fields enrich_with_tmdb() sets from a TMDB match
 _TMDB_FIELDS = ("poster", "title_en", "title_es", "title_original", "synopsis_en", "synopsis_es",
-                "rating_score", "tmdb_id", "origin_country", "rating", "is_new",
+                "rating_score", "tmdb_id", "origin_country", "original_language", "rating", "is_new",
                 "year", "meta", "meta_en")
 
 
@@ -1449,6 +1451,15 @@ function repairSection(container) {
   }
 }
 
+// "English only": TMDB's original language when we have it (a Canadian or
+// Belgian film may be in French); country of origin only as a fallback.
+function isEnglishFilm(card) {
+  const lang = card.dataset.lang || '';
+  if (lang) return lang === 'en';
+  const origins = (card.dataset.origin || '').split(',');
+  return origins.some(o => ['US','GB','AU','CA','IE','NZ'].includes(o.trim()));
+}
+
 function applyVisibility() {
   const params        = new URLSearchParams(window.location.search);
   const filter        = params.get('filter')     || 'all';
@@ -1473,11 +1484,7 @@ function applyVisibility() {
       // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.
       let show = true;
       if (show && (voseOnly || filter === 'vose') && card.dataset.vose !== 'true') show = false;
-      if (show && voseLang === 'en') {
-        const origins = (card.dataset.origin || '').split(',');
-        const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
-      }
+      if (show && voseLang === 'en' && !isEnglishFilm(card)) show = false;
       card.style.display = show ? '' : 'none';
       if (show) visible++;
       return;
@@ -1486,11 +1493,7 @@ function applyVisibility() {
     let show = true;
     if (voseOnly || filter === 'vose') {
       if (card.dataset.vose !== 'true') show = false;
-      if (show && voseLang === 'en') {
-        const origins = (card.dataset.origin || '').split(',');
-        const engOrigins = ['US','GB','AU','CA','IE','NZ'];
-        if (!origins.some(o => engOrigins.includes(o.trim()))) show = false;
-      }
+      if (show && voseLang === 'en' && !isEnglishFilm(card)) show = false;
     }
     if (show && newOnly && card.dataset.isnew !== 'true') show = false;
     if (show && familyOnly) {
@@ -1956,13 +1959,22 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             ]
             if not all_times and not fmt_rows_today:
                 continue
-            vose_label = '<span class="vose-mini">VOSE</span>' if c["vose"] else ""
+            # The cinema-name VOSE tag is only safe when every session in the row
+            # is VOSE. In a mixed row each VOSE time carries its own tag instead,
+            # so nobody books a dubbed session thinking it is in English.
+            _row_flags = [iv for _, iv, _ in all_times] + [
+                e["is_vose"] for *_, _dt in fmt_rows_today for e in _dt.values()
+            ]
+            _row_all_vose = bool(_row_flags) and all(_row_flags)
+            _row_mixed    = any(_row_flags) and not _row_all_vose
+            vose_label = '<span class="vose-mini">VOSE</span>' if _row_all_vose else ""
             def _tbtn(t, iv, url):
                 vattr = "true" if iv else "false"
+                inner = f'{t}<span class="vose-tag">VOSE</span>' if (iv and _row_mixed) else t
                 if url:
                     _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})"
-                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{t}</a>'
-                return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{t}</button>'
+                    return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{inner}</a>'
+                return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{inner}</button>'
             # Standard/VOSE times row
             times_html = ""
             if all_times:
@@ -2111,6 +2123,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .time-btn{{padding:6px 14px;background:#1a1228;border:1px solid #2e2040;border-radius:6px;font-size:13px;color:#f0eae0;text-decoration:none;transition:all .2s;font-weight:500;cursor:pointer;display:inline-block}}
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
+.vose-tag{{margin-left:5px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:1px}}
 .time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
 .time-btn--match{{background:#0d2c18;border-color:#2d8a50;color:#5dda8a;font-weight:700;box-shadow:0 0 0 1px #2d8a50}}
 .time-btn--match:hover{{background:#113621;border-color:#5dda8a;color:#5dda8a}}
@@ -2763,7 +2776,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         if city and _city_ids and _cinema_ids_attr:
             _cinema_ids_attr = ','.join(c for c in _cinema_ids_attr.split(',') if c in _city_ids)
         return f"""
-    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
+    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-lang="{film.get('original_language') or ''}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>

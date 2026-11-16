@@ -63,7 +63,12 @@ def _session_is_vose(attrs: str, film_is_vose: bool) -> bool:
     foreign = {"ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "JAPANESE", "PORTUGUESE"}
     if parts_upper & foreign:
         return True    # Foreign-language audio with subtitles → VOSE
-    return film_is_vose  # fall back to film-level flag
+    # No explicit language on the session: never guess VOSE from the film-level
+    # flag (Kinépolis titles dubbed films "VOSE ..." too). Wrongly showing a
+    # session as dubbed is far less harmful than wrongly showing it as VOSE.
+    if film_is_vose:
+        log.warning("Kinépolis session with no language attribute (%r) — treating as dubbed", attrs)
+    return False
 
 
 def _parse_session(session: dict, film_is_vose: bool = False,

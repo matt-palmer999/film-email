@@ -98,18 +98,33 @@ def _parse_duration(length_str: str) -> int:
     return int(m.group(1)) if m else 0
 
 
+# Yelmo's per-session language labels. Only labels known to mean original
+# audio count as VOSE; anything new is treated as dubbed and logged, because
+# wrongly showing a dubbed session as VOSE is the worst mistake we can make.
+_VOSE_AUDIO = {
+    "SUB ESP": "EN", "VOSE": "EN", "V.O.S.E.": "EN", "VO": "EN",
+    "INGLÉS": "EN", "INGLES": "EN",
+    "COR": "KO", "COREANO": "KO",
+    "JAPONÉS": "JA", "JAPONES": "JA",
+    "FRANCÉS": "FR", "FRANCES": "FR",
+    "ITALIANO": "IT", "ALEMÁN": "DE", "ALEMAN": "DE",
+}
+_DUBBED = {"ESP", "ESPAÑOL", "ESPANOL", "CASTELLANO", "CAT", "CATALÁN", "CATALAN", "CATALÀ"}
+_warned: set = set()
+
+
 def _is_vose(language: str) -> bool:
-    lang = language.upper()
-    return lang not in ("ESP", "ESPAÑOL")
+    lang = language.upper().strip()
+    if lang in _VOSE_AUDIO:
+        return True
+    if lang not in _DUBBED and lang not in _warned:
+        _warned.add(lang)
+        log.warning("Yelmo: unknown language label %r — treating as dubbed", language)
+    return False
 
 
 def _audio_lang(language: str) -> str:
-    lang = language.upper()
-    if lang in ("ESP", "ESPAÑOL"):
-        return "ES"
-    if lang in ("COR", "COREANO"):
-        return "KO"
-    return "EN"
+    return _VOSE_AUDIO.get(language.upper().strip(), "ES")
 
 
 def _poster_url(media: list) -> str:
