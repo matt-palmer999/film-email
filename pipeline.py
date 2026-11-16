@@ -82,7 +82,91 @@ CINEMA_ADDRESSES = {
     "babel":      ("C/ Vicente Sancho Tello 10", "46021", "Valencia"),
     "dor":        ("C/ Almirante Cadarso 31", "46005", "Valencia"),
     "cinesa":     ("C.C. Bonaire, Autovía del Este (A-3) km 345", "46960", "Aldaia"),
+    # Barcelona — confirmed 2026-11-16 (Verdi's two buildings: see CINEMA_BUILDINGS)
+    "verdi_barcelona":     ("C/ Verdi 32", "08012", "Barcelona"),
+    "renoir_barcelona":    ("C/ Floridablanca 135", "08011", "Barcelona"),
+    "aribau_barcelona":    ("C/ Aribau 5", "08011", "Barcelona"),
+    "cinesa_diagonal":     ("C/ Santa Fe de Nou Mèxic s/n", "08021", "Barcelona"),
+    "cinesa_diagonal_mar": ("C.C. Diagonal Mar, Av. Diagonal 3", "08019", "Barcelona"),
+    "yelmo_maquinista":    ("Westfield La Maquinista, C/ Potosí 2", "08030", "Barcelona"),
+    "mooby_gloeries":      ("Westfield Glòries, Av. Diagonal 208", "08018", "Barcelona"),
+    "mooby_arenas":        ("Arenas de Barcelona, Gran Via de les Corts Catalanes 385", "08015", "Barcelona"),
+    "ocine_magic":         ("C.C. Màgic, C/ Concòrdia 1", "08917", "Badalona"),
+    # Alicante — confirmed 2026-11-16
+    "kinepolis_alicante":  ("C.C. Plaza Mar 2, Av. de Dénia s/n", "03016", "Alicante"),
+    "yelmo_alicante":      ("C.C. Puerta de Alicante, Av. Alcalde Lorenzo Carbonell 66", "03007", "Alicante"),
+    "odeon_alicante":      ("C.C. The Outlet Stores, Ctra. de Alicante 94", "03690", "San Vicente del Raspeig"),
+    "abc_elx":             ("C.C. L'Aljub, C/ Jacarilla 7", "03205", "Elche"),
+    "aana_alicante":       ("C/ Médico Pascual Pérez 44-46", "03001", "Alicante"),
+    "aana_san_juan":       ("Av. Miguel Hernández 42", "03550", "Sant Joan d'Alacant"),
+    # Málaga — confirmed 2026-11-16
+    "yelmo_vialia":        ("C.C. Vialia, Explanada de la Estación s/n", "29002", "Málaga"),
+    "yelmo_plaza_mayor":   ("C.C. Plaza Mayor, C/ Alfonso Ponce de León 1-3", "29004", "Málaga"),
+    "albeniz":             ("C/ Alcazabilla 4", "29015", "Málaga"),
+    "mk2_miramar":         ("C.C. Miramar, Av. de la Encarnación s/n", "29640", "Fuengirola"),
+    "mk2_malaga_nostrum":  ("Málaga Nostrum Retail Park, C/ Lugo", "29004", "Málaga"),   # closed since Oct 2026
+    "yelmo_rincon":        ("C.C. Rincón de la Victoria, Ctra. de Totalán s/n, La Cala del Moral", "29730", "Rincón de la Victoria"),
+    "mk2_el_ingenio":      ("C.C. El Ingenio, Av. Juan Carlos I 18", "29740", "Vélez-Málaga"),
+    "rosaleda":            ("C.C. Rosaleda, Av. Simón Bolívar s/n", "29011", "Málaga"),
+    "kinepolis_marbella":  ("C.C. La Cañada, Ctra. de Ojén s/n", "29600", "Marbella"),
 }
+
+# Cinemas spread over more than one building. Each session's building is read by
+# the scraper and stored per session in cinema["building"] = {date: {time: key}}.
+# A session with no known building is shown under the cinema with no label.
+CINEMA_BUILDINGS = {
+    "verdi_barcelona": {
+        "verdi": ("Verdi",      ("C/ Verdi 32", "08012", "Barcelona")),
+        "park":  ("Verdi Park", ("C/ Torrijos 49", "08012", "Barcelona")),
+    },
+}
+
+
+def unknown_buildings(films: dict, today_str: str | None = None) -> dict:
+    """{cinema id: (sessions with no building, all sessions)} from today on,
+    for CINEMA_BUILDINGS cinemas that have any sessions without a building."""
+    today_str = today_str or datetime.now(VALENCIA_TZ).date().isoformat()
+    out = {}
+    for film in films.values():
+        for c in film.get("cinemas", []):
+            if c.get("id") not in CINEMA_BUILDINGS:
+                continue
+            known = c.get("building") or {}
+            for d, times in cinema_times_by_date(c).items():
+                if d < today_str:
+                    continue
+                for t in times:
+                    n_unknown, n_all = out.get(c["id"], (0, 0))
+                    out[c["id"]] = (n_unknown + (0 if known.get(d, {}).get(t) else 1), n_all + 1)
+    return {cid: v for cid, v in out.items() if v[0]}
+
+
+def _map_pin(url: str) -> str:
+    """The little 'Get directions' pin shown next to a cinema or building."""
+    if not url:
+        return ""
+    return (f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer" class="cinema-map-link" '
+            'aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" '
+            'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+            '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a>')
+
+
+def building_postal_address(cid: str, bkey: str) -> dict:
+    addr = cinema_postal_address(cid)
+    b = CINEMA_BUILDINGS.get(cid, {}).get(bkey)
+    if b:
+        street, postcode, town = b[1]
+        addr.update(streetAddress=street, postalCode=postcode, addressLocality=town)
+    return addr
+
+
+def building_maps_url(cid: str, bkey: str) -> str:
+    b = CINEMA_BUILDINGS.get(cid, {}).get(bkey)
+    if not b:
+        return cinema_maps_url(cid)
+    from urllib.parse import quote_plus
+    street, postcode, town = b[1]
+    return "https://maps.google.com/?q=" + quote_plus(f"{b[0]}, {street}, {postcode} {town}")
 
 
 def cinema_postal_address(cid: str) -> dict:
@@ -706,6 +790,7 @@ def merge_scraper_results(all_results: list) -> dict:
         vose_showtimes_by_date: dict = {}
         format_showtimes: dict = {}
         ensub: dict = {}   # {date: {time: True}} sessions with English subtitles
+        building: dict = {}   # {date: {time: key}} for CINEMA_BUILDINGS cinemas
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
@@ -721,6 +806,8 @@ def merge_scraper_results(all_results: list) -> dict:
                 st_is_vose = bool(st.get("is_vose", False))
                 if st.get("en_subs"):
                     ensub.setdefault(d, {})[t] = True
+                if st.get("building"):
+                    building.setdefault(d, {})[t] = st["building"]
                 url = st.get("booking_url", "")
                 if title_flags:
                     st = {**st, **title_flags}
@@ -787,6 +874,8 @@ def merge_scraper_results(all_results: list) -> dict:
                             day_bucket[t] = entry
             for d, times in ensub.items():
                 existing.setdefault("ensub", {}).setdefault(d, {}).update(times)
+            for d, times in building.items():
+                existing.setdefault("building", {}).setdefault(d, {}).update(times)
             if is_vose:
                 existing["vose"] = True
         else:
@@ -800,6 +889,7 @@ def merge_scraper_results(all_results: list) -> dict:
                 "vose_showtimes":  vose_showtimes_by_date,
                 "format_showtimes": format_showtimes,
                 "ensub":           ensub,
+                **({"building": building} if building else {}),
             })
 
         if is_vose:
@@ -987,6 +1077,10 @@ def _merge_cinema_times(dst: dict, src: dict) -> None:
                 day_bucket.setdefault(t, entry)
     for d, times in (src.get("ensub") or {}).items():
         dst.setdefault("ensub", {}).setdefault(d, {}).update(times)
+    for d, times in (src.get("building") or {}).items():
+        day = dst.setdefault("building", {}).setdefault(d, {})
+        for t, b in times.items():
+            day.setdefault(t, b)
     if src.get("vose"):
         dst["vose"] = True
 
@@ -1177,6 +1271,8 @@ def _future_only(entry: dict, today_str: str) -> None:
         if kept:
             fmts[fmt] = kept
     entry["format_showtimes"] = fmts
+    if "building" in entry:
+        entry["building"] = {d: t for d, t in (entry.get("building") or {}).items() if d >= today_str}
 
 
 def carry_forward_failed_cinemas(films: dict, prev_cache: dict, today: date,
@@ -1905,6 +2001,12 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
                 "workPresented":  {"@id": movie_id},
                 "location":       location,
             }
+            # Cinemas in two buildings: the session's own building and address
+            bkey = (cinema.get("building") or {}).get(date_str, {}).get(time_str)
+            bdef = CINEMA_BUILDINGS.get(cinema.get("id", ""), {}).get(bkey)
+            if bdef:
+                ev["location"] = {**location, "name": f"{cinema_name} ({bdef[0]})",
+                                  "address": building_postal_address(cinema.get("id", ""), bkey)}
             # VOSE = original audio with Spanish subtitles (original language not
             # known per session); otherwise the session is in Spanish.
             if is_vose:
@@ -2282,32 +2384,57 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
                     _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})"
                     return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{inner}</a>'
                 return f'<button onclick="showComingSoon()" class="time-btn" data-time="{t}" data-vose="{vattr}">{inner}</button>'
-            # Standard/VOSE times row
-            times_html = ""
-            if all_times:
-                std_btns = "".join(_tbtn(t, iv, url) for t, iv, url in all_times)
-                if fmt_rows_today:
-                    # Label the standard row too, so every row reads "format: times"
-                    times_html += ('<div class="format-row std-row"><span class="format-label format-std" '
-                                   'data-es="Estándar" data-en="Standard">Estándar</span>'
-                                   f'<div class="fmt-times">{std_btns}</div></div>')
-                else:
-                    times_html += f'<div class="times-row">{std_btns}</div>'
-            # Premium format rows
-            for fmt_key, label, css_cls in _FORMAT_DISPLAY:
-                if fmt_key not in fmt_st or day["key"] not in fmt_st[fmt_key]:
-                    continue
-                day_times = fmt_st[fmt_key][day["key"]]
-                fmt_btns = "".join(
-                    _tbtn(t, entry["is_vose"], entry["url"])
-                    for t, entry in sorted(day_times.items())
-                )
-                times_html += f'<div class="format-row"><span class="format-label {css_cls}">{label}</span><div class="fmt-times">{fmt_btns}</div></div>'
+            def _times_html(std_times, fmt_rows):
+                html = ""
+                # Standard/VOSE times row
+                if std_times:
+                    std_btns = "".join(_tbtn(t, iv, url) for t, iv, url in std_times)
+                    if fmt_rows:
+                        # Label the standard row too, so every row reads "format: times"
+                        html += ('<div class="format-row std-row"><span class="format-label format-std" '
+                                 'data-es="Estándar" data-en="Standard">Estándar</span>'
+                                 f'<div class="fmt-times">{std_btns}</div></div>')
+                    else:
+                        html += f'<div class="times-row">{std_btns}</div>'
+                # Premium format rows
+                for _fk, label, css_cls, day_times in fmt_rows:
+                    fmt_btns = "".join(
+                        _tbtn(t, entry["is_vose"], entry["url"])
+                        for t, entry in sorted(day_times.items())
+                    )
+                    html += f'<div class="format-row"><span class="format-label {css_cls}">{label}</span><div class="fmt-times">{fmt_btns}</div></div>'
+                return html
+
             vose_attr    = "true" if c["vose"] else "false"
             _cmeta       = CINEMA_META.get(c["id"], {})
             cinema_city  = _cmeta.get("city", "")
-            _maps_url    = esc(cinema_maps_url(c["id"]))
-            _maps_link   = f'<a href="{_maps_url}" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a>' if _maps_url else ""
+            _maps_link   = _map_pin(cinema_maps_url(c["id"]))
+
+            # Cinemas in two buildings (Cines Verdi): label which building each
+            # session is in. Sessions whose building is unknown get no label.
+            _bdefs = CINEMA_BUILDINGS.get(c["id"]) or {}
+            _bday  = (c.get("building") or {}).get(day["key"], {}) if _bdefs else {}
+            _bkeys = [k for k in _bdefs if k in _bday.values()]
+            if not _bkeys:
+                times_html = _times_html(all_times, fmt_rows_today)
+            else:
+                def _bline(k):
+                    name, (street, _pc, _town) = _bdefs[k]
+                    return (f'<div class="bldg-label"><span translate="no">{esc(name)}</span>'
+                            f'<span class="bldg-street">&nbsp;· {esc(street)}</span>'
+                            f'{_map_pin(building_maps_url(c["id"], k))}</div>')
+                groups = []
+                for k in _bkeys + [None]:
+                    g_std = [x for x in all_times if _bday.get(x[0]) == k]
+                    g_fmt = [(fk, lb, cc, {t: e for t, e in dt.items() if _bday.get(t) == k})
+                             for fk, lb, cc, dt in fmt_rows_today]
+                    g_fmt = [r for r in g_fmt if r[3]]
+                    if g_std or g_fmt:
+                        groups.append((k, g_std, g_fmt))
+                times_html = "".join(
+                    f'<div class="bldg-group">{_bline(k) if k else ""}{_times_html(gs, gf)}</div>'
+                    for k, gs, gf in groups)
+                _maps_link = ""   # each building has its own pin
             cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}{_maps_link}</div><div class="showtime-times">{times_html}</div></div>'
 
         if not cinema_rows:
@@ -2416,6 +2543,10 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-cinema{{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}}
 .vose-mini{{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}}
 .showtime-times{{display:flex;flex-direction:column;gap:6px}}
+.bldg-group{{display:flex;flex-direction:column;gap:6px}}
+.bldg-group+.bldg-group{{margin-top:6px}}
+.bldg-label{{font-size:12px;color:#b8aec8;display:flex;align-items:center;flex-wrap:wrap}}
+.bldg-street{{color:#9a8fb5}}
 .times-row{{display:flex;flex-wrap:wrap;gap:8px}}
 .format-row{{display:grid;grid-template-columns:minmax(76px,max-content) 1fr;align-items:start;column-gap:10px}}
 .fmt-times{{display:flex;flex-wrap:wrap;gap:8px}}
@@ -2589,7 +2720,7 @@ function showDay(key) {{
 // Hide a standard/format row once none of its times are visible, so a format
 // label (IMAX, 4DX…) is never left on its own after times are removed/filtered.
 function syncTimeRows() {{
-  document.querySelectorAll('.times-row, .format-row').forEach(r => {{
+  document.querySelectorAll('.times-row, .format-row, .bldg-group').forEach(r => {{
     const live = Array.from(r.querySelectorAll('.time-btn')).some(b => b.style.display !== 'none');
     r.style.display = live ? '' : 'none';
   }});
@@ -3871,6 +4002,16 @@ def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list |
             "what users already have saved).\n"
             + "".join(f"  - {p}\n" for p in id_problems) + "\n"
         )
+    bldg_block = ""
+    _unknown_b = unknown_buildings(films)
+    if _unknown_b:
+        bldg_block = (
+            "🏢 BUILDING UNKNOWN — these sessions show with no building label (the booking\n"
+            "page didn't say which screen). A few just-started sessions are normal; lots\n"
+            "means the booking page has changed (scrapers/verdi_barcelona.py parse_building).\n"
+            + "".join(f"  - {CINEMA_META.get(cid, {}).get('name', cid)}: {u} of {n} sessions\n"
+                      for cid, (u, n) in sorted(_unknown_b.items())) + "\n"
+        )
     carried = carried or {}
     carry_block = ""
     if carried:
@@ -3929,7 +4070,7 @@ TOP REFERRERS (yesterday):
         vose_lines = ""
     body = f"""whatson.movie pipeline completed at {now_str}
 
-{id_block}{carry_block}SCRAPERS ({len(scraper_status)} cinemas, {" / ".join(f"{len([s for s in scraper_status if s.get('city')==c])} {c}" for c in dict.fromkeys(s.get('city') for s in scraper_status))}):
+{id_block}{carry_block}{bldg_block}SCRAPERS ({len(scraper_status)} cinemas, {" / ".join(f"{len([s for s in scraper_status if s.get('city')==c])} {c}" for c in dict.fromkeys(s.get('city') for s in scraper_status))}):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)

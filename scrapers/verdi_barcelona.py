@@ -7,9 +7,16 @@ Uses the official Cines Verdi JSON API:
 Single HTTP request returns all current films with full performances
 (date + time).  Covers both Verdi (C/Verdi 32) and Verdi Park (C/Torrijos 49)
 — the API does not separate venues by ID, so both are treated as one cinema.
+
+Each session's building is read from its admit-one booking page, which says
+e.g. "Cines Verdi Barcelona | Sala D V.Park" (Sala A-D = Verdi Park,
+Sala 1-5 = Verdi). It is stored per session as "building": "verdi" | "park",
+or None when the page can't be read — the session is always kept.
 """
 
 import logging
+import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 import requests
@@ -38,6 +45,43 @@ def _is_vose(film: dict) -> bool:
     versions would otherwise be wrongly shown as VOSE."""
     version = (film.get("version") or "").upper()
     return "V.O" in version or "VOSE" in version or "ORIGINAL" in version
+
+
+_SALA_RE = re.compile(r"Verdi Barcelona\s*\|\s*Sala\s+([0-9A-Za-z]+)(\s+V\.\s*Park)?", re.I)
+
+
+def parse_building(html: str):
+    """'verdi', 'park' or None from a booking page's 'Verdi Barcelona | Sala X' line."""
+    m = _SALA_RE.search(html or "")
+    if not m:
+        return None
+    sala = m.group(1).upper()
+    if m.group(2) or sala in {"A", "B", "C", "D"}:
+        return "park"
+    if sala.isdigit():
+        return "verdi"
+    return None
+
+
+def _fetch_building(code: str):
+    try:
+        r = requests.get(SHOP_URL.format(code=code), headers=_HEADERS, timeout=15)
+        r.raise_for_status()
+        return parse_building(r.text)
+    except Exception:
+        return None
+
+
+def lookup_buildings(codes: list[str]) -> dict:
+    """{perf code: 'verdi' | 'park' | None}, about 40s for 150 sessions."""
+    codes = sorted(set(c for c in codes if c))
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        found = dict(zip(codes, pool.map(_fetch_building, codes)))
+    unknown = [c for c, b in found.items() if not b]
+    if unknown:
+        log.warning("Verdi Barcelona: building unknown for %d/%d sessions (e.g. %s)",
+                    len(unknown), len(codes), ", ".join(unknown[:5]))
+    return found
 
 
 def scrape_verdi_barcelona() -> list[dict]:
@@ -101,6 +145,8 @@ def scrape_verdi_barcelona() -> list[dict]:
                 "is_imax":        False,
                 "is_4dx":         False,
                 "booking_url":    SHOP_URL.format(code=p["code"]) if p.get("code") else "",
+                "building":       None,
+                "_code":          str(p.get("code") or ""),
             })
 
         if not showtimes:
@@ -121,8 +167,14 @@ def scrape_verdi_barcelona() -> list[dict]:
             "showtimes":      showtimes,
         })
 
+    buildings = lookup_buildings([st["_code"] for f in results for st in f["showtimes"]])
+    for f in results:
+        for st in f["showtimes"]:
+            st["building"] = buildings.get(st.pop("_code"))
+
     total = sum(len(f["showtimes"]) for f in results)
-    log.info("Cines Verdi Barcelona: %d films, %d sessions", len(results), total)
+    n_park = sum(1 for f in results for st in f["showtimes"] if st["building"] == "park")
+    log.info("Cines Verdi Barcelona: %d films, %d sessions (%d at Verdi Park)", len(results), total, n_park)
     return results
 
 
@@ -143,4 +195,8 @@ if __name__ == "__main__":
         dates    = sorted({s["date"] for s in f["showtimes"]})
         n        = len(f["showtimes"])
         d_range  = f"{dates[0]} -> {dates[-1]}" if dates else "?"
-        print(f"  [{vose_tag}] {f['title_es'][:45]:<45} {n:3d} sessions  {d_range}")
+        bl = {"verdi": 0, "park": 0, None: 0}
+        for st in f["showtimes"]:
+            bl[st["building"]] += 1
+        print(f"  [{vose_tag}] {f['title_es'][:45]:<45} {n:3d} sessions  {d_range}  "
+              f"verdi={bl['verdi']} park={bl['park']} ?={bl[None]}")

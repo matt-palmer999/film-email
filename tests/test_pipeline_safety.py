@@ -185,10 +185,13 @@ class Addresses(unittest.TestCase):
         a = pipeline.cinema_postal_address("granturia")
         self.assertEqual((a["addressLocality"], a["postalCode"]), ("Xirivella", "46950"))
         self.assertEqual(pipeline.cinema_postal_address("dor")["postalCode"], "46005")
-        # Cinemas without a checked address still get city-level markup
-        a = pipeline.cinema_postal_address("verdi_barcelona")
-        self.assertEqual(a["addressLocality"], "Barcelona")
-        self.assertNotIn("streetAddress", a)
+        a = pipeline.cinema_postal_address("mk2_el_ingenio")
+        self.assertEqual((a["addressLocality"], a["postalCode"]), ("Vélez-Málaga", "29740"))
+        self.assertEqual(pipeline.cinema_postal_address("cinesa_diagonal")["postalCode"], "08021")
+
+    def test_every_cinema_has_a_checked_address(self):
+        # All 36 confirmed by the user on 2026-11-16; new cinemas need one too
+        self.assertFalse(set(pipeline.CINEMA_META) - set(pipeline.CINEMA_ADDRESSES))
 
     def test_map_links_point_at_the_right_place(self):
         self.assertIn("Roger+de+Lauria", pipeline.cinema_maps_url("park"))
