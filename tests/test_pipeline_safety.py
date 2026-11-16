@@ -180,7 +180,9 @@ class TmdbOverrides(unittest.TestCase):
         for k, v in data.items():
             if not k.startswith("_"):
                 self.assertTrue(v is None or isinstance(v, int), k)
-        self.assertEqual(data.get("La Violinista"), 748681)
+        self.assertEqual(data.get("La Violinista"), 748681)   # 2026 The Violinist, not 2018 Viulisti
+        self.assertEqual(data.get("EL NIÑO"), 1506401)        # 2026 Ortuella film, not 2014 thriller
+        self.assertEqual(data.get("Preestreno – Fatherland"), 1437696)  # 2026 Pawlikowski, not 1994 TV film
 
 
 if __name__ == "__main__":
