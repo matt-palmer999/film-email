@@ -612,6 +612,7 @@ def merge_scraper_results(all_results: list) -> dict:
         showtimes_by_date: dict = {}
         vose_showtimes_by_date: dict = {}
         format_showtimes: dict = {}
+        ensub: dict = {}   # {date: {time: True}} sessions with English subtitles
         for st in film.get("showtimes", []):
             d = st.get("date", "")
             t = st.get("time", "")
@@ -625,6 +626,8 @@ def merge_scraper_results(all_results: list) -> dict:
                 # Every scraper sets a per-session flag. If one ever doesn't,
                 # treat the session as dubbed rather than copying the film flag.
                 st_is_vose = bool(st.get("is_vose", False))
+                if st.get("en_subs"):
+                    ensub.setdefault(d, {})[t] = True
                 url = st.get("booking_url", "")
                 if title_flags:
                     st = {**st, **title_flags}
@@ -689,6 +692,8 @@ def merge_scraper_results(all_results: list) -> dict:
                     for t, entry in times.items():
                         if t not in day_bucket:
                             day_bucket[t] = entry
+            for d, times in ensub.items():
+                existing.setdefault("ensub", {}).setdefault(d, {}).update(times)
             if is_vose:
                 existing["vose"] = True
         else:
@@ -701,6 +706,7 @@ def merge_scraper_results(all_results: list) -> dict:
                 "showtimes":       showtimes_by_date,
                 "vose_showtimes":  vose_showtimes_by_date,
                 "format_showtimes": format_showtimes,
+                "ensub":           ensub,
             })
 
         if is_vose:
@@ -886,6 +892,8 @@ def _merge_cinema_times(dst: dict, src: dict) -> None:
             day_bucket = fmt_bucket.setdefault(d, {})
             for t, entry in times.items():
                 day_bucket.setdefault(t, entry)
+    for d, times in (src.get("ensub") or {}).items():
+        dst.setdefault("ensub", {}).setdefault(d, {}).update(times)
     if src.get("vose"):
         dst["vose"] = True
 
@@ -1087,6 +1095,13 @@ def cinema_has_vose(cinema: dict) -> bool:
     )
 
 
+def cinema_has_ensub(cinema: dict) -> bool:
+    """True if the cinema has an English-subtitled session from today on
+    (e.g. a Spanish film shown "VOSI" / "V.O. SUB. INGLÉS")."""
+    today = datetime.now(VALENCIA_TZ).date().isoformat()
+    return any(d >= today and times for d, times in (cinema.get("ensub") or {}).items())
+
+
 def cinemas_in_window(film: dict) -> list:
     today     = datetime.now(VALENCIA_TZ).date()
     days      = 29 if _is_classic(film) else 6
@@ -1201,6 +1216,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
 .badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.ensub-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .cinema-map-link{display:inline-flex;align-items:center;margin-left:6px;color:#f0eae0;text-decoration:none;vertical-align:middle;transition:color .2s}.cinema-map-link:hover{color:#ffffff}
@@ -1521,8 +1537,11 @@ function applyVisibility() {
     if (isClassic) {
       // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.
       let show = true;
-      if (show && (voseOnly || filter === 'vose') && card.dataset.vose !== 'true') show = false;
-      if (show && voseLang === 'en' && !isEnglishFilm(card)) show = false;
+      if (voseOnly || filter === 'vose') {
+        const voseOk  = card.dataset.vose === 'true' && (voseLang !== 'en' || isEnglishFilm(card));
+        const ensubOk = voseLang === 'en' && !!card.dataset.ensubCinemas;
+        if (!voseOk && !ensubOk) show = false;
+      }
       card.style.display = show ? '' : 'none';
       if (show) visible++;
       return;
@@ -1530,8 +1549,16 @@ function applyVisibility() {
 
     let show = true;
     if (voseOnly || filter === 'vose') {
-      if (card.dataset.vose !== 'true') show = false;
-      if (show && voseLang === 'en' && !isEnglishFilm(card)) show = false;
+      // VOSE (in English when "English only") at the chosen cinemas, or, for
+      // "English only", English-subtitled sessions at the chosen cinemas.
+      const atCinemas = ids => {
+        const list = (ids || '').split(',').filter(Boolean);
+        return (cinemas && cinemas.length) ? list.some(c => cinemas.includes(c)) : list.length > 0;
+      };
+      const voseOk  = card.dataset.vose === 'true' && atCinemas(card.dataset.voseCinemas)
+                      && (voseLang !== 'en' || isEnglishFilm(card));
+      const ensubOk = voseLang === 'en' && atCinemas(card.dataset.ensubCinemas);
+      if (!voseOk && !ensubOk) show = false;
     }
     if (show && newOnly && card.dataset.isnew !== 'true') show = false;
     if (show && familyOnly) {
@@ -1546,11 +1573,6 @@ function applyVisibility() {
     if (show && cinemas && cinemas.length > 0) {
       const cardCinemas = (card.dataset.cinemas || '').split(',');
       if (!cardCinemas.some(c => cinemas.includes(c.trim()))) show = false;
-    }
-    // When VOSE filter + specific cinema(s) selected, verify VOSE exists at those cinemas
-    if (show && (voseOnly || filter === 'vose') && cinemas && cinemas.length > 0) {
-      const voseCinemas = (card.dataset.voseCinemas || '').split(',').filter(Boolean);
-      if (!voseCinemas.some(c => cinemas.includes(c))) show = false;
     }
 
     card.style.display = show ? '' : 'none';
@@ -1654,6 +1676,8 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
                 ev["subtitleLanguage"] = "es"
             else:
                 ev["inLanguage"] = "es"
+            if time_str in (cinema.get("ensub") or {}).get(date_str, {}):
+                ev["subtitleLanguage"] = "en"
             if url:
                 ev["offers"] = {"@type": "Offer", "url": url}
             events.append(ev)
@@ -1768,6 +1792,8 @@ def build_film_archive_page(film: dict, anchor: datetime) -> str:
     trailer_url = film.get("trailer_url", "")
 
     vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
+    if any(cinema_has_ensub(c) for c in film.get("cinemas", [])):
+        vose_badge += '<span class="ensub-badge" data-es="SUBT. INGLÉS" data-en="EN SUBS">SUBT. INGLÉS</span>'
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
     rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
     rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
@@ -1840,6 +1866,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .hero-info{{flex:1;display:flex;flex-direction:column;justify-content:center}}
 .badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}}
 .vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
+.ensub-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}}
 .score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
 .rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
 .hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
@@ -2006,9 +2033,16 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             _row_all_vose = bool(_row_flags) and all(_row_flags)
             _row_mixed    = any(_row_flags) and not _row_all_vose
             vose_label = '<span class="vose-mini">VOSE</span>' if _row_all_vose else ""
+            _ensub_today = (c.get("ensub") or {}).get(day["key"], {})
             def _tbtn(t, iv, url):
                 vattr = "true" if iv else "false"
                 inner = f'{t}<span class="vose-tag">VOSE</span>' if (iv and _row_mixed) else t
+                if t in _ensub_today:
+                    # English subtitles get their own tag, never the VOSE one
+                    inner += ('<span class="ensub-tag" data-es="SUBT. INGLÉS" data-en="EN SUBS">'
+                              'SUBT. INGLÉS</span>')
+                    vattr += '" data-ensub="true'
+
                 if url:
                     _gc = "if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})"
                     return f'<a href="{url}" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="{t}" data-vose="{vattr}" onclick="{_gc}">{inner}</a>'
@@ -2049,6 +2083,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
 
     new_badge   = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW RELEASE">ESTRENO</span>' if is_new else ""
     vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
+    if any(cinema_has_ensub(c) for c in film.get("cinemas", [])):
+        vose_badge += '<span class="ensub-badge" data-es="SUBT. INGLÉS" data-en="EN SUBS">SUBT. INGLÉS</span>'
     score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
     rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
     rating_badge = f'<span class="rating-badge">{rating_label}</span>' if rating_label else ""
@@ -2123,6 +2159,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .film-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px}}
 .badge-new{{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}}
 .vose-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}}
+.ensub-badge{{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}}
 .score-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}}
 .rating-badge{{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}}
 .hero-title{{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}}
@@ -2162,6 +2199,8 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .time-btn:hover{{background:#2a1f3d;border-color:#ffb432;color:#ffb432}}
 .time-btn[data-vose="true"]{{border-color:rgba(255,220,80,.55);color:#ffd84a}}
 .vose-tag{{margin-left:5px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:1px}}
+.ensub-tag{{margin-left:5px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:1px;color:#7cc4ff}}
+.time-btn[data-ensub="true"]{{border-color:rgba(124,196,255,.55)}}
 .time-btn[data-vose="true"]:hover{{border-color:#ffd84a;background:#221a08}}
 .time-btn--match{{background:#0d2c18;border-color:#2d8a50;color:#5dda8a;font-weight:700;box-shadow:0 0 0 1px #2d8a50}}
 .time-btn--match:hover{{background:#113621;border-color:#5dda8a;color:#5dda8a}}
@@ -2425,12 +2464,15 @@ window.addEventListener('DOMContentLoaded', () => {{
     }});
   }}
   const voseFilter = params.get('vose') === 'true';
+  // "English only" also keeps English-subtitled sessions of Spanish films
+  const ensubOk = params.get('vose_lang') === 'en';
   if (voseFilter) {{
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {{
       if (row.style.display === 'none' || row.classList.contains('city-hidden')) return;
       const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
       btns.forEach(btn => {{
-        if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
+        const keep = btn.getAttribute('data-vose') === 'true' || (ensubOk && btn.getAttribute('data-ensub') === 'true');
+        if (!keep) btn.style.display = 'none';
       }});
       if (btns.filter(b => b.style.display !== 'none').length === 0) {{
         row.style.display = 'none';
@@ -2784,6 +2826,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
             vose = film.get("any_vose", False)
         _window_cinemas  = _city_cinemas_in_window if city else cinemas_in_window(film)
         vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if cinema_has_vose(c))
+        ensub_cinema_ids = ",".join(c["id"] for c in _window_cinemas if cinema_has_ensub(c))
         is_new   = film.get("is_new", False)
         cinemas  = film["cinemas"]
         rating   = film.get("rating", "?")
@@ -2794,6 +2837,8 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         )
         new_badge   = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span>' if is_new else ""
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
+        if ensub_cinema_ids:
+            vose_badge += '<span class="ensub-badge" data-es="SUBT. INGLÉS" data-en="EN SUBS">SUBT. INGLÉS</span>'
         score       = film.get("rating_score")
         score_badge = f'<span class="score-badge">⭐ {score}</span>' if score else ""
         rating_label = 'TP' if rating == 'TP' else (f'+{rating}' if rating not in ('?', '') else '')
@@ -2814,7 +2859,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         if city and _city_ids and _cinema_ids_attr:
             _cinema_ids_attr = ','.join(c for c in _cinema_ids_attr.split(',') if c in _city_ids)
         return f"""
-    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-lang="{film.get('original_language') or ''}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
+    <div class="grid-card" data-vose="{'true' if vose else 'false'}" data-vose-cinemas="{vose_cinema_ids}" data-ensub-cinemas="{ensub_cinema_ids}" data-isnew="{'true' if is_new else 'false'}" data-cinemas="{_cinema_ids_attr}" data-year="{cd['year']}" data-section="{cd['section']}" data-rating="{cd['rating_val']}" data-score="{cd['score_val']}" data-origin="{cd['origin']}" data-lang="{film.get('original_language') or ''}" data-hasevening="{cd['hasevening']}" data-showdays="{cd['showdays_attr']}" {cd['showtimes_attrs']}>
       <div class="grid-poster">{poster_html}</div>
       <div class="grid-info">
         <div class="badges">{new_badge}{vose_badge}{score_badge}{rating_badge}</div>

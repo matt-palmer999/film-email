@@ -1918,6 +1918,15 @@ def _cinema_has_vose(cinema: dict) -> bool:
     )
 
 
+def _vose_pref_ok(film: dict, local_vose: bool, local_ensub: bool, vose_lang: str, en_origins: set) -> bool:
+    """VOSE-only subscribers: VOSE at their cinemas (in English if they chose
+    English only). English-only subscribers also get films with English-
+    subtitled sessions (e.g. a Spanish film shown "VOSI")."""
+    if local_vose and (vose_lang != "en" or _is_english_film(film, en_origins)):
+        return True
+    return vose_lang == "en" and local_ensub
+
+
 def _is_english_film(film: dict, en_origins: set) -> bool:
     """TMDB original language when known (a Canadian film may be in French);
     otherwise fall back to country of origin."""
@@ -1926,6 +1935,12 @@ def _is_english_film(film: dict, en_origins: set) -> bool:
         return lang == "en"
     origins = set(film.get("origin_country") or [])
     return bool(origins & en_origins)
+
+
+def _cinema_has_ensub(cinema: dict) -> bool:
+    """English-subtitled session from today on (e.g. "VOSI" Spanish films)."""
+    today = datetime.now().date().isoformat()
+    return any(d >= today and t for d, t in (cinema.get("ensub") or {}).items())
 
 
 def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
@@ -1960,11 +1975,10 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                 continue
             local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
                              if c.get("id", "") in city_cinemas)
-            if vose_only:
-                if not local_vose:
-                    continue
-                if vose_lang == "en" and not _is_english_film(film, EN_ORIGINS):
-                    continue
+            local_ensub = any(_cinema_has_ensub(c) for c in film.get("cinemas", [])
+                              if c.get("id", "") in city_cinemas)
+            if vose_only and not _vose_pref_ok(film, local_vose, local_ensub, vose_lang, EN_ORIGINS):
+                continue
         else:
             # Normal path — all filters apply
             # Cinema filter
@@ -1973,13 +1987,12 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                 continue
             local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
                              if c.get("id", "") in allowed_cinemas)
+            local_ensub = any(_cinema_has_ensub(c) for c in film.get("cinemas", [])
+                              if c.get("id", "") in allowed_cinemas)
 
             # VOSE + language filter
-            if vose_only:
-                if not local_vose:
-                    continue
-                if vose_lang == "en" and not _is_english_film(film, EN_ORIGINS):
-                    continue
+            if vose_only and not _vose_pref_ok(film, local_vose, local_ensub, vose_lang, EN_ORIGINS):
+                continue
 
             # New-only filter
             if new_only and not film.get("is_new", False):
@@ -1997,7 +2010,7 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
                 if score and score < min_rating:
                     continue
 
-        result[title] = {**film, "any_vose": local_vose}
+        result[title] = {**film, "any_vose": local_vose, "any_ensub": local_ensub}
     return result
 
 
@@ -2245,6 +2258,9 @@ def build_full_email(films_by_title: dict, anchor: datetime, page_url: str,
             label_parts.append(f'<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#2a1a00;color:#ffb432;border:1px solid rgba(255,180,50,0.4);">{nl}</span>')
         if any_vose:
             label_parts.append('<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#1a1800;color:#ffd84a;border:1px solid rgba(255,220,80,0.4);">VOSE</span>')
+        if film.get("any_ensub"):
+            el = "SUBT. INGLÉS" if is_es else "EN SUBS"
+            label_parts.append(f'<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:#0d1a26;color:#7cc4ff;border:1px solid rgba(124,196,255,0.4);">{el}</span>')
         label_row = '&nbsp;&nbsp;'.join(label_parts)
         score_row = (f'<div style="margin-top:5px;"><span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;background:rgba(255,255,255,0.05);color:#c5b8d8;border:1px solid #2e2040;">⭐ {score}</span></div>' if score else '')
         badges = label_row + score_row

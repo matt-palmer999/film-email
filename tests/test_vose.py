@@ -173,6 +173,49 @@ class SpanishOriginal(unittest.TestCase):
         self.assertTrue(films["EN"]["cinemas"][0]["vose_showtimes"], "English films keep VOSE")
 
 
+class EnglishSubtitles(unittest.TestCase):
+    """Spanish films shown with English subtitles ("VOSI", "V.O. SUB. INGLÉS"):
+    never VOSE, but tagged and offered to English-only users."""
+
+    def _merged(self):
+        raw = [{"cinema": "mooby_arenas", "title_es": "La bola negra", "is_film": True, "showtimes": [
+                    {"date": D0, "time": "18:00", "is_vose": False, "booking_url": "u"},
+                    {"date": D0, "time": "21:00", "is_vose": False, "en_subs": True, "booking_url": "u"}]}]
+        films = pipeline.merge_scraper_results(raw)
+        f = films["La bola negra"]
+        f.update({"title_en": "La Bola Negra", "slug": "la-bola-negra", "original_language": "es",
+                  "year": "2026", "origin_country": ["ES"]})
+        pipeline.demote_spanish_original_vose(films)
+        return f
+
+    def test_merge_keeps_flag_and_not_vose(self):
+        f = self._merged()
+        c = f["cinemas"][0]
+        self.assertEqual(c["ensub"], {D0: {"21:00": True}})
+        self.assertEqual(c["vose_showtimes"], {})
+        self.assertTrue(pipeline.cinema_has_ensub(c))
+
+    def test_film_page_tag(self):
+        f = self._merged()
+        html = pipeline.build_film_detail_page(f, datetime.combine(TODAY, datetime.min.time()))
+        btns = dict((t, inner) for t, inner in re.findall(r'data-time="([^"]+)"[^>]*>(.*?)</a>', html))
+        self.assertIn("ensub-tag", btns["21:00"])
+        self.assertNotIn("VOSE", btns["21:00"])
+        self.assertNotIn("ensub-tag", btns["18:00"])
+        self.assertIn('data-ensub="true"', html)
+
+    def test_email_english_only_includes_it(self):
+        f = self._merged()
+        prefs = {"city": "Barcelona", "cinemas": ["mooby_arenas"], "vose_only": True, "vose_lang": "en"}
+        r = scraper.apply_subscriber_filters({"LBN": f}, prefs)
+        self.assertIn("LBN", r)
+        self.assertTrue(r["LBN"]["any_ensub"])
+        self.assertFalse(r["LBN"]["any_vose"])
+        # Plain "VOSE only" (any language) must not include it
+        r = scraper.apply_subscriber_filters({"LBN": f}, {**prefs, "vose_lang": "all"})
+        self.assertNotIn("LBN", r)
+
+
 # ── Film page display ────────────────────────────────────────────────────────
 
 def _film(cinemas):

@@ -64,6 +64,7 @@ def scrape_verdi_barcelona() -> list[dict]:
         if not title:
             continue
         vose     = _is_vose(film)
+        en_subs  = "SUB. INGL" in (film.get("version") or "").upper()  # "V.O. SUB. INGLÉS"
         orig     = film.get("title_name") or ""
         imdb_id  = film.get("imdbid") or ""
         synopsis = film.get("synopsis") or ""
@@ -94,6 +95,7 @@ def scrape_verdi_barcelona() -> list[dict]:
                 "time":           time_str,
                 "format":         fmt,
                 "is_vose":        vose,
+                "en_subs":        en_subs,
                 "audio_lang":     "EN" if vose else "ES",
                 "is_3d":          is_3d,
                 "is_imax":        False,

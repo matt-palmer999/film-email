@@ -49,6 +49,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .film-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px}
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.35)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.ensub-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
 .hero-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0eae0;line-height:1.2;margin-bottom:4px}
@@ -88,6 +89,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .time-btn:hover{background:#2a1f3d;border-color:#ffb432;color:#ffb432}
 .time-btn[data-vose="true"]{border-color:rgba(255,220,80,.55);color:#ffd84a}
 .vose-tag{margin-left:5px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:1px}
+.ensub-tag{margin-left:5px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:1px;color:#7cc4ff}
+.time-btn[data-ensub="true"]{border-color:rgba(124,196,255,.55)}
 .time-btn[data-vose="true"]:hover{border-color:#ffd84a;background:#221a08}
 .time-btn--match{background:#0d2c18;border-color:#2d8a50;color:#5dda8a;font-weight:700;box-shadow:0 0 0 1px #2d8a50}
 .time-btn--match:hover{background:#113621;border-color:#5dda8a;color:#5dda8a}
@@ -551,12 +554,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
   const voseFilter = params.get('vose') === 'true';
+  // "English only" also keeps English-subtitled sessions of Spanish films
+  const ensubOk = params.get('vose_lang') === 'en';
   if (voseFilter) {
     document.querySelectorAll('.showtime-row[data-cinema-id]').forEach(row => {
       if (row.style.display === 'none' || row.classList.contains('city-hidden')) return;
       const btns = Array.from(row.querySelectorAll('.time-btn[data-vose]'));
       btns.forEach(btn => {
-        if (btn.getAttribute('data-vose') !== 'true') btn.style.display = 'none';
+        const keep = btn.getAttribute('data-vose') === 'true' || (ensubOk && btn.getAttribute('data-ensub') === 'true');
+        if (!keep) btn.style.display = 'none';
       });
       if (btns.filter(b => b.style.display !== 'none').length === 0) {
         row.style.display = 'none';

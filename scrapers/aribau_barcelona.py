@@ -132,6 +132,9 @@ def scrape_aribau_barcelona(playwright=None) -> list[dict]:  # playwright ignore
         poster      = event.get("poster") or event.get("poster_url") or ""
 
         vose = _is_vose(version, event.get("language", "") or "")
+        # English subtitles ("VOSI"): flagged separately from VOSE, so a Spanish
+        # film with English subs can be shown as such.
+        en_subs = "VOSI" in version.upper() or "INGL" in (event.get("subtitles_lang") or "").upper()
 
         showtimes: list[dict] = []
         for p in performances:
@@ -156,6 +159,7 @@ def scrape_aribau_barcelona(playwright=None) -> list[dict]:  # playwright ignore
                 "time":           time_str,
                 "format":         version or "2D",
                 "is_vose":        vose,
+                "en_subs":        en_subs,
                 "audio_lang":     "EN" if vose else "ES",
                 "is_3d":          "3D" in (version or "").upper(),
                 "is_imax":        False,
