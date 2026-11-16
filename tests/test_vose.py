@@ -260,6 +260,42 @@ class FilmPage(unittest.TestCase):
         self.assertIn("vose-mini", row)
 
 
+class ListingCardVoseTimes(unittest.TestCase):
+    """City listing cards carry data-v-{cinema}_{date} with the VOSE times
+    among the data-t- times (used by the app)."""
+
+    def _attrs(self, film):
+        a = pipeline.compute_card_data(film)["showtimes_attrs"]
+        return dict(re.findall(r'(data-[tv]-[^=]+)="([^"]*)"', a))
+
+    def test_mixed_cinema_marks_only_vose_times(self):
+        # The developer's example: Yelmo Campanar, How to Rob a Bank
+        film = _film([_cinema("yelmo", "Yelmo Campanar",
+                              std={D0: {"16:55": "u", "19:25": "u", "21:55": "u"}},
+                              vose={D0: {"18:25": "u", "21:00": "u"}})])
+        a = self._attrs(film)
+        self.assertEqual(a[f"data-t-yelmo_{D0}"], "16:55|18:25|19:25|21:00|21:55")
+        self.assertEqual(a[f"data-v-yelmo_{D0}"], "18:25|21:00")
+
+    def test_same_time_vose_and_dubbed_counts_as_dubbed(self):
+        film = _film([_cinema("kinepolis", "Kinépolis", std={D0: {"18:00": "u"}},
+                              fmt={"imax": {D0: {"18:00": {"url": "", "is_vose": True},
+                                                 "20:00": {"url": "", "is_vose": True}}}})])
+        self.assertEqual(self._attrs(film)[f"data-v-kinepolis_{D0}"], "20:00")
+
+    def test_no_vose_means_no_attribute(self):
+        film = _film([_cinema("lys", "Cines Lys", std={D0: {"18:00": "u"}})])
+        self.assertFalse([k for k in self._attrs(film) if k.startswith("data-v-")])
+
+    def test_page_scripts_only_read_data_t(self):
+        # The listing page's filters scan attributes by the 'data-t-' prefix;
+        # data-v- must never be picked up by them.
+        import scraper as _s, inspect
+        src = inspect.getsource(_s)
+        self.assertNotIn("startsWith('data-v", src)
+        self.assertIn("startsWith('data-t-')", src)
+
+
 # ── Weekly email filters ─────────────────────────────────────────────────────
 
 class EmailFilters(unittest.TestCase):

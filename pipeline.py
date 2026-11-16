@@ -1420,6 +1420,23 @@ def cinema_times_by_date(cinema: dict) -> dict:
     return out
 
 
+def cinema_vose_only_times(cinema: dict) -> dict:
+    """{date: set(times)} of times where every session at that time is VOSE
+    (standard and premium formats together). Errs towards dubbed."""
+    flags: dict = {}
+    for d, times in (cinema.get("showtimes") or {}).items():
+        for t in times:
+            flags.setdefault(d, {}).setdefault(t, set()).add(False)
+    for d, times in (cinema.get("vose_showtimes") or {}).items():
+        for t in times:
+            flags.setdefault(d, {}).setdefault(t, set()).add(True)
+    for fmt in (cinema.get("format_showtimes") or {}).values():
+        for d, times in fmt.items():
+            for t, e in times.items():
+                flags.setdefault(d, {}).setdefault(t, set()).add(bool((e or {}).get("is_vose")))
+    return {d: {t for t, f in ts.items() if f == {True}} for d, ts in flags.items()}
+
+
 def cinema_has_vose(cinema: dict) -> bool:
     if cinema.get("vose_showtimes"):
         return True
@@ -1502,6 +1519,18 @@ def compute_card_data(film: dict) -> dict:
         f'data-t-{key}="{"|".join(sorted(times))}"'
         for key, times in showtimes_by_cinema_day.items()
     )
+    # data-v-{cinema}_{date}: the VOSE times among that cinema's data-t- times,
+    # for the app (cinemas can mix VOSE and dubbed sessions of one film). A time
+    # is listed only when EVERY session at that time is VOSE — if the same time
+    # is also a dubbed session (another format/screen) it counts as dubbed.
+    # Omitted when there are none. Page scripts only read data-t-*.
+    vose_attrs = []
+    for _c in film.get("cinemas", []):
+        for _dk, _times in sorted(cinema_vose_only_times(_c).items()):
+            if f'{_c.get("id", "")}_{_dk}' in showtimes_by_cinema_day and _times:
+                vose_attrs.append(f'data-v-{_c.get("id", "")}_{_dk}="{"|".join(sorted(_times))}"')
+    if vose_attrs:
+        showtimes_attrs += " " + " ".join(vose_attrs)
 
     return {
         "year":            year,
