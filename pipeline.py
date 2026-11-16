@@ -576,6 +576,13 @@ def aggregate_scrapers() -> tuple[dict, list]:
             else:
                 scraper_status.append({"label": label, "count": 0, "ok": False, "error": str(exc), "city": city})
 
+    films_by_title = merge_scraper_results(all_results)
+    return films_by_title, scraper_status
+
+
+def merge_scraper_results(all_results: list) -> dict:
+    """Merge raw scraper results into {title: film} with per-cinema showtimes,
+    keeping dubbed, VOSE and premium-format sessions in separate buckets."""
     films_by_title: dict = {}
 
     for film in all_results:
@@ -615,7 +622,9 @@ def aggregate_scrapers() -> tuple[dict, list]:
                 if len(dl) >= 16 and not t:
                     t = dl[11:16]
             if d and t:
-                st_is_vose = st.get("is_vose", film_is_vose)
+                # Every scraper sets a per-session flag. If one ever doesn't,
+                # treat the session as dubbed rather than copying the film flag.
+                st_is_vose = bool(st.get("is_vose", False))
                 url = st.get("booking_url", "")
                 if title_flags:
                     st = {**st, **title_flags}
@@ -697,7 +706,7 @@ def aggregate_scrapers() -> tuple[dict, list]:
         if is_vose:
             films_by_title[title]["any_vose"] = True
 
-    return films_by_title, scraper_status
+    return films_by_title
 
 
 # ── TMDB enrichment ───────────────────────────────────────────────────────────
@@ -3095,7 +3104,9 @@ def run() -> None:
     anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
     log.info(f"Pipeline starting for {anchor.date()} …")
 
-    # 1. Scrape all cinemas
+    # 1. Scrape all cinemas (watching for unknown VOSE language labels)
+    from vose_check import install_label_watch, run_vose_check
+    install_label_watch()
     log.info("Running scrapers …")
     films, scraper_status = aggregate_scrapers()
     log.info(f"Unique films before enrichment: {len(films)}")
@@ -3321,8 +3332,9 @@ def run() -> None:
 
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
-    # 11. Send admin confirmation email
-    send_pipeline_summary(films, scraper_status)
+    # 11. VOSE sanity check, then the admin confirmation email
+    vose_issues = run_vose_check(films, CINEMA_META)
+    send_pipeline_summary(films, scraper_status, vose_issues)
 
 
 def submit_indexnow(films: dict, cities: list) -> None:
@@ -3367,7 +3379,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
         log.warning(f"IndexNow submission failed (non-fatal): {exc}")
 
 
-def send_pipeline_summary(films: dict, scraper_status: list) -> None:
+def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list | None = None) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
     import smtplib
     from email.mime.text import MIMEText
@@ -3559,13 +3571,20 @@ TOP REFERRERS (yesterday):
         tmdb_lines = ("\nTMDB MATCHES TO CHECK (borderline title match — fix in tmdb_overrides.json):\n"
                       + "\n".join(f"  '{t}' → {m} ({y}) score {sc} · themoviedb.org/movie/{mid}"
                                    for t, m, y, sc, mid in TMDB_DOUBTFUL) + "\n")
+    if vose_issues:
+        vose_lines = (f"\n⚠️ VOSE CHECK — {len(vose_issues)} issue(s) to look at:\n"
+                      + "\n".join(f"  {line}" for line in vose_issues) + "\n")
+    elif vose_issues is not None:
+        vose_lines = "\nVOSE CHECK: ✅ no problems found\n"
+    else:
+        vose_lines = ""
     body = f"""whatson.movie pipeline completed at {now_str}
 
 SCRAPERS ({len(scraper_status)} cinemas, {" / ".join(f"{len([s for s in scraper_status if s.get('city')==c])} {c}" for c in dict.fromkeys(s.get('city') for s in scraper_status))}):
 {scraper_lines}
 
 FILMS: {len(films)} total (after deduplication & stale removal)
-{tmdb_lines}
+{vose_lines}{tmdb_lines}
 SUBSCRIBERS:
   Total signed up:      {total_subs}
   Active (email on):    {email_subs}
@@ -3577,7 +3596,8 @@ Site: https://whatson.movie/listings/
     msg = MIMEText(body, "plain", "utf-8")
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
     regression_note = f" — ⚠️ {len(regressions)} drop(s)" if regressions else ""
-    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note} · {now_str}"
+    vose_note = f" — ⚠️ VOSE check ({len(vose_issues)})" if vose_issues else ""
+    msg["Subject"] = f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}{regression_note}{vose_note} · {now_str}"
     msg["From"]    = f"{from_name} <{from_addr}>"
     msg["To"]      = ", ".join(admin_to)
 

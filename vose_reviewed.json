@@ -1,0 +1,4 @@
+{
+  "_help": "VOSE-check flags confirmed correct against the cinema's own site. Key: \"<cinema name>|<film title>\" (name as shown in the admin email). Value: why it's fine and when it was checked. Remove an entry if in doubt.",
+  "_example": "Mooby Arenas|Clayface: Mooby lists only a VOSE version (checked YYYY-MM-DD)"
+}

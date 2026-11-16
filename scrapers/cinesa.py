@@ -169,6 +169,12 @@ def scrape_cinesa(playwright=None) -> list[dict]:
     else:
         log.error("No Bearer token captured — cannot fetch showtimes")
 
+    return _build_results(films_data, dates_data, showtimes_by_date)
+
+
+
+def _build_results(films_data: dict, dates_data: dict, showtimes_by_date: dict) -> list[dict]:
+    """Turn the captured API payloads into film dicts (pure; unit-tested)."""
     # ── Build lookups ──────────────────────────────────────────────────────────
     all_films   = films_data.get("films", [])
     film_by_id  = {f["id"]: f for f in all_films}
@@ -298,7 +304,6 @@ def scrape_cinesa(playwright=None) -> list[dict]:
         len(results), sum(1 for f in results if f["is_vose"])
     )
     return results
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
