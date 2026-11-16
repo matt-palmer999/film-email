@@ -71,6 +71,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .showtime-cinema{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .vose-mini{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}
 .showtime-times{display:flex;flex-direction:column;gap:6px}
+.bldg-group{display:flex;flex-direction:column;gap:6px}
+.bldg-group+.bldg-group{margin-top:6px}
+.bldg-label{font-size:12px;color:#b8aec8;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.bldg-street{color:#9a8fb5}
 .times-row{display:flex;flex-wrap:wrap;gap:8px}
 .format-row{display:grid;grid-template-columns:minmax(76px,max-content) 1fr;align-items:start;column-gap:10px}
 .fmt-times{display:flex;flex-wrap:wrap;gap:8px}
@@ -309,7 +313,7 @@ function showDay(key) {
 // Hide a standard/format row once none of its times are visible, so a format
 // label (IMAX, 4DX…) is never left on its own after times are removed/filtered.
 function syncTimeRows() {
-  document.querySelectorAll('.times-row, .format-row').forEach(r => {
+  document.querySelectorAll('.times-row, .format-row, .bldg-group').forEach(r => {
     const live = Array.from(r.querySelectorAll('.time-btn')).some(b => b.style.display !== 'none');
     r.style.display = live ? '' : 'none';
   });

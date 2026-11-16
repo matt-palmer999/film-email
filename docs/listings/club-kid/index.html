@@ -71,6 +71,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .showtime-cinema{font-size:13px;font-weight:500;color:#c5b8d8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .vose-mini{font-size:11px;font-weight:700;letter-spacing:1px;padding:1px 5px;background:rgba(255,220,80,.12);color:#ffd84a;border:1px solid rgba(255,220,80,.35);border-radius:3px}
 .showtime-times{display:flex;flex-direction:column;gap:6px}
+.bldg-group{display:flex;flex-direction:column;gap:6px}
+.bldg-group+.bldg-group{margin-top:6px}
+.bldg-label{font-size:12px;color:#b8aec8;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.bldg-street{color:#9a8fb5}
 .times-row{display:flex;flex-wrap:wrap;gap:8px}
 .format-row{display:grid;grid-template-columns:minmax(76px,max-content) 1fr;align-items:start;column-gap:10px}
 .fmt-times{display:flex;flex-wrap:wrap;gap:8px}
@@ -161,12 +165,14 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
       },
       "location": {
         "@type": "MovieTheater",
-        "name": "Cines Verdi",
+        "name": "Cines Verdi (Verdi Park)",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Barcelona",
           "addressRegion": "Barcelona",
-          "addressCountry": "ES"
+          "addressCountry": "ES",
+          "streetAddress": "C/ Torrijos 49",
+          "postalCode": "08012"
         },
         "url": "https://barcelona.cines-verdi.com"
       },
@@ -191,9 +197,11 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         "name": "mk2 Miramar (Fuengirola)",
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": "Málaga",
+          "addressLocality": "Fuengirola",
           "addressRegion": "Málaga",
-          "addressCountry": "ES"
+          "addressCountry": "ES",
+          "streetAddress": "C.C. Miramar, Av. de la Encarnación s/n",
+          "postalCode": "29640"
         },
         "url": "https://www.mk2cines.es/es/mk2-cinesur-miramar"
       },
@@ -261,7 +269,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div id="showtimes-section" style="display:none;">
     <div class="section-title" data-es="🕖 HORARIOS — próximos 7 días" data-en="🕖 SHOWTIMES — next 7 days">🕖 HORARIOS — próximos 7 días</div>
     <div class="day-tabs"><button class="day-tab active has-shows" data-day="2026-11-17" data-es="Mañana 17" data-en="Tomorrow 17" onclick="showDay('2026-11-17')">Mañana 17</button><button class="day-tab  has-shows" data-day="2026-11-18" data-es="Miércoles 18" data-en="Wednesday 18" onclick="showDay('2026-11-18')">Miércoles 18</button><button class="day-tab  has-shows" data-day="2026-11-19" data-es="Jueves 19" data-en="Thursday 19" onclick="showDay('2026-11-19')">Jueves 19</button></div>
-    <div id="day-panels"><div class="day-panel active" id="day-2026-11-17"><div class="showtime-row" data-cinema-id="park" data-city="Valencia" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines ABC Park</span><span class="vose-mini">VOSE</span><a href="https://maps.google.com/?q=Cines+ABC+Park%2C+C%2F+Roger+de+Lauria+21%2C+46002+Valencia" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="showtime-times"><div class="times-row"><a href="https://www.reservaentradas.com/entrada/valencia/abcpark/club-kid-preestreno/99674/?step=2" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="20:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">20:00</a></div></div></div></div><div class="day-panel " id="day-2026-11-18"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-city="Barcelona" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Verdi</span><span class="vose-mini">VOSE</span><a href="https://maps.google.com/?q=Cines+Verdi+Barcelona" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="showtime-times"><div class="times-row"><a href="https://verdibcn.admit-one.eu/?p=tickets&s=VERDIBCN&perfCode=222518&language=es" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="19:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">19:00</a></div></div></div></div><div class="day-panel " id="day-2026-11-19"><div class="showtime-row" data-cinema-id="mk2_miramar" data-city="Málaga" data-vose="true"><div class="showtime-cinema"><span translate="no">mk2 Miramar (Fuengirola)</span><span class="vose-mini">VOSE</span><a href="https://maps.google.com/?q=mk2+Miramar+Fuengirola" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="showtime-times"><div class="times-row"><a href="https://cine.entradas.com/cine/fuengirola/cinesur-miramar-fuengirola-3d/evento/146585" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="20:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">20:00</a></div></div></div></div></div>
+    <div id="day-panels"><div class="day-panel active" id="day-2026-11-17"><div class="showtime-row" data-cinema-id="park" data-city="Valencia" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines ABC Park</span><span class="vose-mini">VOSE</span><a href="https://maps.google.com/?q=Cines+ABC+Park%2C+C%2F+Roger+de+Lauria+21%2C+46002+Valencia" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="showtime-times"><div class="times-row"><a href="https://www.reservaentradas.com/entrada/valencia/abcpark/club-kid-preestreno/99674/?step=2" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="20:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">20:00</a></div></div></div></div><div class="day-panel " id="day-2026-11-18"><div class="showtime-row" data-cinema-id="verdi_barcelona" data-city="Barcelona" data-vose="true"><div class="showtime-cinema"><span translate="no">Cines Verdi</span><span class="vose-mini">VOSE</span></div><div class="showtime-times"><div class="bldg-group"><div class="bldg-label"><span translate="no">Verdi Park</span><span class="bldg-street">&nbsp;· C/ Torrijos 49</span><a href="https://maps.google.com/?q=Verdi+Park%2C+C%2F+Torrijos+49%2C+08012+Barcelona" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="times-row"><a href="https://verdibcn.admit-one.eu/?p=tickets&s=VERDIBCN&perfCode=222518&language=es" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="19:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">19:00</a></div></div></div></div></div><div class="day-panel " id="day-2026-11-19"><div class="showtime-row" data-cinema-id="mk2_miramar" data-city="Málaga" data-vose="true"><div class="showtime-cinema"><span translate="no">mk2 Miramar (Fuengirola)</span><span class="vose-mini">VOSE</span><a href="https://maps.google.com/?q=mk2+Miramar+%28Fuengirola%29%2C+C.C.+Miramar%2C+Av.+de+la+Encarnaci%C3%B3n+s%2Fn%2C+29640+Fuengirola" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a></div><div class="showtime-times"><div class="times-row"><a href="https://cine.entradas.com/cine/fuengirola/cinesur-miramar-fuengirola-3d/evento/146585" target="_blank" rel="noopener noreferrer" class="time-btn" data-time="20:00" data-vose="true" onclick="if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'book-click/'+(window.location.pathname.replace(/\/$/,'').split('/').pop()||'unknown'),title:'Booking click',event:true})">20:00</a></div></div></div></div></div>
     <div class="showtime-legend" id="showtime-legend" style="display:none;">
       <div class="showtime-legend-dot"></div>
       <span data-es="Coincide con tu filtro de tardes y fines de semana" data-en="Meets your evenings &amp; weekends filter">Coincide con tu filtro de tardes y fines de semana</span>
@@ -371,7 +379,7 @@ function showDay(key) {
 // Hide a standard/format row once none of its times are visible, so a format
 // label (IMAX, 4DX…) is never left on its own after times are removed/filtered.
 function syncTimeRows() {
-  document.querySelectorAll('.times-row, .format-row').forEach(r => {
+  document.querySelectorAll('.times-row, .format-row, .bldg-group').forEach(r => {
     const live = Array.from(r.querySelectorAll('.time-btn')).some(b => b.style.display !== 'none');
     r.style.display = live ? '' : 'none';
   });
