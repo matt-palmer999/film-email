@@ -62,12 +62,23 @@ Check each of these briefly, and report only what looks wrong or unusual:
 3. **Labels the rules don't cover:** any new raw language or version strings in
    the scrapers' data.
 4. **TMDB matches:** films whose poster, year or original language look wrong
-   for the title (an old film matched to a new release, etc).
+   for the title (an old film matched to a new release, etc). A cheap test:
+   compare the runtime the cinema gives with TMDB's runtime. A gap of more
+   than about 10 minutes usually means the wrong film (that's how "La
+   Violinista" and "El Niño" were caught on 16 Nov). Fixes go in
+   `tmdb_overrides.json`.
 5. **Duplicates:** the same film listed twice under different titles.
 6. **Pages:** open whatson.movie and one city page per city, plus 3 or 4 film
    pages, as a visitor would. Try the VOSE / English filter. Look for empty
    days, broken layout, missing posters, and booking links that 404.
 7. **Stale cinemas:** anything in `cinema_last_ok.json` older than 2 days.
+   Those cinemas are being carried forward from an old scrape, and drop off
+   the site after 3 days.
+8. **Lost code:** run `git log --stat --since="8 days ago" -- '*.py'` and look
+   for any commit that deletes far more code than its message suggests. On
+   9 Nov a commit made from an old copy of `pipeline.py` silently removed
+   the carry-forward and the cinema id check. Also confirm
+   `python -m unittest discover -s tests` passes.
 
 ## 3. Report
 
