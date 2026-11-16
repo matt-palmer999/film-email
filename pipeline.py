@@ -2545,7 +2545,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 .showtime-times{{display:flex;flex-direction:column;gap:6px}}
 .bldg-group{{display:flex;flex-direction:column;gap:6px}}
 .bldg-group+.bldg-group{{margin-top:6px}}
-.bldg-label{{font-size:12px;color:#b8aec8;display:flex;align-items:center;flex-wrap:wrap}}
+.bldg-label{{font-size:12px;color:#b8aec8;display:flex;align-items:center;flex-wrap:wrap;gap:6px}}
 .bldg-street{{color:#9a8fb5}}
 .times-row{{display:flex;flex-wrap:wrap;gap:8px}}
 .format-row{{display:grid;grid-template-columns:minmax(76px,max-content) 1fr;align-items:start;column-gap:10px}}
