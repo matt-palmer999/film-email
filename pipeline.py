@@ -986,6 +986,35 @@ _LATIN_RE     = re.compile(r"[A-Za-zÀ-ÿ0-9]")
 _NON_LATIN_RE = re.compile(r"[^\u0000-ɏ -⁯ -ÿ]")
 
 
+def demote_spanish_original_vose(films: dict) -> None:
+    """A film originally in Spanish has no VOSE: its original version IS the
+    Spanish audio. Cinemas still label such sessions "V.O. subtitulada"
+    (Spanish subtitles) or "VOSI" (English subtitles), which would mislead
+    anyone looking for English audio, so treat them as standard sessions."""
+    for film in films.values():
+        if (film.get("original_language") or "") != "es":
+            continue
+        moved = 0
+        for c in film.get("cinemas", []):
+            for d, times in (c.get("vose_showtimes") or {}).items():
+                day = c.setdefault("showtimes", {}).setdefault(d, {})
+                for t, url in times.items():
+                    day.setdefault(t, url)
+                    moved += 1
+            c["vose_showtimes"] = {}
+            for dates in (c.get("format_showtimes") or {}).values():
+                for times in dates.values():
+                    for entry in times.values():
+                        if isinstance(entry, dict) and entry.get("is_vose"):
+                            entry["is_vose"] = False
+                            moved += 1
+            c["vose"] = False
+        film["any_vose"] = False
+        if moved:
+            log.info("  Spanish-language film: %d 'VO' session(s) of %r shown as standard, not VOSE",
+                     moved, film.get("title_en") or film.get("title"))
+
+
 def apply_spanish_display_titles(films: dict) -> None:
     """Show TMDB's official Spain-Spanish title for matched films.
 
@@ -3135,6 +3164,7 @@ def run() -> None:
     deduplicate_by_tmdb_id(films)
     log.info(f"Films after deduplication: {len(films)}")
     apply_spanish_display_titles(films)
+    demote_spanish_original_vose(films)
 
     # 4. Remove films with no showtimes in the relevant window
     #    Classics (3+ years old) use a 30-day window; everything else uses 7 days.

@@ -22,8 +22,17 @@ VENUE_SLUG  = "/glories"
 _VERSION_SUFFIX = re.compile(r"\s*\([^)]+\)\s*$")
 
 
-def _is_vose(version: str) -> bool:
-    return version.upper() in ("VOSE", "VOSI") or "VOSE" in version.upper() or "VOSI" in version.upper()
+_SPANISH_AUDIO = ("ESPANYOL", "ESPAÑOL", "CASTELLANO", "CATALÀ", "CATALA", "CATALÁN")
+
+
+def _is_vose(version: str, language: str = "") -> bool:
+    """VOSE = a VOSE/VOSI version whose audio isn't Spanish or Catalan.
+    "VOSI" means English subtitles, so "La bola negra (VOSI)" is Spanish audio
+    with English subtitles: not VOSE."""
+    v = version.upper()
+    if "VOSE" not in v and "VOSI" not in v:
+        return False
+    return not any(s in language.upper() for s in _SPANISH_AUDIO)
 
 
 def _title_clean(locale_title: str) -> str:
@@ -102,7 +111,7 @@ def scrape_mooby_gloeries(playwright=None) -> list[dict]:
         except (ValueError, TypeError):
             pass
         poster = event.get("poster") or event.get("poster_url") or ""
-        vose   = _is_vose(version)
+        vose   = _is_vose(version, event.get("language", "") or "")
 
         showtimes: list[dict] = []
         for p in performances:

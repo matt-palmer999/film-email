@@ -71,7 +71,10 @@ def _lang_code(idioma: str) -> str:
 
 
 def _is_vose(idioma: str) -> bool:
-    return idioma.lower().strip() not in ("castellano", "español", "")
+    """Go by the film's main (first-listed) language: "Inglés, español" is
+    VOSE, but "Castellano, francés" is a Spanish film with some French."""
+    main = idioma.split(",")[0].lower().strip()
+    return main not in ("castellano", "español", "")
 
 
 

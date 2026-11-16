@@ -75,12 +75,18 @@ class LabelRules(unittest.TestCase):
     def test_babel_language(self):
         self.assertFalse(babel._is_vose("Castellano"))
         self.assertTrue(babel._is_vose("Inglés"))
+        self.assertTrue(babel._is_vose("Inglés, español"))
+        self.assertFalse(babel._is_vose("Castellano, francés"))     # "Jaleos": a Spanish film
 
     def test_version_label_scrapers(self):
         for mod in (aribau_barcelona, mooby_arenas, mooby_gloeries):
             self.assertTrue(mod._is_vose("VOSE"))
-            self.assertFalse(mod._is_vose("DOBLADA ESP"))
+            self.assertTrue(mod._is_vose("VOSE ATMOS", "Anglès"))
+            self.assertTrue(mod._is_vose("VOSI", "Coreano,"))          # Korean audio, English subs
+            self.assertFalse(mod._is_vose("VOSI", "Espanyol,"))        # "La bola negra (VOSI)": Spanish audio
+            self.assertFalse(mod._is_vose("DOBLADA ESP", "Espanyol,"))
             self.assertFalse(mod._is_vose("ESP"))
+            self.assertFalse(mod._is_vose("CAT", "Català"))
         self.assertTrue(renoir_barcelona._is_vose("Versión Original subtitulada a Castellano"))
         self.assertFalse(renoir_barcelona._is_vose("Versión Original Castellano"))
         for mod in (dor, lys, mn4):
@@ -148,6 +154,23 @@ class Merge(unittest.TestCase):
         imax = c["format_showtimes"]["imax"][D0]
         self.assertTrue(imax["17:00"]["is_vose"])
         self.assertFalse(imax["20:45"]["is_vose"])
+
+
+class SpanishOriginal(unittest.TestCase):
+
+    def test_spanish_film_vo_sessions_are_not_vose(self):
+        # Verdi lists "La bola negra" as CASTELLANO, "V.O. SUB. CASTELLANO" and
+        # "V.O. SUB. INGLÉS": all Spanish audio.
+        films = {"LBN": {**_film([_cinema("verdi_barcelona", "Cines Verdi", std={D0: {"18:00": "u"}},
+                                          vose={D0: {"20:00": "u", "22:00": "u"}})]),
+                         "original_language": "es"},
+                 "EN": _film([_cinema("verdi_barcelona", "Cines Verdi", vose={D0: {"19:00": "u"}})])}
+        pipeline.demote_spanish_original_vose(films)
+        c = films["LBN"]["cinemas"][0]
+        self.assertEqual(c["vose_showtimes"], {})
+        self.assertEqual(sorted(c["showtimes"][D0]), ["18:00", "20:00", "22:00"])
+        self.assertFalse(films["LBN"]["any_vose"])
+        self.assertTrue(films["EN"]["cinemas"][0]["vose_showtimes"], "English films keep VOSE")
 
 
 # ── Film page display ────────────────────────────────────────────────────────
