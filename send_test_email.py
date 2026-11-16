@@ -30,8 +30,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 from scraper import (
     build_full_email, apply_subscriber_filters,
     week_range_en, week_range_es,
-    SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD,
-    FROM_ADDRESS, FROM_NAME,
 )
 
 # ── Config ─────────────────────────────────────────────────────────────────────
@@ -96,19 +94,9 @@ def main():
         f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
     )
 
-    # Send
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-    msg["To"]      = TEST_RECIPIENT
-    msg.attach(MIMEText(plain, "plain", "utf-8"))
-    msg.attach(MIMEText(html,  "html",  "utf-8"))
-
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        server.ehlo()
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_ADDRESS, [TEST_RECIPIENT], msg.as_string())
+    # Send (Microsoft 365 when MS_* is set, else SMTP)
+    import mailer
+    mailer.send_email(TEST_RECIPIENT, subject, plain, html=html)
 
     subject_safe = subject.encode("ascii", "replace").decode("ascii")
     print(f"OK - Sent to {TEST_RECIPIENT}")

@@ -3680,20 +3680,13 @@ def submit_indexnow(films: dict, cities: list) -> None:
 def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list | None = None,
                           id_problems: list | None = None, carried: dict | None = None) -> None:
     """Send a brief confirmation email to the admin after a successful pipeline run."""
-    import smtplib
-    from email.mime.text import MIMEText
+    import mailer
 
-    smtp_host = os.environ.get("SMTP_HOST", "")
-    smtp_port = int(os.environ.get("SMTP_PORT", 587))
-    smtp_user = os.environ.get("SMTP_USER", "")
-    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
-    from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
-    from_name = os.environ.get("FROM_NAME", "whatson.movie")
     # Comma-separated list, set in .env (and as a GitHub secret for Actions runs)
     admin_to  = [a.strip() for a in os.environ.get("ADMIN_EMAILS", "").split(",") if a.strip()]
 
-    if not all([smtp_host, smtp_user, smtp_pass]):
-        log.warning("SMTP not configured — skipping pipeline summary email")
+    if not mailer.is_configured():
+        log.warning("Email not configured — skipping pipeline summary email")
         return
     if not admin_to:
         log.warning("ADMIN_EMAILS not set — skipping pipeline summary email")
@@ -3915,24 +3908,17 @@ SUBSCRIBERS:
 Site: https://whatson.movie/listings/
 """
 
-    msg = MIMEText(body, "plain", "utf-8")
     failed_note = f" — {len(failed)} scraper(s) failed" if failed else ""
     regression_note = f" — ⚠️ {len(regressions)} drop(s)" if regressions else ""
     vose_note = f" — ⚠️ VOSE check ({len(vose_issues)})" if vose_issues else ""
     id_note = " — ⚠️ cinema id mismatch" if id_problems else ""
     carry_note = f" — ♻️ {len(carried)} carried forward" if carried else ""
-    msg["Subject"] = (f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}"
-                      f"{regression_note}{vose_note}{id_note}{carry_note} · {now_str}")
-    msg["From"]    = f"{from_name} <{from_addr}>"
-    msg["To"]      = ", ".join(admin_to)
+    subject = (f"{status_icon} whatson.movie pipeline — {len(films)} films{failed_note}"
+               f"{regression_note}{vose_note}{id_note}{carry_note} · {now_str}")
 
     try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(smtp_user, smtp_pass)
-            server.sendmail(from_addr, admin_to, msg.as_string())
-        log.info(f"Pipeline summary email sent to {len(admin_to)} admin recipient(s)")
+        mailer.send_email(admin_to, subject, body)
+        log.info(f"Pipeline summary email sent to {len(admin_to)} admin recipient(s) via {mailer.route_name()}")
     except Exception as exc:
         log.warning(f"Could not send pipeline summary email: {exc}")
 
@@ -3950,9 +3936,8 @@ Site: https://whatson.movie/listings/
 def send_weekly_emails(films: dict) -> None:
     """Send the weekly subscriber email on Thursdays (or when FORCE_EMAIL=1)."""
     from datetime import datetime as _dt
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText as _MIMEText
+    import time as _time
+    import mailer
 
     is_thursday  = _dt.now().weekday() == 3   # 0=Mon … 3=Thu
     force_email  = os.environ.get("FORCE_EMAIL", "").lower() in ("1", "true", "yes")
@@ -3968,15 +3953,8 @@ def send_weekly_emails(films: dict) -> None:
         log.warning(f"Could not import email helpers from scraper.py: {exc} — skipping weekly send")
         return
 
-    smtp_host = os.environ.get("SMTP_HOST", "")
-    smtp_port = int(os.environ.get("SMTP_PORT", 587))
-    smtp_user = os.environ.get("SMTP_USER", "")
-    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
-    from_addr = os.environ.get("FROM_ADDRESS", smtp_user)
-    from_name = os.environ.get("FROM_NAME", "whatson.movie")
-
-    if not all([smtp_host, smtp_user, smtp_pass]):
-        log.warning("SMTP not configured — skipping weekly email send")
+    if not mailer.is_configured():
+        log.warning("Email not configured — skipping weekly email send")
         return
 
     anchor    = _dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -3996,45 +3974,34 @@ def send_weekly_emails(films: dict) -> None:
         log.info("No email-enabled subscribers found — skipping weekly send")
         return
 
-    log.info(f"Sending weekly email to {len(subscribers)} subscriber(s)...")
+    log.info(f"Sending weekly email to {len(subscribers)} subscriber(s) via {mailer.route_name()}...")
     sent = 0
     errors = 0
-    try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(smtp_user, smtp_pass)
-            for sub in subscribers:
-                email = sub.get("email", "").strip()
-                if not email:
-                    continue
-                lang = sub.get("lang") or "es"
-                token = sub.get("unsubscribe_token", "")
-                unsub_url = (f"https://whatson.movie/unsubscribe/?token={token}"
-                             if token else "https://whatson.movie/preferences/")
-                try:
-                    filtered = apply_subscriber_filters(films, sub)
-                    html, subject = build_full_email(filtered, anchor, page_url, prefs_url, unsub_url, prefs=sub)
-                    plain = (
-                        f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
-                        if lang == "es" else
-                        f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
-                    )
-                    msg = MIMEMultipart("alternative")
-                    msg["Subject"] = subject
-                    msg["From"]    = f"{from_name} <{from_addr}>"
-                    msg["To"]      = email
-                    msg.attach(_MIMEText(plain, "plain", "utf-8"))
-                    msg.attach(_MIMEText(html,  "html",  "utf-8"))
-                    server.sendmail(from_addr, [email], msg.as_string())
-                    log.info(f"  [OK]  Weekly email sent to {email}")
-                    sent += 1
-                except Exception as exc:
-                    log.warning(f"  [ERR] Failed to send to {email}: {exc}")
-                    errors += 1
-    except Exception as exc:
-        log.warning(f"SMTP connection failed: {exc}")
-        return
+    for sub in subscribers:
+        email = sub.get("email", "").strip()
+        if not email:
+            continue
+        lang = sub.get("lang") or "es"
+        token = sub.get("unsubscribe_token", "")
+        unsub_url = (f"https://whatson.movie/unsubscribe/?token={token}"
+                     if token else "https://whatson.movie/preferences/")
+        try:
+            filtered = apply_subscriber_filters(films, sub)
+            html, subject = build_full_email(filtered, anchor, page_url, prefs_url, unsub_url, prefs=sub)
+            plain = (
+                f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
+                if lang == "es" else
+                f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
+            )
+            mailer.send_email(email, subject, plain, html=html)
+            log.info(f"  [OK]  Weekly email sent to {email}")
+            sent += 1
+        except Exception as exc:
+            log.warning(f"  [ERR] Failed to send to {email}: {exc}")
+            errors += 1
+        # Microsoft 365 allows about 30 messages a minute per mailbox
+        if mailer.using_graph():
+            _time.sleep(2.2)
 
     log.info(f"Weekly email send complete: {sent} sent, {errors} errors")
 

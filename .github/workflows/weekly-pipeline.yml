@@ -58,6 +58,10 @@ jobs:
           SMTP_PASSWORD:        ${{ secrets.SMTP_PASSWORD }}
           FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
           FROM_NAME:            ${{ secrets.FROM_NAME }}
+          # Microsoft 365 (Graph) — used instead of SMTP when all three are set
+          MS_TENANT_ID:         ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID:         ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET:     ${{ secrets.MS_CLIENT_SECRET }}
           TEST_RECIPIENT:       ${{ inputs.test_mode == true && 'matt_palmer@outlook.com' || '' }}
           YOUTUBE_API_KEY:      ${{ secrets.YOUTUBE_API_KEY }}
         run: python pipeline.py --email-only

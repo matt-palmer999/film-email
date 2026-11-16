@@ -25,10 +25,11 @@ log = logging.getLogger(__name__)
 # ─── Configuration ────────────────────────────────────────────────────────────
 # All sensitive values come from environment variables (GitHub Secrets).
 
-SMTP_HOST     = os.environ["SMTP_HOST"]       # e.g. mail.yourdomain.com
-SMTP_PORT     = int(os.environ.get("SMTP_PORT", "587"))
-SMTP_USER     = os.environ["SMTP_USER"]       # e.g. cartelera@yourdomain.com
-SMTP_PASSWORD = os.environ["SMTP_PASSWORD"]
+# Sending goes through mailer.py (Microsoft 365 when MS_* is set, else SMTP).
+SMTP_HOST     = os.environ.get("SMTP_HOST", "")
+SMTP_PORT     = int(os.environ.get("SMTP_PORT", "587") or 587)
+SMTP_USER     = os.environ.get("SMTP_USER", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 FROM_ADDRESS  = os.environ.get("FROM_ADDRESS", SMTP_USER)
 FROM_NAME     = os.environ.get("FROM_NAME", "Cartelera Valencia")
 
@@ -2419,20 +2420,9 @@ def send_email(html: str, anchor: datetime, recipient: str, lang: str = "en") ->
         subject = f"🎬 Valencia Cinema – {week_range_en(anchor)}"
         plain   = f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML.\n\nSource: mabuse.es"
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-    msg["To"]      = recipient
-
-    msg.attach(MIMEText(plain, "plain", "utf-8"))
-    msg.attach(MIMEText(html,  "html",  "utf-8"))
-
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-        server.ehlo()
-        server.starttls()
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(FROM_ADDRESS, [recipient], msg.as_string())
-    log.info(f"Email sent to {recipient} ({lang})")
+    import mailer
+    mailer.send_email(recipient, subject, plain, html=html)
+    log.info(f"Email sent to {recipient} ({lang}) via {mailer.route_name()}")
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────
@@ -2623,37 +2613,31 @@ def main():
         subscribers = fetch_subscribers()
         sent = 0
         errors = 0
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            for sub in subscribers:
-                email = sub.get("email", "").strip()
-                lang  = sub.get("lang") or "es"
-                if not email:
-                    continue
-                try:
-                    filtered_films = apply_subscriber_filters(films, sub)
-                    html, subject  = build_full_email(filtered_films, anchor, page_url, prefs_url, unsub_url, prefs=sub)
-                    lang_plain = sub.get("lang") or "es"
-                    sub_city_plain = (sub.get("city") or "Valencia").strip().title()
-                    plain = (
-                        f"Cartelera {sub_city_plain} – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
-                        if lang_plain == "es" else
-                        f"{sub_city_plain} Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
-                    )
-                    msg = MIMEMultipart("alternative")
-                    msg["Subject"] = subject
-                    msg["From"]    = f"{FROM_NAME} <{FROM_ADDRESS}>"
-                    msg["To"]      = email
-                    msg.attach(MIMEText(plain, "plain", "utf-8"))
-                    msg.attach(MIMEText(html,  "html",  "utf-8"))
-                    server.sendmail(FROM_ADDRESS, [email], msg.as_string())
-                    log.info(f"  Sent to {email} ({lang})")
-                    sent += 1
-                except Exception as e:
-                    log.warning(f"  Failed to send to {email}: {e}")
-                    errors += 1
+        import time as _time
+        import mailer
+        for sub in subscribers:
+            email = sub.get("email", "").strip()
+            lang  = sub.get("lang") or "es"
+            if not email:
+                continue
+            try:
+                filtered_films = apply_subscriber_filters(films, sub)
+                html, subject  = build_full_email(filtered_films, anchor, page_url, prefs_url, unsub_url, prefs=sub)
+                lang_plain = sub.get("lang") or "es"
+                sub_city_plain = (sub.get("city") or "Valencia").strip().title()
+                plain = (
+                    f"Cartelera {sub_city_plain} – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."
+                    if lang_plain == "es" else
+                    f"{sub_city_plain} Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
+                )
+                mailer.send_email(email, subject, plain, html=html)
+                log.info(f"  Sent to {email} ({lang})")
+                sent += 1
+            except Exception as e:
+                log.warning(f"  Failed to send to {email}: {e}")
+                errors += 1
+            if mailer.using_graph():
+                _time.sleep(2.2)   # Microsoft 365: about 30 messages a minute
         log.info(f"Email send complete: {sent} sent, {errors} errors")
     else:
         log.info(f"Not Thursday (weekday={anchor.weekday()}) — skipping email send")
