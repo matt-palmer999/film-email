@@ -28,12 +28,12 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 # ── Cinema metadata ───────────────────────────────────────────────────────────
 CINEMA_META = {
-    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Valencia+Burjassot"},
+    "kinepolis":  {"name": "Kinépolis Valencia",  "website": "https://www.kinepolis.es/valencia",      "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Kinepolis+Valencia+Heron+City+Paterna"},
     "yelmo":               {"name": "Yelmo Campanar", "website": "https://cineyelmo.com/cines/mercado-de-campanar-valencia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Yelmo+Cines+Campanar+Valencia"},
     "ocine_aqua": {"name": "Ocine Premium Aqua",   "website": "https://www.ocinepremiumaqua.es",        "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Ocine+Premium+Aqua+Valencia"},
-    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Paterna+Valencia"},
+    "park":       {"name": "Cines ABC Park",        "website": "https://park.cinesabc.com",              "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Park+Roger+de+Lauria+21+Valencia"},
     "elsaler":    {"name": "Cines ABC El Saler",    "website": "https://www.cinesabc.com/cine/abcelsaler", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+El+Saler+Valencia"},
-    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://www.cinesabc.com/cine/abcgranturia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Gran+Turia+Paterna+Valencia"},
+    "granturia":  {"name": "Cines ABC Gran Turia",  "website": "https://www.cinesabc.com/cine/abcgranturia", "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+ABC+Gran+Turia+Xirivella"},
     "lys":        {"name": "Cines Lys",             "website": "https://cineslys.com",                   "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+Lys+Valencia"},
     "mn4":        {"name": "Cines MN4",             "website": "https://www.cinesmn4.com",               "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cines+MN4+Valencia"},
     "tivoli":     {"name": "Cine Tívoli",           "website": "https://exhicine.es/cine-tivoli/",       "type": "multiplex", "city": "Valencia", "maps": "https://maps.google.com/?q=Cine+Tivoli+Valencia"},
@@ -65,6 +65,45 @@ CINEMA_META = {
     "rosaleda":            {"name": "Multicines Rosaleda",      "website": "https://www.cineciudad.com/", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Multicines+Rosaleda+Malaga"},
     "kinepolis_marbella":  {"name": "Kinépolis La Cañada (Marbella)", "website": "https://kinepolis.es/?complex=ESMAR&select_theater=ESMAR&main_section=cartelera", "type": "multiplex", "city": "Málaga", "maps": "https://maps.google.com/?q=Kinepolis+La+Ca%C3%B1ada+Marbella"},
 }
+
+# Street addresses (checked by the owner) for search data and map links:
+# cinema id → (street, postcode, town). Add more cities here once they've been checked.
+CINEMA_ADDRESSES = {
+    # Valencia — confirmed 2026-11-16
+    "kinepolis":  ("C.C. Heron City, Av. Francisco Tomás y Valiente s/n", "46980", "Paterna"),
+    "yelmo":      ("C.C. Mercado de Campanar, Av. Tirso de Molina 16", "46015", "Valencia"),
+    "ocine_aqua": ("C.C. Aqua, C/ Menorca 19", "46023", "Valencia"),
+    "park":       ("C/ Roger de Lauria 21", "46002", "Valencia"),
+    "elsaler":    ("C.C. El Saler, Av. Autopista del Saler 16", "46013", "Valencia"),
+    "granturia":  ("C.C. Gran Turia, Plaza de Europa s/n", "46950", "Xirivella"),
+    "lys":        ("Paseo de Ruzafa 3", "46002", "Valencia"),
+    "mn4":        ("C.C. MN4, C/ Alcalde José Puertes s/n", "46910", "Alfafar"),
+    "tivoli":     ("C/ José Carsí 50", "46100", "Burjassot"),
+    "babel":      ("C/ Vicente Sancho Tello 10", "46021", "Valencia"),
+    "dor":        ("C/ Almirante Cadarso 31", "46005", "Valencia"),
+    "cinesa":     ("C.C. Bonaire, Autovía del Este (A-3) km 345", "46960", "Aldaia"),
+}
+
+
+def cinema_postal_address(cid: str) -> dict:
+    """schema.org PostalAddress for a cinema (street-level when we have it)."""
+    meta = CINEMA_META.get(cid, {})
+    addr = {"@type": "PostalAddress", "addressLocality": meta.get("city", "Valencia"),
+            "addressRegion": meta.get("city", "Valencia"), "addressCountry": "ES"}
+    if cid in CINEMA_ADDRESSES:
+        street, postcode, town = CINEMA_ADDRESSES[cid]
+        addr.update(streetAddress=street, postalCode=postcode, addressLocality=town)
+    return addr
+
+
+def cinema_maps_url(cid: str) -> str:
+    """Google Maps link: built from the street address when known, else CINEMA_META's."""
+    meta = CINEMA_META.get(cid, {})
+    if cid in CINEMA_ADDRESSES:
+        from urllib.parse import quote_plus
+        street, postcode, town = CINEMA_ADDRESSES[cid]
+        return "https://maps.google.com/?q=" + quote_plus(f"{meta.get('name', '')}, {street}, {postcode} {town}")
+    return meta.get("maps", "")
 
 
 # ── Date / slug helpers ───────────────────────────────────────────────────────
@@ -1840,15 +1879,10 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
     events: list[dict] = []
     for cinema in film.get("cinemas", []):
         cinema_name = cinema.get("name", "")
-        cinema_city = CINEMA_META.get(cinema.get("id", ""), {}).get("city", "Valencia")
         location: dict = {
-            "@type": "MovieTheater",
-            "name":  cinema_name,
-            "address": {
-                "@type":           "PostalAddress",
-                "addressLocality": cinema_city,
-                "addressCountry":  "ES",
-            },
+            "@type":   "MovieTheater",
+            "name":    cinema_name,
+            "address": cinema_postal_address(cinema.get("id", "")),
         }
         if cinema.get("website"):
             location["url"] = cinema["website"]
@@ -2272,7 +2306,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
             vose_attr    = "true" if c["vose"] else "false"
             _cmeta       = CINEMA_META.get(c["id"], {})
             cinema_city  = _cmeta.get("city", "")
-            _maps_url    = _cmeta.get("maps", "")
+            _maps_url    = esc(cinema_maps_url(c["id"]))
             _maps_link   = f'<a href="{_maps_url}" target="_blank" rel="noopener noreferrer" class="cinema-map-link" aria-label="Get directions" title="Get directions"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></a>' if _maps_url else ""
             cinema_rows += f'<div class="showtime-row" data-cinema-id="{c["id"]}" data-city="{cinema_city}" data-vose="{vose_attr}"><div class="showtime-cinema"><span translate="no">{c["name"]}</span>{vose_label}{_maps_link}</div><div class="showtime-times">{times_html}</div></div>'
 

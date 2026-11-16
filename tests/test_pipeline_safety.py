@@ -173,6 +173,29 @@ class CarryForward(unittest.TestCase):
         self.assertIn("check_cinema_ids(", src)
 
 
+class Addresses(unittest.TestCase):
+    def test_addresses_are_for_known_cinemas_and_complete(self):
+        for cid, (street, postcode, town) in pipeline.CINEMA_ADDRESSES.items():
+            with self.subTest(cid=cid):
+                self.assertIn(cid, pipeline.CINEMA_META)
+                self.assertTrue(street and town)
+                self.assertRegex(postcode, r"^\d{5}$")
+
+    def test_jsonld_address_uses_the_real_town(self):
+        a = pipeline.cinema_postal_address("granturia")
+        self.assertEqual((a["addressLocality"], a["postalCode"]), ("Xirivella", "46950"))
+        self.assertEqual(pipeline.cinema_postal_address("dor")["postalCode"], "46005")
+        # Cinemas without a checked address still get city-level markup
+        a = pipeline.cinema_postal_address("verdi_barcelona")
+        self.assertEqual(a["addressLocality"], "Barcelona")
+        self.assertNotIn("streetAddress", a)
+
+    def test_map_links_point_at_the_right_place(self):
+        self.assertIn("Roger+de+Lauria", pipeline.cinema_maps_url("park"))
+        self.assertNotIn("Paterna", pipeline.cinema_maps_url("park"))
+        self.assertIn("Xirivella", pipeline.cinema_maps_url("granturia"))
+
+
 class TmdbOverrides(unittest.TestCase):
     def test_overrides_file_is_valid(self):
         with open(pipeline.TMDB_OVERRIDES_PATH, encoding="utf-8") as fh:
