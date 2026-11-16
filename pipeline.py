@@ -1025,6 +1025,28 @@ def _is_classic(film: dict) -> bool:
     return bool(year) and int(year) <= datetime.now(VALENCIA_TZ).year - 3
 
 
+def cinema_times_by_date(cinema: dict) -> dict:
+    """All of a cinema's showtimes for a film as {date: set(times)}, including
+    premium-format sessions (IMAX, 4DX...) that live only in format_showtimes."""
+    out: dict[str, set] = {}
+    for src in (cinema.get("showtimes", {}), cinema.get("vose_showtimes", {}),
+                *(cinema.get("format_showtimes") or {}).values()):
+        for dk, times in src.items():
+            out.setdefault(dk, set()).update(times.keys())
+    return out
+
+
+def cinema_has_vose(cinema: dict) -> bool:
+    if cinema.get("vose_showtimes"):
+        return True
+    return any(
+        isinstance(info, dict) and info.get("is_vose")
+        for dates in (cinema.get("format_showtimes") or {}).values()
+        for times in dates.values()
+        for info in times.values()
+    )
+
+
 def cinemas_in_window(film: dict) -> list:
     today     = datetime.now(VALENCIA_TZ).date()
     days      = 29 if _is_classic(film) else 6
@@ -1032,8 +1054,7 @@ def cinemas_in_window(film: dict) -> list:
     today_str = today.strftime("%Y-%m-%d")
     return [
         c for c in film.get("cinemas", [])
-        if any(today_str <= dk <= cutoff for dk in c.get("showtimes", {}).keys())
-        or any(today_str <= dk <= cutoff for dk in c.get("vose_showtimes", {}).keys())
+        if any(today_str <= dk <= cutoff for dk in cinema_times_by_date(c))
     ]
 
 
@@ -1049,10 +1070,7 @@ def compute_card_data(film: dict) -> dict:
 
     has_eve = False
     for _c in film.get("cinemas", []):
-        all_st: dict[str, set] = {}
-        for _src in (_c.get("showtimes", {}), _c.get("vose_showtimes", {})):
-            for _dk, _times in _src.items():
-                all_st.setdefault(_dk, set()).update(_times.keys())
+        all_st = cinema_times_by_date(_c)
         for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
@@ -1079,10 +1097,7 @@ def compute_card_data(film: dict) -> dict:
     showtimes_by_cinema_day: dict = {}
     for _c in film.get("cinemas", []):
         _cid = _c.get("id", "")
-        all_st: dict[str, set] = {}
-        for _src in (_c.get("showtimes", {}), _c.get("vose_showtimes", {})):
-            for _dk, _times in _src.items():
-                all_st.setdefault(_dk, set()).update(_times.keys())
+        all_st = cinema_times_by_date(_c)
         for _dk, _times in all_st.items():
             try:
                 _d = date.fromisoformat(_dk)
@@ -1887,7 +1902,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     dates_with_shows = sorted({
         dk
         for c in film.get("cinemas", [])
-        for dk in list(c.get("showtimes", {}).keys()) + list(c.get("vose_showtimes", {}).keys())
+        for dk in cinema_times_by_date(c)
         if today_str_d <= dk <= cutoff_str
     })
     # Fallback: if nothing found (shouldn't happen after stale removal), show today
@@ -1919,10 +1934,7 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     for i, day in enumerate(days):
         active = "active" if i == 0 else ""
         dk = day["key"]; les = day["label_es"]; len_ = day["label_en"]
-        has_shows = any(
-            c.get("showtimes", {}).get(dk) or c.get("vose_showtimes", {}).get(dk)
-            for c in film["cinemas"]
-        )
+        has_shows = any(cinema_times_by_date(c).get(dk) for c in film["cinemas"])
         show_class = "has-shows" if has_shows else ""
         tab_btns += f'<button class="day-tab {active} {show_class}" data-day="{dk}" data-es="{les}" data-en="{len_}" onclick="showDay(\'{dk}\')">{les}</button>'
 
@@ -2716,11 +2728,11 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
         meta     = film.get("meta", "")
         if city:
             _city_cinemas_in_window = [c for c in cinemas_in_window(film) if c["id"] in _city_ids]
-            vose = any(c.get("vose_showtimes") for c in _city_cinemas_in_window)
+            vose = any(cinema_has_vose(c) for c in _city_cinemas_in_window)
         else:
             vose = film.get("any_vose", False)
         _window_cinemas  = _city_cinemas_in_window if city else cinemas_in_window(film)
-        vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if c.get("vose_showtimes"))
+        vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if cinema_has_vose(c))
         is_new   = film.get("is_new", False)
         cinemas  = film["cinemas"]
         rating   = film.get("rating", "?")
@@ -3110,8 +3122,7 @@ def run() -> None:
     stale = [
         title for title, film in films.items()
         if not any(
-            any(today_str <= dk <= _cutoff(film) for dk in c.get("showtimes", {}).keys())
-            or any(today_str <= dk <= _cutoff(film) for dk in c.get("vose_showtimes", {}).keys())
+            any(today_str <= dk <= _cutoff(film) for dk in cinema_times_by_date(c))
             for c in film.get("cinemas", [])
         )
     ]
