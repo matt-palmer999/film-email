@@ -4327,8 +4327,7 @@ def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list |
             log.warning(f"Could not fetch subscriber count: {exc}")
 
     # GoatCounter stats
-    gc_yesterday = gc_week = gc_book_intents = gc_book_clicks = None
-    gc_book_films = []
+    gc_yesterday = gc_week = gc_book_clicks = None
     gc_click_films = []
     gc_ref_rows = []
     gc_key = os.environ.get("GOATCOUNTER_API_KEY", "")
@@ -4384,7 +4383,6 @@ def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list |
                 return sum(h.get("count", 0) for h in ev), films
 
             gc_book_clicks, gc_click_films = _event_summary("book-click/")
-            gc_book_intents, gc_book_films = _event_summary("book-intent/")
 
             # Top referrers yesterday
             gc_refs    = _gc_fetch(f"https://whatsonmovie.goatcounter.com/api/v0/stats/toprefs?start={yesterday_start}&end={yesterday_end}")
@@ -4441,9 +4439,7 @@ def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list |
         book_line = (
             f"  Booking clicks (to cinema):   {'n/a' if gc_book_clicks is None else gc_book_clicks}\n"
             + "".join(f"    - {f}\n" for f in gc_click_films)
-            + f"  Coming-soon clicks (no link): {'n/a' if gc_book_intents is None else gc_book_intents}\n"
         )
-        film_lines = "".join(f"    - {f}\n" for f in gc_book_films)
         # Deduplicate by name (GoatCounter splits same source by ref_scheme), label direct traffic
         _ref_merged = {}
         for r in gc_ref_rows:
@@ -4455,7 +4451,7 @@ def send_pipeline_summary(films: dict, scraper_status: list, vose_issues: list |
 TRAFFIC (GoatCounter):
   Yesterday:            {gc_yesterday} pageviews
   Last 7 days:          {gc_week} pageviews
-{book_line}{film_lines}
+{book_line}
 TOP REFERRERS (yesterday):
 {ref_lines}"""
     tmdb_lines = ""
