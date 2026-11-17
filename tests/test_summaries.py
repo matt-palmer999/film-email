@@ -162,5 +162,29 @@ class LandingFaq(unittest.TestCase):
         self.assertIn("el.hasAttribute('data-html')", page)   # language switch keeps links
 
 
+class LandingStats(unittest.TestCase):
+    def test_counts_are_written_into_the_page(self):
+        import tempfile
+        films = {"A": _f("A", [_c("lys", vose={D0: {"18:00": ""}}), _c("babel", std={D0: {"20:00": ""}})]),
+                 "B": _f("B", [_c("lys", std={D0: {"18:00": ""}}), _c("dor", std={LATER: {"18:00": ""}})])}
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "index.html")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write('<span id="stat-cinemas" data-count="27" style="x">27</span> '
+                         '<span id="stat-films" data-count="111" style="y">0</span>+')
+            self.assertEqual(pipeline.write_landing_stats(films, path), (2, 2))   # D'Or only later
+            with open(path, encoding="utf-8") as fh:
+                out = fh.read()
+        self.assertIn('<span id="stat-cinemas" data-count="2" style="x">2</span>', out)
+        self.assertIn('<span id="stat-films" data-count="2" style="y">2</span>+', out)
+
+    def test_live_landing_page_reads_both_counts(self):
+        with open(os.path.join(ROOT, "docs", "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        self.assertRegex(page, r'<span id="stat-cinemas" data-count="\d+"[^>]*>\d+</span>')
+        self.assertRegex(page, r'<span id="stat-films" data-count="\d+"[^>]*>\d+</span>')
+        self.assertNotIn("'stat-cinemas'), 27,", page)          # no hard-coded count
+
+
 if __name__ == "__main__":
     unittest.main()

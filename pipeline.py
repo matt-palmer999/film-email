@@ -1719,6 +1719,30 @@ def build_landing_faq(films: dict, anchor: datetime) -> str:
             f'{items}</section>\n  {FAQ_END}')
 
 
+def write_landing_stats(films: dict, path: str = "docs/index.html") -> tuple[int, int]:
+    """Set the landing hero's "N cines / N películas esta semana" counts: cinemas
+    with sessions this week and the films listed. Returns (cinemas, films)."""
+    import re as _re
+    n_cinemas = len({c["id"] for f in films.values() for c in cinemas_in_window(f)})
+    n_films = len(films)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            page = fh.read()
+    except FileNotFoundError:
+        return n_cinemas, n_films
+    new = page
+    for sid, n in (("stat-cinemas", n_cinemas), ("stat-films", n_films)):
+        new = _re.sub(rf'(<span id="{sid}" data-count=")\d+("[^>]*>)\d+(</span>)',
+                      rf"\g<1>{n}\g<2>{n}\g<3>", new)
+    if new == page and f'data-count="{n_films}"' not in page:
+        log.warning("Landing page stats not found — counts not updated")
+    elif new != page:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(new)
+        log.info(f"Landing stats: {n_cinemas} cinemas, {n_films} films")
+    return n_cinemas, n_films
+
+
 def write_landing_faq(films: dict, anchor: datetime, path: str = "docs/index.html") -> None:
     try:
         with open(path, encoding="utf-8") as fh:
@@ -4011,11 +4035,12 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
     if not rebuild:
         submit_indexnow(films, _cities)
 
-    # 10a2. Landing-page FAQ with this week's numbers
+    # 10a2. Landing-page stats and FAQ with this week's numbers
     try:
+        write_landing_stats(films)
         write_landing_faq(films, anchor)
     except Exception as exc:
-        log.error(f"Landing FAQ failed — page left as it was: {exc}", exc_info=True)
+        log.error(f"Landing stats/FAQ failed — page left as it was: {exc}", exc_info=True)
 
     # 10b. Ensure robots.txt points to the sitemap
     robots_path = "docs/robots.txt"

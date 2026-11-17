@@ -842,12 +842,12 @@
     <!-- STATS -->
     <div class="stats">
       <div class="stat">
-        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-cinemas" style="display:inline-block;width:28px;text-align:right;">0</span></div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-cinemas" data-count="35" style="display:inline-block;width:28px;text-align:right;">35</span></div>
         <div class="stat-label" data-es="Cines" data-en="Cinemas">Cines</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" data-count="111" style="display:inline-block;width:36px;text-align:right;">0</span>+</div>
+        <div class="stat-num" style="display:flex;justify-content:center;align-items:baseline;"><span id="stat-films" data-count="129" style="display:inline-block;width:36px;text-align:right;">129</span>+</div>
         <div class="stat-label" data-es="Películas esta semana" data-en="Films this week">Películas esta semana</div>
       </div>
       <div class="stat-divider"></div>
@@ -1088,11 +1088,11 @@
       requestAnimationFrame(step);
     }
 
-    function runStatsAnimation(filmCount) {
+    function runStatsAnimation(cinemaCount, filmCount) {
       const t  = document.getElementById('stat-tailored');
       const tl = document.getElementById('stat-tailored-label');
       const delay = 1600; // wait for hero fade-in (1s delay + 0.8s duration + buffer)
-      setTimeout(() => countUp(document.getElementById('stat-cinemas'), 27, 900), delay);
+      setTimeout(() => countUp(document.getElementById('stat-cinemas'), cinemaCount, 900), delay);
       setTimeout(() => countUp(document.getElementById('stat-films'), filmCount, 1100), delay + 200);
       setTimeout(() => {
         t.style.opacity  = '1';
@@ -1101,8 +1101,13 @@
       }, delay + 1400);
     }
 
+    // Both counts are written into the page by pipeline.py on every run
+    const _cc = parseInt(document.getElementById('stat-cinemas').dataset.count, 10);
     const _fc = parseInt(document.getElementById('stat-films').dataset.count, 10);
-    runStatsAnimation(_fc > 0 ? _fc : 30);
+    // The real numbers are in the HTML for search engines; start the count-up from 0
+    document.getElementById('stat-cinemas').textContent = '0';
+    document.getElementById('stat-films').textContent = '0';
+    runStatsAnimation(_cc > 0 ? _cc : 35, _fc > 0 ? _fc : 100);
   </script>
 
   <script>
