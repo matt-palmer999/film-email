@@ -108,5 +108,59 @@ class OnThePages(unittest.TestCase):
         self.assertIn('<div class="header-summary" data-es="Esta semana', city)
 
 
+class LandingFaq(unittest.TestCase):
+    def _films(self):
+        return {
+            "A": _f("A & B", [_c("lys", vose={D0: {"18:00": ""}}), _c("babel", vose={D0: {"20:00": ""}})]),
+            "B": _f("B", [_c("yelmo", std={D0: {"18:00": ""}})]),
+            "C": _f("Naza", [_c("verdi_barcelona", std={D0: {"18:00": ""}}, ensub={D0: {"18:00": True}})],
+                    lang="es"),
+        }
+
+    def test_numbers_match_the_city_pages(self):
+        films = self._films()
+        st = pipeline.city_stats(films, "Valencia")
+        self.assertEqual((st["films"], st["cinemas"], st["vose_films"]), (2, 3, 1))
+        faq = pipeline.build_landing_faq(films, ANCHOR)
+        self.assertIn("Esta semana hay 1 película en VOSE", faq)
+        self.assertIn("This week there is 1 film in VOSE", faq)
+        self.assertIn("no hay sesiones en VOSE en Barcelona", faq)
+        self.assertIn('href="./listings/valencia/"', faq)
+        self.assertIn("«Naza»", faq)                         # English subtitles, by name
+
+    def test_answers_are_escaped_and_marked_as_html(self):
+        faq = pipeline.build_landing_faq(self._films(), ANCHOR)
+        self.assertIn('<p data-html data-es="', faq)
+        self.assertNotIn("A & B", faq)                       # raw & never reaches the page
+
+    def test_only_the_marked_block_is_replaced(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "index.html")
+            page = "<p>top</p>\n" + pipeline.FAQ_START + "old" + pipeline.FAQ_END + "\n<p>bottom</p>"
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(page)
+            pipeline.write_landing_faq(self._films(), ANCHOR, path)
+            with open(path, encoding="utf-8") as fh:
+                out = fh.read()
+            self.assertTrue(out.startswith("<p>top</p>") and out.endswith("<p>bottom</p>"))
+            self.assertNotIn("old", out)
+            self.assertIn("Preguntas frecuentes", out)
+            pipeline.write_landing_faq(self._films(), ANCHOR, path)   # idempotent
+            with open(path, encoding="utf-8") as fh:
+                self.assertEqual(fh.read().count(pipeline.FAQ_START), 1)
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("<p>no markers</p>")
+            pipeline.write_landing_faq(self._films(), ANCHOR, path)   # left alone, no crash
+            with open(path, encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), "<p>no markers</p>")
+
+    def test_live_landing_page_has_the_markers(self):
+        with open(os.path.join(ROOT, "docs", "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        self.assertEqual(page.count(pipeline.FAQ_START), 1)
+        self.assertIn("el.hasAttribute('data-html')", page)   # language switch keeps links
+
+
 if __name__ == "__main__":
     unittest.main()
