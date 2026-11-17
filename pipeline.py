@@ -1466,6 +1466,153 @@ def cinemas_in_window(film: dict) -> list:
     ]
 
 
+# ── Plain-language summaries (city + film pages) ─────────────────────────────
+# One or two visible sentences built from the same showtime data as the page,
+# so they can never disagree with it. Written for readers and for AI assistants
+# that quote pages ("what's on in VOSE in Valencia this week?").
+
+_DAYS_ES   = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+_DAYS_EN   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+_MONTHS_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+              "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+_MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"]
+
+
+def _join(names: list, lang: str, limit: int = 0, noun: tuple = ("", "")) -> str:
+    """'A', 'A y B', 'A, B y C' — with 'y N más' past `limit`."""
+    names = list(names)
+    more = 0
+    if limit and len(names) > limit + 1:   # "y 1 más" — just name it
+        more = len(names) - limit
+        names = names[:limit]
+    word = "y" if lang == "es" else "and"
+    if more:
+        n_es, n_en = noun
+        tail = (f"{more} {n_es} más" if n_es else f"{more} más") if lang == "es" else                (f"{more} more {n_en}" if n_en else f"{more} more")
+        return ", ".join(names) + f" {word} {tail}"
+    if len(names) <= 1:
+        return "".join(names)
+    return ", ".join(names[:-1]) + f" {word} " + names[-1]
+
+
+def _window(film: dict) -> tuple[str, str]:
+    today = datetime.now(VALENCIA_TZ).date()
+    end = today + timedelta(days=29 if _is_classic(film) else 6)
+    return today.isoformat(), end.isoformat()
+
+
+def _vose_dates(cinema: dict) -> set:
+    out = {d for d, t in (cinema.get("vose_showtimes") or {}).items() if t}
+    for fmt in (cinema.get("format_showtimes") or {}).values():
+        out |= {d for d, times in fmt.items() if any((e or {}).get("is_vose") for e in times.values())}
+    return out
+
+
+def _in(dates, win) -> bool:
+    return any(win[0] <= d <= win[1] for d in dates)
+
+
+def _date_span(d0: date, d1: date, lang: str) -> str:
+    if lang == "es":
+        if d0 == d1:
+            return f"el {_DAYS_ES[d0.weekday()]} {d0.day} de {_MONTHS_ES[d0.month - 1]}"
+        first = f"{_DAYS_ES[d0.weekday()]} {d0.day}" + ("" if d0.month == d1.month else f" de {_MONTHS_ES[d0.month - 1]}")
+        return f"del {first} al {_DAYS_ES[d1.weekday()]} {d1.day} de {_MONTHS_ES[d1.month - 1]}"
+    if d0 == d1:
+        return f"on {_DAYS_EN[d0.weekday()]} {d0.day} {_MONTHS_EN[d0.month - 1]}"
+    first = f"{_DAYS_EN[d0.weekday()]} {d0.day}" + ("" if d0.month == d1.month else f" {_MONTHS_EN[d0.month - 1]}")
+    return f"from {first} to {_DAYS_EN[d1.weekday()]} {d1.day} {_MONTHS_EN[d1.month - 1]}"
+
+
+def city_summary(films: dict, city: str, anchor: datetime) -> tuple[str, str]:
+    """(es, en) summary for a city listings page. `films` = the films on that page."""
+    ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
+    cinemas: set = set()
+    vose_films = ensub_films = 0
+    vose_by_cinema: dict = {}
+    for film in films.values():
+        win = _window(film)
+        here = [c for c in cinemas_in_window(film) if c["id"] in ids]
+        cinemas |= {c["id"] for c in here}
+        v = [c["id"] for c in here if _in(_vose_dates(c), win)]
+        if v:
+            vose_films += 1
+            for cid in v:
+                vose_by_cinema[cid] = vose_by_cinema.get(cid, 0) + 1
+        if any(_in((c.get("ensub") or {}).keys(), win) for c in here):
+            ensub_films += 1
+    end = anchor + timedelta(days=6)
+    if anchor.month == end.month:
+        span_es = f"{anchor.day}–{end.day} de {_MONTHS_ES[anchor.month - 1]}"
+        span_en = f"{anchor.day}–{end.day} {_MONTHS_EN[anchor.month - 1]}"
+    else:
+        span_es = f"{anchor.day} de {_MONTHS_ES[anchor.month - 1]} – {end.day} de {_MONTHS_ES[end.month - 1]}"
+        span_en = f"{anchor.day} {_MONTHS_EN[anchor.month - 1]} – {end.day} {_MONTHS_EN[end.month - 1]}"
+    n, m = len(films), len(cinemas)
+    es = f"Esta semana ({span_es}): {n} película{'s' if n != 1 else ''} en {m} cine{'s' if m != 1 else ''} de {city}."
+    en = f"This week ({span_en}): {n} film{'s' if n != 1 else ''} at {m} cinema{'s' if m != 1 else ''} in {city}."
+    if vose_films:
+        top = [CINEMA_META.get(c, {}).get("name", c)
+               for c, _n in sorted(vose_by_cinema.items(), key=lambda x: (-x[1], x[0]))]
+        es += (f" {vose_films} en VOSE (versión original con subtítulos en español), "
+               f"en {_join(top, 'es', 3, ('cines', 'cinemas'))}.")
+        en += (f" {vose_films} in VOSE (original language with Spanish subtitles), "
+               f"at {_join(top, 'en', 3, ('cines', 'cinemas'))}.")
+    if ensub_films:
+        es += f" {ensub_films} con subtítulos en inglés."
+        en += f" {ensub_films} with English subtitles."
+    return es, en
+
+
+def film_summary(film: dict) -> tuple[str, str]:
+    """(es, en) one-sentence summary for a film page: when, how many cinemas,
+    which cities, how many in VOSE. Cinema names are left to the showtimes
+    below, except when there is only one cinema.
+
+    NOT shown on film pages: the user found it odd under the synopsis
+    (2026-11-17) and may revisit it. Only city pages carry a summary."""
+    win = _window(film)
+    here = cinemas_in_window(film)
+    if not here:
+        return "", ""
+    days = sorted({d for c in here for d in cinema_times_by_date(c) if win[0] <= d <= win[1]})
+    d0, d1 = date.fromisoformat(days[0]), date.fromisoformat(days[-1])
+    order = list(dict.fromkeys(v.get("city") for v in CINEMA_META.values() if v.get("city")))
+    found = {CINEMA_META.get(c["id"], {}).get("city") for c in here}
+    cities = [c for c in order if c in found]
+    n = len(here)
+    k = sum(1 for c in here if _in(_vose_dates(c), win))
+    m = sum(1 for c in here if _in((c.get("ensub") or {}).keys(), win))
+    lang = (film.get("original_language") or "").lower()
+    foreign = bool(lang) and lang not in ("es", "ca", "gl", "eu")
+
+    if n == 1:
+        name = CINEMA_META.get(here[0]["id"], {}).get("name") or here[0].get("name", "")
+        es = f"Se proyecta {_date_span(d0, d1, 'es')} en {name} ({cities[0]})"
+        en = f"Showing {_date_span(d0, d1, 'en')} at {name} ({cities[0]})"
+        if k:
+            es, en = es + ", en VOSE", en + ", in VOSE"
+        elif foreign:
+            es, en = es + ", no en VOSE", en + ", not in VOSE"
+        if m:
+            es, en = es + ", con subtítulos en inglés", en + ", with English subtitles"
+        return es + ".", en + "."
+
+    es = f"Se proyecta {_date_span(d0, d1, 'es')} en {n} cines de {_join(cities, 'es')}"
+    en = f"Showing {_date_span(d0, d1, 'en')} at {n} cinemas in {_join(cities, 'en')}"
+    if k == n:
+        es, en = es + ", todos en VOSE", en + ", all in VOSE"
+    elif k:
+        es, en = es + f", {k} de ellos en VOSE", en + f", {k} of them in VOSE"
+    elif foreign:
+        es, en = es + ", ninguno en VOSE", en + ", none in VOSE"
+    if m:
+        es += f"; con subtítulos en inglés en {m}" + (" de ellos" if m < n else "")
+        en += f"; English subtitles at {m}" + (" of them" if m < n else "")
+    return es + ".", en + "."
+
+
 def compute_card_data(film: dict) -> dict:
     year         = film.get("year", "")
     cinemas_set  = set(c["id"] for c in film["cinemas"])
@@ -1562,6 +1709,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
 .header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px;margin-top:0}
 .header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
+.header-summary{font-size:13px;color:#9b8faa;line-height:1.55;margin-top:10px;max-width:640px}
 .header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
 .section-label{padding:28px 40px 12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#c5b8d8;font-weight:600}
 .section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
@@ -3171,6 +3319,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de {city_name} esta semana. Sesiones VOSE destacadas. Actualizado a diario."
     _page_desc_en  = f"{film_count} films across {cinema_count} {city_name} cinemas this week. VOSE screenings highlighted. Updated daily."
     _page_og_title = f"Cartelera {city_name} \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
+    _summary_es, _summary_en = city_summary(films_by_title, city_name, anchor)
 
     import json as _json
     _ld_items = []
@@ -3350,6 +3499,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
   <div class="header">
     <h1 class="header-title" id="header-title" data-es="Cartelera<br>{city_name}" data-en="Cinema<br>{city_name}">Cartelera<br>{city_name}</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en {city_name} esta semana" data-en="Your complete guide to cinema in {city_name} this week">La guía completa del cine en {city_name} esta semana</div>
+    <div class="header-summary" data-es="{esc(_summary_es)}" data-en="{esc(_summary_en)}">{esc(_summary_es)}</div>
     <div class="header-date" id="header-date"></div>
   </div>
 
