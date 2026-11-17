@@ -189,5 +189,46 @@ class LandingStats(unittest.TestCase):
         self.assertNotIn("'stat-cinemas'), 27,", page)          # no hard-coded count
 
 
+class StructuredData(unittest.TestCase):
+    def _events(self, film):
+        import re as _re
+        ld = pipeline._build_jsonld(film, film["slug"])
+        data = json.loads(_re.search(r"<script[^>]*>(.*?)</script>", ld, _re.S).group(1))
+        return {e["startDate"][11:16]: e for e in data["@graph"] if e.get("@type") == "ScreeningEvent"}
+
+    def test_event_names_are_the_clean_title_and_vose_is_in_the_language_fields(self):
+        f = _f("Porco Rosso", [_c("verdi_barcelona", std={D0: {"16:00": ""}}, vose={D0: {"18:00": ""}})],
+               lang="ja", year="1992")
+        ev = self._events(f)
+        self.assertEqual(ev["18:00"]["name"], "Porco Rosso (EN)")       # title_en, no "(VOSE)"
+        self.assertEqual((ev["18:00"]["inLanguage"], ev["18:00"]["subtitleLanguage"]), ("ja", "es"))
+        self.assertEqual(ev["16:00"]["inLanguage"], "es")
+        self.assertNotIn("subtitleLanguage", ev["16:00"])
+
+    def test_vose_with_unknown_language_has_no_audio_claim(self):
+        f = _f("Mystery", [_c("lys", vose={D0: {"18:00": ""}})], lang="")
+        ev = self._events(f)["18:00"]
+        self.assertEqual(ev["subtitleLanguage"], "es")
+        self.assertNotIn("inLanguage", ev)
+
+
+class LlmsTxt(unittest.TestCase):
+    def test_last_updated_line(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "llms.txt")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("# x\n- Last updated: 2000-01-01 (set by each run)\n")
+            pipeline.write_llms_updated(ANCHOR, path)
+            with open(path, encoding="utf-8") as fh:
+                self.assertIn(f"Last updated: {TODAY.isoformat()} (set by each run)", fh.read())
+
+    def test_live_llms_txt_has_the_line_and_the_en_subs_fact(self):
+        with open(os.path.join(ROOT, "docs", "llms.txt"), encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertRegex(text, r"Last updated: \d{4}-\d{2}-\d{2}")
+        self.assertIn("EN SUBS", text)
+
+
 if __name__ == "__main__":
     unittest.main()

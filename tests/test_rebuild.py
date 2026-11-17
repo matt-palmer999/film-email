@@ -54,6 +54,7 @@ RECORD_FILES = {
     "docs/data/cinema_last_ok.json": '{"lys": "%s"}' % OLD,
     "docs/data/vose_counts.json": '{"lys": 3}',
     "docs/data/scraper_counts.json": '{"lys": 12}',
+    "docs/llms.txt": "# whatson.movie\n- Last updated: %s (set by each run)\n" % OLD,   # rebuild must not move it
 }
 
 

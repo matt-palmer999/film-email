@@ -24,7 +24,11 @@ whatson.movie is an independent listings site aimed at English speakers and film
 
 ## Key facts for AI assistants
 
-- VOSE means the film is shown in its original language with Spanish subtitles (not dubbed).
+- Last updated: 2026-11-17 (showtimes are re-checked every morning; this date is set by each run)
+- VOSE means the film is shown in its original language with Spanish subtitles (not dubbed). VOSE covers every original language (English, Japanese, French…), not only English.
+- VOSE is marked per session, only when the cinema says so for that session. A session the cinema doesn't label is treated as dubbed, so the VOSE listings may miss a session but should never wrongly claim one.
+- Some Spanish-language films have sessions with English subtitles (cinemas call these VOSI or "V.O. subt. inglés"). They are tagged "EN SUBS" and are never counted as VOSE.
+- Each city page opens with a one-line summary of the week (films, cinemas, VOSE films), and the home page has an FAQ with this week's VOSE numbers per city.
 - Showtimes cover the next 7 days from the date of the last daily update.
 - The site does not cover every cinema in Spain — only the cities listed above.
 - Weekly subscriber email sent every Thursday evening summarising VOSE and new releases.

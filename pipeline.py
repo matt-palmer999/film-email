@@ -1743,6 +1743,23 @@ def write_landing_stats(films: dict, path: str = "docs/index.html") -> tuple[int
     return n_cinemas, n_films
 
 
+def write_llms_updated(anchor: datetime, path: str = "docs/llms.txt") -> None:
+    """Set the 'Last updated: YYYY-MM-DD' line in llms.txt. Real runs only:
+    a --rebuild uses old data, so it must not move the date forward."""
+    import re as _re
+    try:
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+    except FileNotFoundError:
+        return
+    new = _re.sub(r"(Last updated: )\d{4}-\d{2}-\d{2}", rf"\g<1>{anchor:%Y-%m-%d}", text, count=1)
+    if new == text and "Last updated: " not in text:
+        log.warning("llms.txt has no 'Last updated:' line — date not set")
+    elif new != text:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(new)
+
+
 def write_landing_faq(films: dict, anchor: datetime, path: str = "docs/index.html") -> None:
     try:
         with open(path, encoding="utf-8") as fh:
@@ -2273,6 +2290,7 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
     import json as _json
 
     title    = film.get("title_en") or film["title"]
+    orig_lang = (film.get("original_language") or "").lower()
     synopsis = (film.get("synopsis_en") or film.get("synopsis_es") or film.get("synopsis", ""))[:500]
     poster   = film.get("poster", "")
     year     = film.get("year", "")
@@ -2316,7 +2334,7 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
                 return
             ev: dict = {
                 "@type":          "ScreeningEvent",
-                "name":           f"{title} (VOSE)" if is_vose else title,
+                "name":           title,   # VOSE is in the language fields below
                 "startDate":      naive.replace(tzinfo=VALENCIA_TZ).isoformat(),
                 "eventStatus":    "https://schema.org/EventScheduled",
                 "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
@@ -2330,10 +2348,13 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
             if bdef:
                 ev["location"] = {**location, "name": f"{cinema_name} ({bdef[0]})",
                                   "address": building_postal_address(cinema.get("id", ""), bkey)}
-            # VOSE = original audio with Spanish subtitles (original language not
-            # known per session); otherwise the session is in Spanish.
+            # VOSE = original audio with Spanish subtitles: the audio is the
+            # film's original language (TMDB) when we know it. Otherwise the
+            # session is in Spanish.
             if is_vose:
                 ev["subtitleLanguage"] = "es"
+                if orig_lang and orig_lang != "es":
+                    ev["inLanguage"] = orig_lang
             else:
                 ev["inLanguage"] = "es"
             if time_str in (cinema.get("ensub") or {}).get(date_str, {}):
@@ -4031,9 +4052,10 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
         fh.write(sitemap_xml)
     log.info(f"Wrote docs/sitemap.xml ({len(sitemap_urls)} URLs)")
 
-    # 10a. Notify Bing IndexNow (once a day, with the real run)
+    # 10a. Notify Bing IndexNow and date llms.txt (once a day, with the real run)
     if not rebuild:
         submit_indexnow(films, _cities)
+        write_llms_updated(anchor)
 
     # 10a2. Landing-page stats and FAQ with this week's numbers
     try:
