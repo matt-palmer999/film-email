@@ -127,6 +127,9 @@ class LandingFaq(unittest.TestCase):
         self.assertIn("no hay sesiones en VOSE en Barcelona", faq)
         self.assertIn('href="./listings/valencia/"', faq)
         self.assertIn("«Naza»", faq)                         # English subtitles, by name
+        # VOSE includes non-English originals, so never promise "films in English"
+        self.assertIn("Where can I watch original-language (VOSE) films in Valencia?", faq)
+        self.assertNotIn("films in English", faq)
 
     def test_answers_are_escaped_and_marked_as_html(self):
         faq = pipeline.build_landing_faq(self._films(), ANCHOR)

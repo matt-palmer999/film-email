@@ -1672,7 +1672,7 @@ def build_landing_faq(films: dict, anchor: datetime) -> str:
             a_es = f"Esta semana no hay sesiones en VOSE en {city}. {l_es}"
             a_en = f"There are no VOSE sessions in {city} this week. {l_en}"
         qa.append((f"¿Dónde ver películas en versión original (VOSE) en {city}?",
-                   f"Where can I watch films in English (VOSE) in {city}?", a_es, a_en))
+                   f"Where can I watch original-language (VOSE) films in {city}?", a_es, a_en))
 
     qa.append(("¿Qué significa VOSE?", "What does VOSE mean?",
                "VOSE es «versión original subtitulada en español»: la película se proyecta en su idioma "
