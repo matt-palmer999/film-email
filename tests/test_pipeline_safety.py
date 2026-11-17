@@ -209,6 +209,7 @@ class TmdbOverrides(unittest.TestCase):
         self.assertEqual(data.get("La Violinista"), 748681)   # 2026 The Violinist, not 2018 Viulisti
         self.assertEqual(data.get("EL NIÑO"), 1506401)        # 2026 Ortuella film, not 2014 thriller
         self.assertEqual(data.get("Preestreno – Fatherland"), 1437696)  # 2026 Pawlikowski, not 1994 TV film
+        self.assertEqual(data.get("Otra vez, por primera vez – Ladybird"), 391713)  # Lady Bird (2017), user-checked
 
 
 if __name__ == "__main__":
