@@ -2664,7 +2664,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <div id="cs-title" style="font-size:16px;font-weight:700;color:#f0eae0;margin-bottom:8px;" data-es="Reserva de entradas — próximamente" data-en="Direct booking — coming soon">Direct booking — coming soon</div>
     <div id="cs-body" style="font-size:13px;color:#9b8faa;line-height:1.6;margin-bottom:20px;" data-es="Pronto podrás comprar entradas directamente desde aquí. Suscríbete gratis para ser el primero en saberlo." data-en="Soon you’ll be able to book tickets directly from here. Subscribe free to be the first to know.">Soon you’ll be able to book tickets directly from here. Subscribe free to be the first to know.</div>
     <a id="cs-cta" href="/" style="display:block;padding:9px 20px;background:#ffb432;color:#0a0810;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:10px;" data-es="Suscribirse gratis →" data-en="Subscribe free →">Subscribe free →</a>
-    <button onclick="hideComingSoon()" style="background:none;border:none;color:#6a5e7a;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;" data-es="Cerrar" data-en="Close">Close</button>
+    <button onclick="hideComingSoon()" style="background:none;border:none;color:#9b8faa;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;" data-es="Cerrar" data-en="Close">Close</button>
   </div>
 </div>
 <script>
@@ -3361,7 +3361,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="qf-btn" id="qf-vose" data-es="Todo VOSE" data-en="All VOSE" onclick="setQFVose()">Todo VOSE</button>
-        <button class="qf-btn qf-disabled" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()">Solo inglés</button>
+        <button class="qf-btn qf-disabled" id="qf-enlang" disabled data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()">Solo inglés</button>
         <button class="qf-btn" id="qf-family" data-es="Familiar (≤ 12)" data-en="Family (≤ 12)" onclick="setQFFamily()">Familiar (≤ 12)</button>
       </div>
     </div>
@@ -3466,6 +3466,7 @@ window.addEventListener('DOMContentLoaded', () => {{
     const enBtn = document.getElementById('qf-enlang');
     if (enBtn) {{
       enBtn.classList.toggle('qf-disabled', !voseOn);
+      enBtn.disabled = !voseOn;   // real disabled: screen readers + contrast rules
       enBtn.classList.toggle('qf-active', voseOn && englishOn);
     }}
   }}
