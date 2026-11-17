@@ -370,7 +370,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     <div style="background:#0f0c14;border:2px solid #5a4a7a;border-top:none;border-bottom:2px solid #5a4a7a;padding:14px 20px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="qf-btn" id="qf-vose" data-es="Todo VOSE" data-en="All VOSE" onclick="setQFVose()">Todo VOSE</button>
-        <button class="qf-btn qf-disabled" id="qf-enlang" data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()">Solo inglés</button>
+        <button class="qf-btn qf-disabled" id="qf-enlang" disabled data-es="Solo inglés" data-en="English only" onclick="setQFEnglish()">Solo inglés</button>
         <button class="qf-btn" id="qf-family" data-es="Familiar (≤ 12)" data-en="Family (≤ 12)" onclick="setQFFamily()">Familiar (≤ 12)</button>
       </div>
     </div>
@@ -1883,6 +1883,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const enBtn = document.getElementById('qf-enlang');
     if (enBtn) {
       enBtn.classList.toggle('qf-disabled', !voseOn);
+      enBtn.disabled = !voseOn;   // real disabled: screen readers + contrast rules
       enBtn.classList.toggle('qf-active', voseOn && englishOn);
     }
   }
