@@ -212,5 +212,18 @@ class TmdbOverrides(unittest.TestCase):
         self.assertEqual(data.get("Otra vez, por primera vez – Ladybird"), 391713)  # Lady Bird (2017), user-checked
 
 
+class ScreeningSeriesPrefix(unittest.TestCase):
+    def test_club_rosebud_merges_with_the_plain_title(self):
+        self.assertEqual(pipeline._title_key("CLUB ROSEBUD: NAZA"), pipeline._title_key("Naza"))
+        self.assertEqual(pipeline._tmdb_search_title("CLUB ROSEBUD: TIEMPOS DE ILUSIÓN"), "TIEMPOS DE ILUSIÓN")
+        films = {"Naza": {"title": "Naza", "tmdb_id": 1755291, "cinemas": [{"id": "lys"}]},
+                 "CLUB ROSEBUD: NAZA": {"title": "CLUB ROSEBUD: NAZA", "tmdb_id": None, "cinemas": [{"id": "park"}]}}
+        pipeline.unify_title_variants(films)
+        self.assertEqual(films["CLUB ROSEBUD: NAZA"]["tmdb_id"], 1755291)
+
+    def test_other_colon_titles_are_left_alone(self):
+        self.assertEqual(pipeline._tmdb_search_title("SUPERTHINGS: LA PELÍCULA"), "SUPERTHINGS: LA PELÍCULA")
+
+
 if __name__ == "__main__":
     unittest.main()

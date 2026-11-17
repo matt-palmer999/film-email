@@ -279,6 +279,8 @@ def _strip_event_prefix(title: str) -> str:
 def _tmdb_clean_title(title: str) -> str:
     """Title with language prefixes and reissue/format suffixes removed (not yet cut at dashes)."""
     t = re.sub(r'^(CAT|VA|EUS|GAL|GL)\s+', '', title, flags=re.IGNORECASE)
+    # Screening-series prefix with a colon: "CLUB ROSEBUD: NAZA" (ABC Park)
+    t = re.sub(r'^Club Rosebud\s*:\s*', '', t, flags=re.IGNORECASE)
     # Version tags and trailing dots: "Jujutsu Kaisen 0: La película (VOSE)."
     t = re.sub(r'\s*\((VOSE|VOS|VO|V\.O\.S\.E\.?|VOSC|DOBLADA)\)', '', t, flags=re.IGNORECASE)
     t = t.rstrip(" .")
