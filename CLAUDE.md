@@ -43,6 +43,14 @@ Get-Content "C:\Users\TV-watchers\film-email\.env" | ForEach-Object {
 python pipeline.py
 ```
 
+For changes that only affect how pages look (layout, labels, HTML attributes),
+use `python pipeline.py --rebuild` instead (same `.env` loading). It rebuilds
+every page from `docs/data/films_cache.json` in a few seconds: no scraping, no
+TMDB/YouTube/Bing calls, no emails, and it leaves the cache, `stats.json`,
+carry-forward and the VOSE baseline untouched. It refuses to run without the
+Supabase settings (pages would break sign-in). Times are as fresh as the last
+real run. Changes to scrapers or data handling still need the full pipeline.
+
 If running from a worktree, `cd` to the worktree directory first (or use an absolute path
 to `pipeline.py` there). The pipeline commits to whichever branch the working directory
 is on — make sure that is `main`, or push to `main` immediately after.

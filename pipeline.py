@@ -3569,65 +3569,12 @@ if ('serviceWorker' in navigator) {{
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
-def run() -> None:
-    anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-    log.info(f"Pipeline starting for {anchor.date()} …")
-
-    # 1. Scrape all cinemas (watching for unknown VOSE language labels)
-    from vose_check import install_label_watch, run_vose_check
-    install_label_watch()
-    log.info("Running scrapers …")
-    films, scraper_status = aggregate_scrapers()
-    log.info(f"Unique films before enrichment: {len(films)}")
-    id_problems = check_cinema_ids(films)
-
-    if len(films) < 10:
-        log.error(f"Only {len(films)} films found — possible scraper failure. Aborting to preserve cached listings.")
-        return
-
-    # Load previous cache now so trailer URLs can be carried forward in step 3b
-    _prev_cache_path_early = "docs/data/films_cache.json"
-    _prev_films_by_slug_early: dict = {}
-    _prev_cache_raw: dict = {}
-    if os.path.exists(_prev_cache_path_early):
-        try:
-            with open(_prev_cache_path_early, encoding="utf-8") as _fh:
-                _prev_cache_raw = json.load(_fh)
-            for _pf in _prev_cache_raw.values():
-                if _pf.get("slug"):
-                    _prev_films_by_slug_early[_pf["slug"]] = _pf
-        except Exception:
-            pass
-    # Date of the previous run (stats.json is rewritten later in the run)
-    _prev_updated = None
-    try:
-        with open("docs/data/stats.json", encoding="utf-8") as _fh:
-            _prev_updated = json.load(_fh).get("updated")
-    except Exception:
-        pass
-
-    # 2. TMDB enrichment
-    enrich_with_tmdb(films)
-
-    # 3. Deduplicate: same-title variants first, then by TMDB ID
-    unify_title_variants(films)
-    deduplicate_by_tmdb_id(films)
-    log.info(f"Films after deduplication: {len(films)}")
-
-    # 3c. Carry forward listings for cinemas whose scraper failed today.
-    #     Any error here must not stop the run — fall back to today's behaviour.
-    carried: dict = {}
-    try:
-        carried = carry_forward_failed_cinemas(
-            films, _prev_cache_raw, datetime.now(VALENCIA_TZ).date(), _prev_updated)
-        if carried:
-            log.info(f"Films after carry-forward: {len(films)}")
-    except Exception as exc:
-        log.error(f"Carry-forward failed — continuing without it: {exc}", exc_info=True)
-
-    apply_spanish_display_titles(films)
-    demote_spanish_original_vose(films)
-
+def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = None,
+               rebuild: bool = False) -> int:
+    """Steps 4-11: drop films with nothing left to show, then write the city
+    pages, film pages, archives, sitemap and credentials. Shared by run() and
+    rebuild() so both always produce the same pages. Returns the number of
+    film pages written."""
     # 4. Remove films with no showtimes in the relevant window
     #    Classics (3+ years old) use a 30-day window; everything else uses 7 days.
     today_local = datetime.now(VALENCIA_TZ).date()
@@ -3651,8 +3598,9 @@ def run() -> None:
     for title, film in films.items():
         film["slug"] = slugify(film.get("title_en", title) or title)
 
-    # 5.5. Look up YouTube trailers for new films
-    enrich_with_trailers(films, _prev_films_by_slug_early)
+    # 5.5. Look up YouTube trailers for new films (not on a rebuild: no network)
+    if not rebuild:
+        enrich_with_trailers(films, prev_films_by_slug or {})
 
     # 6. Build city-specific listings pages + chooser
     os.makedirs("docs/listings", exist_ok=True)
@@ -3683,15 +3631,18 @@ def run() -> None:
         except Exception:
             pass
 
-        # 7. Write stats.json + films cache
-    os.makedirs("docs/data", exist_ok=True)
-    stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
-    with open("docs/data/stats.json", "w", encoding="utf-8") as fh:
-        json.dump(stats, fh)
-    log.info(f"Wrote docs/data/stats.json: {stats}")
-    with open("docs/data/films_cache.json", "w", encoding="utf-8") as fh:
-        json.dump(films, fh, ensure_ascii=False, default=str)
-    log.info(f"Wrote docs/data/films_cache.json ({len(films)} films)")
+    # 7. Write stats.json + films cache. Not on a rebuild: stats.json's date is
+    #    "when cinemas were last scraped" (carry-forward relies on it) and the
+    #    cache is the last real scrape.
+    if not rebuild:
+        os.makedirs("docs/data", exist_ok=True)
+        stats = {"film_count": len(films), "updated": anchor.strftime("%Y-%m-%d")}
+        with open("docs/data/stats.json", "w", encoding="utf-8") as fh:
+            json.dump(stats, fh)
+        log.info(f"Wrote docs/data/stats.json: {stats}")
+        with open("docs/data/films_cache.json", "w", encoding="utf-8") as fh:
+            json.dump(films, fh, ensure_ascii=False, default=str)
+        log.info(f"Wrote docs/data/films_cache.json ({len(films)} films)")
 
     # 8. Archive or clean up stale film detail dirs
     current_slugs = {film["slug"] for film in films.values() if film.get("slug")}
@@ -3783,8 +3734,9 @@ def run() -> None:
         fh.write(sitemap_xml)
     log.info(f"Wrote docs/sitemap.xml ({len(sitemap_urls)} URLs)")
 
-    # 10a. Notify Bing IndexNow
-    submit_indexnow(films, _cities)
+    # 10a. Notify Bing IndexNow (once a day, with the real run)
+    if not rebuild:
+        submit_indexnow(films, _cities)
 
     # 10b. Ensure robots.txt points to the sitemap
     robots_path = "docs/robots.txt"
@@ -3821,6 +3773,99 @@ def run() -> None:
                 log.info(f"Supabase credentials injected into {page_path}")
     else:
         log.warning("SUPABASE_URL or SUPABASE_ANON not set — skipping credential injection")
+
+    return generated
+
+
+def rebuild() -> None:
+    """Rebuild every page from docs/data/films_cache.json without scraping.
+
+    For display-only changes (layout, labels, attributes). Uses the last real
+    run's data, so times are as fresh as that run. It never scrapes, calls
+    TMDB/YouTube/Bing, sends any email, or touches carry-forward,
+    cinema_last_ok.json, stats.json, films_cache.json or the VOSE baseline.
+    """
+    if not (SUPABASE_URL and SUPABASE_ANON):
+        # Pages would go out with placeholder credentials and break sign-in
+        log.error("--rebuild: SUPABASE_URL / SUPABASE_ANON not set — load .env first. Nothing written.")
+        raise SystemExit(1)
+    cache_path = "docs/data/films_cache.json"
+    try:
+        with open(cache_path, encoding="utf-8") as fh:
+            films = json.load(fh)
+    except Exception as exc:
+        log.error(f"--rebuild: could not load {cache_path}: {exc}. Nothing written.")
+        raise SystemExit(1)
+    if len(films) < 10:
+        log.error(f"--rebuild: only {len(films)} films in {cache_path}. Nothing written.")
+        raise SystemExit(1)
+    prev_by_slug = {f["slug"]: f for f in films.values() if f.get("slug")}
+    anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+    log.info(f"Rebuild (no scraping) for {anchor.date()} from {cache_path}: {len(films)} films …")
+    generated = write_site(films, anchor, prev_by_slug, rebuild=True)
+    log.info(f"Rebuild complete. {len(films)} films, {generated} detail pages. No scraping, no emails sent.")
+
+
+def run() -> None:
+    anchor = datetime.now(VALENCIA_TZ).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+    log.info(f"Pipeline starting for {anchor.date()} …")
+
+    # 1. Scrape all cinemas (watching for unknown VOSE language labels)
+    from vose_check import install_label_watch, run_vose_check
+    install_label_watch()
+    log.info("Running scrapers …")
+    films, scraper_status = aggregate_scrapers()
+    log.info(f"Unique films before enrichment: {len(films)}")
+    id_problems = check_cinema_ids(films)
+
+    if len(films) < 10:
+        log.error(f"Only {len(films)} films found — possible scraper failure. Aborting to preserve cached listings.")
+        return
+
+    # Load previous cache now so trailer URLs can be carried forward in step 3b
+    _prev_cache_path_early = "docs/data/films_cache.json"
+    _prev_films_by_slug_early: dict = {}
+    _prev_cache_raw: dict = {}
+    if os.path.exists(_prev_cache_path_early):
+        try:
+            with open(_prev_cache_path_early, encoding="utf-8") as _fh:
+                _prev_cache_raw = json.load(_fh)
+            for _pf in _prev_cache_raw.values():
+                if _pf.get("slug"):
+                    _prev_films_by_slug_early[_pf["slug"]] = _pf
+        except Exception:
+            pass
+    # Date of the previous run (stats.json is rewritten later in the run)
+    _prev_updated = None
+    try:
+        with open("docs/data/stats.json", encoding="utf-8") as _fh:
+            _prev_updated = json.load(_fh).get("updated")
+    except Exception:
+        pass
+
+    # 2. TMDB enrichment
+    enrich_with_tmdb(films)
+
+    # 3. Deduplicate: same-title variants first, then by TMDB ID
+    unify_title_variants(films)
+    deduplicate_by_tmdb_id(films)
+    log.info(f"Films after deduplication: {len(films)}")
+
+    # 3c. Carry forward listings for cinemas whose scraper failed today.
+    #     Any error here must not stop the run — fall back to today's behaviour.
+    carried: dict = {}
+    try:
+        carried = carry_forward_failed_cinemas(
+            films, _prev_cache_raw, datetime.now(VALENCIA_TZ).date(), _prev_updated)
+        if carried:
+            log.info(f"Films after carry-forward: {len(films)}")
+    except Exception as exc:
+        log.error(f"Carry-forward failed — continuing without it: {exc}", exc_info=True)
+
+    apply_spanish_display_titles(films)
+    demote_spanish_original_vose(films)
+
+    generated = write_site(films, anchor, _prev_films_by_slug_early)
 
     log.info(f"Pipeline complete. {len(films)} films, {generated} detail pages.")
 
@@ -4215,8 +4260,14 @@ if __name__ == "__main__":
     _parser = _ap.ArgumentParser()
     _parser.add_argument("--email-only", action="store_true",
                          help="Skip scraping; load films_cache.json and send weekly email")
+    _parser.add_argument("--rebuild", action="store_true",
+                         help="Skip scraping; rebuild all pages from films_cache.json. No emails.")
     _args = _parser.parse_args()
-    if _args.email_only:
+    if _args.rebuild and _args.email_only:
+        _parser.error("--rebuild and --email-only can't be combined")
+    if _args.rebuild:
+        rebuild()
+    elif _args.email_only:
         import json as _json
         _cache = "docs/data/films_cache.json"
         try:
