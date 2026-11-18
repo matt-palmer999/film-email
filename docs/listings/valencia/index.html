@@ -18,6 +18,9 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="Cartelera de cine en Valencia — 18 – 24 de noviembre 2026" data-en="Valencia Cinema Listings — 18 – 24 November 2026">Cartelera de cine en Valencia — 18 – 24 de noviembre 2026</title>
 <link rel="canonical" href="https://whatson.movie/listings/valencia/">
+<link rel="alternate" hreflang="es" href="https://whatson.movie/listings/valencia/">
+<link rel="alternate" hreflang="en" href="https://whatson.movie/en/listings/valencia/">
+<link rel="alternate" hreflang="x-default" href="https://whatson.movie/listings/valencia/">
 <meta name="description" content="110 películas en 12 cines de Valencia esta semana. Sesiones VOSE destacadas. Actualizado a diario.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cartelera Valencia · 110 películas · VOSE">
@@ -1624,6 +1627,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 window.SUPABASE_URL  = "https://xhvbvggbrmlloefsgofy.supabase.co";
 window.SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodmJ2Z2dicm1sbG9lZnNnb2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzcwODQsImV4cCI6MjA5MDExMzA4NH0.gtB-KBC9_A2V4EGUUh9ZWwWSyqVH-P2MsN1oGMmUQyc";
 window.DATA_ANCHOR   = "2026-11-18";
+window.PAGE_LANG     = "";
 
 function setLang(lang) {
   document.getElementById('btn-es').classList.toggle('active', lang === 'es');
@@ -1685,7 +1689,8 @@ function syncSubscriberCity(email) {
 }
 
 async function loadUserPreferences() {
-  const savedLang = localStorage.getItem('cv_lang') || localStorage.getItem('lang');
+  // The English page (/en/listings/…) always opens in English
+  const savedLang = window.PAGE_LANG || localStorage.getItem('cv_lang') || localStorage.getItem('lang');
   if (savedLang) setLang(savedLang);
 
   const params = new URLSearchParams(window.location.search);
