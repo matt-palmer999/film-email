@@ -1997,7 +1997,8 @@ function syncSubscriberCity(email) {
 }
 
 async function loadUserPreferences() {
-  const savedLang = localStorage.getItem('cv_lang') || localStorage.getItem('lang');
+  // The English page (/en/listings/…) always opens in English
+  const savedLang = window.PAGE_LANG || localStorage.getItem('cv_lang') || localStorage.getItem('lang');
   if (savedLang) setLang(savedLang);
 
   const params = new URLSearchParams(window.location.search);
@@ -3474,7 +3475,59 @@ function setLang(lang) {{
 </html>"""
 
 
-def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) -> str:
+_VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
+              "source", "track", "wbr"}
+
+
+def render_language(page: str, lang: str) -> str:
+    """The page as setLang(lang) leaves it in the browser: every element with
+    data-es and data-en gets that language as its content. Used for the
+    English city pages, so crawlers that don't run JavaScript read English."""
+    from html.parser import HTMLParser
+    attr = f"data-{lang}"
+    line_starts = [0] + [m.end() for m in re.finditer("\n", page)]
+    edits: list = []
+
+    class _Walker(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=False)
+            self.stack: list = []
+
+        def _offset(self):
+            line, col = self.getpos()
+            return line_starts[line - 1] + col
+
+        def handle_starttag(self, tag, attrs):
+            if tag in _VOID_TAGS:
+                return
+            a = dict(attrs)
+            value = a.get(attr) if ("data-es" in a and "data-en" in a) else None
+            self.stack.append((tag, self._offset() + len(self.get_starttag_text()), value))
+
+        def handle_endtag(self, tag):
+            for i in range(len(self.stack) - 1, -1, -1):
+                if self.stack[i][0] == tag:
+                    _, inner_start, value = self.stack[i]
+                    del self.stack[i:]
+                    if value is not None:
+                        edits.append((inner_start, self._offset(), value))
+                    return
+
+    _Walker().feed(page)
+    out, pos = [], 0
+    for start, end, value in sorted(edits):
+        if start < pos:          # inside an element already replaced
+            continue
+        out.append(page[pos:start])
+        out.append(value)
+        pos = end
+    out.append(page[pos:])
+    return "".join(out)
+
+
+def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, lang: str = "es") -> str:
+    """A city listings page. lang="en" builds the English page at
+    /en/listings/{city}/ (same page, English written in, its own URL)."""
     if city:
         _city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
         films_by_title = {
@@ -3486,6 +3539,17 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     root_href     = "../../" if city else "../"
     slug_prefix   = "../" if city else "./"
     canonical_url = f"https://whatson.movie/listings/{city_slug_}/" if city else "https://whatson.movie/listings/"
+    english       = bool(city) and lang == "en"
+    es_url        = canonical_url
+    en_url        = f"https://whatson.movie/en/listings/{city_slug_}/" if city else ""
+    if english:
+        # One folder deeper (/en/listings/x/): film, home and settings links go to the shared pages
+        root_href     = "/"
+        slug_prefix   = "/listings/"
+        canonical_url = en_url
+    _hreflang = (f'<link rel="alternate" hreflang="es" href="{es_url}">\n'
+                 f'<link rel="alternate" hreflang="en" href="{en_url}">\n'
+                 f'<link rel="alternate" hreflang="x-default" href="{es_url}">\n') if city else ""
     _all_cinemas      = [k for k, v in CINEMA_META.items() if not city or v.get("city") == city]
     _other_cities = sorted({v["city"] for v in CINEMA_META.values() if v.get("city") and v.get("city") != city}) if city else []
     _other_cities_html = (
@@ -3505,6 +3569,13 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     _page_desc_es  = f"{film_count} pel\u00edculas en {cinema_count} cines de {city_name} esta semana. Sesiones VOSE destacadas. Actualizado a diario."
     _page_desc_en  = f"{film_count} films across {cinema_count} {city_name} cinemas this week. VOSE screenings highlighted. Updated daily."
     _page_og_title = f"Cartelera {city_name} \u00b7 {film_count} pel\u00edculas \u00b7 VOSE"
+    if english:
+        _page_title_en = f"{city_name} cinema listings: VOSE & original-language films \u2014 {date_en}"
+        _page_desc_en  = (f"{film_count} films at {cinema_count} {city_name} cinemas this week, with every "
+                          f"original-language (VOSE) session marked. Updated daily.")
+        _page_og_title = f"{city_name} cinema listings \u00b7 {film_count} films \u00b7 VOSE"
+    _meta_desc  = _page_desc_en if english else _page_desc_es
+    _page_title = _page_title_en if english else _page_title_es
     _summary_es, _summary_en = city_summary(films_by_title, city_name, anchor)
 
     import json as _json
@@ -3519,9 +3590,10 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
     _listing_ld = {
         "@context": "https://schema.org",
         "@graph": [
-            {"@type": "WebPage", "name": _page_title_es, "url": canonical_url,
-             "description": _page_desc_es, "inLanguage": ["es", "en"]},
-            {"@type": "ItemList", "name": f"Pel\u00edculas en cartelera en {city_name}",
+            {"@type": "WebPage", "name": _page_title, "url": canonical_url,
+             "description": _meta_desc, "inLanguage": "en" if english else ["es", "en"]},
+            {"@type": "ItemList",
+             "name": f"Films showing in {city_name}" if english else f"Pel\u00edculas en cartelera en {city_name}",
              "numberOfItems": film_count, "itemListElement": _ld_items},
         ],
     }
@@ -3622,7 +3694,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
             dor_cards += f'\n  <div class="grid-row">{inner}\n  </div>'
 
     _html = f"""<!DOCTYPE html>
-<html lang="es" id="html-root">
+<html lang="{'en' if english else 'es'}" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3641,14 +3713,14 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title data-es="{_page_title_es}" data-en="{_page_title_en}">{_page_title_es}</title>
 <link rel="canonical" href="{canonical_url}">
-<meta name="description" content="{_page_desc_es}">
+{_hreflang}<meta name="description" content="{_meta_desc}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{_page_og_title}">
-<meta property="og:description" content="{_page_desc_es}">
+<meta property="og:description" content="{_meta_desc}">
 <meta property="og:url" content="{canonical_url}">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
-<meta property="og:image:alt" content="Cartelera de cine en {city_name}">
-<meta property="og:locale" content="es_ES">
+<meta property="og:image:alt" content="{('Cinema listings in ' if english else 'Cartelera de cine en ') + city_name}">
+<meta property="og:locale" content="{'en_GB' if english else 'es_ES'}">
 <meta property="og:site_name" content="whatson.movie">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3739,6 +3811,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None) 
 window.SUPABASE_URL  = "__SUPABASE_URL__";
 window.SUPABASE_ANON = "__SUPABASE_ANON__";
 window.DATA_ANCHOR   = "{anchor.strftime('%Y-%m-%d')}";
+window.PAGE_LANG     = "{'en' if english else ''}";
 {JS}
 window.addEventListener('DOMContentLoaded', () => {{
   // Non-subscribers: remember the last city viewed. Subscribers keep their saved city.
@@ -3901,6 +3974,10 @@ if ('serviceWorker' in navigator) {{
 </script>
 </body>
 </html>"""
+    if english:
+        _html = render_language(_html, "en")
+        _html = _html.replace('<button class="lang-btn active" id="btn-es"', '<button class="lang-btn" id="btn-es"', 1)
+        _html = _html.replace('<button class="lang-btn" id="btn-en"', '<button class="lang-btn active" id="btn-en"', 1)
     return _html.replace('__ALL_CINEMAS__', _all_cinemas_json)
 
 
@@ -3950,6 +4027,11 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
         with open(f"{_city_dir}/index.html", "w", encoding="utf-8") as fh:
             fh.write(_city_html)
         log.info(f"Wrote {_city_dir}/index.html")
+        _en_dir = f"docs/en/listings/{city_slug(_city)}"
+        os.makedirs(_en_dir, exist_ok=True)
+        with open(f"{_en_dir}/index.html", "w", encoding="utf-8") as fh:
+            fh.write(build_html(films, anchor, city=_city, lang="en"))
+        log.info(f"Wrote {_en_dir}/index.html")
     _city_slugs = {city_slug(c) for c in _cities}
     _chooser_html = build_city_chooser_html(_cities, films, anchor)
     with open("docs/listings/index.html", "w", encoding="utf-8") as fh:
@@ -4066,6 +4148,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
         _surl("https://whatson.movie/"),
         _surl("https://whatson.movie/listings/"),
         *[_surl(f"https://whatson.movie/listings/{city_slug(c)}/") for c in _cities],
+        *[_surl(f"https://whatson.movie/en/listings/{city_slug(c)}/") for c in _cities],
     ]
     for title, film in films.items():
         slug = film.get("slug")
@@ -4108,6 +4191,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
             "docs/preferences/index.html",
             "docs/listings/index.html",
             *[f"docs/listings/{city_slug(c)}/index.html" for c in _cities],
+            *[f"docs/en/listings/{city_slug(c)}/index.html" for c in _cities],
             "docs/verify/index.html",
             "docs/unsubscribe/index.html",
         ]
@@ -4244,6 +4328,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
         "https://whatson.movie/",
         "https://whatson.movie/listings/",
         *[f"https://whatson.movie/listings/{city_slug(c)}/" for c in cities],
+        *[f"https://whatson.movie/en/listings/{city_slug(c)}/" for c in cities],
     ]
     for film in films.values():
         slug = film.get("slug")
