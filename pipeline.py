@@ -1653,8 +1653,9 @@ def build_landing_faq(films: dict, anchor: datetime) -> str:
     qa: list = []   # (q_es, q_en, a_es, a_en) — answers may contain links
 
     def link(city, es, en):
-        href = f"./listings/{city_slug(city)}/"
-        return (f'<a href="{href}">{es}</a>', f'<a href="{href}">{en}</a>')
+        # The English answer links to the English city page (/en/listings/…)
+        return (f'<a href="./listings/{city_slug(city)}/">{es}</a>',
+                f'<a href="./en/listings/{city_slug(city)}/">{en}</a>')
 
     for city in cities:
         st = stats[city]

@@ -125,8 +125,10 @@ class LandingFaq(unittest.TestCase):
         self.assertIn("Esta semana hay 1 película en VOSE", faq)
         self.assertIn("This week there is 1 film in VOSE", faq)
         self.assertIn("no hay sesiones en VOSE en Barcelona", faq)
-        self.assertIn('href="./listings/valencia/"', faq)
-        self.assertIn("«Naza»", faq)                         # English subtitles, by name
+        self.assertIn('href="./listings/valencia/"', faq)            # Spanish answer: Spanish page
+        self.assertRegex(faq, r'data-en="[^"]*\./en/listings/valencia/')  # English answer: English page
+        self.assertNotRegex(faq, r'data-es="[^"]*/en/listings/')
+        self.assertIn("«Naza»", faq)                        # English subtitles, by name
         # VOSE includes non-English originals, so never promise "films in English"
         self.assertIn("Where can I watch original-language (VOSE) films in Valencia?", faq)
         self.assertNotIn("films in English", faq)
