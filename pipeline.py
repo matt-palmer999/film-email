@@ -2398,6 +2398,23 @@ def _build_jsonld(film: dict, slug: str, shown_dates: set | None = None) -> str:
 
 
 ARCHIVE_MAX_DAYS = 180  # keep archive pages for 6 months
+# From 90 days an archive page leaves the sitemap and asks search engines to
+# drop it (noindex), so it fades out quietly instead of showing up as a 404
+# when it's deleted at 180 days. GoatCounter, 2026-11-18: archive pages get
+# real visits in their first month and almost none after.
+ARCHIVE_NOINDEX_DAYS = 90
+NOINDEX_TAG = '<meta name="robots" content="noindex">'
+
+
+def add_noindex(page: str) -> str:
+    """The page with a robots noindex tag after <meta charset> (unchanged if it has one)."""
+    if 'name="robots"' in page:
+        return page
+    new = re.sub(r'(<meta charset="[^"]*">)', lambda m: m.group(1) + "\n" + NOINDEX_TAG,
+                 page, count=1, flags=re.IGNORECASE)
+    if new == page:
+        new = page.replace("<head>", "<head>\n" + NOINDEX_TAG, 1)
+    return new
 
 
 def _film_from_page_html(film_dir: str, slug: str) -> dict | None:
@@ -3992,7 +4009,16 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
             if age_days >= ARCHIVE_MAX_DAYS:
                 shutil.rmtree(entry.path)
                 log.info(f"  Deleted expired archive: {entry.name} ({age_days}d old)")
-            elif not _is_redirect:
+            elif _is_redirect:
+                pass
+            elif age_days >= ARCHIVE_NOINDEX_DAYS:
+                # Out of the sitemap, and search engines asked to drop it
+                _noindexed = add_noindex(_page_src)
+                if _noindexed != _page_src:
+                    with open(_page_path, "w", encoding="utf-8") as fh:
+                        fh.write(_noindexed)
+                    log.info(f"  Archive {entry.name} is {age_days}d old: noindex, out of the sitemap")
+            else:
                 archived_slugs.append((entry.name, archived_date.isoformat()))
                 log.debug(f"  Keeping archive: {entry.name} ({age_days}d old)")
         else:

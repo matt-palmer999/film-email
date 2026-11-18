@@ -133,6 +133,31 @@ class Rebuild(unittest.TestCase):
         self.assertFalse(os.path.exists("docs/listings/valencia"))
 
 
+    def _archive(self, slug, age_days):
+        os.makedirs(f"docs/listings/{slug}")
+        page = pipeline.build_film_archive_page({"title": slug, "slug": slug}, datetime.now(pipeline.VALENCIA_TZ))
+        with open(f"docs/listings/{slug}/index.html", "w", encoding="utf-8") as fh:
+            fh.write(page)
+        with open(f"docs/listings/{slug}/archived_on.txt", "w", encoding="utf-8") as fh:
+            fh.write((TODAY - timedelta(days=age_days)).isoformat())
+
+    def test_old_archive_pages_fade_out_before_deletion(self):
+        self._archive("recent", 30)
+        self._archive("old", pipeline.ARCHIVE_NOINDEX_DAYS + 10)
+        self._archive("expired", pipeline.ARCHIVE_MAX_DAYS + 1)
+        pipeline.rebuild()
+        sitemap = _read("docs/sitemap.xml")
+        self.assertIn("/listings/recent/", sitemap)
+        self.assertNotIn("noindex", _read("docs/listings/recent/index.html"))
+        old = _read("docs/listings/old/index.html")
+        self.assertNotIn("/listings/old/", sitemap)                 # out of the sitemap…
+        self.assertEqual(old.count(pipeline.NOINDEX_TAG), 1)        # …and noindex, once
+        self.assertIn("archive-notice-label", old)                  # still a working page
+        self.assertFalse(os.path.exists("docs/listings/expired"))   # deleted at 180 days
+        pipeline.rebuild()                                          # a second run doesn't add it twice
+        self.assertEqual(_read("docs/listings/old/index.html").count(pipeline.NOINDEX_TAG), 1)
+
+
 class SharedPageCode(unittest.TestCase):
     def test_run_and_rebuild_use_the_same_page_writer(self):
         import inspect
