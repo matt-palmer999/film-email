@@ -1,4 +1,14 @@
 {
   "_help": "VOSE-check flags confirmed correct against the cinema's own site. Key: \"<cinema name>|<film title>\" (name as shown in the admin email). Value: why it's fine and when it was checked. Remove an entry if in doubt.",
-  "Mooby Arenas|Clayface": "Mooby lists only a 'Clayface (VOSE)' version, English audio, at all its cinemas; no dubbed version (checked 2026-11-16)"
+  "Mooby Arenas|Clayface": "Mooby lists only a 'Clayface (VOSE)' version, English audio, at all its cinemas; no dubbed version (checked 2026-11-16)",
+  "Yelmo Campanar|Clayface": "Yelmo labels every session 'SUB ESP' (checked 2026-11-18)",
+  "Yelmo Campanar|Hope": "Yelmo labels every session 'SUB ESP' (Korean audio) (checked 2026-11-18)",
+  "Yelmo Vialia Málaga|Teenage Sex and Death at Camp Miasma": "Yelmo labels every session 'SUB ESP' (checked 2026-11-18)",
+  "Cines ABC Park|The Harvester": "ABC labels every Sacamantecas session 'VOSE'; original is Basque (checked 2026-11-18)",
+  "Cines ABC Park|The Roses": "ABC labels every Rose session 'VOSE' (checked 2026-11-18)",
+  "Cines Lys|Wicker": "Lys labels every session '(VOSE)' (checked 2026-11-18)",
+  "Cines Lys|Iron Boy": "Lys labels every session '(VOSE)' (French audio) (checked 2026-11-18)",
+  "Mooby Glòries|The Invite": "Mooby lists only 'La invitación (VOSE)', English audio, at Glòries (checked 2026-11-18)",
+  "Mooby Arenas|Resident Evil": "Mooby lists only 'Resident Evil (VOSE)', English audio (checked 2026-11-18)",
+  "Mooby Arenas|Ramayana: Rise of a Legend": "Mooby lists only the VOSE version, Hindi audio (checked 2026-11-18)"
 }

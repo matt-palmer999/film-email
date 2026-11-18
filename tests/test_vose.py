@@ -45,10 +45,13 @@ class LabelRules(unittest.TestCase):
             for label in ("SUB ESP", "INGLÉS", "COR", "JAPONÉS"):
                 self.assertTrue(mod._is_vose(label), f"{mod.__name__}: {label} is original version")
             # Dubbed, and labels we've never seen, must never become VOSE
-            for label in ("ESPAÑOL", "ESP", "CATALÁN", "CAT", "VALENCIÀ", "SOMETHING NEW", ""):
+            for label in ("ESPAÑOL", "ESP", "CATALÁN", "CAT", "NO SUB", "VALENCIÀ", "SOMETHING NEW", ""):
                 self.assertFalse(mod._is_vose(label), f"{mod.__name__}: {label} must not be VOSE")
             self.assertEqual(mod._audio_lang("JAPONÉS"), "JA")
             self.assertEqual(mod._audio_lang("ESPAÑOL"), "ES")
+            mod._warned.clear()
+            with self.assertNoLogs(mod.log, level="WARNING"):
+                self.assertFalse(mod._is_vose("NO SUB"))   # known dubbed label: no warning
 
     def test_verdi_uses_version_not_language(self):
         v = verdi_barcelona._is_vose

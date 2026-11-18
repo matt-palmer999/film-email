@@ -109,7 +109,8 @@ _VOSE_AUDIO = {
     "FRANCÉS": "FR", "FRANCES": "FR",
     "ITALIANO": "IT", "ALEMÁN": "DE", "ALEMAN": "DE",
 }
-_DUBBED = {"ESP", "ESPAÑOL", "ESPANOL", "CASTELLANO", "CAT", "CATALÁN", "CATALAN", "CATALÀ"}
+_DUBBED = {"ESP", "ESPAÑOL", "ESPANOL", "CASTELLANO", "CAT", "CATALÁN", "CATALAN", "CATALÀ",
+           "NO SUB"}   # Spanish version without subtitles (La oveja Shaun, Vialia, 2026-11-18)
 _warned: set = set()
 
 
