@@ -115,6 +115,48 @@ class EnglishCityPage(unittest.TestCase):
         self.assertIn(attr, self.en)
 
 
+class EnglishCityChooser(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cities = ["Valencia", "Barcelona"]
+        cls.es = pipeline.build_city_chooser_html(cities, _films(), ANCHOR)
+        cls.en = pipeline.build_city_chooser_html(cities, _films(), ANCHOR, lang="en")
+
+    def test_english_chooser_is_english_at_its_own_url(self):
+        en = self.en
+        self.assertIn('<html lang="en" id="html-root">', en)
+        self.assertIn('<link rel="canonical" href="https://whatson.movie/en/listings/">', en)
+        self.assertIn("<title>Cinema listings in Barcelona and Valencia: VOSE & original-language films", en)
+        self.assertIn("Choose your <span>city</span>", en)
+        self.assertIn(">CINEMA LISTINGS</div>", en)
+        self.assertIn(">1 films this week</div>", en)
+        self.assertIn('class="lang-btn active" id="btn-en"', en)
+
+    def test_city_cards_open_the_english_city_pages(self):
+        # relative ./valencia/ from /en/listings/ is /en/listings/valencia/
+        self.assertIn('<a href="./valencia/" class="city-card"', self.en)
+        self.assertIn('href="/privacy/"', self.en)
+        self.assertNotIn('href="../privacy/"', self.en)
+
+    def test_both_choosers_point_at_each_other(self):
+        for page in (self.es, self.en):
+            self.assertIn('<link rel="alternate" hreflang="es" href="https://whatson.movie/listings/">', page)
+            self.assertIn('<link rel="alternate" hreflang="en" href="https://whatson.movie/en/listings/">', page)
+
+    def test_spanish_chooser_unchanged_for_visitors(self):
+        self.assertIn('<html lang="es" id="html-root">', self.es)
+        self.assertIn("<title>Elige tu ciudad · whatson.movie</title>", self.es)
+        self.assertIn("Elige tu <span>ciudad</span>", self.es)
+        self.assertIn('href="../privacy/"', self.es)
+        self.assertIn("if (saved === 'en' && !false) setLang('en');", self.es)
+
+    def test_landing_footer_link_follows_the_language(self):
+        with open(os.path.join(ROOT, "docs", "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        self.assertIn('data-href-es="./listings/" data-href-en="./en/listings/"', page)
+        self.assertIn("querySelectorAll('[data-href-es][data-href-en]')", page)
+
+
 class WrittenBySite(unittest.TestCase):
     def test_rebuild_writes_english_pages_into_the_sitemap(self):
         with tempfile.TemporaryDirectory() as d:
@@ -137,6 +179,7 @@ class WrittenBySite(unittest.TestCase):
         self.assertNotIn("__SUPABASE_URL__", en)                  # sign-in works on the English page
         self.assertIn("<loc>https://whatson.movie/en/listings/valencia/</loc>", sitemap)
         self.assertIn("<loc>https://whatson.movie/listings/valencia/</loc>", sitemap)
+        self.assertIn("<loc>https://whatson.movie/en/listings/</loc>", sitemap)
 
 
 if __name__ == "__main__":

@@ -3308,8 +3308,10 @@ window.SUPABASE_ANON = '__SUPABASE_ANON__';
 </html>"""
 
 
-def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) -> str:
-    """Generate the /listings/ city-chooser landing page."""
+def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime, lang: str = "es") -> str:
+    """Generate the /listings/ city-chooser landing page. lang="en" builds the
+    English one at /en/listings/, whose city cards open the English city pages."""
+    english = lang == "en"
     date_str = anchor.strftime("%Y-%m-%d")
     city_film_counts = {}
     for city in cities:
@@ -3347,6 +3349,20 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
     }
     _sorted_cities = sorted(cities)
     _cities_es = (", ".join(_sorted_cities[:-1]) + " y " + _sorted_cities[-1]) if len(_sorted_cities) > 1 else "".join(_sorted_cities)
+    _cities_en = (", ".join(_sorted_cities[:-1]) + " and " + _sorted_cities[-1]) if len(_sorted_cities) > 1 else "".join(_sorted_cities)
+    es_url, en_url = "https://whatson.movie/listings/", "https://whatson.movie/en/listings/"
+    home = "/" if english else "../"          # one folder deeper on the English page
+    if english:
+        _title = f"Cinema listings in {_cities_en}: VOSE & original-language films \u00b7 whatson.movie"
+        _desc  = (f"Cinema listings for {_cities_en}, with every original-language (VOSE) session marked. "
+                  "Pick your city to see this week's films.")
+        _og_title, _canonical, _locale = "whatson.movie \u2014 choose your city", en_url, "en_GB"
+        _h1 = "Choose your <span>city</span>"
+    else:
+        _title = "Elige tu ciudad \u00b7 whatson.movie"
+        _desc  = f"Cartelera de cine en {_cities_es}. Elige tu ciudad para ver las pel\u00edculas de esta semana."
+        _og_title, _canonical, _locale = "whatson.movie \u2014 elige tu ciudad", es_url, "es_ES"
+        _h1 = "Elige tu <span>ciudad</span>"
 
     cards_html = ""
     for city in sorted(cities):
@@ -3362,8 +3378,8 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
       <div class="city-arrow" style="color:{meta['color']};">→</div>
     </a>"""
 
-    return f"""<!DOCTYPE html>
-<html lang="es" id="html-root">
+    _page = f"""<!DOCTYPE html>
+<html lang="{'en' if english else 'es'}" id="html-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3371,12 +3387,16 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime) ->
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0a0810">
-<title>Elige tu ciudad · whatson.movie</title>
-<link rel="canonical" href="https://whatson.movie/listings/">
-<meta name="description" content="Cartelera de cine en {_cities_es}. Elige tu ciudad para ver las películas de esta semana.">
+<title>{_title}</title>
+<link rel="canonical" href="{_canonical}">
+<link rel="alternate" hreflang="es" href="{es_url}">
+<link rel="alternate" hreflang="en" href="{en_url}">
+<link rel="alternate" hreflang="x-default" href="{es_url}">
+<meta name="description" content="{_desc}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="whatson.movie — elige tu ciudad">
-<meta property="og:url" content="https://whatson.movie/listings/">
+<meta property="og:title" content="{_og_title}">
+<meta property="og:url" content="{_canonical}">
+<meta property="og:locale" content="{_locale}">
 <meta property="og:image" content="https://whatson.movie/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3412,19 +3432,19 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
 <body>
 <div class="wrapper">
   <div class="lang-bar">
-    <a href="../" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;">whatson<span style="color:#ffb432;">.movie</span></a>
+    <a href="{home}" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:700;color:#f0eae0;text-decoration:none;">whatson<span style="color:#ffb432;">.movie</span></a>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="lang-toggle">
         <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
       </div>
-      <a href="../" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
+      <a href="{home}" style="font-size:11px;font-weight:600;padding:5px 12px;background:#ffb432;color:#0a0810;border-radius:5px;text-decoration:none;" data-es="Suscribirse" data-en="Subscribe">Suscribirse</a>
     </div>
   </div>
 
   <div class="hero">
     <div class="hero-eyebrow" data-es="CARTELERA DE CINE" data-en="CINEMA LISTINGS">CARTELERA DE CINE</div>
-    <h1 class="hero-title">Elige tu <span>ciudad</span></h1>
+    <h1 class="hero-title">{_h1}</h1>
     <div class="hero-sub" data-es="Películas de esta semana, filtradas por tus cines favoritos" data-en="This week's films, filtered by your favourite cinemas">Películas de esta semana, filtradas por tus cines favoritos</div>
   </div>
 
@@ -3436,7 +3456,7 @@ body{{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae
     <p>
       <span data-es="Carteleras obtenidas directamente de los cines · Información de películas de" data-en="Showtimes sourced directly from cinemas · Film details from">Carteleras obtenidas directamente de los cines · Información de películas de</span>
       <a href="https://www.themoviedb.org">TMDB</a> ·
-      <span style="color:#9a8fb5;">© {anchor.year} · whatson.movie</span> · <a href="../privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
+      <span style="color:#9a8fb5;">© {anchor.year} · whatson.movie</span> · <a href="{home}privacy/" data-es="Privacidad" data-en="Privacy">Privacidad</a>
     </p>
   </div>
 </div>
@@ -3469,11 +3489,16 @@ function setLang(lang) {{
     return;
   }}
   const saved = localStorage.getItem('lang');
-  if (saved === 'en') setLang('en');
+  if (saved === 'en' && !{'true' if english else 'false'}) setLang('en');   // the English page is always English
 }})();
 </script>
 </body>
 </html>"""
+    if english:
+        _page = render_language(_page, "en")
+        _page = _page.replace('<button class="lang-btn active" id="btn-es"', '<button class="lang-btn" id="btn-es"', 1)
+        _page = _page.replace('<button class="lang-btn" id="btn-en"', '<button class="lang-btn active" id="btn-en"', 1)
+    return _page
 
 
 _VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
@@ -4038,6 +4063,10 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
     with open("docs/listings/index.html", "w", encoding="utf-8") as fh:
         fh.write(_chooser_html)
     log.info("Wrote docs/listings/index.html (city chooser)")
+    os.makedirs("docs/en/listings", exist_ok=True)
+    with open("docs/en/listings/index.html", "w", encoding="utf-8") as fh:
+        fh.write(build_city_chooser_html(_cities, films, anchor, lang="en"))
+    log.info("Wrote docs/en/listings/index.html (English city chooser)")
 
     # Load previous films cache before step 7 overwrites it (needed by step 8)
     _prev_cache_path = "docs/data/films_cache.json"
@@ -4148,6 +4177,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
     sitemap_urls = [
         _surl("https://whatson.movie/"),
         _surl("https://whatson.movie/listings/"),
+        _surl("https://whatson.movie/en/listings/"),
         *[_surl(f"https://whatson.movie/listings/{city_slug(c)}/") for c in _cities],
         *[_surl(f"https://whatson.movie/en/listings/{city_slug(c)}/") for c in _cities],
     ]
@@ -4191,6 +4221,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
             "docs/index.html",
             "docs/preferences/index.html",
             "docs/listings/index.html",
+            "docs/en/listings/index.html",
             *[f"docs/listings/{city_slug(c)}/index.html" for c in _cities],
             *[f"docs/en/listings/{city_slug(c)}/index.html" for c in _cities],
             "docs/verify/index.html",
@@ -4328,6 +4359,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
     urls = [
         "https://whatson.movie/",
         "https://whatson.movie/listings/",
+        "https://whatson.movie/en/listings/",
         *[f"https://whatson.movie/listings/{city_slug(c)}/" for c in cities],
         *[f"https://whatson.movie/en/listings/{city_slug(c)}/" for c in cities],
     ]
