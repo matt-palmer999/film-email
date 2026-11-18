@@ -10,7 +10,7 @@ whatson.movie is an independent listings site aimed at English speakers and film
 - [Barcelona cinema listings](https://whatson.movie/listings/barcelona/): All films showing in Barcelona this week, same format.
 - [Alicante cinema listings](https://whatson.movie/listings/alicante/): All films showing in Alicante and nearby (San Vicente, San Juan, Elche) this week, same format.
 - [Málaga cinema listings](https://whatson.movie/listings/malaga/): All films showing in Málaga and nearby (Rincón de la Victoria, Vélez-Málaga, Fuengirola, Marbella) this week, same format.
-- English versions of the city pages (same listings, English titles and synopses): [Valencia](https://whatson.movie/en/listings/valencia/), [Barcelona](https://whatson.movie/en/listings/barcelona/), [Alicante](https://whatson.movie/en/listings/alicante/), [Málaga](https://whatson.movie/en/listings/malaga/).
+- English versions (same listings, English titles and synopses): [all cities](https://whatson.movie/en/listings/), [Valencia](https://whatson.movie/en/listings/valencia/), [Barcelona](https://whatson.movie/en/listings/barcelona/), [Alicante](https://whatson.movie/en/listings/alicante/), [Málaga](https://whatson.movie/en/listings/malaga/).
 - [Film detail pages](https://whatson.movie/listings/): Each film has its own page at /listings/{slug}/ with full showtimes across all cinemas, film metadata (year, country, duration, genre), synopsis, and trailer link.
 
 ## Cinemas covered

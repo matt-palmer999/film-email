@@ -888,7 +888,7 @@
     <div class="footer-logo">whatson<span>.movie</span></div>
     <span class="footer-note" data-es="Valencia · España · 🎬" data-en="Valencia · Spain · 🎬">Valencia · España · 🎬</span>
     <div style="display:flex;gap:20px;">
-      <a href="./listings/" class="footer-link" data-es="Ver cartelera →" data-en="This week's listings →">Ver cartelera →</a>
+      <a href="./listings/" class="footer-link" data-href-es="./listings/" data-href-en="./en/listings/" data-es="Ver cartelera →" data-en="This week's listings →">Ver cartelera →</a>
       <a href="./privacy/" class="footer-link" data-es="Privacidad →" data-en="Privacy →">Privacidad →</a>
     </div>
   </footer>
@@ -907,6 +907,11 @@
         // data-html: our own generated FAQ answers, which contain links
         if (el.hasAttribute('data-html')) el.innerHTML = el.getAttribute('data-' + lang);
         else el.textContent = el.getAttribute('data-' + lang);
+      });
+
+      // Links with a page per language (the English city chooser is /en/listings/)
+      document.querySelectorAll('[data-href-es][data-href-en]').forEach(el => {
+        el.setAttribute('href', el.getAttribute('data-href-' + lang));
       });
 
       // Update input placeholders separately
