@@ -3313,13 +3313,8 @@ def build_city_chooser_html(cities: list[str], films: dict, anchor: datetime, la
     English one at /en/listings/, whose city cards open the English city pages."""
     english = lang == "en"
     date_str = anchor.strftime("%Y-%m-%d")
-    city_film_counts = {}
-    for city in cities:
-        city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
-        city_film_counts[city] = sum(
-            1 for f in films.values()
-            if any(c["id"] in city_ids for c in f.get("cinemas", []))
-        )
+    # Same count as the city page and the landing FAQ: films with sessions this week
+    city_film_counts = {city: city_stats(films, city)["films"] for city in cities}
 
     CITY_META = {
         "Valencia": {

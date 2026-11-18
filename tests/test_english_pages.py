@@ -150,6 +150,15 @@ class EnglishCityChooser(unittest.TestCase):
         self.assertIn('href="../privacy/"', self.es)
         self.assertIn("if (saved === 'en' && !false) setLang('en');", self.es)
 
+    def test_counts_match_the_city_pages(self):
+        # A film whose sessions are all in the past isn't on the city page, so isn't counted here
+        films = _films()
+        films["Gone"] = dict(films["El cielo"], title="Gone", slug="gone", cinemas=[
+            dict(films["El cielo"]["cinemas"][0], showtimes={"2020-01-01": {"18:00": "u"}}, vose_showtimes={})])
+        page = pipeline.build_city_chooser_html(["Valencia"], films, ANCHOR)
+        self.assertIn(">1 películas esta semana</div>", page)
+        self.assertEqual(pipeline.city_stats(films, "Valencia")["films"], 1)
+
     def test_landing_footer_link_follows_the_language(self):
         with open(os.path.join(ROOT, "docs", "index.html"), encoding="utf-8") as fh:
             page = fh.read()
