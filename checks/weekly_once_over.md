@@ -58,7 +58,6 @@ Check each of these briefly, and report only what looks wrong or unusual:
    ```
    python -c "import json,pipeline,vose_check; f=json.load(open('docs/data/films_cache.json',encoding='utf-8')); print(vose_check.vose_audit(f, pipeline.CINEMA_META, None, reviewed=vose_check.load_reviewed())[1])"
    ```
-   (`pipeline` needs `SMTP_HOST` set to import; any value will do.)
 3. **Labels the rules don't cover:** any new raw language or version strings in
    the scrapers' data.
 4. **TMDB matches:** films whose poster, year or original language look wrong
@@ -96,7 +95,7 @@ Keep it short and in plain English. Then email it:
 python send_report.py reports/once_over_YYYY-MM-DD.md "whatson.movie weekly once-over"
 ```
 
-If the email fails (for example Outlook is still blocking AuthSMTP), say so
+If the email fails (for example a Microsoft 365 sign-in error), say so
 at the end of the session. The report file is still there.
 
 ## Adding to this checklist

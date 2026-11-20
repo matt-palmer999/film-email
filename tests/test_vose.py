@@ -19,9 +19,8 @@ from datetime import datetime, timedelta
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 os.chdir(ROOT)
-for _k in ("SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "FROM_EMAIL", "SUPABASE_URL", "SUPABASE_KEY"):
+for _k in ("FROM_EMAIL", "SUPABASE_URL", "SUPABASE_KEY"):
     os.environ.setdefault(_k, "test")
-os.environ.setdefault("SMTP_PORT", "587")
 logging.disable(logging.CRITICAL)
 
 import pipeline  # noqa: E402

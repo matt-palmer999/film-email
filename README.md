@@ -11,7 +11,7 @@ a bilingual (ES/EN) HTML email to your recipient list.
    VOSE availability, ratings and poster images, then builds the HTML email.
 2. **GitHub Actions** runs the script every Thursday at 19:00 Valencia time on
    GitHub's free infrastructure — no server needed.
-3. The email is sent via your own SMTP server using your custom domain.
+3. The email is sent through Microsoft 365 (Graph API) from the whatson.movie mailbox (`mailer.py`).
 
 ---
 
@@ -42,10 +42,9 @@ Add each of the following:
 
 | Secret name    | Example value                        | Notes                                      |
 |----------------|--------------------------------------|--------------------------------------------|
-| `SMTP_HOST`    | `mail.yourdomain.com`                | Your SMTP server hostname                  |
-| `SMTP_PORT`    | `587`                                | Usually 587 (STARTTLS) or 465 (SSL)        |
-| `SMTP_USER`    | `cartelera@yourdomain.com`           | SMTP login username                        |
-| `SMTP_PASSWORD`| `your-smtp-password`                 | SMTP password                              |
+| `MS_TENANT_ID` | (Entra tenant id)                    | Microsoft 365 tenant                       |
+| `MS_CLIENT_ID` | (app id)                             | Entra app "whatson.movie mailer"           |
+| `MS_CLIENT_SECRET` | (app secret)                     | That app's client secret (Mail.Send)       |
 | `FROM_ADDRESS` | `cartelera@yourdomain.com`           | The From: address recipients will see      |
 | `FROM_NAME`    | `Cartelera Valencia`                 | The From: display name                     |
 | `RECIPIENTS`   | `alice@example.com,bob@example.com`  | Comma-separated list of recipient emails   |
@@ -94,10 +93,9 @@ No code changes needed.
 ```bash
 pip install -r requirements.txt
 
-export SMTP_HOST=mail.yourdomain.com
-export SMTP_PORT=587
-export SMTP_USER=cartelera@yourdomain.com
-export SMTP_PASSWORD=yourpassword
+export MS_TENANT_ID=...
+export MS_CLIENT_ID=...
+export MS_CLIENT_SECRET=...
 export FROM_ADDRESS=cartelera@yourdomain.com
 export FROM_NAME="Cartelera Valencia"
 export RECIPIENTS=you@example.com
@@ -118,10 +116,8 @@ and compare with the CSS selectors in `scraper.py` — the `fetch_cinema()` func
 is where to look.
 
 **Email not arriving?**
-- Check GitHub Actions logs for SMTP errors
-- Verify your SMTP credentials work with a simple test (e.g. via Thunderbird)
-- Some hosts require you to allowlist the sending IP — GitHub Actions uses
-  Azure IPs; check your host's documentation
+- Check GitHub Actions logs for "Microsoft sign-in failed" or "Microsoft 365 send failed"
+- An expired client secret in Entra is the usual cause; make a new one and update `MS_CLIENT_SECRET`
 
 **Wrong week dates?**
 The script anchors on the next Friday from the day it runs. If run on a Thursday

@@ -1,4 +1,4 @@
-"""mailer.py routing: Microsoft 365 when configured, SMTP otherwise. Offline."""
+"""mailer.py: Microsoft 365 is the only route. Offline."""
 import os
 import sys
 import unittest
@@ -64,20 +64,20 @@ class Routing(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "ErrorAccessDenied"):
                 mailer.send_email("a@example.com", "Hi", "plain")
 
-    def test_smtp_fallback(self):
+    def test_no_fallback_without_microsoft_365(self):
+        # SMTP settings alone no longer send anything (AuthSMTP removed 2026-11-20)
         env = {"SMTP_HOST": "smtp.example.com", "SMTP_USER": "u", "SMTP_PASSWORD": "p",
                "FROM_ADDRESS": "hello@whatson.movie"}
-        with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(mailer.smtplib, "SMTP") as smtp:
-            mailer.send_email(["a@example.com"], "Hi", "plain")
-        server = smtp.return_value.__enter__.return_value
-        server.login.assert_called_once_with("u", "p")
-        self.assertEqual(server.sendmail.call_args[0][1], ["a@example.com"])
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertFalse(mailer.is_configured())
+            with self.assertRaisesRegex(RuntimeError, "not configured"):
+                mailer.send_email(["a@example.com"], "Hi", "plain")
 
     def test_no_smtplib_left_in_the_senders(self):
         # Every email must go through mailer.py, so a route change happens in one place
-        for f in ("pipeline.py", "scraper.py", "send_report.py", "send_test_email.py"):
+        for f in ("mailer.py", "pipeline.py", "scraper.py", "send_report.py", "send_test_email.py"):
             with open(os.path.join(ROOT, f), encoding="utf-8") as fh:
-                self.assertNotIn("smtplib.SMTP(", fh.read(), f)
+                self.assertNotIn("smtplib", fh.read(), f)
 
 
 if __name__ == "__main__":

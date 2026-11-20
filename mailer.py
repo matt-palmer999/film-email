@@ -1,24 +1,19 @@
 """One place to send email from, for every script.
 
-Uses Microsoft 365 (Graph API, app sign-in) when MS_TENANT_ID, MS_CLIENT_ID and
-MS_CLIENT_SECRET are set; otherwise falls back to plain SMTP (SMTP_HOST etc.).
+Sends through Microsoft 365 (Graph API, app sign-in). There is no other route:
+the old AuthSMTP fallback was removed on 2026-11-20.
 
 Settings (in .env, and as GitHub secrets for the Actions workflows):
     MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET   Entra app "whatson.movie mailer"
                                                    (Graph application permission Mail.Send)
     MS_SENDER      optional; the mailbox to send from (defaults to FROM_ADDRESS)
     FROM_ADDRESS   sender address; FROM_NAME display name
-    SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD  fallback route
 """
 from __future__ import annotations
 
 import logging
 import os
-import smtplib
 import time
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr
 
 import requests
 
@@ -36,17 +31,15 @@ def using_graph() -> bool:
 
 
 def sender_address() -> str:
-    return _env("MS_SENDER") or _env("FROM_ADDRESS") or _env("SMTP_USER")
+    return _env("MS_SENDER") or _env("FROM_ADDRESS")
 
 
 def is_configured() -> bool:
-    if using_graph():
-        return bool(sender_address())
-    return all(_env(k) for k in ("SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD"))
+    return using_graph() and bool(sender_address())
 
 
 def route_name() -> str:
-    return "Microsoft 365" if using_graph() else "SMTP"
+    return "Microsoft 365"
 
 
 def _graph_token() -> str:
@@ -109,29 +102,6 @@ def _send_graph(to: list[str], subject: str, text: str, html: str | None,
         raise RuntimeError(f"Microsoft 365 send failed ({r.status_code}) — {detail}")
 
 
-def _send_smtp(to: list[str], subject: str, text: str, html: str | None,
-               reply_to: str | None, headers: dict | None) -> None:
-    if html:
-        msg = MIMEMultipart("alternative")
-        msg.attach(MIMEText(text or "", "plain", "utf-8"))
-        msg.attach(MIMEText(html, "html", "utf-8"))
-    else:
-        msg = MIMEText(text, "plain", "utf-8")
-    from_addr = _env("FROM_ADDRESS") or _env("SMTP_USER")
-    msg["Subject"] = subject
-    msg["From"] = formataddr((_env("FROM_NAME", "whatson.movie"), from_addr))
-    msg["To"] = ", ".join(to)
-    if reply_to:
-        msg["Reply-To"] = reply_to
-    for k, v in (headers or {}).items():
-        msg[k] = v
-    with smtplib.SMTP(_env("SMTP_HOST"), int(_env("SMTP_PORT", "587"))) as server:
-        server.ehlo()
-        server.starttls()
-        server.login(_env("SMTP_USER"), _env("SMTP_PASSWORD"))
-        server.sendmail(from_addr, to, msg.as_string())
-
-
 def send_email(to: list[str] | str, subject: str, text: str = "", html: str | None = None,
                reply_to: str | None = None, headers: dict | None = None) -> None:
     """Send one message. Raises on failure (callers decide whether that's fatal)."""
@@ -141,8 +111,6 @@ def send_email(to: list[str] | str, subject: str, text: str = "", html: str | No
     if not to:
         raise ValueError("no recipients")
     if not is_configured():
-        raise RuntimeError("email not configured (no Microsoft 365 or SMTP settings)")
-    if using_graph():
-        _send_graph(to, subject, text, html, reply_to, headers)
-    else:
-        _send_smtp(to, subject, text, html, reply_to, headers)
+        raise RuntimeError("email not configured (needs MS_TENANT_ID, MS_CLIENT_ID, "
+                           "MS_CLIENT_SECRET and FROM_ADDRESS or MS_SENDER)")
+    _send_graph(to, subject, text, html, reply_to, headers)

@@ -9,7 +9,7 @@ Usage:
 Edit TEST_PREFS below to simulate different subscriber preferences.
 """
 
-import json, os, sys, smtplib
+import json, os, sys
 import urllib.request, urllib.parse
 from pathlib import Path
 from datetime import datetime
@@ -94,7 +94,7 @@ def main():
         f"Valencia Cinema Weekly – {week_range_en(anchor)}\n\nView this email in a browser that supports HTML."
     )
 
-    # Send (Microsoft 365 when MS_* is set, else SMTP)
+    # Send (Microsoft 365)
     import mailer
     mailer.send_email(TEST_RECIPIENT, subject, plain, html=html)
 

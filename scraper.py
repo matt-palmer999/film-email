@@ -7,7 +7,6 @@ Runs every Thursday evening via GitHub Actions.
 import json
 import os
 import re
-import smtplib
 import logging
 from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
@@ -25,12 +24,8 @@ log = logging.getLogger(__name__)
 # ─── Configuration ────────────────────────────────────────────────────────────
 # All sensitive values come from environment variables (GitHub Secrets).
 
-# Sending goes through mailer.py (Microsoft 365 when MS_* is set, else SMTP).
-SMTP_HOST     = os.environ.get("SMTP_HOST", "")
-SMTP_PORT     = int(os.environ.get("SMTP_PORT", "587") or 587)
-SMTP_USER     = os.environ.get("SMTP_USER", "")
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
-FROM_ADDRESS  = os.environ.get("FROM_ADDRESS", SMTP_USER)
+# Sending goes through mailer.py (Microsoft 365).
+FROM_ADDRESS  = os.environ.get("FROM_ADDRESS", "")
 FROM_NAME     = os.environ.get("FROM_NAME", "Cartelera Valencia")
 
 # Comma-separated list of recipient emails stored as a single secret

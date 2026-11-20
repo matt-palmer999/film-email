@@ -52,13 +52,9 @@ jobs:
           SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON:        ${{ secrets.SUPABASE_ANON }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          SMTP_HOST:            ${{ secrets.SMTP_HOST }}
-          SMTP_PORT:            ${{ secrets.SMTP_PORT }}
-          SMTP_USER:            ${{ secrets.SMTP_USER }}
-          SMTP_PASSWORD:        ${{ secrets.SMTP_PASSWORD }}
           FROM_ADDRESS:         ${{ secrets.FROM_ADDRESS }}
           FROM_NAME:            ${{ secrets.FROM_NAME }}
-          # Microsoft 365 (Graph) — used instead of SMTP when all three are set
+          # Microsoft 365 (Graph): the only email route
           MS_TENANT_ID:         ${{ secrets.MS_TENANT_ID }}
           MS_CLIENT_ID:         ${{ secrets.MS_CLIENT_ID }}
           MS_CLIENT_SECRET:     ${{ secrets.MS_CLIENT_SECRET }}
