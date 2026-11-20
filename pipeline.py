@@ -3546,9 +3546,58 @@ def render_language(page: str, lang: str) -> str:
     return "".join(out)
 
 
-def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, lang: str = "es") -> str:
+def english_vose_only(films: dict, city: str) -> dict:
+    """Films in English in one city, keeping only their VOSE sessions there.
+
+    "In English" means TMDB's original language is English: no guessing from
+    the country (a Canadian film may be in French), and Spanish films with
+    English subtitles don't count. Only sessions the cinema labels VOSE are
+    kept, so the page never lists a dubbed session as English."""
+    import copy
+    ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
+    out = {}
+    for title, film in films.items():
+        if film.get("original_language") != "en":
+            continue
+        f = copy.deepcopy(film)
+        kept = []
+        for c in f.get("cinemas", []):
+            if c.get("id") not in ids:
+                continue
+            c["showtimes"] = {}
+            c["ensub"] = {}
+            c["format_showtimes"] = {
+                fmt: {d: {t: v for t, v in times.items() if (v or {}).get("is_vose")}
+                      for d, times in days.items()}
+                for fmt, days in (c.get("format_showtimes") or {}).items()}
+            c["format_showtimes"] = {fmt: {d: t for d, t in days.items() if t}
+                                     for fmt, days in c["format_showtimes"].items()}
+            c["format_showtimes"] = {fmt: days for fmt, days in c["format_showtimes"].items() if days}
+            kept.append(c)
+        f["cinemas"] = kept
+        if cinemas_in_window(f):
+            f["cinemas"] = cinemas_in_window(f)
+            out[title] = f
+    return out
+
+
+def _sessions_in_window(films: dict) -> int:
+    """Number of sessions this week (as on the page) across these films."""
+    today = datetime.now(VALENCIA_TZ).date()
+    n = 0
+    for f in films.values():
+        cutoff = (today + timedelta(days=29 if _is_classic(f) else 6)).isoformat()
+        for c in cinemas_in_window(f):
+            n += sum(len(t) for d, t in cinema_times_by_date(c).items() if today.isoformat() <= d <= cutoff)
+    return n
+
+
+def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, lang: str = "es",
+               english_only: bool = False) -> str:
     """A city listings page. lang="en" builds the English page at
-    /en/listings/{city}/ (same page, English written in, its own URL)."""
+    /en/listings/{city}/ (same page, English written in, its own URL).
+    english_only=True (with lang="en") builds /en/listings/{city}/english/:
+    only films in English, only their VOSE sessions."""
     if city:
         _city_ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
         films_by_title = {
@@ -3556,6 +3605,11 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
             if any(c["id"] in _city_ids for c in cinemas_in_window(f))
         }
     city_name     = city or "Valencia"
+    english_only  = english_only and bool(city) and lang == "en"
+    _all_films_n  = len(films_by_title)
+    _english_n    = len(english_vose_only(films_by_title, city)) if city and lang == "en" else 0
+    if english_only:
+        films_by_title = english_vose_only(films_by_title, city)
     city_slug_    = city_slug(city) if city else ""
     root_href     = "../../" if city else "../"
     slug_prefix   = "../" if city else "./"
@@ -3571,11 +3625,15 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
     _hreflang = (f'<link rel="alternate" hreflang="es" href="{es_url}">\n'
                  f'<link rel="alternate" hreflang="en" href="{en_url}">\n'
                  f'<link rel="alternate" hreflang="x-default" href="{es_url}">\n') if city else ""
+    if english_only:
+        canonical_url = f"https://whatson.movie/en/listings/{city_slug_}/english/"
+        _hreflang = ""
     _all_cinemas      = [k for k, v in CINEMA_META.items() if not city or v.get("city") == city]
     _other_cities = sorted({v["city"] for v in CINEMA_META.values() if v.get("city") and v.get("city") != city}) if city else []
     _other_cities_html = (
         '<p class="footer-cities"><span data-es="Otras ciudades:" data-en="Other cities:">Otras ciudades:</span> '
-        + " · ".join(f'<a href="../{city_slug(c)}/">{c}</a>' for c in _other_cities)
+        + " · ".join(f'<a href="../{"../" if english_only else ""}{city_slug(c)}/{"english/" if english_only else ""}">{c}</a>'
+                     for c in _other_cities)
         + "</p>"
     ) if _other_cities else ""
     _all_cinemas_json = json.dumps(_all_cinemas)
@@ -3595,9 +3653,42 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
         _page_desc_en  = (f"{film_count} films at {cinema_count} {city_name} cinemas this week, with every "
                           f"original-language (VOSE) session marked. Updated daily.")
         _page_og_title = f"{city_name} cinema listings \u00b7 {film_count} films \u00b7 VOSE"
+    _h1_es, _h1_en   = f"Cartelera<br>{city_name}", f"Cinema<br>{city_name}"
+    _sub_es = f"La gu\u00eda completa del cine en {city_name} esta semana"
+    _sub_en = f"Your complete guide to cinema in {city_name} this week"
+    _header_more = ""
+    _more_style = 'style="margin-top:12px;font-size:13px;font-weight:500;color:#ffb432;text-decoration:none;display:inline-block;"'
+    if english and not english_only and _english_n:
+        _header_more = (f'<div class="header-more"><a href="english/" {_more_style} '
+                        f'data-es="Solo pel\u00edculas en ingl\u00e9s: {_english_n} esta semana \u2192" '
+                        f'data-en="Only films in English: {_english_n} this week \u2192">'
+                        f'Solo pel\u00edculas en ingl\u00e9s: {_english_n} esta semana \u2192</a></div>')
+    if english_only:
+        _n_sess = _sessions_in_window(films_by_title)
+        _page_title_es = f"Pel\u00edculas en ingl\u00e9s en {city_name}: sesiones VOSE \u2014 {date_es}"
+        _page_title_en = f"Films in English in {city_name}: VOSE showtimes \u2014 {date_en}"
+        _page_desc_en  = (f"{film_count} films in English at {cinema_count} {city_name} cinemas this week, with "
+                          f"times for every original-version (VOSE) session. Updated daily.")
+        _page_og_title = f"Films in English in {city_name} \u00b7 {film_count} this week"
+        _h1_es, _h1_en = f"Pel\u00edculas en ingl\u00e9s<br>{city_name}", f"Films in English<br>{city_name}"
+        _sub_es = f"Las pel\u00edculas en versi\u00f3n original en ingl\u00e9s de {city_name} esta semana"
+        _sub_en = f"Every film in its original English in {city_name} this week"
+        _header_more = (f'<div class="header-more"><a href="../" {_more_style} '
+                        f'data-es="Ver las {_all_films_n} pel\u00edculas de {city_name} \u2192" '
+                        f'data-en="See all {_all_films_n} films in {city_name} \u2192">'
+                        f'Ver las {_all_films_n} pel\u00edculas de {city_name} \u2192</a></div>')
     _meta_desc  = _page_desc_en if english else _page_desc_es
     _page_title = _page_title_en if english else _page_title_es
     _summary_es, _summary_en = city_summary(films_by_title, city_name, anchor)
+    if english_only:
+        _summary_es = (f"Esta semana ({date_es}): {film_count} pel\u00edcula{'s' if film_count != 1 else ''} en ingl\u00e9s en "
+                       f"{cinema_count} cine{'s' if cinema_count != 1 else ''} de {city_name}, {_n_sess} sesiones en total. "
+                       "Todas en versi\u00f3n original en ingl\u00e9s con subt\u00edtulos en espa\u00f1ol (VOSE): solo "
+                       "listamos las sesiones que el cine marca como VOSE.")
+        _summary_en = (f"This week ({date_en}): {film_count} film{'s' if film_count != 1 else ''} in English at "
+                       f"{cinema_count} cinema{'s' if cinema_count != 1 else ''} in {city_name}, {_n_sess} sessions in all. "
+                       "Every one is in the original English with Spanish subtitles (VOSE): we only list "
+                       "sessions the cinema labels VOSE.")
 
     import json as _json
     _ld_items = []
@@ -3614,7 +3705,8 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
             {"@type": "WebPage", "name": _page_title, "url": canonical_url,
              "description": _meta_desc, "inLanguage": "en" if english else ["es", "en"]},
             {"@type": "ItemList",
-             "name": f"Films showing in {city_name}" if english else f"Pel\u00edculas en cartelera en {city_name}",
+             "name": (f"Films in English in {city_name}" if english_only else f"Films showing in {city_name}")
+                     if english else f"Pel\u00edculas en cartelera en {city_name}",
              "numberOfItems": film_count, "itemListElement": _ld_items},
         ],
     }
@@ -3776,9 +3868,10 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
 
   <main>
   <div class="header">
-    <h1 class="header-title" id="header-title" data-es="Cartelera<br>{city_name}" data-en="Cinema<br>{city_name}">Cartelera<br>{city_name}</h1>
-    <div class="header-subtitle" data-es="La guía completa del cine en {city_name} esta semana" data-en="Your complete guide to cinema in {city_name} this week">La guía completa del cine en {city_name} esta semana</div>
+    <h1 class="header-title" id="header-title" data-es="{_h1_es}" data-en="{_h1_en}">{_h1_es}</h1>
+    <div class="header-subtitle" data-es="{_sub_es}" data-en="{_sub_en}">{_sub_es}</div>
     <div class="header-summary" data-es="{esc(_summary_es)}" data-en="{esc(_summary_en)}">{esc(_summary_es)}</div>
+    {_header_more}
     <div class="header-date" id="header-date"></div>
   </div>
 
@@ -4053,6 +4146,10 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
         with open(f"{_en_dir}/index.html", "w", encoding="utf-8") as fh:
             fh.write(build_html(films, anchor, city=_city, lang="en"))
         log.info(f"Wrote {_en_dir}/index.html")
+        os.makedirs(f"{_en_dir}/english", exist_ok=True)
+        with open(f"{_en_dir}/english/index.html", "w", encoding="utf-8") as fh:
+            fh.write(build_html(films, anchor, city=_city, lang="en", english_only=True))
+        log.info(f"Wrote {_en_dir}/english/index.html")
     _city_slugs = {city_slug(c) for c in _cities}
     _chooser_html = build_city_chooser_html(_cities, films, anchor)
     with open("docs/listings/index.html", "w", encoding="utf-8") as fh:
@@ -4175,6 +4272,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
         _surl("https://whatson.movie/en/listings/"),
         *[_surl(f"https://whatson.movie/listings/{city_slug(c)}/") for c in _cities],
         *[_surl(f"https://whatson.movie/en/listings/{city_slug(c)}/") for c in _cities],
+        *[_surl(f"https://whatson.movie/en/listings/{city_slug(c)}/english/") for c in _cities],
     ]
     for title, film in films.items():
         slug = film.get("slug")
@@ -4219,6 +4317,7 @@ def write_site(films: dict, anchor: datetime, prev_films_by_slug: dict | None = 
             "docs/en/listings/index.html",
             *[f"docs/listings/{city_slug(c)}/index.html" for c in _cities],
             *[f"docs/en/listings/{city_slug(c)}/index.html" for c in _cities],
+            *[f"docs/en/listings/{city_slug(c)}/english/index.html" for c in _cities],
             "docs/verify/index.html",
             "docs/unsubscribe/index.html",
         ]
@@ -4357,6 +4456,7 @@ def submit_indexnow(films: dict, cities: list) -> None:
         "https://whatson.movie/en/listings/",
         *[f"https://whatson.movie/listings/{city_slug(c)}/" for c in cities],
         *[f"https://whatson.movie/en/listings/{city_slug(c)}/" for c in cities],
+        *[f"https://whatson.movie/en/listings/{city_slug(c)}/english/" for c in cities],
     ]
     for film in films.values():
         slug = film.get("slug")

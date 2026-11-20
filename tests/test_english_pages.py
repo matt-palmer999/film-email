@@ -78,7 +78,9 @@ class EnglishCityPage(unittest.TestCase):
         self.assertIn('<link rel="canonical" href="https://whatson.movie/en/listings/valencia/">', en)
         title = re.search(r"<title[^>]*>([^<]*)</title>", en).group(1)
         self.assertTrue(title.startswith("Valencia cinema listings: VOSE & original-language films"), title)
-        self.assertNotIn("films in English", en)                  # the safer wording, as on the FAQ
+        # The full listing isn't all English: its title and description use the safer wording
+        self.assertNotIn("in English", title)
+        self.assertNotIn("in English", re.search(r'<meta name="description" content="([^"]*)"', en).group(1))
         self.assertRegex(en, r'<meta name="description" content="1 films? at 1 Valencia cinemas? this week')
         self.assertIn('<meta property="og:locale" content="en_GB">', en)
         self.assertIn('class="lang-btn active" id="btn-en"', en)
@@ -113,6 +115,57 @@ class EnglishCityPage(unittest.TestCase):
         attr = f'data-v-lys_{D0}="21:00"'
         self.assertIn(attr, self.es)
         self.assertIn(attr, self.en)
+
+
+class FilmsInEnglishPage(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        films = _films()                                           # "The Sky": English, VOSE 21:00 + dubbed 18:00
+        base = films["El cielo"]
+        lys = base["cinemas"][0]
+        films["Amelie"] = dict(base, title="Amelie", title_en="Amelie", slug="amelie", original_language="fr")
+        films["Dubbed"] = dict(base, title="Dubbed", title_en="Dubbed", slug="dubbed",
+                               cinemas=[dict(lys, vose_showtimes={}, vose=False)])
+        films["Imax"] = dict(base, title="Imax", title_en="Imax", slug="imax", cinemas=[dict(
+            lys, showtimes={}, vose_showtimes={},
+            format_showtimes={"imax": {D0: {"19:00": {"url": "u", "is_vose": True},
+                                            "22:00": {"url": "u", "is_vose": False}}}})])
+        films["Babel"] = dict(base, title="Babel", title_en="Babel", slug="babel-film",
+                              cinemas=[dict(lys, id="babel", name="Cines Babel")])
+        films["Barna"] = dict(base, title="Barna", title_en="Barna", slug="barna",
+                              cinemas=[dict(lys, id="verdi_barcelona", name="Cines Verdi")])
+        cls.films = films
+        cls.page = pipeline.build_html(films, ANCHOR, city="Valencia", lang="en", english_only=True)
+        cls.city = pipeline.build_html(films, ANCHOR, city="Valencia", lang="en")
+
+    def test_only_english_films_with_vose_sessions(self):
+        en = pipeline.english_vose_only(self.films, "Valencia")
+        self.assertEqual(sorted(en), ["Babel", "El cielo", "Imax"])   # not French, not dubbed-only, not Barcelona
+        lys = en["El cielo"]["cinemas"][0]
+        self.assertEqual(lys["showtimes"], {})                      # the dubbed 18:00 is gone
+        self.assertEqual(lys["vose_showtimes"], {D0: {"21:00": "u"}})
+        imax = en["Imax"]["cinemas"][0]["format_showtimes"]["imax"][D0]
+        self.assertEqual(list(imax), ["19:00"])                     # dubbed IMAX 22:00 is gone
+        self.assertEqual(self.films["El cielo"]["cinemas"][0]["showtimes"], {D0: {"18:00": "u"}})  # original untouched
+
+    def test_page_says_in_english_at_its_own_url(self):
+        p = self.page
+        self.assertIn('<link rel="canonical" href="https://whatson.movie/en/listings/valencia/english/">', p)
+        self.assertNotIn('hreflang=', p)                           # no Spanish twin (yet)
+        self.assertIn(">Films in English in Valencia: VOSE showtimes", p)
+        self.assertIn(">Films in English<br>Valencia</h1>", p)
+        self.assertIn("3 films in English at 2 cinemas in Valencia", p)
+        self.assertIn(">The Sky</a>", p)
+        self.assertNotIn(">Amelie</a>", p)
+        self.assertNotIn(">Dubbed</a>", p)
+        self.assertIn('href="../"', p)                             # back to the full English listing
+        self.assertIn('href="../../barcelona/english/"', p)       # other cities' English-film pages
+
+    def test_city_page_links_to_it(self):
+        self.assertIn('<a href="english/"', self.city)
+        self.assertIn("Only films in English: 3 this week", self.city)
+        es = pipeline.build_html(self.films, ANCHOR, city="Valencia")
+        self.assertNotIn("english/", es)                           # the Spanish page is unchanged
 
 
 class EnglishCityChooser(unittest.TestCase):
