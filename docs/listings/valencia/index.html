@@ -70,6 +70,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
 .badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.vose-later{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;color:#e6c65a;border:1px dashed rgba(255,220,80,.45)}
+.header-unpublished{margin-top:8px;font-size:13px;line-height:1.45;color:#c5b8d8;font-style:italic}
 .ensub-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
@@ -364,6 +366,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     <h1 class="header-title" id="header-title" data-es="Cartelera<br>Valencia" data-en="Cinema<br>Valencia">Cartelera<br>Valencia</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en Valencia esta semana" data-en="Your complete guide to cinema in Valencia this week">La guía completa del cine en Valencia esta semana</div>
     <div class="header-summary" data-es="Esta semana (21–27 de noviembre): 103 películas en 12 cines de Valencia. 51 en VOSE (versión original con subtítulos en español), en Cines ABC Park, Yelmo Campanar, Cines Lys y 7 cines más." data-en="This week (21–27 November): 103 films at 12 cinemas in Valencia. 51 in VOSE (original language with Spanish subtitles), at Cines ABC Park, Yelmo Campanar, Cines Lys and 7 more cinemas.">Esta semana (21–27 de noviembre): 103 películas en 12 cines de Valencia. 51 en VOSE (versión original con subtítulos en español), en Cines ABC Park, Yelmo Campanar, Cines Lys y 7 cines más.</div>
+    <div class="header-unpublished" data-es="Los cines aún no han publicado todos sus horarios desde el vie 27: los añadimos cada mañana en cuanto salen." data-en="Cinemas haven’t published all their times from Fri 27 yet: we add them every morning as they appear.">Los cines aún no han publicado todos sus horarios desde el vie 27: los añadimos cada mañana en cuanto salen.</div>
     
     <div class="header-date" id="header-date"></div>
   </div>
@@ -709,10 +712,10 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
         <div class="showtimes-hint"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-es="Cines y horarios →" data-en="Cinemas &amp; showtimes →">Cines y horarios →</span></div>
       </div>
     </div>
-    <div class="grid-card" data-vose="true" data-vose-cinemas="kinepolis" data-ensub-cinemas="" data-isnew="true" data-cinemas="kinepolis" data-year="2026" data-section="1" data-rating="16" data-score="" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-25,2026-11-26,2026-11-27" data-t-kinepolis_2026-11-25="17:30|20:45" data-t-kinepolis_2026-11-26="17:30|20:45" data-t-kinepolis_2026-11-27="18:30|21:45" data-t-cinesa_diagonal_mar_2026-11-25="15:45|19:00|22:15" data-t-cinesa_diagonal_mar_2026-11-26="15:45|19:00|22:15" data-t-cinesa_diagonal_mar_2026-11-27="15:45|19:00|22:15" data-v-cinesa_diagonal_mar_2026-11-25="19:00|22:15" data-v-cinesa_diagonal_mar_2026-11-26="15:45|22:15" data-v-cinesa_diagonal_mar_2026-11-27="15:45|19:00">
+    <div class="grid-card" data-vose="false" data-vose-cinemas="" data-ensub-cinemas="" data-isnew="true" data-cinemas="kinepolis" data-year="2026" data-section="1" data-rating="16" data-score="" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-25,2026-11-26,2026-11-27" data-t-kinepolis_2026-11-25="17:30|20:45" data-t-kinepolis_2026-11-26="17:30|20:45" data-t-kinepolis_2026-11-27="18:30|21:45" data-t-cinesa_diagonal_mar_2026-11-25="15:45|19:00|22:15" data-t-cinesa_diagonal_mar_2026-11-26="15:45|19:00|22:15" data-t-cinesa_diagonal_mar_2026-11-27="15:45|19:00|22:15" data-v-cinesa_diagonal_mar_2026-11-25="19:00|22:15" data-v-cinesa_diagonal_mar_2026-11-26="15:45|22:15" data-v-cinesa_diagonal_mar_2026-11-27="15:45|19:00">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/thX8Rs7nfgmPHfCgjoFuRovy49l.jpg" alt="Las nuevas desventuras de Cliff Booth" width="500" height="750" loading="lazy" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
-        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="rating-badge">+16</span></div>
+        <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-later" data-vose-later="kinepolis:2026-11-28" data-es="VOSE desde el sáb 28" data-en="VOSE from Sat 28">VOSE desde el sáb 28</span><span class="rating-badge">+16</span></div>
         <a href="../the-further-mis-adventures-of-cliff-booth/" class="grid-title" data-es="Las nuevas desventuras de Cliff Booth" data-en="THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH">Las nuevas desventuras de Cliff Booth</a>
         <div class="grid-meta"><span data-es="US · 2026 · 141 min" data-en="US · 2026 · Comedy, Drama, Thriller · 141 min">US · 2026 · 141 min</span></div>
         <div class="grid-synopsis" data-es="Ocho años después de los eventos de &quot;Érase una vez en... Hollywood&quot;, Cliff Booth regresa a un Los Ángeles cambiante. Ahora trabajando como &quot;" data-en="Eight years after the events of Once Upon a Time in... Hollywood, Cliff Booth returns to a changing Los Angeles. Now working as a fixer in t">Ocho años después de los eventos de "Érase una vez en... Hollywood", Cliff Booth regresa a un Los Ángeles cambiante. Ahora trabajando como "</div>
@@ -1810,6 +1813,28 @@ function isEnglishFilm(card) {
   return origins.some(o => ['US','GB','AU','CA','IE','NZ'].includes(o.trim()));
 }
 
+// "VOSE from Sat 28": the first VOSE date after this week at the chosen
+// cinemas (all of them when none are chosen); hidden when there is none.
+// Must match short_day() in pipeline.py.
+function updateVoseLater(el, cinemas) {
+  const dates = (el.dataset.voseLater || '').split(',').filter(Boolean)
+    .map(p => p.split(':'))
+    .filter(([c]) => !(cinemas && cinemas.length) || cinemas.includes(c))
+    .map(([, d]) => d).sort();
+  if (!dates.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const d = new Date(dates[0] + 'T12:00:00');
+  const other = d.getMonth() !== new Date().getMonth();
+  const es = 'VOSE desde el ' + ['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()] : '');
+  const en = 'VOSE from ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] : '');
+  el.setAttribute('data-es', es);
+  el.setAttribute('data-en', en);
+  const root = document.getElementById('html-root');
+  el.textContent = (root && root.getAttribute('lang') === 'en') ? en : es;
+}
+
 function applyVisibility() {
   const params        = new URLSearchParams(window.location.search);
   const filter        = params.get('filter')     || 'all';
@@ -1829,6 +1854,8 @@ function applyVisibility() {
   let visible = 0;
   document.querySelectorAll('[data-vose]').forEach(card => {
     const isClassic = card.dataset.section === '2';
+    const voseLater = card.querySelector('.vose-later');
+    if (voseLater) updateVoseLater(voseLater, cinemas);
 
     if (isClassic) {
       // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.

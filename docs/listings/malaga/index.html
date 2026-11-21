@@ -70,6 +70,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
 .badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.vose-later{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;color:#e6c65a;border:1px dashed rgba(255,220,80,.45)}
+.header-unpublished{margin-top:8px;font-size:13px;line-height:1.45;color:#c5b8d8;font-style:italic}
 .ensub-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
@@ -364,6 +366,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     <h1 class="header-title" id="header-title" data-es="Cartelera<br>Málaga" data-en="Cinema<br>Málaga">Cartelera<br>Málaga</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en Málaga esta semana" data-en="Your complete guide to cinema in Málaga this week">La guía completa del cine en Málaga esta semana</div>
     <div class="header-summary" data-es="Esta semana (21–27 de noviembre): 59 películas en 8 cines de Málaga. 33 en VOSE (versión original con subtítulos en español), en Yelmo Vialia Málaga, mk2 Miramar (Fuengirola), Yelmo Plaza Mayor y 5 cines más." data-en="This week (21–27 November): 59 films at 8 cinemas in Málaga. 33 in VOSE (original language with Spanish subtitles), at Yelmo Vialia Málaga, mk2 Miramar (Fuengirola), Yelmo Plaza Mayor and 5 more cinemas.">Esta semana (21–27 de noviembre): 59 películas en 8 cines de Málaga. 33 en VOSE (versión original con subtítulos en español), en Yelmo Vialia Málaga, mk2 Miramar (Fuengirola), Yelmo Plaza Mayor y 5 cines más.</div>
+    <div class="header-unpublished" data-es="Los cines aún no han publicado todos sus horarios desde el vie 27: los añadimos cada mañana en cuanto salen." data-en="Cinemas haven’t published all their times from Fri 27 yet: we add them every morning as they appear.">Los cines aún no han publicado todos sus horarios desde el vie 27: los añadimos cada mañana en cuanto salen.</div>
     
     <div class="header-date" id="header-date"></div>
   </div>
@@ -545,7 +548,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     </div>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-vose-cinemas="yelmo_vialia,yelmo_plaza_mayor,yelmo_rincon,kinepolis_marbella" data-ensub-cinemas="" data-isnew="true" data-cinemas="yelmo_vialia,yelmo_plaza_mayor,yelmo_rincon,kinepolis_marbella" data-year="2026" data-section="1" data-rating="12" data-score="7.0" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-27" data-t-kinepolis_2026-11-27="17:45|18:30|20:30|21:30|22:30" data-t-yelmo_2026-11-27="15:45|16:45|18:00|19:15|20:20|21:45|22:40" data-t-cinesa_2026-11-27="16:15|19:00|21:45" data-t-cinesa_diagonal_2026-11-27="16:15|19:00|21:45" data-t-cinesa_diagonal_mar_2026-11-27="16:15|19:00|21:45" data-t-yelmo_maquinista_2026-11-27="15:45|18:00|20:15|22:30" data-t-kinepolis_alicante_2026-11-27="17:00|17:30|19:30|20:00|22:00|22:30" data-t-yelmo_alicante_2026-11-27="17:45|20:00|22:15" data-t-yelmo_vialia_2026-11-27="18:00|20:15|22:30" data-t-yelmo_plaza_mayor_2026-11-27="15:45|18:00|20:15|21:15|22:30" data-t-yelmo_rincon_2026-11-27="18:00|20:15|22:30" data-t-kinepolis_marbella_2026-11-27="16:30|18:00|19:00|20:30|21:30" data-v-kinepolis_2026-11-27="18:30|21:30" data-v-yelmo_2026-11-27="16:45|19:15|21:45" data-v-cinesa_diagonal_2026-11-27="21:45" data-v-cinesa_diagonal_mar_2026-11-27="16:15" data-v-kinepolis_alicante_2026-11-27="17:30|20:00|22:30" data-v-yelmo_plaza_mayor_2026-11-27="21:15" data-v-kinepolis_marbella_2026-11-27="18:00|20:30">
+    <div class="grid-card" data-vose="true" data-vose-cinemas="yelmo_plaza_mayor,kinepolis_marbella" data-ensub-cinemas="" data-isnew="true" data-cinemas="yelmo_vialia,yelmo_plaza_mayor,yelmo_rincon,kinepolis_marbella" data-year="2026" data-section="1" data-rating="12" data-score="7.0" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-27" data-t-kinepolis_2026-11-27="17:45|18:30|20:30|21:30|22:30" data-t-yelmo_2026-11-27="15:45|16:45|18:00|19:15|20:20|21:45|22:40" data-t-cinesa_2026-11-27="16:15|19:00|21:45" data-t-cinesa_diagonal_2026-11-27="16:15|19:00|21:45" data-t-cinesa_diagonal_mar_2026-11-27="16:15|19:00|21:45" data-t-yelmo_maquinista_2026-11-27="15:45|18:00|20:15|22:30" data-t-kinepolis_alicante_2026-11-27="17:00|17:30|19:30|20:00|22:00|22:30" data-t-yelmo_alicante_2026-11-27="17:45|20:00|22:15" data-t-yelmo_vialia_2026-11-27="18:00|20:15|22:30" data-t-yelmo_plaza_mayor_2026-11-27="15:45|18:00|20:15|21:15|22:30" data-t-yelmo_rincon_2026-11-27="18:00|20:15|22:30" data-t-kinepolis_marbella_2026-11-27="16:30|18:00|19:00|20:30|21:30" data-v-kinepolis_2026-11-27="18:30|21:30" data-v-yelmo_2026-11-27="16:45|19:15|21:45" data-v-cinesa_diagonal_2026-11-27="21:45" data-v-cinesa_diagonal_mar_2026-11-27="16:15" data-v-kinepolis_alicante_2026-11-27="17:30|20:00|22:30" data-v-yelmo_plaza_mayor_2026-11-27="21:15" data-v-kinepolis_marbella_2026-11-27="18:00|20:30">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/iHJhSfqFpDMOyeMc6h6BOeHxse2.jpg" alt="Ahora los suegros son ellos" width="500" height="750" loading="lazy" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="score-badge">⭐ 7.0</span><span class="rating-badge">+12</span></div>
@@ -655,7 +658,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
     </div>
   </div>
   <div class="grid-row">
-    <div class="grid-card" data-vose="true" data-vose-cinemas="kinepolis_marbella,yelmo_vialia,yelmo_plaza_mayor" data-ensub-cinemas="" data-isnew="true" data-cinemas="kinepolis_marbella,yelmo_vialia,yelmo_plaza_mayor,rosaleda,mk2_miramar,mk2_el_ingenio" data-year="2026" data-section="1" data-rating="TP" data-score="" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-27" data-t-kinepolis_2026-11-27="17:15|17:30|17:45|18:45|19:00|20:00|20:30|21:30|21:45" data-t-kinepolis_alicante_2026-11-27="17:00|17:30|18:00|18:30|19:30" data-t-kinepolis_marbella_2026-11-27="16:00|17:00|18:30|21:05" data-t-yelmo_2026-11-27="17:15|19:40|22:05" data-t-yelmo_maquinista_2026-11-27="14:45|17:00|17:15|19:40|20:00|22:05" data-t-yelmo_alicante_2026-11-27="17:15|19:40|22:05" data-t-yelmo_vialia_2026-11-27="17:15|19:40|22:05" data-t-yelmo_plaza_mayor_2026-11-27="17:15|19:40|22:05" data-t-park_2026-11-27="16:00|18:10|19:50|20:30|22:00" data-t-elsaler_2026-11-27="16:00|18:15|19:30|21:35" data-t-granturia_2026-11-27="16:00|18:15|19:30|21:35" data-t-mn4_2026-11-27="16:00|16:30|17:00|18:00|19:00|19:30|19:45|20:30|22:00" data-t-odeon_alicante_2026-11-27="16:00|18:00|20:15|22:30" data-t-abc_elx_2026-11-27="16:00|18:15|19:30|20:15|21:35" data-t-rosaleda_2026-11-27="17:00|18:00|19:15|20:15|21:30" data-t-cinesa_2026-11-27="15:45|16:45|18:20|19:20|21:00" data-t-cinesa_diagonal_2026-11-27="15:45|16:45|18:20|19:20" data-t-cinesa_diagonal_mar_2026-11-27="15:45|16:45|18:20|19:20" data-t-mk2_miramar_2026-11-27="16:00|18:15|20:30" data-t-mk2_el_ingenio_2026-11-27="16:00|18:20|20:30" data-v-kinepolis_2026-11-27="17:15|20:00" data-v-kinepolis_alicante_2026-11-27="18:00" data-v-kinepolis_marbella_2026-11-27="17:00" data-v-park_2026-11-27="20:30" data-v-abc_elx_2026-11-27="20:15">
+    <div class="grid-card" data-vose="true" data-vose-cinemas="kinepolis_marbella" data-ensub-cinemas="" data-isnew="true" data-cinemas="kinepolis_marbella,yelmo_vialia,yelmo_plaza_mayor,rosaleda,mk2_miramar,mk2_el_ingenio" data-year="2026" data-section="1" data-rating="TP" data-score="" data-origin="US" data-lang="en" data-hasevening="true" data-showdays="2026-11-27" data-t-kinepolis_2026-11-27="17:15|17:30|17:45|18:45|19:00|20:00|20:30|21:30|21:45" data-t-kinepolis_alicante_2026-11-27="17:00|17:30|18:00|18:30|19:30" data-t-kinepolis_marbella_2026-11-27="16:00|17:00|18:30|21:05" data-t-yelmo_2026-11-27="17:15|19:40|22:05" data-t-yelmo_maquinista_2026-11-27="14:45|17:00|17:15|19:40|20:00|22:05" data-t-yelmo_alicante_2026-11-27="17:15|19:40|22:05" data-t-yelmo_vialia_2026-11-27="17:15|19:40|22:05" data-t-yelmo_plaza_mayor_2026-11-27="17:15|19:40|22:05" data-t-park_2026-11-27="16:00|18:10|19:50|20:30|22:00" data-t-elsaler_2026-11-27="16:00|18:15|19:30|21:35" data-t-granturia_2026-11-27="16:00|18:15|19:30|21:35" data-t-mn4_2026-11-27="16:00|16:30|17:00|18:00|19:00|19:30|19:45|20:30|22:00" data-t-odeon_alicante_2026-11-27="16:00|18:00|20:15|22:30" data-t-abc_elx_2026-11-27="16:00|18:15|19:30|20:15|21:35" data-t-rosaleda_2026-11-27="17:00|18:00|19:15|20:15|21:30" data-t-cinesa_2026-11-27="15:45|16:45|18:20|19:20|21:00" data-t-cinesa_diagonal_2026-11-27="15:45|16:45|18:20|19:20" data-t-cinesa_diagonal_mar_2026-11-27="15:45|16:45|18:20|19:20" data-t-mk2_miramar_2026-11-27="16:00|18:15|20:30" data-t-mk2_el_ingenio_2026-11-27="16:00|18:20|20:30" data-v-kinepolis_2026-11-27="17:15|20:00" data-v-kinepolis_alicante_2026-11-27="18:00" data-v-kinepolis_marbella_2026-11-27="17:00" data-v-park_2026-11-27="20:30" data-v-abc_elx_2026-11-27="20:15">
       <div class="grid-poster"><img src="https://image.tmdb.org/t/p/w500/yykeYKbDBM9eUMJUucaaDo2mi1p.jpg" alt="Hechizo: Bienvenidos a Hexe" width="500" height="750" loading="lazy" style="width:100%;height:auto;object-fit:contain;display:block;"></div>
       <div class="grid-info">
         <div class="badges"><span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span><span class="vose-badge">VOSE</span><span class="rating-badge">TP</span></div>
@@ -1326,6 +1329,28 @@ function isEnglishFilm(card) {
   return origins.some(o => ['US','GB','AU','CA','IE','NZ'].includes(o.trim()));
 }
 
+// "VOSE from Sat 28": the first VOSE date after this week at the chosen
+// cinemas (all of them when none are chosen); hidden when there is none.
+// Must match short_day() in pipeline.py.
+function updateVoseLater(el, cinemas) {
+  const dates = (el.dataset.voseLater || '').split(',').filter(Boolean)
+    .map(p => p.split(':'))
+    .filter(([c]) => !(cinemas && cinemas.length) || cinemas.includes(c))
+    .map(([, d]) => d).sort();
+  if (!dates.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const d = new Date(dates[0] + 'T12:00:00');
+  const other = d.getMonth() !== new Date().getMonth();
+  const es = 'VOSE desde el ' + ['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()] : '');
+  const en = 'VOSE from ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] : '');
+  el.setAttribute('data-es', es);
+  el.setAttribute('data-en', en);
+  const root = document.getElementById('html-root');
+  el.textContent = (root && root.getAttribute('lang') === 'en') ? en : es;
+}
+
 function applyVisibility() {
   const params        = new URLSearchParams(window.location.search);
   const filter        = params.get('filter')     || 'all';
@@ -1345,6 +1370,8 @@ function applyVisibility() {
   let visible = 0;
   document.querySelectorAll('[data-vose]').forEach(card => {
     const isClassic = card.dataset.section === '2';
+    const voseLater = card.querySelector('.vose-later');
+    if (voseLater) updateVoseLater(voseLater, cinemas);
 
     if (isClassic) {
       // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.

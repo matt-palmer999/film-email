@@ -1515,6 +1515,69 @@ def _in(dates, win) -> bool:
     return any(win[0] <= d <= win[1] for d in dates)
 
 
+VOSE_LATER_DAYS = 14   # how far past this week's window "VOSE from ..." looks
+
+_DAY_ABBR_ES = ["lun", "mar", "mi\u00e9", "jue", "vie", "s\u00e1b", "dom"]
+_DAY_ABBR_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+_MON_ABBR_ES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+_MON_ABBR_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def short_day(iso: str, lang: str) -> str:
+    """'sáb 28' / 'Sat 28', with the month added when it isn't this month.
+    Must match updateVoseLater() in the page script."""
+    d = date.fromisoformat(iso)
+    days, months = (_DAY_ABBR_ES, _MON_ABBR_ES) if lang == "es" else (_DAY_ABBR_EN, _MON_ABBR_EN)
+    out = f"{days[d.weekday()]} {d.day}"
+    if d.month != datetime.now(VALENCIA_TZ).month:
+        out += f" {months[d.month - 1]}"
+    return out
+
+
+def vose_in_window(cinema: dict, film: dict) -> bool:
+    """A VOSE session at this cinema within this week's window (the dates the
+    page shows). VOSE later on doesn't make the film VOSE this week."""
+    return _in(_vose_dates(cinema), _window(film))
+
+
+def vose_later_date(cinema: dict, film: dict) -> str:
+    """First VOSE date after this week's window (up to VOSE_LATER_DAYS past
+    it), or "". Same per-session labels as everything else: never guesses."""
+    end = _window(film)[1]
+    last = (date.fromisoformat(end) + timedelta(days=VOSE_LATER_DAYS)).isoformat()
+    later = sorted(d for d in _vose_dates(cinema) if end < d <= last)
+    return later[0] if later else ""
+
+
+def unpublished_from(films: dict, city: str) -> str:
+    """First day of this week's window the cinemas don't seem to have published
+    yet, or "". Spanish cinemas publish Friday-Thursday weeks around Tuesday,
+    so at the weekend the last days hold only presales. A day counts as
+    unpublished when it, and every day after it in the window, has under a
+    third of the sessions of a typical day at the start of the week."""
+    ids = {k for k, v in CINEMA_META.items() if v.get("city") == city}
+    today = datetime.now(VALENCIA_TZ).date()
+    days = [(today + timedelta(days=i)).isoformat() for i in range(7)]
+    counts = dict.fromkeys(days, 0)
+    for f in films.values():
+        for c in f.get("cinemas", []):
+            if c.get("id") not in ids:
+                continue
+            for d, t in cinema_times_by_date(c).items():
+                if d in counts:
+                    counts[d] += len(t)
+    typical = sorted(counts[d] for d in days[:3])[1]
+    if typical < 20:
+        return ""
+    start = ""
+    for d in reversed(days[3:]):
+        if counts[d] < typical / 3:
+            start = d
+        else:
+            break
+    return start
+
+
 def _date_span(d0: date, d1: date, lang: str) -> str:
     if lang == "es":
         if d0 == d1:
@@ -1895,6 +1958,8 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .badge-new{background:rgba(255,180,50,.15);color:#ffb432;border:1px solid rgba(255,180,50,.3)}
 .badge-genre{background:rgba(100,140,220,.12);color:#7aa0e0;border:1px solid rgba(100,140,220,.25)}
 .vose-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1.5px;background:rgba(255,220,80,.15);color:#ffd84a;border:1px solid rgba(255,220,80,.35)}
+.vose-later{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;color:#e6c65a;border:1px dashed rgba(255,220,80,.45)}
+.header-unpublished{margin-top:8px;font-size:13px;line-height:1.45;color:#c5b8d8;font-style:italic}
 .ensub-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(124,196,255,.12);color:#7cc4ff;border:1px solid rgba(124,196,255,.35)}
 .score-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(255,255,255,.06);color:#c5b8d8;border:1px solid rgba(255,255,255,.12)}
 .rating-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.5px;background:rgba(180,100,100,.12);color:#c98a8a;border:1px solid rgba(180,100,100,.3)}
@@ -2194,6 +2259,28 @@ function isEnglishFilm(card) {
   return origins.some(o => ['US','GB','AU','CA','IE','NZ'].includes(o.trim()));
 }
 
+// "VOSE from Sat 28": the first VOSE date after this week at the chosen
+// cinemas (all of them when none are chosen); hidden when there is none.
+// Must match short_day() in pipeline.py.
+function updateVoseLater(el, cinemas) {
+  const dates = (el.dataset.voseLater || '').split(',').filter(Boolean)
+    .map(p => p.split(':'))
+    .filter(([c]) => !(cinemas && cinemas.length) || cinemas.includes(c))
+    .map(([, d]) => d).sort();
+  if (!dates.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const d = new Date(dates[0] + 'T12:00:00');
+  const other = d.getMonth() !== new Date().getMonth();
+  const es = 'VOSE desde el ' + ['dom','lun','mar','mié','jue','vie','sáb'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()] : '');
+  const en = 'VOSE from ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + d.getDate()
+           + (other ? ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] : '');
+  el.setAttribute('data-es', es);
+  el.setAttribute('data-en', en);
+  const root = document.getElementById('html-root');
+  el.textContent = (root && root.getAttribute('lang') === 'en') ? en : es;
+}
+
 function applyVisibility() {
   const params        = new URLSearchParams(window.location.search);
   const filter        = params.get('filter')     || 'all';
@@ -2213,6 +2300,8 @@ function applyVisibility() {
   let visible = 0;
   document.querySelectorAll('[data-vose]').forEach(card => {
     const isClassic = card.dataset.section === '2';
+    const voseLater = card.querySelector('.vose-later');
+    if (voseLater) updateVoseLater(voseLater, cinemas);
 
     if (isClassic) {
       // Classics bypass cinema/new/family/rating/evening filters, but still respect VOSE + language.
@@ -2452,7 +2541,9 @@ def _meta_description(film: dict, title: str, archived: bool = False, limit: int
     head = f"{title} ({year})" if year and year not in title else title
     cinemas = film.get("cinemas", [])
     cities = sorted({CINEMA_META.get(c.get("id", ""), {}).get("city") for c in cinemas} - {None, ""})
-    vose = " · VOSE disponible" if film.get("any_vose") else ""
+    # Live pages: VOSE this week only; archive pages keep the film's history
+    _v = film.get("any_vose") if archived else any(vose_in_window(c, film) for c in film.get("cinemas", []))
+    vose = " · VOSE disponible" if _v else ""
     if archived:
         lead = f"{head} ya no está en cartelera."
     elif len(cities) == 1:
@@ -2653,7 +2744,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
     meta_en    = film.get("meta_en", meta)
     score      = film.get("rating_score")
     rating     = film.get("rating", "?")
-    vose        = film.get("any_vose", False)
+    # VOSE this week only (the dates this page shows)
+    vose        = any(vose_in_window(c, film) for c in film.get("cinemas", []))
     is_new      = film.get("is_new", False)
     trailer_url = film.get("trailer_url", "")
 
@@ -2823,8 +2915,8 @@ def build_film_detail_page(film: dict, anchor: datetime) -> str:
         _city = next(iter(_film_cities))
         _brand_es, _brand_en = f"Cartelera {_city}", f"{_city} Cinema"
         _city_cines = ", ".join(cm["name"] for cm in film.get("cinemas", [])[:3] if CINEMA_META.get(cm.get("id",""),{}).get("city") == _city)
-        _vsfx_es = " · VOSE disponible" if film.get("any_vose") else ""
-        _vsfx_en = " · VOSE available" if film.get("any_vose") else ""
+        _vsfx_es = " · VOSE disponible" if vose else ""
+        _vsfx_en = " · VOSE available" if vose else ""
         _desc_es = (f"{esc(title_es)} en cartelera en {_city}{_vsfx_es}. Horarios en {_city_cines}." if _city_cines else f"{esc(title_es)} — sesiones y horarios en {_city}{_vsfx_es}.")
         _desc_en = (f"{esc(title_en)} now showing in {_city}{_vsfx_en}. Showtimes at {_city_cines}." if _city_cines else f"{esc(title_en)} — {_city} cinema showtimes{_vsfx_en}.")
         _back_href, _back_es, _back_en = f"../{city_slug(_city)}/", f"Cartelera {_city}", f"{_city} Cinema"
@@ -3607,6 +3699,14 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
     city_name     = city or "Valencia"
     english_only  = english_only and bool(city) and lang == "en"
     _all_films_n  = len(films_by_title)
+    _unpub = unpublished_from(films_by_title, city) if city else ""
+    _unpublished_html = ""
+    if _unpub:
+        _u_es = (f"Los cines a\u00fan no han publicado todos sus horarios desde el {short_day(_unpub, 'es')}: "
+                 "los a\u00f1adimos cada ma\u00f1ana en cuanto salen.")
+        _u_en = (f"Cinemas haven\u2019t published all their times from {short_day(_unpub, 'en')} yet: "
+                 "we add them every morning as they appear.")
+        _unpublished_html = (f'<div class="header-unpublished" data-es="{_u_es}" data-en="{_u_en}">{_u_es}</div>')
     _english_n    = len(english_vose_only(films_by_title, city)) if city and lang == "en" else 0
     if english_only:
         films_by_title = english_vose_only(films_by_title, city)
@@ -3736,11 +3836,14 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
         meta     = film.get("meta", "")
         if city:
             _city_cinemas_in_window = [c for c in cinemas_in_window(film) if c["id"] in _city_ids]
-            vose = any(cinema_has_vose(c) for c in _city_cinemas_in_window)
-        else:
-            vose = film.get("any_vose", False)
         _window_cinemas  = _city_cinemas_in_window if city else cinemas_in_window(film)
-        vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if cinema_has_vose(c))
+        # VOSE this week only: a VOSE session after the window doesn't count
+        vose             = any(vose_in_window(c, film) for c in _window_cinemas)
+        vose_cinema_ids  = ",".join(c["id"] for c in _window_cinemas if vose_in_window(c, film))
+        # "VOSE from Sat 28": cinemas here whose first VOSE session is after this week
+        _later = {c["id"]: vose_later_date(c, film) for c in film["cinemas"]
+                  if (not city or c["id"] in _city_ids) and not vose_in_window(c, film)}
+        _later = {k: v for k, v in sorted(_later.items()) if v}
         ensub_cinema_ids = ",".join(c["id"] for c in _window_cinemas if cinema_has_ensub(c))
         is_new   = film.get("is_new", False)
         cinemas  = film["cinemas"]
@@ -3752,6 +3855,12 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
         )
         new_badge   = '<span class="film-badge badge-new" data-es="ESTRENO" data-en="NEW">ESTRENO</span>' if is_new else ""
         vose_badge  = '<span class="vose-badge">VOSE</span>' if vose else ""
+        if not vose and _later:
+            _first = min(_later.values())
+            _l_es, _l_en = f"VOSE desde el {short_day(_first, 'es')}", f"VOSE from {short_day(_first, 'en')}"
+            _later_attr = ",".join(f"{k}:{v}" for k, v in _later.items())
+            vose_badge = (f'<span class="vose-later" data-vose-later="{_later_attr}" '
+                          f'data-es="{_l_es}" data-en="{_l_en}">{_l_es}</span>')
         if ensub_cinema_ids:
             vose_badge += '<span class="ensub-badge" data-es="SUBT. INGLÉS" data-en="EN SUBS">SUBT. INGLÉS</span>'
         score       = film.get("rating_score")
@@ -3871,6 +3980,7 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
     <h1 class="header-title" id="header-title" data-es="{_h1_es}" data-en="{_h1_en}">{_h1_es}</h1>
     <div class="header-subtitle" data-es="{_sub_es}" data-en="{_sub_en}">{_sub_es}</div>
     <div class="header-summary" data-es="{esc(_summary_es)}" data-en="{esc(_summary_en)}">{esc(_summary_es)}</div>
+    {_unpublished_html}
     {_header_more}
     <div class="header-date" id="header-date"></div>
   </div>
