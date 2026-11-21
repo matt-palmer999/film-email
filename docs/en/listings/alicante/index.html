@@ -50,7 +50,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
 .header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px;margin-top:0}
 .header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
-.header-summary{font-size:13px;color:#9b8faa;line-height:1.55;margin-top:10px;max-width:640px}
+.page-summary{font-size:13px;color:#9b8faa;line-height:1.55;max-width:640px;margin:0 auto;padding:18px 24px 26px;text-align:center}
 .header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
 .section-label{padding:28px 40px 12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#c5b8d8;font-weight:600}
 .section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
@@ -362,7 +362,6 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   <div class="header">
     <h1 class="header-title" id="header-title" data-es="Cartelera<br>Alicante" data-en="Cinema<br>Alicante">Cinema<br>Alicante</h1>
     <div class="header-subtitle" data-es="La guía completa del cine en Alicante esta semana" data-en="Your complete guide to cinema in Alicante this week">Your complete guide to cinema in Alicante this week</div>
-    <div class="header-summary" data-es="Esta semana (21–27 de noviembre): 53 películas en 6 cines de Alicante. 22 en VOSE (versión original con subtítulos en español), en Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante y 3 cines más." data-en="This week (21–27 November): 53 films at 6 cinemas in Alicante. 22 in VOSE (original language with Spanish subtitles), at Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante and 3 more cinemas.">This week (21–27 November): 53 films at 6 cinemas in Alicante. 22 in VOSE (original language with Spanish subtitles), at Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante and 3 more cinemas.</div>
     <div class="header-unpublished" data-es="Los cines aún no han publicado todos sus horarios desde el vie 27: los añadimos cada mañana en cuanto salen." data-en="Cinemas haven’t published all their times from Fri 27 yet: we add them every morning as they appear.">Cinemas haven’t published all their times from Fri 27 yet: we add them every morning as they appear.</div>
     <div class="header-more"><a href="english/" style="margin-top:12px;font-size:13px;font-weight:500;color:#ffb432;text-decoration:none;display:inline-block;" data-es="Solo películas en inglés: 15 esta semana →" data-en="Only films in English: 15 this week →">Only films in English: 15 this week →</a></div>
     <div class="header-date" id="header-date"></div>
@@ -985,6 +984,9 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
   </div>
   <div id="section2-cards"></div>
   <div class="section-divider"></div>
+  <!-- The week in one paragraph, for readers and AI assistants that quote the page
+       (GEO). Kept below the listings so the top of the page stays uncluttered. -->
+  <div class="page-summary" data-es="Esta semana (21–27 de noviembre): 53 películas en 6 cines de Alicante. 22 en VOSE (versión original con subtítulos en español), en Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante y 3 cines más." data-en="This week (21–27 November): 53 films at 6 cinemas in Alicante. 22 in VOSE (original language with Spanish subtitles), at Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante and 3 more cinemas.">This week (21–27 November): 53 films at 6 cinemas in Alicante. 22 in VOSE (original language with Spanish subtitles), at Kinépolis Alicante, Cines ABC Elx, Odeon Multicines Alicante and 3 more cinemas.</div>
   </main>
 
   <div class="footer">

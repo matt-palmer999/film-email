@@ -104,7 +104,10 @@ class OnThePages(unittest.TestCase):
         page = pipeline.build_film_detail_page(f, ANCHOR)
         self.assertNotIn('class="hero-summary"', page)    # city pages only, for now
         city = pipeline.build_html({"Hamnet": f}, ANCHOR, city="Valencia")
-        self.assertIn('<div class="header-summary" data-es="Esta semana', city)
+        self.assertIn('<div class="page-summary" data-es="Esta semana', city)
+        # below the listings, not in the header
+        self.assertGreater(city.index('class="page-summary"'), city.index('id="section2-cards"'))
+        self.assertNotIn('class="header-summary"', city)
 
 
 class LandingFaq(unittest.TestCase):

@@ -1938,7 +1938,7 @@ body{background:#0f0c14;font-family:'DM Sans',Helvetica,sans-serif;color:#f0eae0
 .header-eyebrow{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#ffb432;margin-bottom:12px}
 .header-title{font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:700;color:#f9f3e8;line-height:1.1;margin-bottom:10px;margin-top:0}
 .header-subtitle{font-size:14px;color:#9b8faa;font-weight:300}
-.header-summary{font-size:13px;color:#9b8faa;line-height:1.55;margin-top:10px;max-width:640px}
+.page-summary{font-size:13px;color:#9b8faa;line-height:1.55;max-width:640px;margin:0 auto;padding:18px 24px 26px;text-align:center}
 .header-date{display:inline-block;margin-top:18px;padding:6px 18px;background:rgba(255,180,50,.12);border:1px solid rgba(255,180,50,.3);border-radius:20px;font-size:12px;color:#ffb432;letter-spacing:1px}
 .section-label{padding:28px 40px 12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#c5b8d8;font-weight:600}
 .section-divider{height:1px;background:linear-gradient(90deg,transparent,#2e2040 30%,#2e2040 70%,transparent);margin:8px 24px 20px}
@@ -3979,7 +3979,6 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
   <div class="header">
     <h1 class="header-title" id="header-title" data-es="{_h1_es}" data-en="{_h1_en}">{_h1_es}</h1>
     <div class="header-subtitle" data-es="{_sub_es}" data-en="{_sub_en}">{_sub_es}</div>
-    <div class="header-summary" data-es="{esc(_summary_es)}" data-en="{esc(_summary_en)}">{esc(_summary_es)}</div>
     {_unpublished_html}
     {_header_more}
     <div class="header-date" id="header-date"></div>
@@ -4018,6 +4017,9 @@ def build_html(films_by_title: dict, anchor: datetime, city: str | None = None, 
   </div>
   <div id="section2-cards"></div>
   <div class="section-divider"></div>
+  <!-- The week in one paragraph, for readers and AI assistants that quote the page
+       (GEO). Kept below the listings so the top of the page stays uncluttered. -->
+  <div class="page-summary" data-es="{esc(_summary_es)}" data-en="{esc(_summary_en)}">{esc(_summary_es)}</div>
   </main>
 
   <div class="footer">
