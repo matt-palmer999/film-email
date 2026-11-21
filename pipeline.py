@@ -4908,7 +4908,7 @@ def send_weekly_emails(films: dict) -> None:
         unsub_url = (f"https://whatson.movie/unsubscribe/?token={token}"
                      if token else "https://whatson.movie/preferences/")
         try:
-            filtered = apply_subscriber_filters(films, sub)
+            filtered = apply_subscriber_filters(films, sub, anchor)
             html, subject = build_full_email(filtered, anchor, page_url, prefs_url, unsub_url, prefs=sub)
             plain = (
                 f"Cartelera Valencia – {week_range_es(anchor)}\n\nVer este email en un navegador compatible con HTML."

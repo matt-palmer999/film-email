@@ -1901,17 +1901,40 @@ _CINEMAS_BY_CITY = {
     "Málaga":    ['yelmo_vialia','yelmo_plaza_mayor','yelmo_rincon','albeniz','mk2_miramar','mk2_el_ingenio','kinepolis_marbella','rosaleda'],
 }
 
-def _cinema_has_vose(cinema: dict) -> bool:
+def _in_win(d: str, win: tuple | None) -> bool:
+    return win is None or win[0] <= d <= win[1]
+
+
+def _cinema_dates(cinema: dict) -> set:
+    """Every date this cinema has a session of the film (any format)."""
+    out = set()
+    for src in (cinema.get("showtimes") or {}, cinema.get("vose_showtimes") or {},
+                *(cinema.get("format_showtimes") or {}).values()):
+        out |= {d for d, t in src.items() if t}
+    return out
+
+
+def _cinema_has_vose(cinema: dict, win: tuple | None = None) -> bool:
     """True if this cinema has at least one VOSE session for the film,
-    including premium-format (IMAX, 4DX...) sessions."""
-    if cinema.get("vose_showtimes"):
+    including premium-format (IMAX, 4DX...) sessions; within win=(first, last)
+    ISO dates when given. A VOSE run that starts after the email's week
+    doesn't make the film VOSE this week (same rule as the website)."""
+    if any(t and _in_win(d, win) for d, t in (cinema.get("vose_showtimes") or {}).items()):
         return True
     return any(
-        isinstance(info, dict) and info.get("is_vose")
+        isinstance(info, dict) and info.get("is_vose") and _in_win(d, win)
         for dates in (cinema.get("format_showtimes") or {}).values()
-        for times in dates.values()
+        for d, times in dates.items()
         for info in times.values()
     )
+
+
+def _email_window(film_is_classic: bool, anchor) -> tuple:
+    """The email's week, as the website counts it: the send day and the six
+    days after it (30 days for classics)."""
+    start = (anchor or datetime.now()).date()
+    end = start + timedelta(days=29 if film_is_classic else 6)
+    return start.isoformat(), end.isoformat()
 
 
 def _vose_pref_ok(film: dict, local_vose: bool, local_ensub: bool, vose_lang: str, en_origins: set) -> bool:
@@ -1933,18 +1956,25 @@ def _is_english_film(film: dict, en_origins: set) -> bool:
     return bool(origins & en_origins)
 
 
-def _cinema_has_ensub(cinema: dict) -> bool:
-    """English-subtitled session from today on (e.g. "VOSI" Spanish films)."""
-    today = datetime.now().date().isoformat()
-    return any(d >= today and t for d, t in (cinema.get("ensub") or {}).items())
+def _cinema_has_ensub(cinema: dict, win: tuple | None = None) -> bool:
+    """English-subtitled session (e.g. "VOSI" Spanish films) from today on,
+    or within win=(first, last) ISO dates when given."""
+    if win is None:
+        win = (datetime.now().date().isoformat(), "9999-12-31")
+    return any(t and _in_win(d, win) for d, t in (cinema.get("ensub") or {}).items())
 
 
-def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
+def apply_subscriber_filters(films: dict, prefs: dict, anchor=None) -> dict:
     """Filter films dict according to a subscriber's saved preferences.
 
     "any_vose" on each returned film is recomputed for the subscriber's own
     cinemas, so the VOSE filter and VOSE badge never rely on VOSE sessions
-    at a cinema (or city) the subscriber doesn't go to."""
+    at a cinema (or city) the subscriber doesn't go to.
+
+    Only the email's week counts (anchor, default today, plus six days; 30
+    days for classics), as on the website: a cinema with no session of the
+    film that week is ignored, and VOSE or English-subtitled sessions after
+    that week don't make the film VOSE now."""
     sub_city = (prefs.get("city") or "Valencia").strip().title()
     _default_cinemas = _CINEMAS_BY_CITY.get(sub_city, _CINEMAS_BY_CITY["Valencia"])
     allowed_cinemas = set(prefs.get("cinemas") or _default_cinemas)
@@ -1962,28 +1992,31 @@ def apply_subscriber_filters(films: dict, prefs: dict) -> dict:
         film_year = int(film.get("year") or 0)
         is_classic = film_year > 0 and film_year <= current_year - 3
 
+        win = _email_window(is_classic, anchor)
+        week_cinemas = [c for c in film.get("cinemas", [])
+                        if any(_in_win(d, win) for d in _cinema_dates(c))]
         if is_classic:
             # Classics bypass per-cinema preferences but still respect city.
-            film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
+            film_cinemas = {c.get("id", "") for c in week_cinemas}
             sub_city = (prefs.get("city") or "Valencia").strip().title()
             city_cinemas = set(_CINEMAS_BY_CITY.get(sub_city, []))
             if not film_cinemas & city_cinemas:
                 continue
-            local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
+            local_vose = any(_cinema_has_vose(c, win) for c in week_cinemas
                              if c.get("id", "") in city_cinemas)
-            local_ensub = any(_cinema_has_ensub(c) for c in film.get("cinemas", [])
+            local_ensub = any(_cinema_has_ensub(c, win) for c in week_cinemas
                               if c.get("id", "") in city_cinemas)
             if vose_only and not _vose_pref_ok(film, local_vose, local_ensub, vose_lang, EN_ORIGINS):
                 continue
         else:
             # Normal path — all filters apply
             # Cinema filter
-            film_cinemas = {c.get("id", "") for c in film.get("cinemas", [])}
+            film_cinemas = {c.get("id", "") for c in week_cinemas}
             if not film_cinemas & allowed_cinemas:
                 continue
-            local_vose = any(_cinema_has_vose(c) for c in film.get("cinemas", [])
+            local_vose = any(_cinema_has_vose(c, win) for c in week_cinemas
                              if c.get("id", "") in allowed_cinemas)
-            local_ensub = any(_cinema_has_ensub(c) for c in film.get("cinemas", [])
+            local_ensub = any(_cinema_has_ensub(c, win) for c in week_cinemas
                               if c.get("id", "") in allowed_cinemas)
 
             # VOSE + language filter

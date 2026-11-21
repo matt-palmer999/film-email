@@ -140,6 +140,49 @@ class UnpublishedNote(unittest.TestCase):
         self.assertEqual(pipeline.unpublished_from(films, "Valencia"), _d(6))
 
 
+class WeeklyEmail(unittest.TestCase):
+    """The weekly email uses the same rule: VOSE only counts in its own week."""
+
+    @classmethod
+    def setUpClass(cls):
+        import scraper
+        cls.scraper = scraper
+
+    def _f(self, cinemas):
+        return _film(cinemas)
+
+    def test_vose_after_the_week_is_not_vose_in_the_email(self):
+        r = self.scraper.apply_subscriber_filters(self._f([_cinema("kinepolis", [0, 1], [8])]),
+                                                  {"city": "Valencia"}, ANCHOR)
+        self.assertFalse(r["Cliff"]["any_vose"])
+
+    def test_vose_only_subscriber_does_not_get_it(self):
+        r = self.scraper.apply_subscriber_filters(self._f([_cinema("kinepolis", [0, 1], [8])]),
+                                                  {"city": "Valencia", "vose_only": True}, ANCHOR)
+        self.assertNotIn("Cliff", r)
+
+    def test_vose_this_week_still_counts(self):
+        r = self.scraper.apply_subscriber_filters(self._f([_cinema("kinepolis", [0], [3])]),
+                                                  {"city": "Valencia", "vose_only": True}, ANCHOR)
+        self.assertTrue(r["Cliff"]["any_vose"])
+
+    def test_week_starts_at_the_send_day(self):
+        # Sent 2 days from now: day 8 is inside that email's week
+        later = ANCHOR + timedelta(days=2)
+        r = self.scraper.apply_subscriber_filters(self._f([_cinema("kinepolis", [2], [8])]),
+                                                  {"city": "Valencia"}, later)
+        self.assertTrue(r["Cliff"]["any_vose"])
+
+    def test_film_with_no_session_in_the_week_is_left_out(self):
+        r = self.scraper.apply_subscriber_filters(self._f([_cinema("kinepolis", [10], [10])]),
+                                                  {"city": "Valencia"}, ANCHOR)
+        self.assertNotIn("Cliff", r)
+
+    def test_pipeline_passes_the_send_day(self):
+        with open(os.path.join(ROOT, "pipeline.py"), encoding="utf-8") as fh:
+            self.assertIn("apply_subscriber_filters(films, sub, anchor)", fh.read())
+
+
 class DailyCommit(unittest.TestCase):
     def test_daily_commit_includes_the_english_pages(self):
         with open(os.path.join(ROOT, "run_pipeline.ps1"), encoding="utf-8") as fh:
